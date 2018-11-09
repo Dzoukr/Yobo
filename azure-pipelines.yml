@@ -12,3 +12,9 @@ variables:
 steps:
 - script: fake build -t publish
   displayName: 'Publish'
+
+# Publish Pipeline Artifact
+- task: PublishPipelineArtifact@0
+  inputs:
+    artifactName: 'yobo-app'
+    targetPath: ./deploy

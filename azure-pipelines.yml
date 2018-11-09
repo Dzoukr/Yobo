@@ -12,9 +12,16 @@ variables:
 steps:
 - script: fake build -t publish
   displayName: 'Publish'
-
+  
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: ./deploy
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip' 
+    replaceExistingArchive: true 
+    
 # Publish Pipeline Artifact
 - task: PublishPipelineArtifact@0
   inputs:
-    artifactName: 'yobo-app'
-    targetPath: ./deploy
+    artifactName: yobo-app.$(Build.BuildId).zip
+    targetPath: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip' 

@@ -16,6 +16,7 @@ steps:
 - task: ArchiveFiles@2
   inputs:
     rootFolderOrFile: ./deploy
+    includeRootFolder: false
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip' 
     replaceExistingArchive: true 
@@ -23,8 +24,4 @@ steps:
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip'
-    #artifactName: 'drop' 
-    #publishLocation: 'Container' # Options: container, filePath
-    #targetPath: # Required when publishLocation == FilePath
-    #parallel: false # Optional
-    #parallelCount: # Optional
+    artifactName: 'yobo-app'

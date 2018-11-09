@@ -11,17 +11,18 @@ variables:
 
 steps:
 - script: fake build -t publish
-  displayName: 'Publish'
+  displayName: 'Build'
   
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: ./deploy
-    includeRootFolder: false
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip' 
-    replaceExistingArchive: true 
+# - task: ArchiveFiles@2
+#   inputs:
+#     rootFolderOrFile: ./deploy
+#     includeRootFolder: false
+#     archiveType: 'zip'
+#     archiveFile: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip' 
+#     replaceExistingArchive: true 
 
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifacts'
   inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)/yobo-app.$(Build.BuildId).zip'
+    pathtoPublish: './deploy'
     artifactName: 'yobo-app'

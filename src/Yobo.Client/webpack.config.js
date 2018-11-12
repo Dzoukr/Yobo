@@ -1,6 +1,8 @@
 var path = require("path");
 var webpack = require("webpack");
 var MinifyPlugin = require("terser-webpack-plugin");
+var HtmlWebpackPlugin = require('html-webpack-plugin')
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 function resolve(filePath) {
     return path.join(__dirname, filePath)
@@ -12,7 +14,8 @@ var CONFIG = {
             "whatwg-fetch",
             "@babel/polyfill",
             resolve("./Yobo.Client.fsproj")
-        ],
+        ]
+        ,
         "login": [
             "whatwg-fetch",
             "@babel/polyfill",
@@ -29,8 +32,6 @@ var CONFIG = {
         index: resolve("./index.html")
     },
     contentBase: resolve("./public"),
-    // Use babel-preset-env to generate JS compatible with most-used browsers.
-    // More info at https://github.com/babel/babel/blob/master/packages/babel-preset-env/README.md
     babel: {
         presets: [
             ["@babel/preset-env", {
@@ -45,17 +46,27 @@ var CONFIG = {
     }
 }
 
-
 var isProduction = process.argv.indexOf("-p") >= 0;
 console.log("Bundling for " + (isProduction ? "production" : "development") + "...");
+
+var commonPlugins = [
+    new HtmlWebpackPlugin({
+        chunks: ['app'],
+        template: resolve('./public/index.html'),
+        filename: resolve('./output/index.html')
+    }),
+    new HtmlWebpackPlugin({
+        chunks: ['login'],
+        template: resolve('./public/login.html'),
+        filename: resolve('./output/login.html')
+    })
+]
 
 module.exports = {
     entry : CONFIG.fsharpEntry,
     output: {
-        path: resolve('./public/js'),
-        publicPath: "/js",
-        //filename: isProduction ? '[name].[hash].js' : '[name].js'
-        filename: '[name].js'
+        path: resolve('./output'),
+        filename: isProduction ? '[name].[hash].js' : '[name].js'
     },
     mode: isProduction ? "production" : "development",
     devtool: isProduction ? undefined : "source-map",
@@ -63,8 +74,6 @@ module.exports = {
         symlinks: false
     },
     optimization: {
-        // Split the code coming from npm packages into a different file.
-        // 3rd party dependencies change less often, let the browser cache them.
         splitChunks: {
             cacheGroups: {
                 commons: {
@@ -76,13 +85,14 @@ module.exports = {
         },
         minimizer: isProduction ? [new MinifyPlugin()] : []
     },
-    // DEVELOPMENT
-    //      - HotModuleReplacementPlugin: Enables hot reloading when code changes without refreshing
-    plugins: isProduction ? [] : [
+    plugins: isProduction ? commonPlugins.concat ( [
+        new CopyWebpackPlugin([
+            { from: resolve('./public') }
+        ])
+    ]) : commonPlugins.concat ([
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin()
-    ],
-    // Configuration for webpack-dev-server
+    ]),
     devServer: {
         proxy: CONFIG.devServerProxy,
         hot: true,
@@ -90,8 +100,6 @@ module.exports = {
         historyApiFallback: CONFIG.historyApiFallback,
         contentBase: CONFIG.contentBase
     },
-    // - fable-loader: transforms F# into JS
-    // - babel-loader: transforms JS to old syntax (compatible with old browsers)
     module: {
         rules: [
             {

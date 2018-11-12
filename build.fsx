@@ -14,6 +14,7 @@ open Fake.IO
 
 let serverPath = Path.getFullName "./src/Yobo.API"
 let clientPath = Path.getFullName "./src/Yobo.Client"
+let clientOutputDir = clientPath + "/output"
 let deployDir = Path.getFullName "./deploy"
 
 let platformTool tool winTool =
@@ -53,7 +54,7 @@ let openBrowser url =
     |> ignore
 
 Target.create "Clean" (fun _ ->
-    Shell.cleanDirs [deployDir]
+    Shell.cleanDirs [deployDir;clientOutputDir]
 )
 
 Target.create "InstallClient" (fun _ ->
@@ -99,7 +100,7 @@ Target.create "Publish" (fun _ ->
     let publishArgs = sprintf "publish -c Release -o \"%s\"" deployDir
     runDotNet publishArgs serverPath
 
-    Shell.copyDir publicDir "src/Yobo.Client/public" FileFilter.allFiles
+    Shell.copyDir publicDir "src/Yobo.Client/output" FileFilter.allFiles
 )
 
 

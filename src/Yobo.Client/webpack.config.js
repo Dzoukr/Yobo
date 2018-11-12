@@ -12,6 +12,11 @@ var CONFIG = {
             "whatwg-fetch",
             "@babel/polyfill",
             resolve("./Yobo.Client.fsproj")
+        ],
+        "login": [
+            "whatwg-fetch",
+            "@babel/polyfill",
+            resolve("./Login/Yobo.Client.Login.fsproj")
         ]
     },
     devServerProxy: {

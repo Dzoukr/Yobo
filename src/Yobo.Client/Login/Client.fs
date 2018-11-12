@@ -32,16 +32,18 @@ type Msg =
 let initialCounter = fetchAs<Counter> "/api/init" (Decode.Auto.generateDecoder<Counter>(true))
 
 // defines the initial state and initial command (= side-effect) of the application
-let init () : Model * Cmd<Msg> =
-    let initialModel = { Counter = None }
-    let loadCountCmd =
-        Cmd.ofPromise
-            initialCounter
-            []
-            (Ok >> InitialCountLoaded)
-            (Error >> InitialCountLoaded)
-    initialModel, loadCountCmd
+// let init  : Model * Cmd<Msg> =
+//     let initialModel = { Counter = None }
+//     let loadCountCmd =
+//         Cmd.ofPromise
+//             initialCounter
+//             []
+//             (Ok >> InitialCountLoaded)
+//             (Error >> InitialCountLoaded)
+//     initialModel, loadCountCmd
 
+let init () =
+    { Counter = Some { Value = 123; Message = "TOTO JE LOGIN"}}, Cmd.none
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
 // It can also run side-effects (encoded as commands) like calling the server via Http.
@@ -70,7 +72,7 @@ let safeComponents =
     let components =
         span [ ]
            [
-             a [ Href "/login.html" ] [ str "LOGIN" ]
+             a [ Href "/test.html" ] [ str "TEST" ]
              str ", "
              a [ Href "https://github.com/giraffe-fsharp/Giraffe" ] [ str "Giraffe" ]
              str ", "
@@ -93,7 +95,7 @@ let show = function
 let button txt onClick =
     Button.button
         [ Button.IsFullWidth
-          Button.Color IsDanger
+          Button.Color IsPrimary
           Button.OnClick onClick ]
         [ str txt ]
 

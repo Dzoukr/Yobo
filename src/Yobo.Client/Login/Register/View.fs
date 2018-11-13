@@ -10,9 +10,17 @@ open Yobo.Client.Login.Register.Domain
 
 let render (state : State) (dispatch : Msg -> unit) =
     
-    let txtIn m =
+    let txtIn m err =
+        let error = state.ValidationErrors |> List.tryFind (fun (n,_) -> n = err) |> Option.map snd
+        let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
+        let help = if error.IsSome then 
+                    Help.help [ Help.Color IsDanger ]
+                        [ str error.Value ]
+                   else span [] []
+
         Control.div [] [
-            Input.text [ Input.Option.OnChange (fun e -> !!e.target?value |> m |> dispatch) ]
+            Input.text [ clr; Input.Option.OnChange (fun e -> !!e.target?value |> m |> dispatch); ]
+            help
         ]
 
     let pwdIn m =
@@ -37,13 +45,13 @@ let render (state : State) (dispatch : Msg -> unit) =
                 Heading.h1 [ ] [ str "Registrace" ]
                 
                 lbl "Křestní jméno"
-                txtIn ChangeFirstName
+                txtIn ChangeFirstName "FirstName"
                 
                 lbl "Příjmení"
-                txtIn ChangeLastName
+                txtIn ChangeLastName "LastName"
 
                 lbl "Email"
-                txtIn ChangeEmail
+                txtIn ChangeEmail "Email"
 
                 lbl "Heslo"
                 pwdIn ChangePassword

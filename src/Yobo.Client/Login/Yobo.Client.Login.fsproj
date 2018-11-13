@@ -4,7 +4,9 @@
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="..\..\Yobo.Shared\Shared.fs" />
+        <Compile Include="..\..\Yobo.Shared\Login\Register\Domain.fs" />
+        <Compile Include="..\..\Yobo.Shared\Login\Register\Validation.fs" />
+        
         <Compile Include="Router.fs" />
         <Compile Include="SignIn\Domain.fs" />
         <Compile Include="SignIn\View.fs" />

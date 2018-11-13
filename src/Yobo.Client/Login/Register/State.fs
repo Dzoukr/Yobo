@@ -5,7 +5,9 @@ open Yobo.Client.Login.Register.Domain
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
-    | Register -> { state with IsRegistering = true }, Cmd.none
+    | Register -> 
+        let errs = state.Account |> Yobo.Shared.Login.Register.Validation.validateAccount
+        { state with IsRegistering = true; ValidationErrors = errs }, Cmd.none
     | ChangeFirstName v -> { state with Account = { state.Account with FirstName = v }}, Cmd.none
     | ChangeLastName v -> { state with Account = { state.Account with LastName = v }}, Cmd.none
     | ChangeEmail v -> { state with Account = { state.Account with Email = v }}, Cmd.none

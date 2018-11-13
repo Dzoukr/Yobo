@@ -1,29 +1,17 @@
 module Yobo.Client.Login.Register.Domain
 
-type Account = {
-    FirstName: string
-    LastName: string
-    Email: string
-    Password: string
-    SecondPassword: string
-}
-with
-    static member Init = {
-        FirstName = ""
-        LastName = ""
-        Email = ""
-        Password = ""
-        SecondPassword = ""
-    }
+open Yobo.Shared.Login.Register.Domain
 
 type State = {
     IsRegistering : bool
     Account : Account
+    ValidationErrors: (string * string) list
 }
 with
     static member Init = {
         IsRegistering = false
         Account = Account.Init
+        ValidationErrors = []
     }
 
 type Msg =

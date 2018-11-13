@@ -5,19 +5,19 @@ open Elmish.Browser.Navigation
 open Fable.Import
 
 type Page =
-    | Login
+    | SignIn
     | Register
     | ForgottenPassword
     with
         member x.ToHash() = 
             match x with
-            | Login -> "#login"
+            | SignIn -> "#signIn"
             | Register -> "#register"
             | ForgottenPassword -> "#forgottenPassword"
 
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
-        map Login (s "login")
+        map SignIn (s "signIn")
         map Register (s "register")
         map ForgottenPassword (s "forgottenPassword")
     ]

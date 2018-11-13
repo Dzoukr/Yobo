@@ -15,7 +15,6 @@ Program.mkProgram State.init State.update View.render
 |> Program.toNavigable (parseHash Router.pageParser) State.urlUpdate
 #if DEBUG
 |> Program.withConsoleTrace
-|> Program.withHMR
 #endif
 |> Program.withReact "elmish-app"
 #if DEBUG

@@ -6,7 +6,16 @@
     <ItemGroup>
         <Compile Include="..\..\Yobo.Shared\Shared.fs" />
         <Compile Include="Router.fs" />
+        <Compile Include="SignIn\Domain.fs" />
+        <Compile Include="SignIn\View.fs" />
+        
+        <Compile Include="Register\Domain.fs" />
+        <Compile Include="Register\View.fs" />
+        
         <Compile Include="Domain.fs" />
+        <Compile Include="SignIn\State.fs" />
+        <Compile Include="Register\State.fs" />
+
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />
         <Compile Include="App.fs" />

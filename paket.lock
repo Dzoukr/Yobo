@@ -1,3 +1,5 @@
+
+
 GROUP Build
 STORAGE: NONE
 RESTRICTION: == netstandard2.0
@@ -574,6 +576,11 @@ NUGET
     Fable.Elmish (2.0)
       Fable.Core (>= 2.0)
       Fable.PowerPack (>= 2.0.1)
+      FSharp.Core (>= 4.5.2)
+    Fable.Elmish.Browser (2.1)
+      Fable.Core (>= 2.0)
+      Fable.Elmish (>= 2.0)
+      Fable.Import.Browser (>= 1.3)
       FSharp.Core (>= 4.5.2)
     Fable.Elmish.Debugger (2.0.2)
       Fable.Core (>= 2.0)

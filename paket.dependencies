@@ -21,6 +21,7 @@ group Client
     nuget Fable.Elmish.HMR ~> 2
     nuget Fable.React ~> 4
     nuget Fulma ~> 1
+    nuget Fable.Elmish.Browser ~> 2
 
     clitool dotnet-fable ~> 2
 

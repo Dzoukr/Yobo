@@ -1,17 +1,18 @@
 module Yobo.Client.Login.Register.Domain
 
 open Yobo.Shared.Login.Register.Domain
+open Yobo.Shared.Validation
 
 type State = {
     IsRegistering : bool
     Account : Account
-    ValidationErrors: (string * string) list
+    ValidationResult: ValidationResult
 }
 with
     static member Init = {
         IsRegistering = false
         Account = Account.Init
-        ValidationErrors = []
+        ValidationResult = ValidationResult.Empty
     }
 
 type Msg =

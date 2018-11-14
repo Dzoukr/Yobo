@@ -4,6 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="..\..\Yobo.Shared\Validation.fs" />
         <Compile Include="..\..\Yobo.Shared\Login\Register\Domain.fs" />
         <Compile Include="..\..\Yobo.Shared\Login\Register\Validation.fs" />
         

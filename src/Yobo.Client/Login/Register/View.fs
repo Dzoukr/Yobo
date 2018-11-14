@@ -11,7 +11,7 @@ open Yobo.Client.Login.Register.Domain
 let render (state : State) (dispatch : Msg -> unit) =
     
     let txtIn m err =
-        let error = state.ValidationErrors |> List.tryFind (fun (n,_) -> n = err) |> Option.map snd
+        let error = state.ValidationResult.TryGetMessage err
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]

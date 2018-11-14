@@ -2,10 +2,11 @@ module Yobo.Shared.Login.Register.Validation
 
 open System
 open Yobo.Shared.Login.Register.Domain
-
-let validateNotEmpty msg name value errors = if String.IsNullOrEmpty(value) then (name, msg) :: errors else errors
+open Yobo.Shared.Validation
 
 let validateAccount (acc:Account) =
-    []
-    |> validateNotEmpty "Blablab" "FirstName" acc.FirstName
-    |> validateNotEmpty "Blablab" "LastName" acc.LastName
+    [
+        validateNotEmpty "Blablab" "FirstName" (fun x -> x.FirstName)
+        validateNotEmpty "Blablab" "LastName" (fun x -> x.LastName)
+        validateLongerThan 5 "Heslo musí být delší než 5 znaků" "Password" (fun x -> x.Password)
+    ] |> validate acc

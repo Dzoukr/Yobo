@@ -7,10 +7,10 @@ open Yobo.Shared.Text
 
 let validateAccount (acc:Account) =
     [
-        FirstName, validateNotEmpty (fun x -> x.FirstName)
-        LastName, validateNotEmpty (fun x -> x.LastName)
-        Email, validateNotEmpty (fun x -> x.Email)
-        Password, validateLongerThan 5 (fun x -> x.Password)
-        SecondPassword, validateLongerThan 5 (fun x -> x.SecondPassword)
-        SecondPassword, validateEquals (fun x -> x.Password) (fun x -> x.SecondPassword)
+        validateNotEmpty FirstName (fun x -> x.FirstName)
+        validateNotEmpty LastName (fun x -> x.LastName)
+        validateNotEmpty Email (fun x -> x.Email)
+        validateLongerThan 5 Password (fun x -> x.Password)
+        validateLongerThan 5 SecondPassword (fun x -> x.SecondPassword)
+        validateEquals Password SecondPassword (fun x -> x.Password) (fun x -> x.SecondPassword)
     ] |> validate acc

@@ -3,6 +3,11 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
     </PropertyGroup>
+    <PropertyGroup>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <WarningsAsErrors>FS0025</WarningsAsErrors>
+        <NoWarn>2003</NoWarn>
+    </PropertyGroup>
     <ItemGroup>
         <Compile Include="..\..\Yobo.Shared\Text.fs" />
         <Compile Include="..\..\Yobo.Shared\Validation.fs" />

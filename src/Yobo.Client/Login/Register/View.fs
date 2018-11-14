@@ -8,16 +8,17 @@ open Fable.Core.JsInterop
 open Yobo.Client.Login.Register.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
+open Yobo.Shared
 
 
 let render (state : State) (dispatch : Msg -> unit) =
     
     let regInput typ msgType txt =
-        let error = state.ValidationResult.TryGetError txt
+        let error = state.ValidationResult.TryGetFieldError txt
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]
-                        [ str (error.Value |> Locale.errorToCz txt ) ]
+                        [ str (error.Value |> Locale.errorToCz ) ]
                    else span [] []
         Control.div [] [
             typ [
@@ -27,7 +28,7 @@ let render (state : State) (dispatch : Msg -> unit) =
             help
         ]
 
-    let lbl txt = Label.label [] [ str (Locale.toCz txt |> Locale.title) ]
+    let lbl txt = Label.label [] [ str (Locale.toTitleCz txt) ]
 
     let btn isLogging =
         let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str "Zaregistrovat se"
@@ -41,7 +42,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         div 
             [ ClassName "box"] 
             [
-                Heading.h1 [ ] [ str "Registrace" ]
+                Heading.h1 [ ] [ str (Registration |> Locale.toTitleCz) ]
                 
                 lbl FirstName
                 regInput Input.text ChangeFirstName FirstName

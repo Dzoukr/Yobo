@@ -5,12 +5,14 @@ open Yobo.Shared.Validation
 
 type State = {
     IsRegistering : bool
+    AlreadyTried : bool
     Account : Account
     ValidationResult: ValidationResult
 }
 with
     static member Init = {
         IsRegistering = false
+        AlreadyTried = false
         Account = Account.Init
         ValidationResult = ValidationResult.Empty
     }

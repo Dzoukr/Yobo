@@ -5,30 +5,29 @@ open Fable.Helpers.React.Props
 open Fulma
 open Fable.Core.JsInterop
 
-open Yobo.Client.Login
 open Yobo.Client.Login.Register.Domain
+open Yobo.Shared
+open Yobo.Shared.Text
+
 
 let render (state : State) (dispatch : Msg -> unit) =
     
-    let txtIn m err =
-        let error = state.ValidationResult.TryGetMessage err
+    let regInput typ msgType txt =
+        let error = state.ValidationResult.TryGetError txt
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]
-                        [ str error.Value ]
+                        [ str (error.Value |> Locale.errorToCz txt ) ]
                    else span [] []
-
         Control.div [] [
-            Input.text [ clr; Input.Option.OnChange (fun e -> !!e.target?value |> m |> dispatch); ]
+            typ [
+                clr
+                Input.Option.OnChange (fun e -> !!e.target?value |> msgType |> dispatch)
+            ]
             help
         ]
 
-    let pwdIn m =
-        Control.div [] [
-            Input.password [ Input.Option.OnChange (fun e -> !!e.target?value |> m |> dispatch) ]
-        ]
-
-    let lbl s = Label.label [] [ str s ]
+    let lbl txt = Label.label [] [ str (Locale.toCz txt |> Locale.title) ]
 
     let btn isLogging =
         let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str "Zaregistrovat se"
@@ -44,20 +43,20 @@ let render (state : State) (dispatch : Msg -> unit) =
             [
                 Heading.h1 [ ] [ str "Registrace" ]
                 
-                lbl "Křestní jméno"
-                txtIn ChangeFirstName "FirstName"
+                lbl FirstName
+                regInput Input.text ChangeFirstName FirstName
                 
-                lbl "Příjmení"
-                txtIn ChangeLastName "LastName"
+                lbl LastName
+                regInput Input.text ChangeLastName LastName
 
-                lbl "Email"
-                txtIn ChangeEmail "Email"
+                lbl Email
+                regInput Input.email ChangeEmail Email
 
-                lbl "Heslo"
-                pwdIn ChangePassword
+                lbl Password
+                regInput Input.password ChangePassword Password
                 
-                lbl "Heslo (znovu)"
-                pwdIn ChangeSecondPassword
+                lbl SecondPassword
+                regInput Input.password ChangeSecondPassword SecondPassword
 
                 btn state.IsRegistering
                 str (state.ToString())

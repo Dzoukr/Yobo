@@ -1,37 +1,44 @@
 module Yobo.Shared.Validation
 
 open System
+open Yobo.Shared.Text
 
-type ValidationError = {
-    Name: string
-    Message: string
-}
+type ValidationError = 
+    | IsEmpty
+    | MustBeLongerThan of int
+    | ValuesNotEqual
 
 type ValidationResult = {
     IsValid : bool
-    Errors: ValidationError list
-    TryGetMessage: string -> string option
+    Errors: (TextValue * ValidationError) list
+    TryGetError: TextValue -> ValidationError option
 }
 with
-    static member FromErrorList (errs:ValidationError list) = {
+    static member FromErrorList (errs:(TextValue * ValidationError) list) = {
         IsValid = errs.Length = 0
         Errors = errs
-        TryGetMessage = (fun x -> errs |> List.tryFind (fun e -> e.Name = x ) |> Option.map (fun x -> x.Message))
+        TryGetError = (fun x -> errs |> List.tryFind (fun (e,_) -> e = x ) |> Option.map snd)
     }
 
     static member Empty = ValidationResult.FromErrorList []
 
-let validateNotEmpty msg name getter args = 
+let validateNotEmpty getter args = 
     let value = args |> getter
-    if String.IsNullOrWhiteSpace(value) then Some {Name = name; Message = msg } else None
+    if String.IsNullOrWhiteSpace(value) then IsEmpty |> Some else None
 
-let validateLongerThan l msg name getter args =
+let validateLongerThan l getter args =
     let value : string = args |> getter
-    if value.Length <= l then Some {Name = name; Message = msg } else None 
+    if value.Length <= l then MustBeLongerThan(l) |> Some else None 
 
-let validate (arg:'a) (fns: ('a -> ValidationError option) list) =
+let validateEquals fstGetter sndGetter args =
+    let val1 = args |> fstGetter
+    let val2 = args |> sndGetter
+    if val1 <> val2 then ValuesNotEqual |> Some else None
+
+
+let validate (arg:'a) (fns: (TextValue * ('a -> ValidationError option)) list) =
     fns 
-    |> List.map (fun x -> arg |> x) 
-    |> List.filter (Option.isSome)
-    |> List.map Option.get
+    |> List.map (fun (n,fn) -> n, (arg |> fn))
+    |> List.filter (snd >> Option.isSome)
+    |> List.map (fun (n,e) -> n, Option.get(e))
     |> ValidationResult.FromErrorList

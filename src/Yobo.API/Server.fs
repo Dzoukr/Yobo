@@ -23,12 +23,19 @@ let publicPath = Path.GetFullPath "wwwroot"
 let port = 8085us
 
 let getInitCounter () : Task<Counter> = task { return { Value = 999; Message = "Nazdar volecku"} }
+
+open Yobo.Shared.Communication
+open Yobo.Shared.Text
+open Yobo.Shared.Validation
+
+
 let webApp =
-    route "/api/init" >=>
+    
+    route "/api/register" >=>
         fun next ctx ->
             task {
-                let! counter = getInitCounter()
-                return! Successful.OK counter next ctx
+                let err = TextValue.FirstName |> ValidationError.IsEmpty |> ServerError.ValidationError
+                return! RequestErrors.BAD_REQUEST err next ctx
             }
 
 let configureApp (app : IApplicationBuilder) =
@@ -38,10 +45,7 @@ let configureApp (app : IApplicationBuilder) =
 
 let configureServices (services : IServiceCollection) =
     services.AddGiraffe() |> ignore
-    let fableJsonSettings = Newtonsoft.Json.JsonSerializerSettings()
-    fableJsonSettings.Converters.Add(Fable.JsonConverter())
-    fableJsonSettings.ContractResolver <- Newtonsoft.Json.Serialization.CamelCasePropertyNamesContractResolver()
-    services.AddSingleton<IJsonSerializer>(NewtonsoftJsonSerializer fableJsonSettings) |> ignore
+    services.AddSingleton<IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer()) |> ignore
 
 WebHostBuilder()
     .UseKestrel()

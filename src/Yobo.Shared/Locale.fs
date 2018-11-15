@@ -12,6 +12,7 @@ let toCz = function
     | SecondPassword -> "heslo (pro kontrolu)"
     | Email -> "email"
     | Registration -> "registrace"
+    | ToRegister -> "zaregistrovat se"
 
 let title (s:string) = Char.ToUpperInvariant(s.[0]).ToString() + s.Substring(1).ToLowerInvariant()
 

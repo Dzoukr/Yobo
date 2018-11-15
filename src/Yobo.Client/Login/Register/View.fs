@@ -8,8 +8,6 @@ open Fable.Core.JsInterop
 open Yobo.Client.Login.Register.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
-open Yobo.Shared
-
 
 let render (state : State) (dispatch : Msg -> unit) =
     
@@ -31,7 +29,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let lbl txt = Label.label [] [ str (Locale.toTitleCz txt) ]
 
     let btn isLogging =
-        let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str "Zaregistrovat se"
+        let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str (Locale.toTitleCz ToRegister)
         Control.div [] [
             Button.button 
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Register)  ]
@@ -42,7 +40,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         div 
             [ ClassName "box"] 
             [
-                Heading.h1 [ ] [ str (Registration |> Locale.toTitleCz) ]
+                Heading.h1 [ ] [ str (Locale.toTitleCz Registration) ]
                 
                 lbl FirstName
                 regInput Input.text ChangeFirstName FirstName
@@ -60,7 +58,9 @@ let render (state : State) (dispatch : Msg -> unit) =
                 regInput Input.password ChangeSecondPassword SecondPassword
 
                 btn state.IsRegistering
+                str "AAAAA"
                 str (state.ToString())
+
             ]
    
     Hero.hero [ ]

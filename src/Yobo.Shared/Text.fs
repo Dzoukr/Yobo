@@ -7,3 +7,4 @@ type TextValue =
     | SecondPassword
     | Email
     | Registration
+    | ToRegister

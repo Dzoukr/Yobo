@@ -8,6 +8,8 @@ group Server
     nuget Microsoft.AspNetCore
     nuget Microsoft.AspNetCore.StaticFiles
     nuget Fable.JsonConverter
+    nuget Thoth.Json.Net
+    nuget Thoth.Json.Giraffe
 
 group Client
     source https://api.nuget.org/v3/index.json

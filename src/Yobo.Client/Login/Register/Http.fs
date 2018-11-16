@@ -9,7 +9,7 @@ open Thoth.Json
 open Fable.PowerPack.Fetch
 open Fable.Import
 
-let private toJson v = Encode.Auto.toString(0, v, true)
+let private toJson v = Encode.Auto.toString(0, v)
 //let private errorDecoder = Decode.Auto.generateDecoder<ServerError>()
 let tryToServerError s =
     match Decode.Auto.fromString<ServerError>(s) with

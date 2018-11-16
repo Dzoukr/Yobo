@@ -1,0 +1,4 @@
+group Core
+    FSharp.Core
+    CosmoStore
+    Newtonsoft.Json

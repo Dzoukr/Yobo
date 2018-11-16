@@ -34,6 +34,7 @@ let webApp =
     route "/api/register" >=>
         fun next ctx ->
             task {
+                let! acc = ctx.BindJsonAsync<Yobo.Shared.Login.Register.Domain.Account>()
                 let err = TextValue.FirstName |> ValidationError.IsEmpty |> ServerError.ValidationError
                 return! RequestErrors.BAD_REQUEST err next ctx
             }

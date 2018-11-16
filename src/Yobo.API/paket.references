@@ -3,6 +3,5 @@ group Server
     Giraffe
     Microsoft.AspNetCore
     Microsoft.AspNetCore.StaticFiles
-    Fable.JsonConverter
     Thoth.Json.Net
     Thoth.Json.Giraffe

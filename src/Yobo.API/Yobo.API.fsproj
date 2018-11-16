@@ -1,16 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.Web">
-    <PropertyGroup>
-        <AssemblyName>Yobo.API</AssemblyName>
-        <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp2.1</TargetFramework>
-    </PropertyGroup>
-    <ItemGroup>
-        <Compile Include="..\Yobo.Shared\Shared.fs" />
-        <Compile Include="..\Yobo.Shared\Text.fs" />
-        <Compile Include="..\Yobo.Shared\Validation.fs" />
-        <Compile Include="..\Yobo.Shared\Communication.fs" />
-        <Compile Include="Server.fs" />
-    </ItemGroup>
-    <Import Project="..\..\.paket\Paket.Restore.targets" />
+  <PropertyGroup>
+    <AssemblyName>Yobo.API</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\Yobo.Shared\Shared.fs" />
+    <Compile Include="..\Yobo.Shared\Text.fs" />
+    <Compile Include="..\Yobo.Shared\Validation.fs" />
+    <Compile Include="..\Yobo.Shared\Communication.fs" />
+    <Compile Include="..\Yobo.Shared\Login\Register\Domain.fs" />
+    <Compile Include="Server.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Yobo.Core\Yobo.Core.fsproj" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

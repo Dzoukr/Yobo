@@ -7,9 +7,17 @@ group Server
     nuget Giraffe
     nuget Microsoft.AspNetCore
     nuget Microsoft.AspNetCore.StaticFiles
-    nuget Fable.JsonConverter
     nuget Thoth.Json.Net
     nuget Thoth.Json.Giraffe
+
+group Core
+    source https://api.nuget.org/v3/index.json
+    framework: netstandard2.0
+    storage: none
+
+    nuget FSharp.Core
+    nuget CosmoStore
+    nuget Newtonsoft.Json
 
 group Client
     source https://api.nuget.org/v3/index.json

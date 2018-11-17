@@ -28,6 +28,10 @@ with
     }
 
     static member Empty = ValidationResult.FromErrorList []
+    static member FromResult result =
+        match result with
+        | Ok _ -> ValidationResult.Empty
+        | Error errs -> ValidationResult.FromErrorList errs
 
 let validateNotEmpty txt getter args = 
     let value = args |> getter
@@ -47,4 +51,7 @@ let validate (arg:'a) (fns: ('a -> ValidationError option) list) =
     |> List.map (fun (fn) -> arg |> fn)
     |> List.filter (Option.isSome)
     |> List.map (Option.get)
-    |> ValidationResult.FromErrorList
+    |> (fun errors -> 
+        if errors.Length = 0 then Ok arg
+        else Error errors
+    )

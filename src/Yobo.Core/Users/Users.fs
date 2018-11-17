@@ -21,3 +21,5 @@ type Event =
 type State = {
     Id : Guid
 }
+with
+    static member Init = { Id = Guid.Empty }

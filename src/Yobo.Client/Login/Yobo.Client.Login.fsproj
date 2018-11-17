@@ -9,13 +9,6 @@
         <NoWarn>2003</NoWarn>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="..\..\Yobo.Shared\Text.fs" />
-        <Compile Include="..\..\Yobo.Shared\Validation.fs" />
-        <Compile Include="..\..\Yobo.Shared\Communication.fs" />
-        <Compile Include="..\..\Yobo.Shared\Locale.fs" />
-        <Compile Include="..\..\Yobo.Shared\Login\Register\Domain.fs" />
-        <Compile Include="..\..\Yobo.Shared\Login\Register\Validation.fs" />
-        
         <Compile Include="Router.fs" />
         <Compile Include="SignIn\Domain.fs" />
         <Compile Include="SignIn\View.fs" />
@@ -32,5 +25,8 @@
         <Compile Include="View.fs" />
         <Compile Include="App.fs" />
     </ItemGroup>
+    <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+  </ItemGroup>
     <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -8,8 +8,6 @@ open Yobo.Shared
 open Thoth.Json
 open Fable.Import
 
-//let initialCounter = fetchAs<Counter> "/api/init" (Decode.Auto.generateDecoder<Counter>(true))
-
 let urlUpdate (result: Option<Router.Page>) state =
     match result with
     | None ->

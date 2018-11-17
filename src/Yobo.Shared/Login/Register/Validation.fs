@@ -1,6 +1,5 @@
 module Yobo.Shared.Login.Register.Validation
 
-open System
 open Yobo.Shared.Login.Register.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Text

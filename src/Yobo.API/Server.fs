@@ -22,8 +22,6 @@ let publicPath = Path.GetFullPath "wwwroot"
 
 let port = 8085us
 
-let getInitCounter () : Task<Counter> = task { return { Value = 999; Message = "Nazdar volecku"} }
-
 open Yobo.Shared.Communication
 open Yobo.Shared.Text
 open Yobo.Shared.Validation

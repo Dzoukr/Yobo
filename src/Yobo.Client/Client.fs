@@ -9,11 +9,13 @@ open Fable.PowerPack.Fetch
 
 open Thoth.Json
 
-open Yobo.Shared
-
 
 open Fulma
 
+type Counter = {
+    Value : int
+    Message : string
+}
 
 // The model holds data that you want to keep track of while the application is running
 // in this case, we are keeping track of a counter
@@ -29,18 +31,18 @@ type Msg =
 | InitialCountLoaded of Result<Counter, exn>
 | Reset
 
-let initialCounter = fetchAs<Counter> "/api/init" (Decode.Auto.generateDecoder<Counter>(true))
+//let initialCounter = fetchAs<Counter> "/api/init" (Decode.Auto.generateDecoder<Counter>(true))
 
 // defines the initial state and initial command (= side-effect) of the application
 let init () : Model * Cmd<Msg> =
     let initialModel = { Counter = None }
-    let loadCountCmd =
-        Cmd.ofPromise
-            initialCounter
-            []
-            (Ok >> InitialCountLoaded)
-            (Error >> InitialCountLoaded)
-    initialModel, loadCountCmd
+    // let loadCountCmd =
+    //     Cmd.ofPromise
+    //         initialCounter
+    //         []
+    //         (Ok >> InitialCountLoaded)
+    //         (Error >> InitialCountLoaded)
+    initialModel, Cmd.none
 
 
 // The update function computes the next state of the application based on the current state and the incoming events/messages
@@ -58,11 +60,7 @@ let update (msg : Msg) (currentModel : Model) : Model * Cmd<Msg> =
         let nextModel = { Counter = Some initialCount }
         nextModel, Cmd.none
     | _, Reset ->
-        currentModel, Cmd.ofPromise
-                        initialCounter
-                        []
-                        (Ok >> InitialCountLoaded)
-                        (Error >> InitialCountLoaded)
+        currentModel, Cmd.none
     | _ -> currentModel, Cmd.none
 
 

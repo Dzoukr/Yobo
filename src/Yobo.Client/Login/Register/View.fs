@@ -58,7 +58,7 @@ let render (state : State) (dispatch : Msg -> unit) =
                 regInput Input.password ChangeSecondPassword SecondPassword
 
                 btn state.IsRegistering
-                str "AAAAA"
+                
                 str (state.ToString())
 
             ]

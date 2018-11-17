@@ -11,6 +11,8 @@ open System
 open Fake.Core
 open Fake.DotNet
 open Fake.IO
+open Fake.IO.Globbing.Operators
+open Fake.Core.TargetOperators
 
 let serverPath = Path.getFullName "./src/Yobo.API"
 let clientPath = Path.getFullName "./src/Yobo.Client"
@@ -54,7 +56,11 @@ let openBrowser url =
     |> ignore
 
 Target.create "Clean" (fun _ ->
-    Shell.cleanDirs [deployDir;clientOutputDir]
+    !! "src/*/bin"
+    ++ "src/*/obj"
+    ++ deployDir
+    ++ clientOutputDir
+    |> Shell.cleanDirs
 )
 
 Target.create "InstallClient" (fun _ ->

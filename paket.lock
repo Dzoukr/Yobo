@@ -1152,7 +1152,9 @@ NUGET
     WindowsAzure.Storage (9.3.2)
       NETStandard.Library (>= 1.6.1)
       Newtonsoft.Json (>= 10.0.2)
-
+GIST
+  remote: Dzoukr/bfcf416edaefbb8555586cf80fc2006e
+    FSharp.Rop.fs (0252e9c7e387248f69ddc6b07853d335b2109516)
 GROUP Server
 STORAGE: NONE
 RESTRICTION: == netcoreapp2.1

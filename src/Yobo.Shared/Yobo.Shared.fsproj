@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Yobo.Shared</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\paket-files\core\Dzoukr\bfcf416edaefbb8555586cf80fc2006e\FSharp.Rop.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/FSharp.Rop.fs</Link>
+    </Compile>
+    <Compile Include="Text.fs" />
+    <Compile Include="Domain.fs" />
+    <Compile Include="Validation.fs" />
+    <Compile Include="Locale.fs" />
+    <Compile Include="Login\Register\Domain.fs" />
+    <Compile Include="Login\Register\Validation.fs" />
+    <Compile Include="Communication.fs" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

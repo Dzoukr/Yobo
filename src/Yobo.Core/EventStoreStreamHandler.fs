@@ -3,11 +3,13 @@ module Yobo.Core.EventStoreStreamHandler
 open System
 open Newtonsoft.Json.Linq
 open Yobo.Shared.Validation
+open Yobo.Shared.Domain
+open FSharp.Rop
+open CosmoStore
+open FSharp.Control.Tasks.V2
 
 type EventStoreError = 
     | General of Exception
-
-type DomainError = TODO
 
 type Aggregate<'state, 'command, 'event> = {
     Init : 'state
@@ -38,3 +40,74 @@ type StreamHandlerSettings<'state, 'command, 'event> = {
     Serializer : EventSerializer<'event>
     Validators : ('command -> Result<'command, ValidationError>) list
 }
+
+let private runValidators validators cmd =
+    let foldFn acc item =
+        match acc with
+        | Error _ -> acc
+        | Ok _ -> cmd |> item
+    validators |> List.fold foldFn (Ok cmd) |> Result.mapError ValidationError
+
+let private toEventWrite corrId (name, data) =
+    let id = Guid.NewGuid()
+    {
+        Id = id
+        CorrelationId = defaultArg corrId id
+        Name = name
+        Data = data
+        Metadata = None
+    }
+
+let private getCurrentStateAndPosition<'state, 'event> (toEvent:string * JToken -> 'event) (init:'state) (apply:'state -> 'event -> 'state) (eventStore:EventStore) streamId = 
+    task {
+        try
+            let toEventFn (e:EventRead) = toEvent(e.Name, e.Data)
+            let! events = eventStore.GetEvents streamId EventsReadRange.AllEvents
+            let expectedPosition = 
+                events 
+                |> List.map (fun x -> x.Position) 
+                |> List.tryLast |> function | None -> 1L | Some p -> p + 1L
+            let domainEvents = events |> List.map toEventFn
+            let currentState = domainEvents |> List.fold apply init
+            return Ok (currentState,expectedPosition)
+        with ex -> return (EventStoreError.General(ex) |> Error)
+    }
+
+let getStreamHandler<'state, 'command, 'event> (settings:StreamHandlerSettings<'state, 'command, 'event>) (eventStore:EventStore) =
+    // state reader
+    let getCurrentStateFn = getCurrentStateAndPosition settings.Serializer.DataToEvent settings.Aggregate.Init settings.Aggregate.Apply eventStore
+    
+    // handle function
+    let handleCmd corrId cmd =
+        task {
+            try
+                match cmd |> runValidators settings.Validators with
+                | Ok cmd ->
+                    let streamId = cmd |> settings.GetStreamId
+                    let! currentStateAndPosition = streamId |> getCurrentStateFn
+                    match (currentStateAndPosition |> Result.mapError EventStoreError) with
+                    | Ok (state,position) ->
+                        match cmd |> settings.Aggregate.Execute state with
+                        | Ok newEvents ->
+                            let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
+                            return Ok newEvents
+                        | Error e -> return e |> StreamHandlerError.DomainError |> Error
+                    | Error e -> return e |> Error
+                | Error vErr -> return vErr |> Error
+            with ex -> return (StreamHandlerError.EventStoreError(EventStoreError.General ex) |> Error)
+        }
+    
+    {
+        GetCurrentStateWithNextPosition = getCurrentStateFn >> Async.AwaitTask >> Async.RunSynchronously
+        GetCurrentState = getCurrentStateFn >> Async.AwaitTask >> Async.RunSynchronously >> Result.map fst
+        HandleCmd = fun cmd -> handleCmd None cmd |> Async.AwaitTask |> Async.RunSynchronously
+        HandleCorrelatedCmd = fun corrId cmd -> handleCmd (Some corrId) cmd |> Async.AwaitTask |> Async.RunSynchronously
+    }
+
+module Extractor =
+    let inline extractId x = (^T:(member Id:Guid)x)
+    let formatId (i:Guid) = i.ToString("N")
+    let inline getIdFromCommand x =
+        x 
+        |> extractId
+        |> formatId

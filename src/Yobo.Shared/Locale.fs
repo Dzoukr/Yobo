@@ -6,6 +6,7 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Text
 
 let toCz = function
+    | Id -> "ID"
     | FirstName -> "křestní jméno"
     | LastName -> "příjmení"
     | Password -> "heslo"
@@ -23,3 +24,4 @@ let errorToCz err =
     | IsEmpty field -> sprintf "Prosím vyplňte %s" (toCz field)
     | MustBeLongerThan (field, l) -> sprintf "%s musí být delší než %i znaků" (field |> toTitleCz) l
     | ValuesNotEqual(f1,f2) -> sprintf "Hodnota u pole %s se neshoduje s hodnotu v poli %s" (toCz f1) (toCz f2)
+    | IsNotValidEmail field -> sprintf "%s není ve správném formátu pro emailovou adresu" (toTitleCz field)

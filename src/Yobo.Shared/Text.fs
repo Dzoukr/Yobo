@@ -1,6 +1,7 @@
 module Yobo.Shared.Text
 
 type TextValue =
+    | Id
     | FirstName
     | LastName
     | Password

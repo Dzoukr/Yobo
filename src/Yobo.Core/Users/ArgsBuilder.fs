@@ -8,7 +8,7 @@ open Yobo.Shared.Login.Register.Domain
 
 // TODO : Move it to Server part
 
-let buildCreate getHash =
+let buildRegister getHash =
     ArgsBuilder.build (fun (acc:Account) ->
         {
             Id = Guid.NewGuid()
@@ -16,6 +16,6 @@ let buildCreate getHash =
             PasswordHash = acc.Password |> getHash
             FirstName = acc.FirstName
             LastName = acc.LastName
-            Email = acc.Email
-        } : CmdArgs.Create
+            Email = acc.Email.ToLower()
+        } : CmdArgs.Register
     ) Validation.validateAccount

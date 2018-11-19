@@ -3,7 +3,12 @@
   <PropertyGroup>
     <AssemblyName>Yobo.Shared</AssemblyName>
     <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
+    </PropertyGroup>
+    <PropertyGroup>
+        <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+        <WarningsAsErrors>FS0025</WarningsAsErrors>
+        <NoWarn>2003</NoWarn>
+    </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\core\Dzoukr\bfcf416edaefbb8555586cf80fc2006e\FSharp.Rop.fs">
       <Paket>True</Paket>

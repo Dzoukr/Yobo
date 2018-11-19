@@ -20,7 +20,7 @@ type Aggregate<'state, 'command, 'event> = {
 type StreamHandlerError =
     | EventStoreError of EventStoreError
     | DomainError of DomainError
-    | ValidationError of ValidationError
+    | ValidationError of ValidationError list
 
 type StreamHandler<'state, 'command, 'event> = {
     GetCurrentState : string -> Result<'state, EventStoreError>
@@ -28,6 +28,15 @@ type StreamHandler<'state, 'command, 'event> = {
     HandleCmd : 'command -> Result<'event list, StreamHandlerError>
     HandleCorrelatedCmd : Guid -> 'command -> Result<'event list, StreamHandlerError>
 }
+
+// Ideas:
+// 1. What about to make Domain error one of Validation errors?
+// 2. Validators to get state?
+
+
+//type TODO<'cmd,'event> =
+//    | Direct of 'cmd
+//    | Compensating of command:'cmd * onSuccess:(unit -> Result<_, StreamHandlerError>) * compesation:'event
 
 type EventSerializer<'event> = {
     EventToData : 'event -> string * JToken
@@ -38,15 +47,15 @@ type StreamHandlerSettings<'state, 'command, 'event> = {
     Aggregate : Aggregate<'state, 'command, 'event>
     GetStreamId : 'command -> string
     Serializer : EventSerializer<'event>
-    Validators : ('command -> Result<'command, ValidationError>) list
+    Validators : ('command -> Result<'command, ValidationError list>) list
 }
 
 let private runValidators validators cmd =
     let foldFn acc item =
-        match acc with
-        | Error _ -> acc
-        | Ok _ -> cmd |> item
-    validators |> List.fold foldFn (Ok cmd) |> Result.mapError ValidationError
+        match cmd |> item with
+        | Error e -> acc @ e
+        | Ok _ -> acc
+    validators |> List.fold foldFn []
 
 let private toEventWrite corrId (name, data) =
     let id = Guid.NewGuid()
@@ -76,13 +85,13 @@ let private getCurrentStateAndPosition<'state, 'event> (toEvent:string * JToken 
 let getStreamHandler<'state, 'command, 'event> (settings:StreamHandlerSettings<'state, 'command, 'event>) (eventStore:EventStore) =
     // state reader
     let getCurrentStateFn = getCurrentStateAndPosition settings.Serializer.DataToEvent settings.Aggregate.Init settings.Aggregate.Apply eventStore
-    
+
     // handle function
     let handleCmd corrId cmd =
         task {
             try
                 match cmd |> runValidators settings.Validators with
-                | Ok cmd ->
+                | [] ->
                     let streamId = cmd |> settings.GetStreamId
                     let! currentStateAndPosition = streamId |> getCurrentStateFn
                     match (currentStateAndPosition |> Result.mapError EventStoreError) with
@@ -91,10 +100,11 @@ let getStreamHandler<'state, 'command, 'event> (settings:StreamHandlerSettings<'
                         | Ok newEvents ->
                             let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
                             return Ok newEvents
+
                         | Error e -> return e |> StreamHandlerError.DomainError |> Error
                     | Error e -> return e |> Error
-                | Error vErr -> return vErr |> Error
-            with ex -> return (StreamHandlerError.EventStoreError(EventStoreError.General ex) |> Error)
+                | errors -> return ValidationError(errors) |> Error
+            with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
     
     {

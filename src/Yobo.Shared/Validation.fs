@@ -7,12 +7,14 @@ type ValidationError =
     | IsEmpty of TextValue
     | MustBeLongerThan of TextValue * int
     | ValuesNotEqual of TextValue * TextValue
+    | IsNotValidEmail of TextValue
 
 let private tryFindErrorForField errs txt =
     let findFn = function
         | IsEmpty t -> txt = t
         | MustBeLongerThan (t,_) -> txt = t
         | ValuesNotEqual (_, t2) -> txt = t2
+        | IsNotValidEmail t -> txt = t
     errs |> List.tryFind findFn
 
 type ValidationResult = {
@@ -26,7 +28,6 @@ with
         Errors = errs
         TryGetFieldError = tryFindErrorForField errs
     }
-
     static member Empty = ValidationResult.FromErrorList []
     static member FromResult result =
         match result with
@@ -45,6 +46,23 @@ let validateEquals fstTxt sndTxt fstGetter sndGetter args =
     let val1 = args |> fstGetter
     let val2 = args |> sndGetter
     if val1 <> val2 then ValuesNotEqual(fstTxt,sndTxt) |> Some else None
+
+let private isValidEmail (value:string) =
+    let parts = value.Split([|'@'|])
+    if parts.Length < 2 then false
+    else
+        let lastPart = parts.[parts.Length - 1]
+        lastPart.Split([|'.'|], StringSplitOptions.RemoveEmptyEntries).Length > 1
+
+let validateNotEmptyGuid txt getter args =
+    let value : Guid = args |> getter
+    if value = Guid.Empty then IsEmpty(txt) |> Some else None
+
+
+let validateEmail txt getter args =
+    let value : string = args |> getter
+    if isValidEmail value then None
+    else IsNotValidEmail(txt) |> Some
 
 let validate (arg:'a) (fns: ('a -> ValidationError option) list) =
     fns 

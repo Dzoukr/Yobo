@@ -8,8 +8,14 @@ let onlyIfDoesNotExist state =
     if state.Id = State.Init.Id then Ok state
     else DomainError.ItemAlreadyExists |> Error
 
+let normalizeCreate (args:CmdArgs.Register) = { args with Email = args.Email.ToLower() }
+
 let execute (state:State) = function
-    | Create args -> onlyIfDoesNotExist state <!> (fun _ -> Created args) <!> List.singleton
+    | Register args ->
+        onlyIfDoesNotExist state
+        <!> (fun _ -> normalizeCreate args)
+        <!> (fun a -> Registered a)
+        <!> List.singleton
 
 let apply (state:State) = function
-    | Created args -> { state with Id = args.Id }
+    | Registered args -> { state with Id = args.Id }

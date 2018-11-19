@@ -1,9 +1,10 @@
 module Yobo.Core.Users.EventSerializer
 
 open Yobo.Core
+
 let toEvent = function
-    | "Created", data -> data |> Serialization.objectFromJToken<CmdArgs.Create> |> Created
+    | "Registered", data -> data |> Serialization.objectFromJToken<CmdArgs.Register> |> Registered
     | n,_ -> failwithf "Unrecognized event %s" n
 
 let toData = function
-    | Created args -> "Created", (args |> Serialization.objectToJToken)
+    | Registered args -> "Registered", (args |> Serialization.objectToJToken)

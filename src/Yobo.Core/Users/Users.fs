@@ -3,7 +3,7 @@ namespace Yobo.Core.Users
 open System
 
 module CmdArgs = 
-    type Create = {
+    type Register = {
         Id : Guid
         ConfirmationKey : Guid
         PasswordHash: string
@@ -13,10 +13,10 @@ module CmdArgs =
     }
 
 type Command =
-    | Create of CmdArgs.Create
+    | Register of CmdArgs.Register
 
 type Event = 
-    | Created of CmdArgs.Create
+    | Registered of CmdArgs.Register
 
 type State = {
     Id : Guid

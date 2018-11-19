@@ -56,7 +56,8 @@ let openBrowser url =
     |> ignore
 
 Target.create "Clean" (fun _ ->
-    !! "src/*/bin"
+    !! "obj"
+    ++ "src/*/bin"
     ++ "src/*/obj"
     ++ deployDir
     ++ clientOutputDir

@@ -23,8 +23,6 @@ type StreamHandlerError =
     | ValidationError of ValidationError list
 
 type StreamHandler<'state, 'command, 'event> = {
-    GetCurrentState : string -> Result<'state, EventStoreError>
-    GetCurrentStateWithNextPosition : string -> Result<'state * int64, EventStoreError>
     HandleCmd : 'command -> Result<'event list, StreamHandlerError>
     HandleCorrelatedCmd : Guid -> 'command -> Result<'event list, StreamHandlerError>
 }
@@ -32,6 +30,7 @@ type StreamHandler<'state, 'command, 'event> = {
 // Ideas:
 // 1. What about to make Domain error one of Validation errors?
 // 2. Validators to get state?
+// 3. Special stream handler for compensation flow?
 
 
 //type TODO<'cmd,'event> =
@@ -108,8 +107,6 @@ let getStreamHandler<'state, 'command, 'event> (settings:StreamHandlerSettings<'
         }
     
     {
-        GetCurrentStateWithNextPosition = getCurrentStateFn >> Async.AwaitTask >> Async.RunSynchronously
-        GetCurrentState = getCurrentStateFn >> Async.AwaitTask >> Async.RunSynchronously >> Result.map fst
         HandleCmd = fun cmd -> handleCmd None cmd |> Async.AwaitTask |> Async.RunSynchronously
         HandleCorrelatedCmd = fun corrId cmd -> handleCmd (Some corrId) cmd |> Async.AwaitTask |> Async.RunSynchronously
     }

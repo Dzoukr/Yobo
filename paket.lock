@@ -1620,3 +1620,13 @@ NUGET
       System.Reflection.Emit.Lightweight (>= 4.3)
       System.Threading.Tasks.Extensions (>= 4.4)
       System.ValueTuple (>= 4.4)
+
+GROUP Shared
+STORAGE: NONE
+RESTRICTION: == netstandard2.0
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Core (4.5.3)
+GIST
+  remote: Dzoukr/bfcf416edaefbb8555586cf80fc2006e
+    FSharp.Rop.fs (0252e9c7e387248f69ddc6b07853d335b2109516)

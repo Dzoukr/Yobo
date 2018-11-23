@@ -27,6 +27,17 @@ group Core
     nuget Newtonsoft.Json
     gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
 
+group Libraries
+    source https://api.nuget.org/v3/index.json
+    framework: netstandard2.0
+    storage: none
+
+    nuget FSharp.Core
+    nuget Newtonsoft.Json
+    nuget WindowsAzure.Storage
+    nuget TaskBuilder.fs
+    gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
+
 group Client
     source https://api.nuget.org/v3/index.json
     framework: netstandard2.0

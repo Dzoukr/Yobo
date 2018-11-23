@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>Yobo.Libraries</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\..\paket-files\libraries\Dzoukr\bfcf416edaefbb8555586cf80fc2006e\FSharp.Rop.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/FSharp.Rop.fs</Link>
+    </Compile>
+    <Compile Include="Security\SymetricCrypto.fs" />
+    <Compile Include="Security\SymetricCryptoProvider.fs" />
+    <Compile Include="Security\TableStorageSymetricCryptoProvider.fs" />
+    <Compile Include="Security\Password.fs" />
+  </ItemGroup>
+  <Import Project="..\..\.paket\Paket.Restore.targets" />
+</Project>

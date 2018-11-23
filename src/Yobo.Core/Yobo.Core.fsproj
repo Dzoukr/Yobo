@@ -11,22 +11,26 @@
     </Compile>
     <Compile Include="Serialization.fs" />
     <Compile Include="ArgsBuilder.fs" />
-    <Compile Include="Security\SymetricCrypto.fs" />
-    <Compile Include="Security\Password.fs" />
-    <Compile Include="EventStoreStreamHandler.fs" />
+    
+    <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="Users\Registry\Registry.fs" />
     <Compile Include="Users\Registry\CommandValidator.fs" />
     <Compile Include="Users\Registry\Aggregate.fs" />
     <Compile Include="Users\Registry\EventSerializer.fs" />
-    <Compile Include="Users\Registry\StreamHandler.fs" />
+    <Compile Include="Users\Registry\CommandHandler.fs" />
     <Compile Include="Users\Users.fs" />
     <Compile Include="Users\ArgsBuilder.fs" />
     <Compile Include="Users\Aggregate.fs" />
     <Compile Include="Users\EventSerializer.fs" />
-    <Compile Include="Users\StreamHandler.fs" />
+    <Compile Include="Users\CommandHandler.fs" />
+    <Compile Include="CQRS.fs" />
+    <Compile Include="CommandHandler.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Yobo.Libraries\Yobo.Libraries.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

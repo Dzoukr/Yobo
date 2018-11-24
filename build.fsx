@@ -103,10 +103,8 @@ Target.create "Run" (fun _ ->
 
 Target.create "Publish" (fun _ ->
     let publicDir = Path.combine deployDir "wwwroot"
-
     let publishArgs = sprintf "publish -c Release -o \"%s\"" deployDir
     runDotNet publishArgs serverPath
-
     Shell.copyDir publicDir "src/Yobo.Client/output" FileFilter.allFiles
 )
 

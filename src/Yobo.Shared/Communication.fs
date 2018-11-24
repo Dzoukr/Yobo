@@ -5,6 +5,6 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Domain
 
 type ServerError =
-    | ValidationError of ValidationError
+    | ValidationError of ValidationError list
     | DomainError of DomainError
     | Exception of Exception

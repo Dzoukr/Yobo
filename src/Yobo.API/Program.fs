@@ -1,18 +1,14 @@
+module Yobo.API.Program
+
 open System
 open System.IO
-open System.Threading.Tasks
-
-open Microsoft.AspNetCore
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
-open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.DependencyInjection
 
-open FSharp.Control.Tasks.V2
 open Giraffe
-open Yobo.Shared
-
 open Giraffe.Serialization
+
 
 #if DEBUG
 let publicPath = Path.GetFullPath "../Yobo.Client/public"
@@ -20,27 +16,10 @@ let publicPath = Path.GetFullPath "../Yobo.Client/public"
 let publicPath = Path.GetFullPath "wwwroot"
 #endif
 
-let port = 8085us
-
-open Yobo.Shared.Communication
-open Yobo.Shared.Text
-open Yobo.Shared.Validation
-
-
-let webApp =
-    
-    route "/api/register" >=>
-        fun next ctx ->
-            task {
-                let! acc = ctx.BindJsonAsync<Yobo.Shared.Login.Register.Domain.Account>()
-                let err = TextValue.FirstName |> ValidationError.IsEmpty |> ServerError.ValidationError
-                return! RequestErrors.BAD_REQUEST err next ctx
-            }
-
 let configureApp (app : IApplicationBuilder) =
     app.UseDefaultFiles()
        .UseStaticFiles()
-       .UseGiraffe webApp
+       .UseGiraffe Routes.webApp
 
 let configureServices (services : IServiceCollection) =
     services.AddGiraffe() |> ignore
@@ -53,6 +32,6 @@ WebHostBuilder()
     .UseContentRoot(publicPath)
     .Configure(Action<IApplicationBuilder> configureApp)
     .ConfigureServices(configureServices)
-    .UseUrls("http://0.0.0.0:" + port.ToString() + "/")
+    .UseUrls("http://0.0.0.0:8085/")
     .Build()
     .Run()

@@ -26,7 +26,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | Ok _ ->
             { state with IsRegistering = false; RegistrationResult = result }, Cmd.none
         | Error (ServerError.ValidationError err) ->
-            let validation = ValidationResult.FromErrorList [err]
+            let validation = ValidationResult.FromErrorList err
             { state with IsRegistering = false; RegistrationResult = result; ValidationResult = validation }, Cmd.none
         | _ -> { state with IsRegistering = false; RegistrationResult = result }, Cmd.none
     | ChangeFirstName v -> { state with Account = { state.Account with FirstName = v } } |> updateValidation, Cmd.none

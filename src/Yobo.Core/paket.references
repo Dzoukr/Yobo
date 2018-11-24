@@ -2,4 +2,6 @@ group Core
     FSharp.Core
     CosmoStore
     Newtonsoft.Json
+    SQLProvider
+    System.Data.SqlClient
     File:FSharp.Rop.fs

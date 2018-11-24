@@ -51,10 +51,9 @@ let private runValidators validators cmd =
     validators |> List.fold foldFn []
 
 let private toEventWrite corrId (name, data) =
-    let id = Guid.NewGuid()
     {
-        Id = id
-        CorrelationId = defaultArg corrId id
+        Id = Guid.NewGuid()
+        CorrelationId = corrId
         Name = name
         Data = data
         Metadata = None
@@ -86,6 +85,7 @@ let getCompensatingCommandHandler<'state, 'command, 'event, 'outerCommand, 'oute
     let handleCmd corrId (outerCmd:'outerCommand) =
         task {
             try
+                let corrId = defaultArg corrId (Guid.NewGuid())
                 let cmd, compensationEvents = outerCmd |> settings.CompensationBuilder
                 match cmd |> runValidators settings.Validators with
                 | [] ->
@@ -96,7 +96,7 @@ let getCompensatingCommandHandler<'state, 'command, 'event, 'outerCommand, 'oute
                         match cmd |> settings.Aggregate.Execute state with
                         | Ok newEvents ->
                             let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
-                            match settings.OuterCommandHandler corrId outerCmd with
+                            match settings.OuterCommandHandler (Some corrId) outerCmd with
                             | Ok subEvents ->                           
                                 return Ok subEvents
                             | Error e ->
@@ -118,6 +118,7 @@ let getCommandHandler<'state, 'command, 'event> (settings:CommandHandlerSettings
     let handleCmd corrId cmd =
         task {
             try
+                let corrId = defaultArg corrId (Guid.NewGuid())
                 match cmd |> runValidators settings.Validators with
                 | [] ->
                     let streamId = cmd |> settings.GetStreamId

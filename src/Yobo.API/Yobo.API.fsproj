@@ -4,10 +4,14 @@
     <AssemblyName>Yobo.API</AssemblyName>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
-    
-    <Compile Include="Server.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="Login\HttpHandlers.fs" />
+    <Compile Include="CompositionRoot.fs" />
+    <Compile Include="Routes.fs" />
+    <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Core\Yobo.Core.fsproj" />

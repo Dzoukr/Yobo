@@ -17,14 +17,18 @@ group Server
     nuget Thoth.Json.Net
     nuget Thoth.Json.Giraffe
 
+
 group Core
     source https://api.nuget.org/v3/index.json
-    framework: netstandard2.0
-    storage: none
+    framework: netcoreapp2.1
 
     nuget FSharp.Core
     nuget CosmoStore
     nuget Newtonsoft.Json
+    nuget SQLProvider
+    nuget System.Data.SqlClient
+    nuget FSharp.Compiler.Tools
+    
     gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
 
 group Libraries

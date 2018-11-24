@@ -12,3 +12,4 @@ release.sh
 *.DotSettings.user
 deploy
 src/Yobo.Client/output/
+/src/Yobo.API/config.development.json

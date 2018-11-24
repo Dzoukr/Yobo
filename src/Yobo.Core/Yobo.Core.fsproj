@@ -2,7 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Yobo.Core</AssemblyName>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\core\Dzoukr\bfcf416edaefbb8555586cf80fc2006e\FSharp.Rop.fs">
@@ -11,6 +13,7 @@
     </Compile>
     <Compile Include="Serialization.fs" />
     <Compile Include="ArgsBuilder.fs" />
+    <Compile Include="ReadDb.fs" />
     
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="Users\Registry\Registry.fs" />
@@ -23,14 +26,25 @@
     <Compile Include="Users\Aggregate.fs" />
     <Compile Include="Users\EventSerializer.fs" />
     <Compile Include="Users\CommandHandler.fs" />
+    <Compile Include="Users\UpdateQueries.fs" />
+    <Compile Include="Users\DbEventHandler.fs" />
     <Compile Include="CQRS.fs" />
+    <Compile Include="DbEventHandler.fs" />
     <Compile Include="CommandHandler.fs" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Libraries\Yobo.Libraries.fsproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <FscToolPath>../../packages/core/FSharp.Compiler.Tools/tools</FscToolPath>
+    <FscToolExe>fsc.exe</FscToolExe>
+  </PropertyGroup>
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="copy ..\..\packages\core\System.Data.SqlClient\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll bin\Debug\netcoreapp2.1\" />
+  </Target>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

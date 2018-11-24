@@ -13,6 +13,8 @@
     <Compile Include="Security\SymetricCryptoProvider.fs" />
     <Compile Include="Security\TableStorageSymetricCryptoProvider.fs" />
     <Compile Include="Security\Password.fs" />
+    <Compile Include="Emails\Emails.fs" />
+    <Compile Include="Emails\MailjetProvider.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

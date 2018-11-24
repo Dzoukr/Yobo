@@ -14,7 +14,6 @@
     <Compile Include="Serialization.fs" />
     <Compile Include="ArgsBuilder.fs" />
     <Compile Include="ReadDb.fs" />
-    
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="Users\Registry\Registry.fs" />
     <Compile Include="Users\Registry\CommandValidator.fs" />
@@ -32,7 +31,6 @@
     <Compile Include="DbEventHandler.fs" />
     <Compile Include="CommandHandler.fs" />
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
   </ItemGroup>

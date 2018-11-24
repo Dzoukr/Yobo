@@ -35,3 +35,19 @@ module EventStore =
 
 module ReadDb =
     let get : string = conf.["readDb:connectionString"]
+
+module Emails =
+    open Yobo.Libraries.Emails
+
+    module Mailjet =
+        open Yobo.Libraries.Emails.MailjetProvider
+
+        let get : Configuration = {
+            ApiKey = conf.["emails:mailjet:apiKey"]
+            SecretKey = conf.["emails:mailjet:secretKey"]
+        }
+
+    let from : Address = {
+        Name = conf.["emails:from:name"]
+        Email = conf.["emails:from:email"]
+    }

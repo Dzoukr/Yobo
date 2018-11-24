@@ -40,6 +40,7 @@ group Libraries
     nuget Newtonsoft.Json
     nuget WindowsAzure.Storage
     nuget TaskBuilder.fs
+    nuget Mailjet.Api
     gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
 
 group Client

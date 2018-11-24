@@ -1,14 +1,16 @@
 module Yobo.API.CompositionRoot
 
-open Yobo.Libraries.Security
 open Yobo.Core
 open Yobo.Core.EventStoreCommandHandler
 open Yobo.Shared.Communication
+open Yobo.Libraries.Security
+open Yobo.Libraries.Emails
 open FSharp.Rop
 
 // services
 let private eventStore = Configuration.EventStore.get |> CosmoStore.TableStorage.EventStore.getEventStore
 let private cryptoProvider = Configuration.SymetricCryptoProvide.get |> TableStorageSymetricCryptoProvider.create
+let mailService : EmailProvider = Configuration.Emails.Mailjet.get |> MailjetProvider.create
 
 // error handling
 let private toServerError = function

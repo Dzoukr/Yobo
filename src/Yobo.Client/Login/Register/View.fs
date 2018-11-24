@@ -8,6 +8,7 @@ open Fable.Core.JsInterop
 open Yobo.Client.Login.Register.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
+open Yobo.Shared.Communication
 
 let render (state : State) (dispatch : Msg -> unit) =
     
@@ -35,13 +36,25 @@ let render (state : State) (dispatch : Msg -> unit) =
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Register)  ]
                 [ content  ]
         ]
+
+    let errorBox =
+        match state.RegistrationResult with
+        | Some (Error (ServerError.Exception(ex))) ->
+            str ex.Message
+        | Some (Error (ServerError.DomainError(msg))) ->
+            Notification.notification [ Notification.Color IsDanger ]
+                [ str <| msg.ToString() ]
+        | _ -> str ""
+        
     
     let form = 
         div 
             [ ClassName "box"] 
             [
                 Heading.h1 [ ] [ str (Locale.toTitleCz Registration) ]
-                
+
+                errorBox
+
                 lbl FirstName
                 regInput Input.text ChangeFirstName FirstName
                 

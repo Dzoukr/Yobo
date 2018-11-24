@@ -1,4 +1,4 @@
-module Yobo.API.CompositionRoot
+module Yobo.API.CompositionRoot.Services
 
 open Yobo.Core
 open Yobo.Core.EventStoreCommandHandler
@@ -6,6 +6,7 @@ open Yobo.Shared.Communication
 open Yobo.Libraries.Security
 open Yobo.Libraries.Emails
 open FSharp.Rop
+open Yobo.API
 
 // services
 let private eventStore = Configuration.EventStore.get |> CosmoStore.TableStorage.EventStore.getEventStore
@@ -33,4 +34,3 @@ module CommandHandler =
         cmd |> handleFn
         <!> List.map EventHandler.handle
         |> Result.mapError toServerError
-

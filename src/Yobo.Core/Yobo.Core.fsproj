@@ -21,7 +21,6 @@
     <Compile Include="Users\Registry\EventSerializer.fs" />
     <Compile Include="Users\Registry\CommandHandler.fs" />
     <Compile Include="Users\Users.fs" />
-    <Compile Include="Users\ArgsBuilder.fs" />
     <Compile Include="Users\Aggregate.fs" />
     <Compile Include="Users\EventSerializer.fs" />
     <Compile Include="Users\CommandHandler.fs" />

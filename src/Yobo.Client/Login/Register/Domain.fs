@@ -10,7 +10,7 @@ type State = {
     AlreadyTried : bool
     Account : Account
     ValidationResult: ValidationResult
-    RegistrationResult: Result<Guid, ServerError>
+    RegistrationResult: Result<Guid, ServerError> option
 }
 with
     static member Init = {
@@ -18,7 +18,7 @@ with
         AlreadyTried = false
         Account = Account.Init
         ValidationResult = ValidationResult.Empty
-        RegistrationResult = Ok Guid.Empty
+        RegistrationResult = None
     }
 
 type Msg =

@@ -16,6 +16,7 @@ open Fake.Core.TargetOperators
 
 let serverPath = Path.getFullName "./src/Yobo.API"
 let clientPath = Path.getFullName "./src/Yobo.Client"
+let corePath = Path.getFullName "./src/Yobo.Client"
 let clientOutputDir = clientPath + "/output"
 let deployDir = Path.getFullName "./deploy"
 
@@ -108,8 +109,17 @@ Target.create "Publish" (fun _ ->
     Shell.copyDir publicDir "src/Yobo.Client/output" FileFilter.allFiles
 )
 
+Target.create "RefreshSchema" (fun _ -> 
+    let srcFile = "..\Yobo.Private\ReadDb.fs"
+    let original = corePath + "\ReadDb.fs"
+    let schemaFile = ".\database\yobo.schema"
 
-open Fake.Core.TargetOperators
+    schemaFile |> File.delete
+    let backup = original |> File.readAsString
+    srcFile |> File.readAsString |> File.replaceContent original
+    runDotNet (sprintf "build %s" corePath) "."
+    backup |> File.replaceContent original
+)
 
 "Clean"
     ==> "InstallClient"

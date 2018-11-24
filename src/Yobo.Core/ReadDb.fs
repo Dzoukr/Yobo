@@ -11,6 +11,5 @@ let schemaPath = "./../../database/yobo.schema"
 type Db = SqlDataProvider<
                   ConnectionString = testConnection,
                   DatabaseVendor = Common.DatabaseProviderTypes.MSSQLSERVER,
-                  UseOptionTypes = true
-                  ,ContextSchemaPath = schemaPath
-                  >
+                  UseOptionTypes = true,
+                  ContextSchemaPath = schemaPath>

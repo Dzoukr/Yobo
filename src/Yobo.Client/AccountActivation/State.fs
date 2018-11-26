@@ -1,7 +1,7 @@
 module Yobo.Client.AccountActivation.State
 
-open Elmish
 open Yobo.Client.AccountActivation.Domain
+open Elmish
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     state, Cmd.none

@@ -4,10 +4,8 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open Fable.Core.JsInterop
-
 open Yobo.Client
 open Yobo.Client.Login.Domain
-
 
 
 let render (state : State) (dispatch : Msg -> unit) =

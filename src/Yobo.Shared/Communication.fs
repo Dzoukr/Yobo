@@ -10,6 +10,6 @@ type ServerError =
     | Exception of string
 
 module Routes =
-    let register = "/register"
-    let AccountActivation : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/activateAccount/%O"
+    let register = "/api/register"
+    let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/api/activateAccount/%O"
 

@@ -2,7 +2,6 @@ module Yobo.Client.App
 
 open Elmish
 open Elmish.React
-open Yobo.Client
 open Elmish.Browser.UrlParser
 open Elmish.Browser.Navigation
 

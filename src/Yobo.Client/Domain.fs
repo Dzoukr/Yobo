@@ -1,7 +1,5 @@
 module Yobo.Client.Domain
 
-open Yobo.Client
-
 type State = { 
     Page : Router.Page
     LoginState : Login.Domain.State

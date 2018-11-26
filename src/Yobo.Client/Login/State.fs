@@ -1,7 +1,7 @@
 module Yobo.Client.Login.State
 
-open Elmish
 open Yobo.Client.Login.Domain
+open Elmish
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with

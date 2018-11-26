@@ -1,8 +1,8 @@
 module Yobo.Shared.Registration.Validation
 
-open Yobo.Shared.Registration.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Text
+open Domain
 
 let validateAccount (acc:Account) =
     [

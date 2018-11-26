@@ -29,3 +29,4 @@ type Msg =
     | ChangeEmail of string
     | ChangePassword of string
     | ChangeSecondPassword of string
+

@@ -1,6 +1,5 @@
 module Yobo.Client.View
 
-open Yobo.Client
 open Yobo.Client.Domain
 
 let render (state : State) (dispatch : Msg -> unit) =

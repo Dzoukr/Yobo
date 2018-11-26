@@ -2,11 +2,12 @@ module Yobo.Core.EventStoreCommandHandler
 
 open System
 open Newtonsoft.Json.Linq
+open Yobo.Shared
 open Yobo.Shared.Validation
-open Yobo.Shared.Domain
 open FSharp.Rop
 open CosmoStore
 open FSharp.Control.Tasks.V2
+open Yobo.Shared.Domain
 
 type EventStoreError = 
     | General of Exception

@@ -1,11 +1,8 @@
 module Yobo.Client.State
 
-open Yobo.Client.Domain
-open Yobo.Client
 open Elmish
-open Fable.PowerPack.Fetch
-open Thoth.Json
 open Fable.Import
+open Yobo.Client.Domain
 
 let urlUpdate (result: Option<Router.Page>) state =
     match result with
@@ -14,7 +11,11 @@ let urlUpdate (result: Option<Router.Page>) state =
         state, Router.modifyUrl state.Page
     | Some page ->
         let state = { state with Page = page }
-        state, Cmd.none
+        let cmd =
+            match page with
+            | Router.Page.AccountActivation id -> id |>  AccountActivation.Domain.Msg.Activate |> Msg.AccountActivationMsg |> Cmd.ofMsg
+            | _ -> Cmd.none
+        state, cmd
 
 let private mapUpdate fn1 fn2 (f,s) = (fn1 f), (s |> Cmd.map fn2)
 

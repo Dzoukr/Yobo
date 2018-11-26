@@ -16,6 +16,16 @@ type EmailMessage = {
     HtmlMessage : string
     PlainTextMessage : string
 }
+with
+    static member Empty = {
+        From = { Name = ""; Email = ""}
+        To = []
+        Cc = []
+        Bcc = []
+        Subject = ""
+        HtmlMessage = ""
+        PlainTextMessage = ""
+    }
 
 type EmailProvider = {
     Send : EmailMessage -> Result<unit, Exception>

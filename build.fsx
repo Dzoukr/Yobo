@@ -16,7 +16,7 @@ open Fake.Core.TargetOperators
 
 let serverPath = Path.getFullName "./src/Yobo.API"
 let clientPath = Path.getFullName "./src/Yobo.Client"
-let corePath = Path.getFullName "./src/Yobo.Client"
+let corePath = Path.getFullName "./src/Yobo.Core"
 let clientOutputDir = clientPath + "/output"
 let deployDir = Path.getFullName "./deploy"
 

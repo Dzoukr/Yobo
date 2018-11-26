@@ -28,6 +28,7 @@ group Core
     nuget SQLProvider
     nuget System.Data.SqlClient
     nuget FSharp.Compiler.Tools
+    nuget Fue
     
     gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
 

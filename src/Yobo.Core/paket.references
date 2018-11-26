@@ -4,4 +4,5 @@ group Core
     Newtonsoft.Json
     SQLProvider
     System.Data.SqlClient
+    Fue
     File:FSharp.Rop.fs

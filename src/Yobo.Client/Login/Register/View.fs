@@ -40,7 +40,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let errorBox =
         match state.RegistrationResult with
         | Some (Error (ServerError.Exception(ex))) ->
-            str ex.Message
+            str ex
         | Some (Error (ServerError.DomainError(msg))) ->
             Notification.notification [ Notification.Color IsDanger ]
                 [ str <| msg.ToString() ]

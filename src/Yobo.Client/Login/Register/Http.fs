@@ -10,7 +10,7 @@ open Fable.PowerPack.Fetch
 open Fable.Import
 
 let private toJson v = Encode.Auto.toString(0, v)
-//let private errorDecoder = Decode.Auto.generateDecoder<ServerError>()
+
 let tryToServerError s =
     match Decode.Auto.fromString<ServerError>(s) with
     | Ok err -> Some err
@@ -25,11 +25,11 @@ let fetch url (init: RequestProperties list) =
             let! respText = resp.text()
             match respText |> tryToServerError with
             | Some err -> return Error err
-            | None -> return ServerError.Exception(new System.Exception(respText)) |> Error
+            | None -> return ServerError.Exception(respText) |> Error
     }
 
 let fetchAs<'a> url (decoder:Decode.Decoder<'a>) init =
-    let safeDecode = Decode.fromString decoder >> Result.mapError (System.Exception >> ServerError.Exception)
+    let safeDecode = Decode.fromString decoder >> Result.mapError ServerError.Exception
     promise {
         let! res = fetch url init
         match res with
@@ -52,6 +52,4 @@ let registerPromise (acc:Account) =
 let register (acc:Account) =
     Cmd.ofPromise registerPromise acc
                   (fun s -> RegisterDone s)
-                  (fun ex -> 
-                    Browser.console.log "HERE"
-                    Exception(ex) |> Error |> RegisterDone)
+                  (fun ex -> Exception(ex.Message) |> Error |> RegisterDone)

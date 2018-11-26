@@ -7,4 +7,4 @@ open Yobo.Shared.Domain
 type ServerError =
     | ValidationError of ValidationError list
     | DomainError of DomainError
-    | Exception of Exception
+    | Exception of string

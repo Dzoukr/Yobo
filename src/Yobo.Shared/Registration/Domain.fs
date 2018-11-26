@@ -1,4 +1,4 @@
-module Yobo.Shared.Register.Domain
+module Yobo.Shared.Registration.Domain
 
 type Account = {
     FirstName: string

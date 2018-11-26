@@ -1,4 +1,4 @@
-module Yobo.Client.ActivateAccount.View
+module Yobo.Client.AccountActivation.View
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
@@ -6,7 +6,7 @@ open Fulma
 open Fable.Core.JsInterop
 
 open Yobo.Client
-open Yobo.Client.ActivateAccount.Domain
+open Yobo.Client.AccountActivation.Domain
 
 
 

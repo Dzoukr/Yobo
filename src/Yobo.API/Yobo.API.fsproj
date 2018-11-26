@@ -8,8 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Configuration.fs" />
-    <Compile Include="Register\ArgsBuilder.fs" />
-    <Compile Include="Register\HttpHandlers.fs" />
+    <Compile Include="Registration\ArgsBuilder.fs" />
+    <Compile Include="Registration\HttpHandlers.fs" />
     <Compile Include="CompositionRoot.Services.fs" />
     <Compile Include="CompositionRoot.HttpHandlers.fs" />
     <Compile Include="Routes.fs" />

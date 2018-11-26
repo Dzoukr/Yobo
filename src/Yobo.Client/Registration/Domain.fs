@@ -1,12 +1,12 @@
-module Yobo.Client.Register.Domain
+module Yobo.Client.Registration.Domain
 
 open System
-open Yobo.Shared.Register.Domain
+open Yobo.Shared.Registration.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Communication
 
 type State = {
-    IsRegistering : bool
+    IsRegistrationing : bool
     AlreadyTried : bool
     Account : Account
     ValidationResult: ValidationResult
@@ -14,7 +14,7 @@ type State = {
 }
 with
     static member Init = {
-        IsRegistering = false
+        IsRegistrationing = false
         AlreadyTried = false
         Account = Account.Init
         ValidationResult = ValidationResult.Empty

@@ -1,11 +1,11 @@
-module Yobo.Client.Register.View
+module Yobo.Client.Registration.View
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open Fable.Core.JsInterop
 
-open Yobo.Client.Register.Domain
+open Yobo.Client.Registration.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
 open Yobo.Shared.Communication
@@ -30,10 +30,10 @@ let render (state : State) (dispatch : Msg -> unit) =
     let lbl txt = Label.label [] [ str (Locale.toTitleCz txt) ]
 
     let btn isLogging =
-        let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str (Locale.toTitleCz ToRegister)
+        let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str (Locale.toTitleCz Register)
         Control.div [] [
             Button.button 
-                [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Register)  ]
+                [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Msg.Register)  ]
                 [ content  ]
         ]
 
@@ -70,7 +70,7 @@ let render (state : State) (dispatch : Msg -> unit) =
                 lbl SecondPassword
                 regInput Input.password ChangeSecondPassword SecondPassword
 
-                btn state.IsRegistering
+                btn state.IsRegistrationing
                 
                 str (state.ToString())
 

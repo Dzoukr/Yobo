@@ -9,8 +9,8 @@ let frontend wwwRootPath =
 
 let webApp wwwRootPath : HttpHandler = choose [
     subRoute "/api" <| choose [
-        route Routes.register >=> CompositionRoot.HttpHandlers.Register.register
-        routeCif Routes.activateAccount (fun i -> Successful.OK "AAA")
+        route Routes.register >=> CompositionRoot.HttpHandlers.Registration.register
+        routeCif Routes.AccountActivation (fun i -> Successful.OK "AAA")
     ]
     frontend wwwRootPath
 ]

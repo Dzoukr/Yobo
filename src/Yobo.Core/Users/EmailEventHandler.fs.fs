@@ -13,7 +13,7 @@ let handle (settings:EmailSettings.Settings) = function
         let message =
             Fue.Data.init
             |> Fue.Data.add "baseUrl" (settings.BaseUrl.ToString())
-            |> Fue.Data.add "activate" (sprintf Routes.activateAccount args.ActivationKey)
+            |> Fue.Data.add "activate" (sprintf Routes.AccountActivation args.ActivationKey)
             |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.Register.html")
 
         { EmailMessage.Empty with

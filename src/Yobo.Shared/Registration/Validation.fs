@@ -1,6 +1,6 @@
-module Yobo.Shared.Register.Validation
+module Yobo.Shared.Registration.Validation
 
-open Yobo.Shared.Register.Domain
+open Yobo.Shared.Registration.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Text
 

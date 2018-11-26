@@ -1,4 +1,4 @@
-module Yobo.Client.ActivateAccount.Domain
+module Yobo.Client.AccountActivation.Domain
 
 open System
 open Yobo.Shared.Communication

@@ -1,9 +1,9 @@
-module Yobo.Client.Register.Http
+module Yobo.Client.Registration.Http
 
 open Elmish
 open Fable.PowerPack
-open Yobo.Client.Register.Domain
-open Yobo.Shared.Register.Domain
+open Yobo.Client.Registration.Domain
+open Yobo.Shared.Registration.Domain
 open Yobo.Shared.Communication
 open Thoth.Json
 open Fable.PowerPack.Fetch
@@ -44,12 +44,12 @@ let private asPost r =
       requestHeaders [ContentType "application/json"]
       RequestProperties.Body <| unbox(toJson r)]
 
-let registerPromise (acc:Account) =
+let RegistrationPromise (acc:Account) =
     promise {
         return! acc |> asPost |> fetchAs "/api/register" Decode.guid
     }
 
-let register (acc:Account) =
-    Cmd.ofPromise registerPromise acc
+let Registration (acc:Account) =
+    Cmd.ofPromise RegistrationPromise acc
                   (fun s -> RegisterDone s)
                   (fun ex -> Exception(ex.Message) |> Error |> RegisterDone)

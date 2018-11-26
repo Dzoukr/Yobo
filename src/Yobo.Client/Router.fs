@@ -9,23 +9,23 @@ open Fable.Core.JsInterop
 
 type Page =
     | Login
-    | Register
+    | Registration
     | ForgottenPassword
-    | ActivateAccount of Guid
+    | AccountActivation of Guid
     with
         member x.ToPath() = 
             match x with
             | Login -> "/login"
-            | Register -> "/register"
+            | Registration -> "/registration"
             | ForgottenPassword -> "/forgottenPassword"
-            | ActivateAccount id -> sprintf "/activateAccount/%A" id
+            | AccountActivation id -> sprintf "/AccountActivation/%A" id
 
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
         map Login (s "login")
-        map Register (s "register")
+        map Registration (s "registration")
         map ForgottenPassword (s "forgottenPassword")
-        map ((fun (x:string) -> Guid(x)) >> ActivateAccount) (s "activateAccount" </> str)
+        map ((fun (x:string) -> Guid(x)) >> AccountActivation) (s "accountActivation" </> str)
     ]
 
 let modifyUrl (route:Page) = route.ToPath() |> Navigation.modifyUrl

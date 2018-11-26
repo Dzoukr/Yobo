@@ -4,6 +4,7 @@ open Fable.PowerPack
 open Yobo.Shared.Communication
 open Thoth.Json
 open Fable.PowerPack.Fetch
+open Elmish
 
 let private toJson v = Encode.Auto.toString(0, v)
 
@@ -39,3 +40,8 @@ let asPost r =
     [ RequestProperties.Method HttpMethod.POST
       requestHeaders [ContentType "application/json"]
       RequestProperties.Body <| unbox(toJson r)]
+
+let promiseToCmd<'a,'b> msg (promise:Fable.Import.JS.Promise<Result<'a, ServerError>>) : Cmd<'b> =
+    Cmd.ofPromise (fun _ -> promise) ()
+        (fun s -> msg s)
+        (fun ex -> Exception(ex.Message) |> Error |> msg)

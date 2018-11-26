@@ -18,7 +18,7 @@ type Page =
             | Login -> "/login"
             | Registration -> "/registration"
             | ForgottenPassword -> "/forgottenPassword"
-            | AccountActivation id -> sprintf "/AccountActivation/%A" id
+            | AccountActivation id -> sprintf "/accountActivation/%A" id
 
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [

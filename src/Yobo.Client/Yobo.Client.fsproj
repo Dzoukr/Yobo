@@ -10,6 +10,7 @@
         <Compile Include="Http.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="AccountActivation\Domain.fs" />
+        <Compile Include="AccountActivation\Http.fs" />
         <Compile Include="AccountActivation\View.fs" />
         <Compile Include="AccountActivation\State.fs" />
         <Compile Include="Login\Domain.fs" />

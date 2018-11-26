@@ -4,7 +4,6 @@ open Yobo.Client.Domain
 open Yobo.Client
 open Elmish
 open Fable.PowerPack.Fetch
-open Yobo.Shared
 open Thoth.Json
 open Fable.Import
 
@@ -26,3 +25,4 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
     | LoginMsg m -> Login.State.update m state.LoginState |> mapUpdate (fun s -> { state with LoginState = s }) Msg.LoginMsg
     | RegisterMsg m -> Register.State.update m state.RegisterState |> mapUpdate (fun s -> { state with RegisterState = s }) Msg.RegisterMsg
+    | AccountActivationMsg m -> ActivateAccount.State.update m state.AccountActivationState |> mapUpdate (fun s -> { state with AccountActivationState = s }) Msg.AccountActivationMsg 

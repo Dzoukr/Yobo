@@ -1,4 +1,4 @@
-module Yobo.API.Login.ArgsBuilder
+module Yobo.API.Register.ArgsBuilder
 
 open System
 open Yobo.Core

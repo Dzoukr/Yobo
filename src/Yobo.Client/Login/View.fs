@@ -8,14 +8,7 @@ open Fable.Core.JsInterop
 open Yobo.Client
 open Yobo.Client.Login.Domain
 
-open Fable.Helpers
-open Fable.Import
-open Elmish.Browser.Navigation
 
-let goToUrl (e: React.MouseEvent) =
-    e.preventDefault()
-    let href = !!e.target?href
-    Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore
 
 let render (state : State) (dispatch : Msg -> unit) =
     
@@ -39,11 +32,11 @@ let render (state : State) (dispatch : Msg -> unit) =
 
     let footer = 
         div [] [
-            a [ Href <| Router.Page.Register.ToPath(); OnClick goToUrl] [
+            a [ Href <| Router.Page.Register.ToPath(); OnClick Router.goToUrl] [
                 str "Registrace"
             ]
             str " · "
-            a [ Href <| Router.Page.ForgottenPassword.ToPath(); OnClick goToUrl] [
+            a [ Href <| Router.Page.ForgottenPassword.ToPath(); OnClick Router.goToUrl] [
                 str "Zapomněl(a) jsem heslo!"
             ]
         ]

@@ -12,3 +12,4 @@ type ServerError =
 module Routes =
     let register = "/register"
     let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/activateAccount/%O"
+

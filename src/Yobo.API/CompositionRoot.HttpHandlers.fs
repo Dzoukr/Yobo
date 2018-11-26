@@ -25,8 +25,8 @@ let private tryBindJson<'T> (errorF:System.Exception -> HttpHandler) (f : 'T -> 
 
 let private safeBindJson<'a> = tryBindJson ((fun ex -> ex.Message) >> ServerError.Exception >> Error >> toHandler)
 
-module Login =
-    open Yobo.API.Login.HttpHandlers
+module Register =
+    open Yobo.API.Register.HttpHandlers
     open Yobo.Shared.Register.Domain
     open Yobo.Libraries.Security
 

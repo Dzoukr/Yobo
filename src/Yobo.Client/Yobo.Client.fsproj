@@ -8,6 +8,9 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Router.fs" />
+        <Compile Include="ActivateAccount\Domain.fs" />
+        <Compile Include="ActivateAccount\View.fs" />
+        <Compile Include="ActivateAccount\State.fs" />
         <Compile Include="Login\Domain.fs" />
         <Compile Include="Login\View.fs" />
         
@@ -23,6 +26,7 @@
         <Compile Include="View.fs" />
         <Compile Include="App.fs" />
     </ItemGroup>
+    <ItemGroup />
     <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
   </ItemGroup>

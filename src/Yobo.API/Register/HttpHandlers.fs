@@ -1,4 +1,4 @@
-module Yobo.API.Login.HttpHandlers
+module Yobo.API.Register.HttpHandlers
 
 open Giraffe
 

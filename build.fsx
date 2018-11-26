@@ -72,7 +72,6 @@ Target.create "InstallClient" (fun _ ->
     runTool yarnTool "--version" __SOURCE_DIRECTORY__
     runTool yarnTool "install --frozen-lockfile" __SOURCE_DIRECTORY__
     runDotNet "restore Yobo.Client.fsproj" clientPath
-    runDotNet "restore Login\Yobo.Client.Login.fsproj" clientPath
 )
 
 Target.create "RestoreServer" (fun _ ->

@@ -11,8 +11,8 @@ open Yobo.API
 // services
 let private eventStore = Configuration.EventStore.get |> CosmoStore.TableStorage.EventStore.getEventStore
 let private cryptoProvider = Configuration.SymetricCryptoProvide.get |> TableStorageSymetricCryptoProvider.create
-let private mailService : EmailProvider = Configuration.Emails.Mailjet.get |> MailjetProvider.create
-let private mailFrom : Address = Configuration.Emails.from
+let private emailService : EmailProvider = Configuration.Emails.Mailjet.get |> MailjetProvider.create
+let private emailSettings : EmailSettings.Settings = { From = Configuration.Emails.from; BaseUrl = Configuration.Server.baseUrl }
 
 // error handling
 let private toServerError = function
@@ -23,7 +23,7 @@ let private toServerError = function
 // event handlers
 module EventHandler =
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.get
-    let private emailHandleFn = EmailEventHandler.getHandler mailService mailFrom
+    let private emailHandleFn = EmailEventHandler.getHandler emailService emailSettings
     let handle evn =
         evn |> dbHandleFn |> ignore
         evn |> emailHandleFn |> ignore

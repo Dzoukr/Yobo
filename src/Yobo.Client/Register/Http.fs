@@ -1,9 +1,9 @@
-module Yobo.Client.Login.Register.Http
+module Yobo.Client.Register.Http
 
 open Elmish
 open Fable.PowerPack
-open Yobo.Client.Login.Register.Domain
-open Yobo.Shared.Login.Register.Domain
+open Yobo.Client.Register.Domain
+open Yobo.Shared.Register.Domain
 open Yobo.Shared.Communication
 open Thoth.Json
 open Fable.PowerPack.Fetch

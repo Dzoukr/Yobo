@@ -16,6 +16,7 @@
     <Compile Include="ReadDb.fs" />
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
+    <Compile Include="EmailSettings.fs" />
     <EmbeddedResource Include="Users\EmailTemplates\Register.html" />
     <Compile Include="Users\Registry\Registry.fs" />
     <Compile Include="Users\Registry\CommandValidator.fs" />

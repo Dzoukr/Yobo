@@ -5,7 +5,7 @@ open System
 module CmdArgs = 
     type Register = {
         Id : Guid
-        ConfirmationKey : Guid
+        ActivationKey : Guid
         PasswordHash: string
         FirstName: string
         LastName: string

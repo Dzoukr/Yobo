@@ -27,7 +27,7 @@ let private safeBindJson<'a> = tryBindJson ((fun ex -> ex.Message) >> ServerErro
 
 module Login =
     open Yobo.API.Login.HttpHandlers
-    open Yobo.Shared.Login.Register.Domain
+    open Yobo.Shared.Register.Domain
     open Yobo.Libraries.Security
 
     let register : HttpHandler = safeBindJson<Account> (register Services.CommandHandler.handle Password.createHash >> toHandler)

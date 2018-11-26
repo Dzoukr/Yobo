@@ -2,9 +2,8 @@ module Yobo.Core.EmailEventHandler
 
 open Yobo.Libraries.Emails
 
-let getHandler (sender:EmailProvider) (from:Address) =
-    let send = fun (msg:EmailMessage) ->  { msg with From = from } |> sender.Send
+let getHandler (sender:EmailProvider) (settings:EmailSettings.Settings) =
     let handle cmd =
         match cmd with
-        | CoreEvent.Users e -> e |> Users.EmailEventHandler.handle |> send
+        | CoreEvent.Users e -> e |> Users.EmailEventHandler.handle settings |> sender.Send
     handle

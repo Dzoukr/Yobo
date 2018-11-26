@@ -1,19 +1,26 @@
 module Yobo.Client.Login.Domain
 
-open Yobo.Client.Login
-
-type State = { 
-    Page : Router.Page
-    SignInState : SignIn.Domain.State
-    RegisterState : Register.Domain.State
+type Credentials = {
+    Email: string
+    Password: string
 }
 with
     static member Init = {
-        Page = Router.Page.SignIn
-        SignInState = SignIn.Domain.State.Init 
-        RegisterState = Register.Domain.State.Init 
+        Email = ""
+        Password = ""
+    }
+
+type State = {
+    IsLogging : bool
+    Credentials : Credentials
+}
+with
+    static member Init = {
+        IsLogging = false
+        Credentials = Credentials.Init
     }
 
 type Msg =
-    | LoginMsg of SignIn.Domain.Msg
-    | RegisterMsg of Register.Domain.Msg
+    | Login
+    | ChangeEmail of string
+    | ChangePassword of string

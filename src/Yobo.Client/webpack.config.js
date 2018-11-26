@@ -15,12 +15,6 @@ var CONFIG = {
             "@babel/polyfill",
             resolve("./Yobo.Client.fsproj")
         ]
-        ,
-        "login": [
-            "whatwg-fetch",
-            "@babel/polyfill",
-            resolve("./Login/Yobo.Client.Login.fsproj")
-        ]
     },
     devServerProxy: {
         '/api/*': {
@@ -28,9 +22,7 @@ var CONFIG = {
             changeOrigin: true
         }
     },
-    historyApiFallback: {
-        index: resolve("./index.html")
-    },
+    historyApiFallback: true,
     contentBase: resolve("./public"),
     babel: {
         presets: [
@@ -54,11 +46,6 @@ var commonPlugins = [
         chunks: ['app'],
         template: resolve('./public/index.html'),
         filename: resolve('./output/index.html')
-    }),
-    new HtmlWebpackPlugin({
-        chunks: ['login'],
-        template: resolve('./public/login.html'),
-        filename: resolve('./output/login.html')
     })
 ]
 

@@ -1,10 +1,10 @@
-module Yobo.Client.Login.Register.State
+module Yobo.Client.Register.State
 
 open Elmish
-open Yobo.Client.Login.Register.Domain
+open Yobo.Client.Register.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Communication
-open Yobo.Shared.Login.Register.Validation
+open Yobo.Shared.Register.Validation
 
 let private updateValidation (state : State) =
     let validation = 

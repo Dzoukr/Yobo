@@ -17,9 +17,10 @@ let publicPath = Path.GetFullPath "wwwroot"
 #endif
 
 let configureApp (app : IApplicationBuilder) =
+    let env = app.ApplicationServices.GetService<IHostingEnvironment>()
     app.UseDefaultFiles()
        .UseStaticFiles()
-       .UseGiraffe Routes.webApp
+       .UseGiraffe (Routes.webApp env.WebRootPath)
 
 let configureServices (services : IServiceCollection) =
     services.AddGiraffe() |> ignore

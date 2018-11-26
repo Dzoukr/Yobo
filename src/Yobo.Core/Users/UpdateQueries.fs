@@ -9,7 +9,7 @@ let register (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
     item.Email <- args.Email
     item.FirstName <- args.FirstName
     item.LastName <- args.LastName
-    item.ConfirmationKey <- args.ConfirmationKey
+    item.ActivationKey <- args.ActivationKey
     item.PasswordHash <- args.PasswordHash
     item.RegisteredUtc <- DateTime.UtcNow
     ctx.SubmitUpdates()

@@ -1,8 +1,8 @@
-module Yobo.Client.Login.App
+module Yobo.Client.App
 
 open Elmish
 open Elmish.React
-open Yobo.Client.Login
+open Yobo.Client
 open Elmish.Browser.UrlParser
 open Elmish.Browser.Navigation
 
@@ -12,7 +12,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram State.init State.update View.render
-|> Program.toNavigable (parseHash Router.pageParser) State.urlUpdate
+|> Program.toNavigable (parsePath Router.pageParser) State.urlUpdate
 #if DEBUG
 |> Program.withConsoleTrace
 #endif

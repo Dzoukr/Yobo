@@ -51,3 +51,6 @@ module Emails =
         Name = conf.["emails:from:name"]
         Email = conf.["emails:from:email"]
     }
+
+module Server =
+    let baseUrl = Uri(conf.["server:baseUrl"])

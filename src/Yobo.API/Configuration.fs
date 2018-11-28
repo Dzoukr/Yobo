@@ -9,7 +9,7 @@ let private conf =
         .AddEnvironmentVariables()
         .Build()
 
-module SymetricCryptoProvide =
+module SymetricCryptoProvider =
     open Yobo.Libraries.Security.TableStorageSymetricCryptoProvider
 
     let get : Configuration = 
@@ -34,7 +34,7 @@ module EventStore =
         else Configuration.CreateDefault conf.["eventStore:accountName"] conf.["eventStore:authKey"]
 
 module ReadDb =
-    let get : string = conf.["readDb:connectionString"]
+    let connectionString : string = conf.["readDb:connectionString"]
 
 module Emails =
     open Yobo.Libraries.Emails

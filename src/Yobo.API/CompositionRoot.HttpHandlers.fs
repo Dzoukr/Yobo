@@ -1,5 +1,6 @@
 module Yobo.API.CompositionRoot.HttpHandlers
 
+open System
 open Giraffe
 open Yobo.Shared.Communication
 open Microsoft.AspNetCore.Http
@@ -23,11 +24,13 @@ let private tryBindJson<'T> (errorF:System.Exception -> HttpHandler) (f : 'T -> 
             with ex -> return! errorF ex next ctx
         }
 
-let private safeBindJson<'a> = tryBindJson ((fun ex -> ex.Message) >> ServerError.Exception >> Error >> toHandler)
+let private safeBindJson<'a> = tryBindJson<'a>((fun ex -> ex.Message) >> ServerError.Exception >> Error >> toHandler)
 
 module Registration =
     open Yobo.API.Registration.HttpHandlers
     open Yobo.Shared.Registration.Domain
     open Yobo.Libraries.Security
+    open Yobo.API.CompositionRoot
 
     let register : HttpHandler = safeBindJson<Account> (register Services.CommandHandler.handle Password.createHash >> toHandler)
+    let activateAccount _ = safeBindJson<Guid> (activateAccount Services.CommandHandler.handle Services.Users.queries.GetUserByActivationKey >> toHandler)

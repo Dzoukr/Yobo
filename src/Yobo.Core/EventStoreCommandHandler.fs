@@ -40,7 +40,7 @@ type CompensatingCommandHandlerSettings<'state, 'command, 'event, 'outerCommand,
     GetStreamId : 'command -> string
     Serializer : EventSerializer<'event>
     Validators : ('command -> Result<'command, ValidationError list>) list
-    CompensationBuilder : 'outerCommand -> 'command * 'event list
+    CompensationBuilder : 'outerCommand -> ('command * 'event list) option
     OuterCommandHandler : Guid option -> 'outerCommand -> Result<'outerEvent list, CommandHandlerError>
 }
 
@@ -87,26 +87,29 @@ let getCompensatingCommandHandler<'state, 'command, 'event, 'outerCommand, 'oute
         task {
             try
                 let corrId = defaultArg corrId (Guid.NewGuid())
-                let cmd, compensationEvents = outerCmd |> settings.CompensationBuilder
-                match cmd |> runValidators settings.Validators with
-                | [] ->
-                    let streamId = cmd |> settings.GetStreamId
-                    let! currentStateAndPosition = streamId |> getCurrentStateFn
-                    match (currentStateAndPosition |> Result.mapError EventStoreError) with
-                    | Ok (state,position) ->
-                        match cmd |> settings.Aggregate.Execute state with
-                        | Ok newEvents ->
-                            let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
-                            match settings.OuterCommandHandler (Some corrId) outerCmd with
-                            | Ok subEvents ->                           
-                                return Ok subEvents
-                            | Error e ->
-                                let newPosition = position + int64 newEvents.Length
-                                let! _ = compensationEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact newPosition)
-                                return Error e
-                        | Error e -> return e |> CommandHandlerError.DomainError |> Error
-                    | Error e -> return e |> Error
-                | errors -> return ValidationError(errors) |> Error
+                match outerCmd |> settings.CompensationBuilder with
+                | Some (cmd, compensationEvents) -> 
+                    match cmd |> runValidators settings.Validators with
+                    | [] ->
+                        let streamId = cmd |> settings.GetStreamId
+                        let! currentStateAndPosition = streamId |> getCurrentStateFn
+                        match (currentStateAndPosition |> Result.mapError EventStoreError) with
+                        | Ok (state,position) ->
+                            match cmd |> settings.Aggregate.Execute state with
+                            | Ok newEvents ->
+                                let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
+                                match settings.OuterCommandHandler (Some corrId) outerCmd with
+                                | Ok subEvents ->                           
+                                    return Ok subEvents
+                                | Error e ->
+                                    let newPosition = position + int64 newEvents.Length
+                                    let! _ = compensationEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact newPosition)
+                                    return Error e
+                            | Error e -> return e |> CommandHandlerError.DomainError |> Error
+                        | Error e -> return e |> Error
+                    | errors -> return ValidationError(errors) |> Error
+                | None -> return settings.OuterCommandHandler (Some corrId) outerCmd
+
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
     fun corrId -> handleCmd corrId >> Async.AwaitTask >> Async.RunSynchronously

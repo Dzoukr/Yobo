@@ -18,7 +18,9 @@ let private decryptRegister (cryptoProvider:SymetricCryptoProvider) (args:CmdArg
 
 let toEvent (cryptoProvider:SymetricCryptoProvider) = function
     | "Registered", data -> data |> Serialization.objectFromJToken<CmdArgs.Register> |> decryptRegister cryptoProvider |> Registered
+    | "Activated", data -> data |> Serialization.objectFromJToken<CmdArgs.Activate> |> Activated
     | n,_ -> failwithf "Unrecognized event %s" n
 
 let toData (cryptoProvider:SymetricCryptoProvider) = function
     | Registered args -> "Registered", (args |> encryptRegister cryptoProvider |> Serialization.objectToJToken)
+    | Activated args -> "Activated", (args |> Serialization.objectToJToken)

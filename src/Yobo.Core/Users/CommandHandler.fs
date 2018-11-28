@@ -6,6 +6,7 @@ open Yobo.Libraries.Security.SymetricCryptoProvider
 
 let private getId = function
     | Register args -> args |> Extractor.getIdFromCommand
+    | Activate args -> args |> Extractor.getIdFromCommand
 
 let private settings cryptoProvider = {
     Aggregate = {
@@ -25,7 +26,8 @@ let private compensationBuilder = function
     | Register args -> 
         let cmd = Registry.Add { UserId = args.Id; Email = args.Email }
         let events = Registry.Removed { UserId = args.Id; Email = args.Email } |> List.singleton
-        cmd, events
+        Some (cmd, events)
+    | _ -> None
 
 let get (cryptoProvider:SymetricCryptoProvider) store =
     let userCmdHandler = store |> getCommandHandler (settings cryptoProvider)

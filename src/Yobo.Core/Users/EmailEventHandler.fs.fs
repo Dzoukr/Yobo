@@ -21,4 +21,5 @@ let handle (settings:EmailSettings.Settings) = function
             To = tos |> List.singleton
             Subject = subject
             HtmlMessage = message
-        }
+        } |> Some
+    | _ -> None

@@ -15,8 +15,9 @@ let register cmdHandler createHashFn (acc:Account) =
         return args.Id
     }
 
-let validateAccount cmdHandler getUserByConfId (confirmationId:Guid) =
+let activateAccount cmdHandler getUserByActivationKey (activationKey:Guid) =
     result {
-        let! user = getUserByConfId confirmationId
-        return ()
+        let! (user : ReadQueries.User) = getUserByActivationKey activationKey
+        let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> Command.Activate |> CoreCommand.Users |> cmdHandler
+        return user.Id
     }

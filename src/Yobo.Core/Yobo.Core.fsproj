@@ -14,6 +14,7 @@
     <Compile Include="Serialization.fs" />
     <Compile Include="ArgsBuilder.fs" />
     <Compile Include="ReadDb.fs" />
+    <Compile Include="Data.fs" />
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
     <Compile Include="EmailSettings.fs" />
@@ -30,6 +31,7 @@
     <Compile Include="Users\UpdateQueries.fs" />
     <Compile Include="Users\DbEventHandler.fs" />
     <Compile Include="Users\EmailEventHandler.fs.fs" />
+    <Compile Include="Users\ReadQueries.fs" />
     <Compile Include="CQRS.fs" />
     <Compile Include="DbEventHandler.fs" />
     <Compile Include="EmailEventHandler.fs" />

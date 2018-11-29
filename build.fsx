@@ -17,6 +17,7 @@ open Fake.Core.TargetOperators
 let serverPath = Path.getFullName "./src/Yobo.API"
 let clientPath = Path.getFullName "./src/Yobo.Client"
 let corePath = Path.getFullName "./src/Yobo.Core"
+let sharedPath = Path.getFullName "./src/Yobo.Shared"
 let clientOutputDir = clientPath + "/output"
 let deployDir = Path.getFullName "./deploy"
 
@@ -74,28 +75,20 @@ Target.create "InstallClient" (fun _ ->
     runDotNet "restore Yobo.Client.fsproj" clientPath
 )
 
-Target.create "RestoreServer" (fun _ ->
-    runDotNet "restore" serverPath
-)
-
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
     runDotNet "fable webpack-cli -- --config src/Yobo.Client/webpack.config.js -p" clientPath
 )
 
 Target.create "Run" (fun _ ->
+    runDotNet "build" sharedPath
     let server = async {
         runDotNet "watch run" serverPath
     }
     let client = async {
         runDotNet "fable webpack-dev-server -- --config src/Yobo.Client/webpack.config.js" clientPath
     }
-    let browser = async {
-        do! Async.Sleep 5000
-        openBrowser "http://localhost:8080"
-    }
-
-    [ server; client; browser ]
+    [ client; server ]
     |> Async.Parallel
     |> Async.RunSynchronously
     |> ignore
@@ -127,7 +120,8 @@ Target.create "RefreshSchema" (fun _ ->
 
 "Clean"
     ==> "InstallClient"
-    ==> "RestoreServer"
     ==> "Run"
+
+
 
 Target.runOrDefaultWithArguments "Build"

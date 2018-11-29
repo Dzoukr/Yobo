@@ -49,14 +49,6 @@ let runDotNet cmd workingDir =
         DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
-let openBrowser url =
-    //https://github.com/dotnet/corefx/issues/10361
-    Command.ShellCommand url
-    |> CreateProcess.fromCommand
-    |> CreateProcess.ensureExitCodeWithMessage "opening browser failed"
-    |> Proc.run
-    |> ignore
-
 Target.create "Clean" (fun _ ->
     !! "obj"
     ++ "src/*/bin"
@@ -77,7 +69,7 @@ Target.create "InstallClient" (fun _ ->
 
 Target.create "Build" (fun _ ->
     runDotNet "build" serverPath
-    runDotNet "fable webpack-cli -- --config src/Yobo.Client/webpack.config.js -p" clientPath
+    runTool yarnTool "webpack-cli --config src/Yobo.Client/webpack.config.js -p" clientPath
 )
 
 Target.create "Run" (fun _ ->
@@ -86,7 +78,7 @@ Target.create "Run" (fun _ ->
         runDotNet "watch run" serverPath
     }
     let client = async {
-        runDotNet "fable webpack-dev-server -- --config src/Yobo.Client/webpack.config.js" clientPath
+        runTool yarnTool "webpack-dev-server --config src/Yobo.Client/webpack.config.js" clientPath
     }
     [ client; server ]
     |> Async.Parallel

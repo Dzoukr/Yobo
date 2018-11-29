@@ -7,4 +7,4 @@ let render (state : State) (dispatch : Msg -> unit) =
     | Router.Page.Login -> Login.View.render state.LoginState (LoginMsg >> dispatch)
     | Router.Page.Registration -> Registration.View.render state.RegistrationState (RegistrationMsg >> dispatch)
     | Router.Page.ForgottenPassword -> Registration.View.render state.RegistrationState (RegistrationMsg >> dispatch)
-    | Router.Page.AccountActivation id -> AccountActivation.View.render id state.AccountActivationState (AccountActivationMsg >> dispatch)
+    | Router.Page.AccountActivation _ -> AccountActivation.View.render state.AccountActivationState (AccountActivationMsg >> dispatch)

@@ -1,9 +1,9 @@
 module Yobo.Core.Users.EmailEventHandler
 
+open System
 open Yobo.Libraries.Emails
 open Yobo.Core
 open Yobo.Shared.Communication
-
 
 let handle (settings:EmailSettings.Settings) = function
     | Registered args ->
@@ -12,8 +12,7 @@ let handle (settings:EmailSettings.Settings) = function
         let subject = "TODO"
         let message =
             Fue.Data.init
-            |> Fue.Data.add "baseUrl" (settings.BaseUrl.ToString())
-            |> Fue.Data.add "activate" (sprintf Routes.activateAccount args.ActivationKey)
+            |> Fue.Data.add "activate" (Uri(settings.BaseUrl, sprintf FrontendRoutes.activateAccount args.ActivationKey))
             |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.Register.html")
 
         { EmailMessage.Empty with

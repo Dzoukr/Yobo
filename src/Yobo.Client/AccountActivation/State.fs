@@ -5,5 +5,5 @@ open Elmish
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
-    | Activate id -> { state with IsActivating = true }, Http.activate id
-    | ActivateDone res -> { state with IsActivating = false; ActivationResult = Some res }, Cmd.none
+    | Activate id -> state, Http.activate id
+    | ActivateDone res -> { state with ActivationResult = Some res }, Cmd.none

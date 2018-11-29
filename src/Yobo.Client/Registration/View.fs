@@ -4,20 +4,19 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open Fable.Core.JsInterop
-
 open Yobo.Client.Registration.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
-open Yobo.Shared.Communication
+open Yobo.Client
 
 let render (state : State) (dispatch : Msg -> unit) =
     
     let regInput typ msgType txt =
-        let error = state.ValidationResult.TryGetFieldError txt
+        let error = state.ValidationResult |> Validation.tryGetFieldError txt
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]
-                        [ str (error.Value |> Locale.errorToCz ) ]
+                        [ str (error.Value |> Locale.validationErrorToCz ) ]
                    else span [] []
         Control.div [] [
             typ [
@@ -36,16 +35,6 @@ let render (state : State) (dispatch : Msg -> unit) =
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Msg.Register)  ]
                 [ content  ]
         ]
-
-    let errorBox =
-        match state.RegistrationResult with
-        | Some (Error (ServerError.Exception(ex))) ->
-            str ex
-        | Some (Error (ServerError.DomainError(msg))) ->
-            Notification.notification [ Notification.Color IsDanger ]
-                [ str <| msg.ToString() ]
-        | _ -> str ""
-        
     
     let form = 
         div 
@@ -53,7 +42,7 @@ let render (state : State) (dispatch : Msg -> unit) =
             [
                 Heading.h1 [ ] [ str (Locale.toTitleCz Registration) ]
 
-                errorBox
+                (SharedView.serverErrorToViewIfAny state.RegistrationResult)
 
                 lbl FirstName
                 regInput Input.text ChangeFirstName FirstName

@@ -4,12 +4,10 @@ open System
 open Yobo.Shared.Communication
 
 type State = {
-    IsActivating : bool
     ActivationResult: Result<Guid,ServerError> option
 }
 with
     static member Init = {
-        IsActivating = false
         ActivationResult = None
     }
 

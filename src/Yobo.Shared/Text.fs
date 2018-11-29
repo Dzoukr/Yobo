@@ -9,3 +9,8 @@ type TextValue =
     | Email
     | Registration
     | Register
+    | Login
+
+type TextMessageValue =
+    | ActivatingYourAccount
+    | AccountSuccessfullyActivated

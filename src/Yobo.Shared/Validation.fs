@@ -9,24 +9,15 @@ type ValidationError =
     | ValuesNotEqual of TextValue * TextValue
     | IsNotValidEmail of TextValue
 
-let private tryFindErrorForField errs txt =
-    let findFn = function
-        | IsEmpty t -> txt = t
-        | MustBeLongerThan (t,_) -> txt = t
-        | ValuesNotEqual (_, t2) -> txt = t2
-        | IsNotValidEmail t -> txt = t
-    errs |> List.tryFind findFn
 
 type ValidationResult = {
     IsValid : bool
     Errors: (ValidationError) list
-    TryGetFieldError: TextValue -> ValidationError option
 }
 with
     static member FromErrorList (errs:ValidationError list) = {
         IsValid = errs.Length = 0
         Errors = errs
-        TryGetFieldError = tryFindErrorForField errs
     }
     static member Empty = ValidationResult.FromErrorList []
     static member FromResult result =

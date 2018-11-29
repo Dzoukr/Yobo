@@ -17,10 +17,10 @@
     <Compile Include="Text.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Validation.fs" />
+    <Compile Include="Communication.fs" />
     <Compile Include="Locale.fs" />
     <Compile Include="Registration\Domain.fs" />
     <Compile Include="Registration\Validation.fs" />
-    <Compile Include="Communication.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

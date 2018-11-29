@@ -7,6 +7,8 @@
         <NoWarn>2003</NoWarn>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Validation.fs" />
+        <Compile Include="SharedView.fs" />
         <Compile Include="Http.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="AccountActivation\Domain.fs" />

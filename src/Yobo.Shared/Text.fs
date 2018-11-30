@@ -14,3 +14,4 @@ type TextValue =
 type TextMessageValue =
     | ActivatingYourAccount
     | AccountSuccessfullyActivated
+    | RegistrationSuccessful

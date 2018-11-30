@@ -6,7 +6,7 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Communication
 
 type State = {
-    IsRegistrationing : bool
+    IsRegistrating : bool
     AlreadyTried : bool
     Account : Account
     ValidationResult: ValidationResult
@@ -14,7 +14,7 @@ type State = {
 }
 with
     static member Init = {
-        IsRegistrationing = false
+        IsRegistrating = false
         AlreadyTried = false
         Account = Account.Init
         ValidationResult = ValidationResult.Empty

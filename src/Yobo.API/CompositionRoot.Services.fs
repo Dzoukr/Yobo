@@ -48,3 +48,4 @@ module CommandHandler =
 
 module Users =
    let queries = Users.ReadQueries.UserQueries(Configuration.ReadDb.connectionString, dbErrorToServerError)
+   let authenticator = Users.ReadQueries.Authenticator(Configuration.ReadDb.connectionString, ServerError.AuthError)

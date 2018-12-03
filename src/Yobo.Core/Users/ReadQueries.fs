@@ -3,6 +3,7 @@ module Yobo.Core.Users.ReadQueries
 open Yobo.Core
 open System
 open FSharp.Rop
+open Yobo.Shared.Auth
 
 type User = {
     Id : Guid
@@ -19,7 +20,7 @@ let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         LastName = u.LastName
     }
 
-let private getUserByActivationKey key (ctx:ReadDb.Db.dataContext) =
+let private getByActivationKey key (ctx:ReadDb.Db.dataContext) =
     query {
         for x in ctx.Dbo.Users do
         where (x.ActivationKey = key)
@@ -27,8 +28,29 @@ let private getUserByActivationKey key (ctx:ReadDb.Db.dataContext) =
     }
     |> Data.oneOrError key
     <!> userFromDbEntity
-    
+
+let private login (verifyHashFn:string -> string -> bool) email pwd (ctx:ReadDb.Db.dataContext) =
+    let user =
+        query {
+            for x in ctx.Dbo.Users do
+            where (x.Email = email)
+            select x
+        } |> Seq.tryHead
+    match user with
+    | Some u ->
+        match (verifyHashFn pwd u.PasswordHash), u.ActivatedUtc with
+        | true, Some _ ->  u |> userFromDbEntity |> Ok
+        | true, None -> AccountNotActivated(u.Id) |> Error
+        | false, _ -> InvalidLoginOrPassword |> Error
+    | None -> InvalidLoginOrPassword |> Error
 
 type UserQueries<'a>(connString:string, mapError:Data.DbError -> 'a) =
     let ctx = ReadDb.Db.GetDataContext(connString)
-    member __.GetUserByActivationKey key = key |> getUserByActivationKey |> Data.tryQuery ctx |> Result.mapError mapError
+    member __.GetByActivationKey key = key |> getByActivationKey |> Data.tryQuery ctx |> Result.mapError mapError
+
+type Authenticator<'a>(connString:string, mapError:AuthError -> 'a) =
+    let ctx = ReadDb.Db.GetDataContext(connString)
+    member __.Login verifyHash email pwd =
+        login verifyHash email pwd
+        |> Data.tryQueryM (fun _ -> InvalidLoginOrPassword) ctx
+        |> Result.mapError mapError

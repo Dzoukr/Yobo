@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Yobo.Shared</AssemblyName>
@@ -17,10 +17,13 @@
     <Compile Include="Text.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Validation.fs" />
+    <Compile Include="Auth.fs" />
     <Compile Include="Communication.fs" />
     <Compile Include="Locale.fs" />
     <Compile Include="Registration\Domain.fs" />
     <Compile Include="Registration\Validation.fs" />
+    <Compile Include="Login\Domain.fs" />
+    <Compile Include="Login\Validation.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -10,6 +10,7 @@
     <Compile Include="Configuration.fs" />
     <Compile Include="Registration\ArgsBuilder.fs" />
     <Compile Include="Registration\HttpHandlers.fs" />
+    <Compile Include="Login\HttpHandlers.fs" />
     <Compile Include="CompositionRoot.Services.fs" />
     <Compile Include="CompositionRoot.HttpHandlers.fs" />
     <Compile Include="Routes.fs" />

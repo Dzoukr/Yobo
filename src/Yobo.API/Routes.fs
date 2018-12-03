@@ -8,7 +8,10 @@ let frontend wwwRootPath =
     Giraffe.ResponseWriters.htmlFile <| System.IO.Path.Combine(wwwRootPath, "index.html")
 
 let webApp wwwRootPath : HttpHandler = choose [
-    route Routes.register >=> CompositionRoot.HttpHandlers.Registration.register
-    routeCif Routes.activateAccount CompositionRoot.HttpHandlers.Registration.activateAccount
+    POST >=> choose [
+        route Routes.register >=> CompositionRoot.HttpHandlers.Registration.register
+        route Routes.login >=> CompositionRoot.HttpHandlers.Login.login
+        routeCif Routes.activateAccount CompositionRoot.HttpHandlers.Registration.activateAccount
+    ]
     frontend wwwRootPath
 ]

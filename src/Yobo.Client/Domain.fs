@@ -2,9 +2,11 @@ module Yobo.Client.Domain
 
 type State = { 
     Page : Router.Page
+    // pages state
     LoginState : Login.Domain.State
     RegistrationState : Registration.Domain.State
     AccountActivationState : AccountActivation.Domain.State
+
 }
 with
     static member Init = {

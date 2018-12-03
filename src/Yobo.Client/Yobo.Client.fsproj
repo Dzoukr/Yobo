@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
@@ -16,13 +16,14 @@
         <Compile Include="AccountActivation\View.fs" />
         <Compile Include="AccountActivation\State.fs" />
         <Compile Include="Login\Domain.fs" />
+        <Compile Include="Login\Http.fs" />
         <Compile Include="Login\View.fs" />
         <Compile Include="Login\State.fs" />
         <Compile Include="Registration\Domain.fs" />
         <Compile Include="Registration\View.fs" />
         <Compile Include="Registration\Http.fs" />
-        <Compile Include="Domain.fs" />
         <Compile Include="Registration\State.fs" />
+        <Compile Include="Domain.fs" />
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />
         <Compile Include="App.fs" />

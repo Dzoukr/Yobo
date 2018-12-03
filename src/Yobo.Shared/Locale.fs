@@ -6,6 +6,7 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Text
 open Yobo.Shared.Domain
 open Yobo.Shared.Communication
+open Yobo.Shared.Auth
 
 let toCz = function
     | Id -> "ID"
@@ -41,8 +42,14 @@ let domainErrorToCz err =
     | DomainError.ItemAlreadyExists field -> sprintf "Tento %s již v systému existuje." (field |> toCz)
     | DomainError.ItemDoesNotExist field -> sprintf "Položka s touto hodnotou %s v systému neexistuje." (field |> toCz)
 
+let authErrorToCz err =
+    match err with
+    | AuthError.InvalidLoginOrPassword -> "Zadali jste nesprávný email nebo heslo."
+    | AuthError.AccountNotActivated _ -> "Váš účet ještě nebyl zaktivován."
+
 let serverErrorToCz (err:Yobo.Shared.Communication.ServerError) =
     match err with
     | Exception ex -> sprintf "Došlo k chybě : %s" ex
     | DomainError err -> err |> domainErrorToCz |> sprintf "Došlo k chybě : %s" 
     | ValidationError _ -> "Došlo k chybě správnosti dat. Prosím zkontrolujte formulář."
+    | AuthError err -> err |> authErrorToCz |> sprintf "Došlo k chybě : %s" 

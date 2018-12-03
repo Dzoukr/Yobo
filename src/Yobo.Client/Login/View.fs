@@ -6,6 +6,7 @@ open Fulma
 open Fable.Core.JsInterop
 open Yobo.Client
 open Yobo.Client.Login.Domain
+open Fable.Import
 
 
 let render (state : State) (dispatch : Msg -> unit) =
@@ -39,16 +40,19 @@ let render (state : State) (dispatch : Msg -> unit) =
             ]
         ]
     
+    
     let form = 
         div 
             [ ClassName "box"] 
             [
                 Heading.h1 [ ] [ str "Yoga Booking" ]
+
+                (SharedView.serverErrorToViewIfAny state.LoginResult)
+
                 email
                 pwd
                 btn state.IsLogging
                 footer
-                str (state.ToString())
             ]
    
     Hero.hero [ ]

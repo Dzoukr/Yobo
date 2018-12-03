@@ -33,4 +33,12 @@ module Registration =
     open Yobo.API.CompositionRoot
 
     let register : HttpHandler = safeBindJson<Account> (register Services.CommandHandler.handle Password.createHash >> toHandler)
-    let activateAccount _ = safeBindJson<Guid> (activateAccount Services.CommandHandler.handle Services.Users.queries.GetUserByActivationKey >> toHandler)
+    let activateAccount _ = safeBindJson<Guid> (activateAccount Services.CommandHandler.handle Services.Users.queries.GetByActivationKey >> toHandler)
+
+module Login =
+    open Yobo.API.Login.HttpHandlers
+    open Yobo.Shared.Login.Domain
+    open Yobo.API.CompositionRoot
+    open Yobo.Libraries.Security
+    
+    let login : HttpHandler = safeBindJson<Login> (login (Services.Users.authenticator.Login Password.verifyPassword) >> toHandler)

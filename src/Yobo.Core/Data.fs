@@ -3,7 +3,7 @@ module Yobo.Core.Data
 open System
 
 type DbError =
-    | ItemNotFound of Guid
+    | ItemNotFound of obj
     | Exception of exn
 
 let internal oneOrError<'a> i (s:seq<'a>) =
@@ -11,7 +11,9 @@ let internal oneOrError<'a> i (s:seq<'a>) =
         s |> Seq.head |> Ok
     with _ -> DbError.ItemNotFound(i) |> Error
 
-let internal tryQuery ctx f = 
+let internal tryQueryM errorMapFn ctx f = 
     try 
         f ctx
-    with ex -> DbError.Exception(ex) |> Error
+    with ex -> ex |> errorMapFn |> Error
+
+let internal tryQuery ctx f = tryQueryM (fun ex -> DbError.Exception(ex)) ctx f

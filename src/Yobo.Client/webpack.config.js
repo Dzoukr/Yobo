@@ -3,6 +3,9 @@ var webpack = require("webpack");
 var MinifyPlugin = require("terser-webpack-plugin");
 var HtmlWebpackPlugin = require('html-webpack-plugin')
 var CopyWebpackPlugin = require('copy-webpack-plugin');
+var MiniCssExtractPlugin = require('mini-css-extract-plugin');
+var OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+var SafePostCssParser = require('postcss-safe-parser');
 
 function resolve(filePath) {
     return path.join(__dirname, filePath)
@@ -13,6 +16,7 @@ var CONFIG = {
         "app": [
             "whatwg-fetch",
             "@babel/polyfill",
+            resolve("./styles/app.scss"),
             resolve("./Yobo.Client.fsproj")
         ]
     },
@@ -50,7 +54,7 @@ var commonPlugins = [
 ]
 
 module.exports = {
-    entry : CONFIG.fsharpEntry,
+    entry: CONFIG.fsharpEntry,
     output: {
         path: resolve('./output'),
         publicPath: '/',
@@ -71,13 +75,21 @@ module.exports = {
                 }
             }
         },
-        minimizer: isProduction ? [new MinifyPlugin()] : []
+        minimizer: isProduction ? [new MinifyPlugin(), new OptimizeCSSAssetsPlugin({
+            cssProcessorOptions: {
+                parser: SafePostCssParser,
+            }
+        })] : []
     },
-    plugins: isProduction ? commonPlugins.concat ( [
+    plugins: isProduction ? commonPlugins.concat([
         new CopyWebpackPlugin([
             { from: resolve('./public') }
-        ])
-    ]) : commonPlugins.concat ([
+        ]),
+        new MiniCssExtractPlugin({
+            filename: 'css/[name].[contenthash:8].css',
+            chunkFilename: 'css/[name].[contenthash:8].chunk.css',
+        }),
+    ]) : commonPlugins.concat([
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NamedModulesPlugin()
     ]),
@@ -93,6 +105,36 @@ module.exports = {
             {
                 test: /\.fs(x|proj)?$/,
                 use: "fable-loader"
+            },
+            {
+                test: /\.scss$/,
+                use: [
+                    isProduction ? {
+                        loader: MiniCssExtractPlugin.loader,
+                    } : 'style-loader',
+                    {
+                        loader: 'css-loader',
+                        options: {
+                            importLoaders: 2,
+                        },
+                    },
+                    {
+                        loader: 'postcss-loader',
+                        options: {
+                            ident: 'postcss',
+                            plugins: () => [
+                                require('postcss-flexbugs-fixes'),
+                                require('postcss-preset-env')({
+                                    autoprefixer: {
+                                        flexbox: 'no-2009',
+                                    },
+                                    stage: 3,
+                                }),
+                            ],
+                        },
+                    },
+                    'sass-loader',
+                ]
             },
             {
                 test: /\.js$/,

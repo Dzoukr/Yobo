@@ -11,10 +11,12 @@ type ServerError =
     | AuthError of AuthError
     | Exception of string
 
-module Routes =
-    let register = "/api/register"
-    let login = "/api/login"
-    let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/api/activateAccount/%O"
+type ServerResponse<'a> = Async<Result<'a, ServerError>>
+
+//module Routes =
+//    let register = "/api/register"
+//    let login = "/api/login"
+//    let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/api/activateAccount/%O"
 
 module FrontendRoutes =
     let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/accountActivation/%O"

@@ -5,6 +5,7 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Communication
 open Yobo.Shared.Registration.Validation
 open Yobo.Client.Registration.Domain
+open Yobo.Client.Http
 
 let private updateValidation (state : State) =
     let validation = 
@@ -19,7 +20,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | Register -> 
         let validation = state.Account |> validateAccount |> ValidationResult.FromResult
         match validation.IsValid with
-        | true -> { state with AlreadyTried = true; IsRegistrating = true; ValidationResult = validation }, Http.register(state.Account)
+        | true -> { state with AlreadyTried = true; IsRegistrating = true; ValidationResult = validation }, (state.Account |> Cmd.ofAsyncResult registrationAPI.Register RegisterDone)
         | false -> { state with AlreadyTried = true; ValidationResult = validation }, Cmd.none
     | RegisterDone result -> 
         match result with

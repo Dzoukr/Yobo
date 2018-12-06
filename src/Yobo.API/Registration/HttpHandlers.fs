@@ -1,7 +1,5 @@
 module Yobo.API.Registration.HttpHandlers
 
-open Giraffe
-
 open Yobo.Shared.Registration.Domain
 open FSharp.Rop
 open Yobo.Core

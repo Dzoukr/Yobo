@@ -3,5 +3,4 @@ group Server
     Giraffe
     Microsoft.AspNetCore
     Microsoft.AspNetCore.StaticFiles
-    Thoth.Json.Net
-    Thoth.Json.Giraffe
+    Fable.Remoting.Giraffe

@@ -22,8 +22,10 @@
     <Compile Include="Locale.fs" />
     <Compile Include="Registration\Domain.fs" />
     <Compile Include="Registration\Validation.fs" />
+    <Compile Include="Registration\Communication.fs" />
     <Compile Include="Login\Domain.fs" />
     <Compile Include="Login\Validation.fs" />
+    <Compile Include="Login\Communication.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

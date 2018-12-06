@@ -5,10 +5,7 @@ open System.IO
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.DependencyInjection
-
 open Giraffe
-open Giraffe.Serialization
-
 
 #if DEBUG
 let publicPath = Path.GetFullPath "../Yobo.Client/public"
@@ -24,7 +21,6 @@ let configureApp (app : IApplicationBuilder) =
 
 let configureServices (services : IServiceCollection) =
     services.AddGiraffe() |> ignore
-    services.AddSingleton<IJsonSerializer>(Thoth.Json.Giraffe.ThothSerializer()) |> ignore
 
 WebHostBuilder()
     .UseKestrel()

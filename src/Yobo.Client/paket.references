@@ -6,5 +6,5 @@ group Client
     Fable.Core
     Fulma
     Fable.Elmish.Browser
-
+    Fable.Remoting.Client
     dotnet-fable

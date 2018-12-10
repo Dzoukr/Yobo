@@ -18,11 +18,13 @@ let toCz = function
     | Registration -> "registrace"
     | Register -> "zaregistrovat se"
     | Login -> "přihlásit se"
+    | ResendActivationLink -> "poslat aktivační odkaz"
     
 let toCzMsg = function    
     | ActivatingYourAccount -> "Aktivuji váš účet..."
     | AccountSuccessfullyActivated -> "Váš účet byl právě zaktivován. Nyní se můžete přihlásit do systému."
     | RegistrationSuccessful -> "Registrace proběhla úspěšně. Nyní je potřeba zaktivovat váš účet. Podívejte se prosím do emailu, kam by vám měl přijít aktivační odkaz a klikněte na něj."
+    | AccountNotActivatedYet -> "Zkuste se podívat do vaší emailové schránky, kam jsme vám poslali aktivační odkaz. Pokud ho nemůžete nalézt, klikněte na tlačítko níže a nechte si poslat nový."
 
 let title (s:string) = Char.ToUpperInvariant(s.[0]).ToString() + s.Substring(1).ToLowerInvariant()
 

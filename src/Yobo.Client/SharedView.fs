@@ -24,7 +24,15 @@ let successBox content =
 let inProgressBox content =
     article [ ClassName "message is-info has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fa fa-circle-o-notch fa-spin" ] []
+            i [ ClassName "fa fa-circle-o-notch fa-spin"; Style [ PaddingRight 10 ] ] [] 
+            content
+        ]
+    ]        
+
+let infoBox content =
+    article [ ClassName "message is-info has-text-centered" ] [
+        div [ ClassName "message-body"][
+            i [ ClassName "fa fa-info-circle"; Style [ PaddingRight 10 ] ] [] 
             content
         ]
     ]        

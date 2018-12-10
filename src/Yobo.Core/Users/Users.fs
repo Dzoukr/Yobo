@@ -17,12 +17,19 @@ module CmdArgs =
         ActivationKey: Guid
     }
 
+    type RegenerateActivationKey = {
+        Id : Guid
+        ActivationKey: Guid
+    }
+
 type Command =
     | Register of CmdArgs.Register
+    | RegenerateActivationKey of CmdArgs.RegenerateActivationKey
     | Activate of CmdArgs.Activate
 
 type Event = 
     | Registered of CmdArgs.Register
+    | ActivationKeyRegenerated of CmdArgs.RegenerateActivationKey
     | Activated of CmdArgs.Activate
 
 type State = {

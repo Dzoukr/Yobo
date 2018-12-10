@@ -26,6 +26,11 @@ let execute (state:State) = function
         <!> (fun _ -> normalizeCreate args)
         <!> (fun a -> Registered a)
         <!> List.singleton
+    | RegenerateActivationKey args ->
+        onlyIfNotAlreadyActivated state
+        >>= onlyIfExists
+        <!> (fun _ -> ActivationKeyRegenerated args)
+        <!> List.singleton
     | Activate args ->
         onlyIfNotAlreadyActivated state
         >>= onlyIfExists
@@ -35,4 +40,5 @@ let execute (state:State) = function
 
 let apply (state:State) = function
     | Registered args -> { state with Id = args.Id; ActivationKey = args.ActivationKey }
+    | ActivationKeyRegenerated args -> { state with ActivationKey = args.ActivationKey }
     | Activated args -> { state with Id = args.Id; IsActivated = true }

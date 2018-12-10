@@ -10,8 +10,10 @@ type TextValue =
     | Registration
     | Register
     | Login
+    | ResendActivationLink
 
 type TextMessageValue =
     | ActivatingYourAccount
     | AccountSuccessfullyActivated
     | RegistrationSuccessful
+    | AccountNotActivatedYet

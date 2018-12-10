@@ -7,7 +7,9 @@ open Fable.Core.JsInterop
 open Yobo.Client
 open Yobo.Client.Login.Domain
 open Fable.Import
-
+open Yobo.Shared.Auth
+open Yobo.Shared.Communication
+open Yobo.Shared
 
 let render (state : State) (dispatch : Msg -> unit) =
     
@@ -39,7 +41,21 @@ let render (state : State) (dispatch : Msg -> unit) =
                 str "Zapomněl(a) jsem heslo!"
             ]
         ]
-    
+
+    let resendActivationInfoBox =
+        match state.LoginResult with
+        | Some (Error (ServerError.AuthError (AccountNotActivated id))) ->
+            span [] [
+                Text.TextMessageValue.AccountNotActivatedYet |> Locale.toCzMsg |> str
+
+                div [ Style [ MarginTop 10]] [
+                    Button.button [ Button.Color IsInfo; Button.OnClick (fun _ -> id |> ResendActivation |> dispatch )] [
+                        Text.TextValue.ResendActivationLink |> Locale.toTitleCz |> str
+                    ]
+                ]
+            ] |> SharedView.infoBox
+        | _ -> str ""
+        
     
     let form = 
         div 
@@ -48,6 +64,7 @@ let render (state : State) (dispatch : Msg -> unit) =
                 Heading.h1 [ ] [ str "Yoga Booking" ]
 
                 (SharedView.serverErrorToViewIfAny state.LoginResult)
+                resendActivationInfoBox
 
                 email
                 pwd

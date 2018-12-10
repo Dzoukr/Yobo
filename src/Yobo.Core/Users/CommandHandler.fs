@@ -6,6 +6,7 @@ open Yobo.Libraries.Security.SymetricCryptoProvider
 
 let private getId = function
     | Register args -> args |> Extractor.getIdFromCommand
+    | RegenerateActivationKey args -> args |> Extractor.getIdFromCommand
     | Activate args -> args |> Extractor.getIdFromCommand
 
 let private settings cryptoProvider = {

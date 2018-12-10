@@ -1,4 +1,4 @@
-module Yobo.API.Registration.HttpHandlers
+module Yobo.API.Registration.Functions
 
 open Yobo.Shared.Registration.Domain
 open FSharp.Rop

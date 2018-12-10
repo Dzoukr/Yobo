@@ -8,4 +8,5 @@ let routeBuilder _ m = sprintf "/api/login/%s" m
 
 type API = {
     Login : Login -> ServerResponse<User>
+    ResendActivation: Guid -> ServerResponse<Guid>
 } 

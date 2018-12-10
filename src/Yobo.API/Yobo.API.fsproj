@@ -9,10 +9,10 @@
   <ItemGroup>
     <Compile Include="Configuration.fs" />
     <Compile Include="Registration\ArgsBuilder.fs" />
-    <Compile Include="Registration\HttpHandlers.fs" />
-    <Compile Include="Login\HttpHandlers.fs" />
+    <Compile Include="Registration\Functions.fs" />
+    <Compile Include="Login\Functions.fs" />
     <Compile Include="CompositionRoot.Services.fs" />
-    <Compile Include="CompositionRoot.HttpHandlers.fs" />
+    <Compile Include="CompositionRoot.Communication.fs" />
     <Compile Include="Routes.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

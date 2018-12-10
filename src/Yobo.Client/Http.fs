@@ -5,17 +5,12 @@ open Fable.Remoting.Client
 module Cmd =
     open Elmish
     open Yobo.Shared.Communication
-    open Fable.Import
 
     let ofAsyncResult f msg i =
         Cmd.ofAsync
             f i            
-            (fun s ->
-                Browser.console.log "TADY"
-                msg s)
-            (fun ex ->
-                Browser.console.log "AAAAAAAAA"
-                ServerError.Exception(ex.Message) |> Error |> msg)
+            (msg)
+            (fun ex -> ServerError.Exception(ex.Message) |> Error |> msg)
 
 let registrationAPI =
     Remoting.createApi()

@@ -25,3 +25,8 @@ let activate (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.ActivatedUtc <- Some DateTime.UtcNow
     ctx.SubmitUpdates()
+
+let regenerateActivationKey (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.ActivationKey <- args.ActivationKey
+    ctx.SubmitUpdates()

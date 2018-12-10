@@ -1,7 +1,7 @@
 module Yobo.Client.Login.Domain
 
+open System
 open Yobo.Shared.Login.Domain
-open Yobo.Shared.Domain
 open Yobo.Shared.Communication
 
 type State = {
@@ -21,3 +21,4 @@ type Msg =
     | LoginDone of Result<User, ServerError>
     | ChangeEmail of string
     | ChangePassword of string
+    | ResendActivation of Guid

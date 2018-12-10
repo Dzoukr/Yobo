@@ -11,7 +11,14 @@ let frontend wwwRootPath =
 let registration : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Registration.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.HttpHandlers.Registration.api
+    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Registration.api
     |> Remoting.buildHttpHandler
 
-let webApp wwwRootPath : HttpHandler = choose [ registration; frontend wwwRootPath ]
+let login : HttpHandler =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.Login.Communication.routeBuilder
+    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Login.api
+    |> Remoting.buildHttpHandler
+
+let webApp wwwRootPath : HttpHandler =
+    choose [ registration; login; frontend wwwRootPath ]

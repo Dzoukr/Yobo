@@ -18,6 +18,7 @@
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
     <Compile Include="EmailSettings.fs" />
+    <EmbeddedResource Include="Users\EmailTemplates\RegenerateActivation.html" />
     <EmbeddedResource Include="Users\EmailTemplates\Register.html" />
     <Compile Include="Users\Registry\Registry.fs" />
     <Compile Include="Users\Registry\CommandValidator.fs" />
@@ -29,9 +30,10 @@
     <Compile Include="Users\EventSerializer.fs" />
     <Compile Include="Users\CommandHandler.fs" />
     <Compile Include="Users\UpdateQueries.fs" />
+    <Compile Include="Users\ReadQueries.fs" />
+    <Compile Include="Users\Authenticator.fs" />
     <Compile Include="Users\DbEventHandler.fs" />
     <Compile Include="Users\EmailEventHandler.fs.fs" />
-    <Compile Include="Users\ReadQueries.fs" />
     <Compile Include="CQRS.fs" />
     <Compile Include="DbEventHandler.fs" />
     <Compile Include="EmailEventHandler.fs" />
@@ -44,11 +46,8 @@
     <ProjectReference Include="..\..\src\Yobo.Libraries\Yobo.Libraries.fsproj" />
   </ItemGroup>
   <PropertyGroup>
-    <FscToolPath>../../packages/core/FSharp.Compiler.Tools/tools</FscToolPath>
+    <FscToolPath>../../packages/tools/FSharp.Compiler.Tools/tools</FscToolPath>
     <FscToolExe>fsc.exe</FscToolExe>
   </PropertyGroup>
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="copy ..\..\packages\core\System.Data.SqlClient\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll bin\Debug\netcoreapp2.1\" />
-  </Target>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

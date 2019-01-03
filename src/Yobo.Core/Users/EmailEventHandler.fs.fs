@@ -5,7 +5,11 @@ open Yobo.Libraries.Emails
 open Yobo.Core
 open Yobo.Shared.Communication
 
-let handle (settings:EmailSettings.Settings) = function
+let private okOrNone = function
+    | Ok v -> Some v
+    | Error _ -> None
+
+let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = function
     | Registered args ->
         let name = sprintf "%s %s" args.FirstName args.LastName
         let tos = { Email = args.Email; Name = name }
@@ -21,4 +25,26 @@ let handle (settings:EmailSettings.Settings) = function
             Subject = subject
             HtmlMessage = message
         } |> Some
-    | _ -> None
+
+    | ActivationKeyRegenerated args ->
+        args.Id
+        |> q.GetById
+        |> okOrNone
+        |> Option.map (fun user ->
+            let name = sprintf "%s %s" user.FirstName user.LastName
+            let tos = { Email = user.Email; Name = name }
+            let subject = "TODO"
+            let message =
+                Fue.Data.init
+                |> Fue.Data.add "activate" (Uri(settings.BaseUrl, sprintf FrontendRoutes.activateAccount args.ActivationKey))
+                |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.RegenerateActivation.html")
+
+            { EmailMessage.Empty with
+                From = settings.From
+                To = tos |> List.singleton
+                Subject = subject
+                HtmlMessage = message
+            }
+        )
+
+    | Activated _ -> None

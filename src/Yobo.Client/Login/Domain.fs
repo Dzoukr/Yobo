@@ -8,12 +8,14 @@ type State = {
     IsLogging : bool
     Login : Login
     LoginResult : Result<User, ServerError> option
+    ResendActivationResult: Result<Guid, ServerError> option
 }
 with
     static member Init = {
         IsLogging = false
         Login = Login.Init
         LoginResult = None
+        ResendActivationResult = None
     }
 
 type Msg =
@@ -22,3 +24,4 @@ type Msg =
     | ChangeEmail of string
     | ChangePassword of string
     | ResendActivation of Guid
+    | ResendActivationDone of Result<Guid, ServerError>

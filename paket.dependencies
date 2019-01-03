@@ -5,6 +5,11 @@ group Shared
     nuget FSharp.Core
     gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
 
+group Tools
+    source https://api.nuget.org/v3/index.json
+    framework: netcoreapp2.1
+    nuget FSharp.Compiler.Tools
+
 group Server
     source https://api.nuget.org/v3/index.json
     framework: netcoreapp2.1
@@ -19,13 +24,13 @@ group Server
 group Core
     source https://api.nuget.org/v3/index.json
     framework: netcoreapp2.1
+    storage: none
 
     nuget FSharp.Core
     nuget CosmoStore
     nuget Newtonsoft.Json
     nuget SQLProvider
     nuget System.Data.SqlClient
-    nuget FSharp.Compiler.Tools
     nuget Fue
     
     gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
@@ -67,4 +72,3 @@ group Build
     nuget Fake.Core.Target
     nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
-

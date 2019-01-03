@@ -4,6 +4,7 @@ open Yobo.Core
 open System
 open FSharp.Rop
 open Yobo.Shared.Auth
+open Yobo.Core.Data
 
 type User = {
     Id : Guid
@@ -12,7 +13,19 @@ type User = {
     LastName : string
 }
 
-let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
+type UserQueries<'a> = {
+    GetByActivationKey : Guid -> Result<User, 'a>
+    GetById : Guid -> Result<User, 'a>
+}
+
+let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
+    GetByActivationKey = q.GetByActivationKey >> Result.mapError fn
+    GetById = q.GetById >> Result.mapError fn
+}
+
+let withErrorForActivation (fn:'a -> 'a) q = { q with GetByActivationKey = q.GetByActivationKey >> Result.mapError fn }
+
+let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
     {
         Id = u.Id
         Email = u.Email
@@ -29,28 +42,18 @@ let private getByActivationKey key (ctx:ReadDb.Db.dataContext) =
     |> Data.oneOrError key
     <!> userFromDbEntity
 
-let private login (verifyHashFn:string -> string -> bool) email pwd (ctx:ReadDb.Db.dataContext) =
-    let user =
-        query {
-            for x in ctx.Dbo.Users do
-            where (x.Email = email)
-            select x
-        } |> Seq.tryHead
-    match user with
-    | Some u ->
-        match (verifyHashFn pwd u.PasswordHash), u.ActivatedUtc with
-        | true, Some _ ->  u |> userFromDbEntity |> Ok
-        | true, None -> AccountNotActivated(u.Id) |> Error
-        | false, _ -> InvalidLoginOrPassword |> Error
-    | None -> InvalidLoginOrPassword |> Error
+let private getById i (ctx:ReadDb.Db.dataContext) =
+    query {
+        for x in ctx.Dbo.Users do
+        where (x.Id = i)
+        select x
+    }
+    |> Data.oneOrError i
+    <!> userFromDbEntity
 
-type UserQueries<'a>(connString:string, mapError:Data.DbError -> 'a) =
+let createDefault (connString:string) =
     let ctx = ReadDb.Db.GetDataContext(connString)
-    member __.GetByActivationKey key = key |> getByActivationKey |> Data.tryQuery ctx |> Result.mapError mapError
-
-type Authenticator<'a>(connString:string, mapError:AuthError -> 'a) =
-    let ctx = ReadDb.Db.GetDataContext(connString)
-    member __.Login verifyHash email pwd =
-        login verifyHash email pwd
-        |> Data.tryQueryM (fun _ -> InvalidLoginOrPassword) ctx
-        |> Result.mapError mapError
+    {
+        GetByActivationKey = getByActivationKey >> Data.tryQuery ctx
+        GetById = getById >> Data.tryQuery ctx
+    }

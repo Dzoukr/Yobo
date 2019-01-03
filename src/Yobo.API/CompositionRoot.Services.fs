@@ -28,10 +28,22 @@ let private dbErrorToServerError = function
     | DbError.ItemNotFound id -> TextValue.Id |> DomainError.ItemDoesNotExist |> ServerError.DomainError
     | DbError.Exception e -> e.Message |> ServerError.Exception
 
+module Users =
+    let queries =
+        Configuration.ReadDb.connectionString
+        |> Users.ReadQueries.createDefault 
+        |> Users.ReadQueries.withError dbErrorToServerError
+        |> Users.ReadQueries.withErrorForActivation (fun _ -> ServerError.DomainError(DomainError.ActivationKeyDoesNotMatch))
+
+    let authenticator =
+        Password.verifyPassword
+        |> Users.Authenticator.createDefault Configuration.ReadDb.connectionString
+        |> Users.Authenticator.withError ServerError.AuthError
+
 // event handlers
 module EventHandler =
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.connectionString
-    let private emailHandleFn = EmailEventHandler.getHandler emailService emailSettings
+    let private emailHandleFn = EmailEventHandler.getHandler Users.queries emailService emailSettings
     let handle evn =
         evn |> dbHandleFn |> ignore
         evn |> emailHandleFn |> ignore
@@ -45,7 +57,3 @@ module CommandHandler =
         cmd |> handleFn
         <!> List.map EventHandler.handle
         |> Result.mapError cmdHandlerErrorToServerError
-
-module Users =
-   let queries = Users.ReadQueries.UserQueries(Configuration.ReadDb.connectionString, dbErrorToServerError)
-   let authenticator = Users.ReadQueries.Authenticator(Configuration.ReadDb.connectionString, ServerError.AuthError)

@@ -7,7 +7,7 @@ open Fable.Import
 open Fable.Helpers
 open Fable.Core.JsInterop
 
-type Page =
+type PublicPage =
     | Login
     | Registration
     | ForgottenPassword
@@ -20,12 +20,19 @@ type Page =
             | ForgottenPassword -> "/forgottenPassword"
             | AccountActivation id -> sprintf "/accountActivation/%A" id
 
+type Page =
+    | Public of PublicPage
+     with
+        member x.ToPath() =
+            match x with
+            | Public p -> p.ToPath()
+
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
-        map Login (s "login")
-        map Registration (s "registration")
-        map ForgottenPassword (s "forgottenPassword")
-        map ((fun (x:string) -> Guid(x)) >> AccountActivation) (s "accountActivation" </> str)
+        map (Public(Login)) (s "login")
+        map (Public(Registration)) (s "registration")
+        map (Public(ForgottenPassword)) (s "forgottenPassword")
+        map ((fun (x:string) -> Guid(x)) >> AccountActivation >> Public) (s "accountActivation" </> str)
     ]
 
 let modifyUrl (route:Page) = route.ToPath() |> Navigation.modifyUrl

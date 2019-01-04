@@ -15,7 +15,7 @@ let private mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
         Email = u.Email
         FirstName = u.FirstName
         LastName = u.LastName
-    }
+    } : Yobo.Shared.Domain.User
 
 let private claimsToUser (claims:seq<Claim>) =
     let find key = claims |> Seq.find (fun x -> x.Type = key) |> (fun x -> x.Value)
@@ -24,9 +24,9 @@ let private claimsToUser (claims:seq<Claim>) =
         Email = find "Email"
         FirstName = find "FirstName"
         LastName = find "LastName"
-    }
+    } : Yobo.Shared.Domain.User
 
-let private userToClaims (u:User) =
+let private userToClaims (u:Yobo.Shared.Domain.User) =
     seq [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)

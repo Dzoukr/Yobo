@@ -14,7 +14,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let successContent msg = span [] [
         str (msg |> Locale.toCzMsg)
         div [] [
-            a [ Href <| Router.Page.Login.ToPath(); OnClick Router.goToUrl] [
+            a [ Href <| Router.Page.Public(Router.PublicPage.Login).ToPath(); OnClick Router.goToUrl] [
                 TextValue.Login |> Locale.toTitleCz |> str
             ]
         ]

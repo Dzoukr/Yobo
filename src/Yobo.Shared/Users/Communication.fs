@@ -1,6 +1,7 @@
 module Yobo.Shared.Users.Communication
 
 open System
+open Yobo.Shared.Domain
 open Yobo.Shared.Communication
 open Yobo.Shared.Users.Domain
 

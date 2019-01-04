@@ -27,10 +27,3 @@ with
         Email = ""
         Password = ""
     }
-
-type User = {
-    Id : Guid
-    Email : string
-    FirstName : string
-    LastName : string
-}

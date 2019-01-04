@@ -33,7 +33,7 @@ let render (state : State) (dispatch : Msg -> unit) =
 
     let footer = 
         div [] [
-            a [ Href <| Router.Page.Registration.ToPath(); OnClick Router.goToUrl] [
+            a [ Href <| Router.Page.Public(Router.PublicPage.Registration).ToPath(); OnClick Router.goToUrl] [
                 str (Text.TextValue.Registration |> Locale.toTitleCz)
             ]
             //str " · "

@@ -11,6 +11,7 @@
         <Compile Include="SharedView.fs" />
         <Compile Include="Http.fs" />
         <Compile Include="Router.fs" />
+        <Compile Include="TokenStorage.fs" />
         <Compile Include="AccountActivation\Domain.fs" />
         <Compile Include="AccountActivation\View.fs" />
         <Compile Include="AccountActivation\State.fs" />

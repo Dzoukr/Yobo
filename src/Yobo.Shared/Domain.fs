@@ -7,3 +7,10 @@ type DomainError =
     | ItemDoesNotExist of Text.TextValue
     | UserAlreadyActivated
     | ActivationKeyDoesNotMatch
+
+type User = {
+    Id : Guid
+    Email : string
+    FirstName : string
+    LastName : string
+}

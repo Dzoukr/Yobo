@@ -15,7 +15,6 @@ let private updateValidation (state : State) =
 
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
-    
     match msg with
     | Register -> 
         let validation = state.Account |> validateAccount |> ValidationResult.FromResult

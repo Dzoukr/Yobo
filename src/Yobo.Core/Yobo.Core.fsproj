@@ -7,7 +7,7 @@
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\core\Dzoukr\bfcf416edaefbb8555586cf80fc2006e\FSharp.Rop.fs">
+    <Compile Include="..\..\paket-files\core\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>

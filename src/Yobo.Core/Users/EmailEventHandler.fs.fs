@@ -4,10 +4,7 @@ open System
 open Yobo.Libraries.Emails
 open Yobo.Core
 open Yobo.Shared.Communication
-
-let private okOrNone = function
-    | Ok v -> Some v
-    | Error _ -> None
+open FSharp.Rop
 
 let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = function
     | Registered args ->
@@ -29,7 +26,7 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
     | ActivationKeyRegenerated args ->
         args.Id
         |> q.GetById
-        |> okOrNone
+        |> Result.toOption
         |> Option.map (fun user ->
             let name = sprintf "%s %s" user.FirstName user.LastName
             let tos = { Email = user.Email; Name = name }

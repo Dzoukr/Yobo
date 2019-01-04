@@ -5,3 +5,4 @@ open System
 type AuthError =
     | InvalidLoginOrPassword
     | AccountNotActivated of Guid
+    | InvalidOrExpiredToken

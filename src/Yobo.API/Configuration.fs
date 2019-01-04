@@ -54,3 +54,13 @@ module Emails =
 
 module Server =
     let baseUrl = Uri(conf.["server:baseUrl"])
+
+module Authorization =
+    open Yobo.Libraries.Authorization
+
+    let get : Configuration = {
+        Issuer = conf.["auth:issuer"]
+        Audience = conf.["auth:audience"]
+        Secret = conf.["auth:secret"] |> Base64String.fromString
+        TokenLifetime = conf.["auth:tokenLifetime"] |> TimeSpan.Parse
+    }

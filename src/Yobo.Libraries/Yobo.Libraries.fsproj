@@ -5,10 +5,13 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\libraries\Dzoukr\bfcf416edaefbb8555586cf80fc2006e\FSharp.Rop.fs">
+    <Compile Include="..\..\paket-files\libraries\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
+    <Compile Include="Authorization\Authorization.fs" />
+    <Compile Include="Authorization\Keys.fs" />
+    <Compile Include="Authorization\Jwt.fs" />
     <Compile Include="Security\SymetricCrypto.fs" />
     <Compile Include="Security\SymetricCryptoProvider.fs" />
     <Compile Include="Security\TableStorageSymetricCryptoProvider.fs" />

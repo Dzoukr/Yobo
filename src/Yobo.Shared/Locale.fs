@@ -25,6 +25,8 @@ let toCzMsg = function
     | AccountSuccessfullyActivated -> "Váš účet byl právě zaktivován. Nyní se můžete přihlásit do systému."
     | RegistrationSuccessful -> "Registrace proběhla úspěšně. Nyní je potřeba zaktivovat váš účet. Podívejte se prosím do emailu, kam by vám měl přijít aktivační odkaz a klikněte na něj."
     | AccountNotActivatedYet -> "Zkuste se podívat do vaší emailové schránky, kam jsme vám poslali aktivační odkaz. Pokud ho nemůžete nalézt, klikněte na tlačítko níže a nechte si poslat nový."
+    | ActivationLinkSuccessfullyResent -> "Aktivační odkaz byl úspěšně odeslán do vaší emailové schránky."
+    | ActivationLinkResendError -> "Aktivační odkaz se nepodařilo odeslat. Zavřete okno prohlížeče a zkuste to prosím později."
 
 let title (s:string) = Char.ToUpperInvariant(s.[0]).ToString() + s.Substring(1).ToLowerInvariant()
 
@@ -48,6 +50,7 @@ let authErrorToCz err =
     match err with
     | AuthError.InvalidLoginOrPassword -> "Zadali jste nesprávný email nebo heslo."
     | AuthError.AccountNotActivated _ -> "Váš účet ještě nebyl zaktivován."
+    | AuthError.InvalidOrExpiredToken -> "Token je nevalidní, nebo již vypršela jeho platnost"
 
 let serverErrorToCz (err:Yobo.Shared.Communication.ServerError) =
     match err with

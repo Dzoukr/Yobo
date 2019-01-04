@@ -17,3 +17,5 @@ type TextMessageValue =
     | AccountSuccessfullyActivated
     | RegistrationSuccessful
     | AccountNotActivatedYet
+    | ActivationLinkSuccessfullyResent
+    | ActivationLinkResendError

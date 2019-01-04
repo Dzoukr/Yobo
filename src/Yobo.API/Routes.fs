@@ -21,4 +21,4 @@ let login : HttpHandler =
     |> Remoting.buildHttpHandler
 
 let webApp wwwRootPath : HttpHandler =
-    choose [ registration; login; frontend wwwRootPath ]
+    choose [ registration; login; frontend wwwRootPath ] 

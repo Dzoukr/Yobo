@@ -7,6 +7,7 @@ open Yobo.Shared.Login.Domain
 let routeBuilder _ m = sprintf "/api/login/%s" m
 
 type API = {
-    Login : Login -> ServerResponse<User>
+    Login : Login -> ServerResponse<string>
+    GetUser : string -> ServerResponse<User>
     ResendActivation: Guid -> ServerResponse<Guid>
 } 

@@ -7,7 +7,7 @@ open Yobo.Shared.Communication
 type State = {
     IsLogging : bool
     Login : Login
-    LoginResult : Result<User, ServerError> option
+    LoginResult : Result<string, ServerError> option
     ResendActivationResult: Result<Guid, ServerError> option
 }
 with
@@ -20,7 +20,7 @@ with
 
 type Msg =
     | Login
-    | LoginDone of Result<User, ServerError>
+    | LoginDone of Result<string, ServerError>
     | ChangeEmail of string
     | ChangePassword of string
     | ResendActivation of Guid

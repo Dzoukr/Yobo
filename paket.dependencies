@@ -3,7 +3,7 @@ group Shared
     framework: netstandard2.0
     storage: none
     nuget FSharp.Core
-    gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
+    github Dzoukr/FSharp.Rop FSharp.Rop.fs
 
 group Tools
     source https://api.nuget.org/v3/index.json
@@ -33,7 +33,7 @@ group Core
     nuget System.Data.SqlClient
     nuget Fue
     
-    gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
+    github Dzoukr/FSharp.Rop FSharp.Rop.fs
 
 group Libraries
     source https://api.nuget.org/v3/index.json
@@ -45,7 +45,8 @@ group Libraries
     nuget WindowsAzure.Storage
     nuget TaskBuilder.fs
     nuget Mailjet.Api
-    gist Dzoukr/bfcf416edaefbb8555586cf80fc2006e FSharp.Rop.fs
+    nuget System.IdentityModel.Tokens.Jwt
+    github Dzoukr/FSharp.Rop FSharp.Rop.fs
 
 group Client
     source https://api.nuget.org/v3/index.json

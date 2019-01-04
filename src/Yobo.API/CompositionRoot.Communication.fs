@@ -19,6 +19,7 @@ module Login =
     open Yobo.Shared.Auth
     
     let api : Yobo.Shared.Login.Communication.API = {
-        Login = login Services.Users.authenticator.Login >> toAsync
+        Login = login Services.Users.authenticator.Login (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
+        GetUser = getUser Services.Users.authorizator.ValidateToken >> toAsync
         ResendActivation = resendActivation Services.CommandHandler.handle >> toAsync
     }

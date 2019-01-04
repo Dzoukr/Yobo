@@ -13,7 +13,7 @@ let urlUpdate (result: Option<Router.Page>) state =
         let state = { state with Page = page }
         let cmd =
             match page with
-            | Router.Page.AccountActivation id -> id |>  AccountActivation.Domain.Msg.Activate |> Msg.AccountActivationMsg |> Cmd.ofMsg
+            | Router.Page.AccountActivation id -> id |> AccountActivation.Domain.Msg.Activate |> Msg.AccountActivationMsg |> Cmd.ofMsg
             | _ -> Cmd.none
         state, cmd
 

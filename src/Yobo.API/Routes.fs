@@ -8,17 +8,11 @@ let frontend wwwRootPath =
     let wwwRootPath = if isNull wwwRootPath then "" else wwwRootPath
     Giraffe.ResponseWriters.htmlFile <| System.IO.Path.Combine(wwwRootPath, "index.html")
 
-let registration : HttpHandler =
+let users : HttpHandler =
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Registration.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Registration.api
-    |> Remoting.buildHttpHandler
-
-let login : HttpHandler =
-    Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Login.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Login.api
+    |> Remoting.withRouteBuilder Yobo.Shared.Users.Communication.routeBuilder
+    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Users.api
     |> Remoting.buildHttpHandler
 
 let webApp wwwRootPath : HttpHandler =
-    choose [ registration; login; frontend wwwRootPath ] 
+    choose [ users; frontend wwwRootPath ] 

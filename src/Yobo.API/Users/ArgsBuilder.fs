@@ -1,14 +1,14 @@
-module Yobo.API.Registration.ArgsBuilder
+module Yobo.API.Users.ArgsBuilder
 
 open System
 open Yobo.Core
 open Yobo.Core.Users
-open Yobo.Shared.Registration
-open Yobo.Shared.Registration.Domain
+open Yobo.Shared.Users
+open Yobo.Shared.Users.Domain
 open Yobo.Shared.Communication
 
 let buildRegister getHash =
-    ArgsBuilder.build (fun (acc:Account) ->
+    ArgsBuilder.build (fun (acc:NewAccount) ->
         ({
             Id = Guid.NewGuid()
             ActivationKey = Guid.NewGuid()

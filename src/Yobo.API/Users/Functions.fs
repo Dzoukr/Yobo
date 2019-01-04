@@ -1,7 +1,7 @@
-module Yobo.API.Login.Functions
+module Yobo.API.Users.Functions
 
 open System
-open Yobo.Shared.Login.Domain
+open Yobo.Shared.Users.Domain
 open FSharp.Rop
 open Yobo.Core.Users
 open Yobo.Core
@@ -51,3 +51,17 @@ let getUser validateFn token =
     match token |> validateFn with
     | Some claims -> claims |> claimsToUser |> Ok
     | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
+
+let register cmdHandler createHashFn (acc:NewAccount) =
+    result {
+        let! args = acc |> ArgsBuilder.buildRegister createHashFn
+        let! _ = args |> Command.Register |> CoreCommand.Users |> cmdHandler
+        return args.Id
+    }
+
+let activateAccount cmdHandler getUserByActivationKey (activationKey:Guid) =
+    result {
+        let! (user : ReadQueries.User) = getUserByActivationKey activationKey
+        let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> Command.Activate |> CoreCommand.Users |> cmdHandler
+        return user.Id
+    }

@@ -1,14 +1,14 @@
 module Yobo.Client.Registration.Domain
 
 open System
-open Yobo.Shared.Registration.Domain
+open Yobo.Shared.Users.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Communication
 
 type State = {
     IsRegistrating : bool
     AlreadyTried : bool
-    Account : Account
+    Account : NewAccount
     ValidationResult: ValidationResult
     RegistrationResult: Result<Guid, ServerError> option
 }
@@ -16,7 +16,7 @@ with
     static member Init = {
         IsRegistrating = false
         AlreadyTried = false
-        Account = Account.Init
+        Account = NewAccount.Init
         ValidationResult = ValidationResult.Empty
         RegistrationResult = None
     }

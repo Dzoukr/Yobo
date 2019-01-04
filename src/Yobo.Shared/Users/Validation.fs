@@ -1,12 +1,12 @@
-module Yobo.Shared.Registration.Validation
+module Yobo.Shared.Users.Validation
 
 open Yobo.Shared.Validation
 open Yobo.Shared.Text
-open Domain
+open Yobo.Shared.Users.Domain
 
-let validateAccount (acc:Account) =
+let validateAccount (acc:NewAccount) =
     [
-        validateNotEmpty FirstName (fun x -> x.FirstName)
+        validateNotEmpty FirstName (fun (x:NewAccount) -> x.FirstName)
         validateNotEmpty LastName (fun x -> x.LastName)
         validateNotEmpty Email (fun x -> x.Email)
         validateLongerThan 5 Password (fun x -> x.Password)
@@ -14,3 +14,9 @@ let validateAccount (acc:Account) =
         validateEquals Password SecondPassword (fun x -> x.Password) (fun x -> x.SecondPassword)
         validateEmail Email (fun x -> x.Email)
     ] |> validate acc
+
+let validateLogin (log:Login) =
+    [
+        validateNotEmpty Password (fun x -> x.Password)
+        validateEmail Email (fun x -> x.Email)
+    ] |> validate log

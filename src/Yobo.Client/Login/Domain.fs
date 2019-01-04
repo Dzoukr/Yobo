@@ -1,7 +1,7 @@
 module Yobo.Client.Login.Domain
 
 open System
-open Yobo.Shared.Login.Domain
+open Yobo.Shared.Users.Domain
 open Yobo.Shared.Communication
 
 type State = {

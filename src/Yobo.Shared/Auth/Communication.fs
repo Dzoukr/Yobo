@@ -10,7 +10,8 @@ let routeBuilder _ m = sprintf "/api/users/%s" m
 type API = {
     Register : NewAccount -> ServerResponse<Guid>
     ActivateAccount : Guid -> ServerResponse<Guid>
-    Login : Login -> ServerResponse<string>
-    GetUser : string -> ServerResponse<User>
+    GetToken : Login -> ServerResponse<string>
+    RefreshToken : string -> ServerResponse<string>
+    GetUserByToken : string -> ServerResponse<User>
     ResendActivation: Guid -> ServerResponse<Guid>
 } 

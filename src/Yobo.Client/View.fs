@@ -13,6 +13,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         | Router.AuthPage.Registration -> Auth.Registration.View.render state.Auth.Registration (RegistrationMsg >> AuthMsg >> dispatch)
         | Router.AuthPage.ForgottenPassword -> Auth.Registration.View.render state.Auth.Registration (RegistrationMsg >> AuthMsg >> dispatch)
         | Router.AuthPage.AccountActivation _ -> Auth.AccountActivation.View.render state.Auth.AccountActivation (AccountActivationMsg >> AuthMsg >> dispatch)
+        | Router.AuthPage.Logout -> str ""
     | Router.Page.Admin admin ->
         match admin with
         | Router.AdminPage.Users -> div [] [ str ("USEEEEEEEEEEERS pro " + (string state.LoggedUser)) ]

@@ -39,5 +39,7 @@ type AuthMsg =
 
 type Msg =
     | AuthMsg of AuthMsg
-    | GetUser of string
-    | GetUserDone of Result<Yobo.Shared.Domain.User,ServerError>
+    | LoadUserByToken of string
+    | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
+    | RefreshToken of string
+    | TokenRefreshed of Result<string, ServerError>

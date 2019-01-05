@@ -9,8 +9,9 @@ module Auth =
     open Yobo.Shared.Auth
     
     let api : Yobo.Shared.Auth.Communication.API = {
-        Login = login Services.Users.authenticator.Login (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
-        GetUser = getUser Services.Users.authorizator.ValidateToken >> toAsync
+        GetToken = getToken Services.Users.authenticator.Login (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
+        RefreshToken = refreshToken Services.Users.authorizator.ValidateToken (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
+        GetUserByToken = getUser Services.Users.authorizator.ValidateToken >> toAsync
         ResendActivation = resendActivation Services.CommandHandler.handle >> toAsync
         Register = register Services.CommandHandler.handle Password.createHash >> toAsync
         ActivateAccount = activateAccount Services.CommandHandler.handle Services.Users.authenticator.GetByActivationKey >> toAsync

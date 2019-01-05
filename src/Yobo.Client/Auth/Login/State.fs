@@ -7,7 +7,7 @@ open Yobo.Client
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
-    | Login -> { state with IsLogging = true }, (state.Login |> Cmd.ofAsyncResult authAPI.Login LoginDone)
+    | Login -> { state with IsLogging = true }, (state.Login |> Cmd.ofAsyncResult authAPI.GetToken LoginDone)
     | ResendActivation id -> state, (id |> Cmd.ofAsyncResult authAPI.ResendActivation ResendActivationDone)
     | LoginDone res ->
         match res with

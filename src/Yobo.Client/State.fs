@@ -4,6 +4,7 @@ open Elmish
 open Fable.Import
 open Yobo.Client.Domain
 open Http
+open System
 
 let urlUpdate (result: Option<Router.Page>) state =
     match result with
@@ -22,7 +23,7 @@ let urlUpdate (result: Option<Router.Page>) state =
         | Router.Page.Admin _ ->
             state, match state.LoggedUser, TokenStorage.tryGetToken() with
                     | Some _, Some _ -> Cmd.none
-                    | None, Some t -> Cmd.ofMsg (Msg.GetUser t)
+                    | None, Some t -> Cmd.ofMsg (Msg.LoadUserByToken t)
                     | _, None -> Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
         | Router.Page.Auth(Router.AuthPage.Logout) ->
             TokenStorage.removeToken()
@@ -47,8 +48,26 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | AccountActivationMsg m ->
             Auth.AccountActivation.State.update m state.Auth.AccountActivation
             |> mapUpdate (fun s -> { state with Auth = { state.Auth with AccountActivation = s } }) (AccountActivationMsg >> Msg.AuthMsg)
-    | GetUser t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUser GetUserDone)
-    | GetUserDone res ->
+    | LoadUserByToken t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
+    | UserByTokenLoaded res ->
         match res with
         | Ok user -> { state with LoggedUser = Some user }, Cmd.none
         | Error _ -> state, Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
+    | RefreshToken t -> state, (t |> Cmd.ofAsyncResult authAPI.RefreshToken TokenRefreshed)
+    | TokenRefreshed res ->
+        match res with
+        | Ok t ->
+            t |> TokenStorage.setToken
+            state, Cmd.none
+        | Error _ -> state, Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
+
+let subscribe init =
+    let sub dispatch = 
+        let timer = (TimeSpan.FromMinutes 1.).TotalMilliseconds |> int
+        Fable.Import.Browser.console.log(timer)
+        let handler _ =
+            match TokenStorage.tryGetToken() with
+            | Some t -> dispatch (RefreshToken t) |> ignore
+            | None -> Cmd.none |> ignore
+        Fable.Import.Browser.window.setInterval(handler, timer) |> ignore
+    Cmd.ofSub sub

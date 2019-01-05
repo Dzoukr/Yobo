@@ -34,11 +34,15 @@ let private userToClaims (u:Yobo.Shared.Domain.User) =
         Claim("LastName", u.LastName)
     ]
 
-let login loginFn tokenCreator (acc:Login) =
+let getToken loginFn tokenCreator (acc:Login) =
     result {
         let! user = loginFn acc.Email acc.Password
         return user |> mapToUser |> userToClaims |> tokenCreator
     }
+let refreshToken validateFn tokenCreator token =
+    match token |> validateFn with
+    | Some claims -> claims |> tokenCreator |> Ok
+    | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
 let resendActivation cmdHandler (userId:Guid) =
     result {

@@ -11,6 +11,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram State.init State.update View.render
+|> Program.withSubscription State.subscribe
 |> Program.toNavigable (parsePath Router.pageParser) State.urlUpdate
 #if DEBUG
 |> Program.withConsoleTrace

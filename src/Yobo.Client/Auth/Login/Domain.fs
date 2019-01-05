@@ -20,8 +20,8 @@ with
 
 type Msg =
     | Login
-    | LoginDone of Result<string, ServerError>
+    | LoggedIn of Result<string, ServerError>
     | ChangeEmail of string
     | ChangePassword of string
     | ResendActivation of Guid
-    | ResendActivationDone of Result<Guid, ServerError>
+    | ActivationResent of Result<Guid, ServerError>

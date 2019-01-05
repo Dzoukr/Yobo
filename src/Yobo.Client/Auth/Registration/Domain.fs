@@ -23,7 +23,7 @@ with
 
 type Msg =
     | Register
-    | RegisterDone of Result<Guid,ServerError>
+    | Registered of Result<Guid,ServerError>
     | ChangeFirstName of string
     | ChangeLastName of string
     | ChangeEmail of string

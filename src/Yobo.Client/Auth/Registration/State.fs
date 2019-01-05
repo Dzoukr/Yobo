@@ -19,9 +19,9 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | Register -> 
         let validation = state.Account |> validateAccount |> ValidationResult.FromResult
         match validation.IsValid with
-        | true -> { state with AlreadyTried = true; IsRegistrating = true; ValidationResult = validation }, (state.Account |> Cmd.ofAsyncResult authAPI.Register RegisterDone)
+        | true -> { state with AlreadyTried = true; IsRegistrating = true; ValidationResult = validation }, (state.Account |> Cmd.ofAsyncResult authAPI.Register Registered)
         | false -> { state with AlreadyTried = true; ValidationResult = validation }, Cmd.none
-    | RegisterDone result -> 
+    | Registered result -> 
         match result with
         | Ok _ ->
             { state with IsRegistrating = false; RegistrationResult = Some result }, Cmd.none

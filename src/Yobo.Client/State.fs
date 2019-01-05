@@ -5,13 +5,13 @@ open Fable.Import
 open Yobo.Client.Domain
 open Http
 
-module TokenStorage =
-    let private storageKey = "token"
-    let tryGetToken () : string option =
-        Browser.localStorage.getItem(storageKey)
-        |> function null -> None | x -> Some (unbox x)
-    let setToken token =
-        Browser.localStorage.setItem(storageKey, token)
+//module TokenStorage =
+//    let private storageKey = "token"
+//    let tryGetToken () : string option =
+//        Browser.localStorage.getItem(storageKey)
+//        |> function null -> None | x -> Some (unbox x)
+//    let setToken token =
+//        Browser.localStorage.setItem(storageKey, token)
 
 let urlUpdate (result: Option<Router.Page>) state =
     match result with
@@ -43,5 +43,6 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             | Ok user -> { state with LoggedUser = Some user }, Cmd.none
             | Error _ -> { state with LoggedUser = None; Page = Router.Public(Router.PublicPage.Login) }, Cmd.none
     match msg with
-    | LoginMsg(Login.Domain.Msg.LoginDone(Ok _)) -> { state with Page = Router.Page.Public(Router.PublicPage.Registration) }, cmd
+    | LoginMsg(Login.Domain.Msg.LoginDone(Ok _)) -> state, (Router.PublicPage.Registration |> Router.Page.Public |> Router.newUrl)
+    //urlUpdate(Router.PublicPage.Registration |> Router.Page.Public |> Some) state
     | _ -> state, cmd

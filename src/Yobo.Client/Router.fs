@@ -36,7 +36,8 @@ let pageParser: Parser<Page -> Page, Page> =
     ]
 
 let modifyUrl (route:Page) = route.ToPath() |> Navigation.modifyUrl
-let modifyLocation (route:Page) = Browser.window.location.href <- route.ToPath()
+let newUrl (route:Page) = route.ToPath() |> Navigation.newUrl
+//let modifyLocation (route:Page) = Browser.window.location.href <- route.ToPath()
 
 let goToUrl (e: React.MouseEvent) =
     e.preventDefault()

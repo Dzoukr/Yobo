@@ -1,7 +1,7 @@
-module Yobo.Client.Registration.Domain
+module Yobo.Client.Auth.Registration.Domain
 
 open System
-open Yobo.Shared.Users.Domain
+open Yobo.Shared.Auth.Domain
 open Yobo.Shared.Validation
 open Yobo.Shared.Communication
 

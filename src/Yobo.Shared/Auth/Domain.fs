@@ -1,4 +1,4 @@
-module Yobo.Shared.Users.Domain
+module Yobo.Shared.Auth.Domain
 
 open System
 

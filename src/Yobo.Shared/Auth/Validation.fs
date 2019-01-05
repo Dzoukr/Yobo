@@ -1,8 +1,8 @@
-module Yobo.Shared.Users.Validation
+module Yobo.Shared.Auth.Validation
 
 open Yobo.Shared.Validation
 open Yobo.Shared.Text
-open Yobo.Shared.Users.Domain
+open Yobo.Shared.Auth.Domain
 
 let validateAccount (acc:NewAccount) =
     [

@@ -12,7 +12,7 @@ module Cmd =
             (msg)
             (fun ex -> ServerError.Exception(ex.Message) |> Error |> msg)
 
-let usersAPI =
+let authAPI =
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Users.Communication.routeBuilder
-    |> Remoting.buildProxy<Yobo.Shared.Users.Communication.API>
+    |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
+    |> Remoting.buildProxy<Yobo.Shared.Auth.Communication.API>

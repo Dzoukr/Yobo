@@ -8,8 +8,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Configuration.fs" />
-    <Compile Include="Users\ArgsBuilder.fs" />
-    <Compile Include="Users\Functions.fs" />
+    <Compile Include="Auth\ArgsBuilder.fs" />
+    <Compile Include="Auth\Functions.fs" />
     <Compile Include="CompositionRoot.Services.fs" />
     <Compile Include="CompositionRoot.Communication.fs" />
     <Compile Include="Routes.fs" />

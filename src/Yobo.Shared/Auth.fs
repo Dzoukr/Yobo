@@ -1,4 +1,4 @@
-module Yobo.Shared.Auth
+namespace Yobo.Shared.Auth
 
 open System
 
@@ -6,3 +6,4 @@ type AuthError =
     | InvalidLoginOrPassword
     | AccountNotActivated of Guid
     | InvalidOrExpiredToken
+    | ActivationKeyDoesNotMatch

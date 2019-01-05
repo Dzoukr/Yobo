@@ -10,8 +10,8 @@ let frontend wwwRootPath =
 
 let users : HttpHandler =
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Users.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Users.api
+    |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
+    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Auth.api
     |> Remoting.buildHttpHandler
 
 let webApp wwwRootPath : HttpHandler =

@@ -51,6 +51,7 @@ let authErrorToCz err =
     | AuthError.InvalidLoginOrPassword -> "Zadali jste nesprávný email nebo heslo."
     | AuthError.AccountNotActivated _ -> "Váš účet ještě nebyl zaktivován."
     | AuthError.InvalidOrExpiredToken -> "Token je nevalidní, nebo již vypršela jeho platnost"
+    | AuthError.ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."
 
 let serverErrorToCz (err:Yobo.Shared.Communication.ServerError) =
     match err with

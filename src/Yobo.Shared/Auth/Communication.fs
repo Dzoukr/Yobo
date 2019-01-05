@@ -1,9 +1,9 @@
-module Yobo.Shared.Users.Communication
+module Yobo.Shared.Auth.Communication
 
 open System
 open Yobo.Shared.Domain
 open Yobo.Shared.Communication
-open Yobo.Shared.Users.Domain
+open Yobo.Shared.Auth.Domain
 
 let routeBuilder _ m = sprintf "/api/users/%s" m
 

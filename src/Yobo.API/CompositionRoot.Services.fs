@@ -33,7 +33,6 @@ module Users =
         Configuration.ReadDb.connectionString
         |> Users.ReadQueries.createDefault 
         |> Users.ReadQueries.withError dbErrorToServerError
-        |> Users.ReadQueries.withErrorForActivation (fun _ -> ServerError.DomainError(DomainError.ActivationKeyDoesNotMatch))
 
     let authenticator =
         Password.verifyPassword

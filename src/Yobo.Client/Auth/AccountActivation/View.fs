@@ -1,9 +1,9 @@
-module Yobo.Client.AccountActivation.View
+module Yobo.Client.Auth.AccountActivation.View
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
-open Yobo.Client.AccountActivation.Domain
+open Yobo.Client.Auth.AccountActivation.Domain
 open Yobo.Client
 open Yobo.Shared
 open Yobo.Shared.Text
@@ -14,7 +14,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let successContent msg = span [] [
         str (msg |> Locale.toCzMsg)
         div [] [
-            a [ Href <| Router.Page.Public(Router.PublicPage.Login).ToPath(); OnClick Router.goToUrl] [
+            a [ Href <| Router.Page.Auth(Router.AuthPage.Login).ToPath(); OnClick Router.goToUrl] [
                 TextValue.Login |> Locale.toTitleCz |> str
             ]
         ]

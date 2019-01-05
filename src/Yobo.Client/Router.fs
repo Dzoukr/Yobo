@@ -7,8 +7,9 @@ open Fable.Import
 open Fable.Helpers
 open Fable.Core.JsInterop
 
-type PublicPage =
+type AuthPage =
     | Login
+    | Logout
     | Registration
     | ForgottenPassword
     | AccountActivation of Guid
@@ -16,28 +17,41 @@ type PublicPage =
         member x.ToPath() = 
             match x with
             | Login -> "/login"
+            | Logout -> "/logout"
             | Registration -> "/registration"
             | ForgottenPassword -> "/forgottenPassword"
             | AccountActivation id -> sprintf "/accountActivation/%A" id
 
+type AdminPage =
+    | Users
+    with
+        member x.ToPath() = 
+            match x with
+            | Users -> "/users"
+
 type Page =
-    | Public of PublicPage
+    | Auth of AuthPage
+    | Admin of AdminPage
      with
         member x.ToPath() =
             match x with
-            | Public p -> p.ToPath()
+            | Auth p -> p.ToPath()
+            | Admin p -> p.ToPath()
+        static member DefaultPage = Users |> Admin
 
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
-        map (Public(Login)) (s "login")
-        map (Public(Registration)) (s "registration")
-        map (Public(ForgottenPassword)) (s "forgottenPassword")
-        map ((fun (x:string) -> Guid(x)) >> AccountActivation >> Public) (s "accountActivation" </> str)
+        map (Auth(Login)) (s "login")
+        map (Auth(Logout)) (s "logout")
+        map (Auth(Registration)) (s "registration")
+        map (Auth(ForgottenPassword)) (s "forgottenPassword")
+        map ((fun (x:string) -> Guid(x)) >> AccountActivation >> Auth) (s "accountActivation" </> str)
+
+        map (Admin(Users)) (s "users")
     ]
 
 let modifyUrl (route:Page) = route.ToPath() |> Navigation.modifyUrl
 let newUrl (route:Page) = route.ToPath() |> Navigation.newUrl
-//let modifyLocation (route:Page) = Browser.window.location.href <- route.ToPath()
 
 let goToUrl (e: React.MouseEvent) =
     e.preventDefault()

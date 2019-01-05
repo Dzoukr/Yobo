@@ -1,7 +1,7 @@
-module Yobo.API.Users.Functions
+module Yobo.API.Auth.Functions
 
 open System
-open Yobo.Shared.Users.Domain
+open Yobo.Shared.Auth.Domain
 open FSharp.Rop
 open Yobo.Core.Users
 open Yobo.Core

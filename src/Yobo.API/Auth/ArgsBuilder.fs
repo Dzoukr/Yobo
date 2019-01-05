@@ -1,10 +1,10 @@
-module Yobo.API.Users.ArgsBuilder
+module Yobo.API.Auth.ArgsBuilder
 
 open System
 open Yobo.Core
 open Yobo.Core.Users
-open Yobo.Shared.Users
-open Yobo.Shared.Users.Domain
+open Yobo.Shared.Auth
+open Yobo.Shared.Auth.Domain
 open Yobo.Shared.Communication
 
 let buildRegister getHash =

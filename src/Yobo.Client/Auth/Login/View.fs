@@ -1,11 +1,11 @@
-module Yobo.Client.Login.View
+module Yobo.Client.Auth.Login.View
 
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open Fable.Core.JsInterop
 open Yobo.Client
-open Yobo.Client.Login.Domain
+open Yobo.Client.Auth.Login.Domain
 open Fable.Import
 open Yobo.Shared.Auth
 open Yobo.Shared.Communication
@@ -33,7 +33,7 @@ let render (state : State) (dispatch : Msg -> unit) =
 
     let footer = 
         div [] [
-            a [ Href <| Router.Page.Public(Router.PublicPage.Registration).ToPath(); OnClick Router.goToUrl] [
+            a [ Href <| Router.Page.Auth(Router.AuthPage.Registration).ToPath(); OnClick Router.goToUrl] [
                 str (Text.TextValue.Registration |> Locale.toTitleCz)
             ]
             //str " · "

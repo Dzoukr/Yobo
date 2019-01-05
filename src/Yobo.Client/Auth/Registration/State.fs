@@ -1,10 +1,10 @@
-module Yobo.Client.Registration.State
+module Yobo.Client.Auth.Registration.State
 
 open Elmish
 open Yobo.Shared.Validation
 open Yobo.Shared.Communication
-open Yobo.Shared.Users.Validation
-open Yobo.Client.Registration.Domain
+open Yobo.Shared.Auth.Validation
+open Yobo.Client.Auth.Registration.Domain
 open Yobo.Client.Http
 
 let private updateValidation (state : State) =
@@ -19,7 +19,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | Register -> 
         let validation = state.Account |> validateAccount |> ValidationResult.FromResult
         match validation.IsValid with
-        | true -> { state with AlreadyTried = true; IsRegistrating = true; ValidationResult = validation }, (state.Account |> Cmd.ofAsyncResult usersAPI.Register RegisterDone)
+        | true -> { state with AlreadyTried = true; IsRegistrating = true; ValidationResult = validation }, (state.Account |> Cmd.ofAsyncResult authAPI.Register RegisterDone)
         | false -> { state with AlreadyTried = true; ValidationResult = validation }, Cmd.none
     | RegisterDone result -> 
         match result with

@@ -20,9 +20,9 @@
     <Compile Include="Auth.fs" />
     <Compile Include="Communication.fs" />
     <Compile Include="Locale.fs" />
-    <Compile Include="Users\Domain.fs" />
-    <Compile Include="Users\Validation.fs" />
-    <Compile Include="Users\Communication.fs" />
+    <Compile Include="Auth\Domain.fs" />
+    <Compile Include="Auth\Validation.fs" />
+    <Compile Include="Auth\Communication.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

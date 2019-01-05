@@ -9,12 +9,13 @@ open Yobo.Shared.Auth
 open System.Security.Claims
 open Yobo.Shared.Communication
 
-let private mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
+let mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
     {
         Id = u.Id
         Email = u.Email
         FirstName = u.FirstName
         LastName = u.LastName
+        IsAdmin = false
     } : Yobo.Shared.Domain.User
 
 let private claimsToUser (claims:seq<Claim>) =
@@ -24,6 +25,7 @@ let private claimsToUser (claims:seq<Claim>) =
         Email = find "Email"
         FirstName = find "FirstName"
         LastName = find "LastName"
+        IsAdmin = find "IsAdmin" |> Boolean.Parse
     } : Yobo.Shared.Domain.User
 
 let private userToClaims (u:Yobo.Shared.Domain.User) =
@@ -32,12 +34,13 @@ let private userToClaims (u:Yobo.Shared.Domain.User) =
         Claim("Email", u.Email)
         Claim("FirstName", u.FirstName)
         Claim("LastName", u.LastName)
+        Claim("IsAdmin", (u.IsAdmin.ToString()))
     ]
 
 let getToken loginFn tokenCreator (acc:Login) =
     result {
         let! user = loginFn acc.Email acc.Password
-        return user |> mapToUser |> userToClaims |> tokenCreator
+        return user |> userToClaims |> tokenCreator
     }
 let refreshToken validateFn tokenCreator token =
     match token |> validateFn with

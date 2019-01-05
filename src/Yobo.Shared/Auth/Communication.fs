@@ -5,7 +5,7 @@ open Yobo.Shared.Domain
 open Yobo.Shared.Communication
 open Yobo.Shared.Auth.Domain
 
-let routeBuilder _ m = sprintf "/api/users/%s" m
+let routeBuilder _ m = sprintf "/api/auth/%s" m
 
 type API = {
     Register : NewAccount -> ServerResponse<Guid>

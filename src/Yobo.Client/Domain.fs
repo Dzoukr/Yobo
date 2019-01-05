@@ -18,7 +18,6 @@ with
 type State = { 
     Page : Router.Page
     LoggedUser : Yobo.Shared.Domain.User option
-    Token : string option
 
     // pages state
     Auth : AuthState
@@ -27,8 +26,6 @@ with
     static member Init = {
         Page = Router.Page.DefaultPage
         LoggedUser = None
-        Token = TokenStorage.tryGetToken()
-
         Auth = AuthState.Init
     }
 

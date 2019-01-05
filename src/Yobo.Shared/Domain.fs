@@ -13,4 +13,5 @@ type User = {
     Email : string
     FirstName : string
     LastName : string
+    IsAdmin : bool
 }

@@ -61,10 +61,10 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             state, Cmd.none
         | Error _ -> state, Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
 
-let subscribe init =
+let subscribe (state:State) =
     let sub dispatch = 
         let timer = (TimeSpan.FromMinutes 1.).TotalMilliseconds |> int
-        Fable.Import.Browser.console.log(timer)
+        
         let handler _ =
             match TokenStorage.tryGetToken() with
             | Some t -> dispatch (RefreshToken t) |> ignore

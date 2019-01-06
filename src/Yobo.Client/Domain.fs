@@ -21,12 +21,14 @@ type State = {
 
     // pages state
     Auth : AuthState
+    Admin : Admin.Domain.State
 }
 with
     static member Init = {
         Page = Router.Page.DefaultPage
         LoggedUser = None
         Auth = AuthState.Init
+        Admin = Admin.Domain.State.Init
     }
 
 type AuthMsg =
@@ -36,6 +38,7 @@ type AuthMsg =
 
 type Msg =
     | AuthMsg of AuthMsg
+    | AdminMsg of Admin.Domain.Msg
     | LoadUserByToken of string
     | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
     | RefreshToken of string

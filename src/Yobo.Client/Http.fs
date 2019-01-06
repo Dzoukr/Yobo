@@ -16,3 +16,17 @@ let authAPI =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
     |> Remoting.buildProxy<Yobo.Shared.Auth.Communication.API>
+
+let adminAPI =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.Admin.Communication.routeBuilder
+    |> Remoting.buildProxy<Yobo.Shared.Admin.Communication.API>
+
+
+module SecuredParam =
+    open Yobo.Shared.Communication
+
+    let create value = {
+        Token = TokenStorage.tryGetToken() |> Option.defaultValue ""
+        Param = value
+    }

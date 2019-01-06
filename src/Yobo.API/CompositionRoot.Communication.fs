@@ -9,21 +9,32 @@ module Auth =
     open Yobo.API.Auth.Functions
     open Yobo.Libraries.Security 
     open Yobo.API.CompositionRoot
+    open Yobo.API
+    open Yobo.Shared.Communication
+    open Yobo.Shared.Auth
 
     let private adminUser =
         {
             Id = Guid("f65203d4-60dd-4580-a31c-e538807ef720")
-            Email = "todo"
+            Email = Configuration.Admin.email
             FirstName = "Admin"
             LastName = "Admin"
             IsAdmin = true
         } : Yobo.Shared.Domain.User
 
     let private loginWithAdmin email pwd =
-        if email = "a" && pwd = "a" then Ok adminUser
+        if email = Configuration.Admin.email && pwd = Configuration.Admin.password then Ok adminUser
         else
             Services.Users.authenticator.Login email pwd <!> mapToUser
-    
+
+    let onlyForAdmin (sp:SecuredParam<_>) =
+        match sp.Token |> Services.Users.authorizator.ValidateToken with
+        | Some claims ->
+            match claims |> claimsToUser with
+            | { IsAdmin = true } -> Ok sp.Param
+            | _ -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
+        | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
+
     let api : Yobo.Shared.Auth.Communication.API = {
         GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
         RefreshToken = refreshToken Services.Users.authorizator.ValidateToken (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
@@ -31,4 +42,13 @@ module Auth =
         ResendActivation = resendActivation Services.CommandHandler.handle >> toAsync
         Register = register Services.CommandHandler.handle Password.createHash >> toAsync
         ActivateAccount = activateAccount Services.CommandHandler.handle Services.Users.authenticator.GetByActivationKey >> toAsync
+    }
+
+module Admin =
+    open Yobo.API.Auth.Functions
+    open Yobo.API.CompositionRoot
+    open Yobo.API
+    
+    let api : Yobo.Shared.Admin.Communication.API = {
+        GetAllUsers = fun x -> x |> Auth.onlyForAdmin >>= Services.Users.queries.GetAll <!> List.map mapToUser |> toAsync
     }

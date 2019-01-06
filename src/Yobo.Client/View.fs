@@ -16,4 +16,4 @@ let render (state : State) (dispatch : Msg -> unit) =
         | Router.AuthPage.Logout -> str ""
     | Router.Page.Admin admin ->
         match admin with
-        | Router.AdminPage.Users -> div [] [ str ("USEEEEEEEEEEERS pro " + (string state.LoggedUser)) ]
+        | Router.AdminPage.Users -> Admin.View.render state.Admin (AdminMsg >> dispatch)

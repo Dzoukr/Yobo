@@ -20,11 +20,14 @@ let urlUpdate (result: Option<Router.Page>) state =
                 |> AuthMsg.AccountActivationMsg
                 |> AuthMsg
                 |> Cmd.ofMsg
-        | Router.Page.Admin _ ->
-            state, match state.LoggedUser, TokenStorage.tryGetToken() with
-                    | Some _, Some _ -> Cmd.none
-                    | None, Some t -> Cmd.ofMsg (Msg.LoadUserByToken t)
-                    | _, None -> Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
+        | Router.Page.Admin admin ->
+            let state, cmd =
+                state, match state.LoggedUser, TokenStorage.tryGetToken() with
+                        | Some _, Some _ -> Cmd.none
+                        | None, Some t -> Cmd.ofMsg (Msg.LoadUserByToken t)
+                        | _, None -> Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
+            match admin with
+            | Router.AdminPage.Users -> state, Cmd.batch [cmd; (Admin.Domain.Msg.Init |> AdminMsg |> Cmd.ofMsg) ]
         | Router.Page.Auth(Router.AuthPage.Logout) ->
             TokenStorage.removeToken()
             { state with LoggedUser = None}, Router.newUrl(Router.Page.Auth(Router.AuthPage.Login))
@@ -48,6 +51,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | AccountActivationMsg m ->
             Auth.AccountActivation.State.update m state.Auth.AccountActivation
             |> mapUpdate (fun s -> { state with Auth = { state.Auth with AccountActivation = s } }) (AccountActivationMsg >> Msg.AuthMsg)
+    | AdminMsg m -> Admin.State.update m state.Admin |> mapUpdate (fun s -> { state with Admin = s}) AdminMsg
     | LoadUserByToken t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->
         match res with
@@ -61,7 +65,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             state, Cmd.none
         | Error _ -> state, Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
 
-let subscribe (state:State) =
+let subscribe (_:State) =
     let sub dispatch = 
         let timer = (TimeSpan.FromMinutes 1.).TotalMilliseconds |> int
         

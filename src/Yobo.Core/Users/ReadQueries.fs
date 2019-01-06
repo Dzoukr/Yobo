@@ -15,10 +15,13 @@ type User = {
 
 type UserQueries<'a> = {
     GetById : Guid -> Result<User, 'a>
+    GetAll : unit -> Result<User list, 'a>
 }
 
 let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
     GetById = q.GetById >> Result.mapError fn
+    GetAll = q.GetAll >> Result.mapError fn
+
 }
 
 let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
@@ -38,8 +41,19 @@ let private getById i (ctx:ReadDb.Db.dataContext) =
     |> Data.oneOrError i
     <!> userFromDbEntity
 
+let private getAll () (ctx:ReadDb.Db.dataContext) =
+    query {
+        for x in ctx.Dbo.Users do
+        sortBy x.LastName
+        select x
+    }
+    |> Seq.map userFromDbEntity
+    |> Seq.toList
+
 let createDefault (connString:string) =
     let ctx = ReadDb.Db.GetDataContext(connString)
     {
-        GetById = getById >> Data.tryQuery ctx
+        GetById = getById >> Data.tryQueryResult ctx
+        GetAll = getAll >> Data.tryQuery ctx
+        
     }

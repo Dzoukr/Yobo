@@ -44,6 +44,6 @@ let private login (verifyHashFn:string -> string -> bool) email pwd (ctx:ReadDb.
 let createDefault (connString:string) (verifyHashFn:string -> string -> bool) =
     let ctx = ReadDb.Db.GetDataContext(connString)
     {
-        Login = fun l p -> login verifyHashFn l p |> Data.tryQueryM (fun _ -> InvalidLoginOrPassword) ctx
-        GetByActivationKey = getByActivationKey >> Data.tryQuery ctx >> Result.mapError (fun _ -> ActivationKeyDoesNotMatch)
+        Login = fun l p -> login verifyHashFn l p |> Data.tryQueryResultM (fun _ -> InvalidLoginOrPassword) ctx
+        GetByActivationKey = getByActivationKey >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> ActivationKeyDoesNotMatch)
     }

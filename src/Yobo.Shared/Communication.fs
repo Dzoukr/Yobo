@@ -13,5 +13,10 @@ type ServerError =
 
 type ServerResponse<'a> = Async<Result<'a, ServerError>>
 
+type SecuredParam<'a> = {
+    Token : string
+    Param: 'a
+}
+
 module FrontendRoutes =
     let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/accountActivation/%O"

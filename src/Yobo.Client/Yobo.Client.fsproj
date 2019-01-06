@@ -9,9 +9,9 @@
     <ItemGroup>
         <Compile Include="Validation.fs" />
         <Compile Include="SharedView.fs" />
+        <Compile Include="TokenStorage.fs" />
         <Compile Include="Http.fs" />
         <Compile Include="Router.fs" />
-        <Compile Include="TokenStorage.fs" />
         <Compile Include="Auth\Registration\Domain.fs" />
         <Compile Include="Auth\Registration\View.fs" />
         <Compile Include="Auth\Registration\State.fs" />
@@ -21,6 +21,9 @@
         <Compile Include="Auth\AccountActivation\Domain.fs" />
         <Compile Include="Auth\AccountActivation\View.fs" />
         <Compile Include="Auth\AccountActivation\State.fs" />
+        <Compile Include="Admin\Domain.fs" />
+        <Compile Include="Admin\State.fs" />
+        <Compile Include="Admin\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />

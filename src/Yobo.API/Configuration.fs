@@ -64,3 +64,7 @@ module Authorization =
         Secret = conf.["auth:secret"] |> Base64String.fromString
         TokenLifetime = conf.["auth:tokenLifetime"] |> TimeSpan.Parse
     }
+
+module Admin =
+    let email = conf.["admin:email"]
+    let password = conf.["admin:password"]

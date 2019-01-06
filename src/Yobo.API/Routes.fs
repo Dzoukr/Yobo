@@ -14,5 +14,11 @@ let users : HttpHandler =
     |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Auth.api
     |> Remoting.buildHttpHandler
 
+let admin : HttpHandler =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.Admin.Communication.routeBuilder
+    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Admin.api
+    |> Remoting.buildHttpHandler
+
 let webApp wwwRootPath : HttpHandler =
-    choose [ users; frontend wwwRootPath ] 
+    choose [ users; admin; frontend wwwRootPath ] 

@@ -18,7 +18,7 @@ let mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
         IsAdmin = false
     } : Yobo.Shared.Domain.User
 
-let private claimsToUser (claims:seq<Claim>) =
+let claimsToUser (claims:seq<Claim>) =
     let find key = claims |> Seq.find (fun x -> x.Type = key) |> (fun x -> x.Value)
     {
         Id = find "Id" |> Guid
@@ -28,7 +28,7 @@ let private claimsToUser (claims:seq<Claim>) =
         IsAdmin = find "IsAdmin" |> Boolean.Parse
     } : Yobo.Shared.Domain.User
 
-let private userToClaims (u:Yobo.Shared.Domain.User) =
+let userToClaims (u:Yobo.Shared.Domain.User) =
     seq [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)

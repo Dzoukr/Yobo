@@ -11,7 +11,7 @@ open Yobo.Shared.Text
 open Yobo.Client
 
 let render (state : State) (dispatch : Msg -> unit) =
-    let regInput typ msgType txt =
+    let regInput value typ msgType txt =
         let error = state.ValidationResult |> Validation.tryGetFieldError txt
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
@@ -21,6 +21,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         Control.div [] [
             typ [
                 clr
+                Input.Option.Value value
                 Input.Option.OnChange (fun e -> !!e.target?value |> msgType |> dispatch)
             ]
             help
@@ -45,21 +46,25 @@ let render (state : State) (dispatch : Msg -> unit) =
                 (SharedView.serverErrorToViewIfAny state.RegistrationResult)
 
                 lbl FirstName
-                regInput Input.text ChangeFirstName FirstName
+                regInput state.Account.FirstName Input.text ChangeFirstName FirstName
                 
                 lbl LastName
-                regInput Input.text ChangeLastName LastName
+                regInput state.Account.LastName Input.text ChangeLastName LastName
 
                 lbl Email
-                regInput Input.email ChangeEmail Email
+                regInput state.Account.Email Input.email ChangeEmail Email
 
                 lbl Password
-                regInput Input.password ChangePassword Password
+                regInput "" Input.password ChangePassword Password
                 
                 lbl SecondPassword
-                regInput Input.password ChangeSecondPassword SecondPassword
+                regInput "" Input.password ChangeSecondPassword SecondPassword
 
                 btn state.IsRegistrating
+
+                a [ Href <| Router.Page.Auth(Router.AuthPage.Login).ToPath(); OnClick Router.goToUrl] [
+                    str (Text.TextValue.BackToLogin |> Locale.toTitleCz)
+                ]   
             ]
 
     let content = 

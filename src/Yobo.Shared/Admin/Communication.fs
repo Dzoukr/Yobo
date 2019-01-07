@@ -1,7 +1,7 @@
 module Yobo.Shared.Admin.Communication
 
 open System
-open Yobo.Shared.Domain
+open Domain
 open Yobo.Shared.Communication
 
 let routeBuilder _ m = sprintf "/api/admin/%s" m

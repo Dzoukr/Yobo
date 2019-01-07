@@ -12,6 +12,7 @@ module Auth =
     open Yobo.API
     open Yobo.Shared.Communication
     open Yobo.Shared.Auth
+    open Yobo.Shared.Auth.Domain
 
     let private adminUser =
         {
@@ -20,12 +21,12 @@ module Auth =
             FirstName = "Admin"
             LastName = "Admin"
             IsAdmin = true
-        } : Yobo.Shared.Domain.User
+        } : LoggedUser
 
     let private loginWithAdmin email pwd =
         if email = Configuration.Admin.email && pwd = Configuration.Admin.password then Ok adminUser
         else
-            Services.Users.authenticator.Login email pwd <!> mapToUser
+            Services.Users.authenticator.Login email pwd <!> mapToLoggedUser
 
     let onlyForAdmin (sp:SecuredParam<_>) =
         match sp.Token |> Services.Users.authorizator.ValidateToken with
@@ -45,7 +46,7 @@ module Auth =
     }
 
 module Admin =
-    open Yobo.API.Auth.Functions
+    open Yobo.API.Admin.Functions
     open Yobo.API.CompositionRoot
     open Yobo.API
     

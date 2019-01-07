@@ -15,12 +15,17 @@ let render (state : State) (dispatch : Msg -> unit) =
     
     let pwd = 
         Control.div [] [
-            Input.password [ Input.Option.Placeholder (Text.TextValue.Password |> Locale.toTitleCz); Input.Option.OnChange (fun e -> !!e.target?value |> ChangePassword |> dispatch) ]
+            Input.password [
+                Input.Option.Placeholder (Text.TextValue.Password |> Locale.toTitleCz)
+                Input.Option.OnChange (fun e -> !!e.target?value |> ChangePassword |> dispatch) ]
         ]
 
     let email =
         Control.div [] [
-            Input.text [ Input.Option.Placeholder (Text.TextValue.Email |> Locale.toTitleCz); Input.Option.OnChange (fun e -> !!e.target?value |> ChangeEmail |> dispatch) ]
+            Input.text [
+                Input.Option.Value state.Login.Email
+                Input.Option.Placeholder (Text.TextValue.Email |> Locale.toTitleCz)
+                Input.Option.OnChange (fun e -> !!e.target?value |> ChangeEmail |> dispatch) ]
         ]
 
     let btn isLogging =

@@ -9,14 +9,14 @@ open Yobo.Shared.Auth
 open System.Security.Claims
 open Yobo.Shared.Communication
 
-let mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
+let mapToLoggedUser (u:Yobo.Core.Users.ReadQueries.User) =
     {
         Id = u.Id
         Email = u.Email
         FirstName = u.FirstName
         LastName = u.LastName
         IsAdmin = false
-    } : Yobo.Shared.Domain.User
+    } : Yobo.Shared.Auth.Domain.LoggedUser
 
 let claimsToUser (claims:seq<Claim>) =
     let find key = claims |> Seq.find (fun x -> x.Type = key) |> (fun x -> x.Value)
@@ -26,9 +26,9 @@ let claimsToUser (claims:seq<Claim>) =
         FirstName = find "FirstName"
         LastName = find "LastName"
         IsAdmin = find "IsAdmin" |> Boolean.Parse
-    } : Yobo.Shared.Domain.User
+    } : Yobo.Shared.Auth.Domain.LoggedUser
 
-let userToClaims (u:Yobo.Shared.Domain.User) =
+let userToClaims (u:Yobo.Shared.Auth.Domain.LoggedUser) =
     seq [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)

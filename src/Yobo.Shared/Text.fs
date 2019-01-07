@@ -10,6 +10,7 @@ type TextValue =
     | Registration
     | Register
     | Login
+    | BackToLogin
     | ResendActivationLink
 
 type TextMessageValue =

@@ -18,6 +18,7 @@ let toCz = function
     | Registration -> "registrace"
     | Register -> "zaregistrovat se"
     | Login -> "přihlásit se"
+    | BackToLogin -> "zpět na přihlášení"
     | ResendActivationLink -> "poslat aktivační odkaz"
     
 let toCzMsg = function    

@@ -52,4 +52,5 @@ module Admin =
     
     let api : Yobo.Shared.Admin.Communication.API = {
         GetAllUsers = fun x -> x |> Auth.onlyForAdmin >>= Services.Users.queries.GetAll <!> List.map mapToUser |> toAsync
+        AddCredits = fun x -> x |> Auth.onlyForAdmin >>= (fun _ -> Yobo.Shared.Communication.ServerError.Exception "TODO" |> Error) |> toAsync
     }

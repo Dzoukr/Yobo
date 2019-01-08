@@ -15,6 +15,9 @@ type TextValue =
     | ActivationDate
     | Innactive
     | AddCredits
+    | User
+    | CreditsCount
+    | ExpirationDate
 
 type TextMessageValue =
     | ActivatingYourAccount

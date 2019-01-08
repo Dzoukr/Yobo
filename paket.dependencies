@@ -63,6 +63,7 @@ group Client
     nuget Fable.Remoting.Client
     nuget Fulma ~> 1
     nuget Fulma.Extensions.Wikiki.Quickview
+    nuget Thoth.Elmish.Toast
     clitool dotnet-fable ~> 2
 
 group Build

@@ -6,6 +6,7 @@ open Fulma
 module Calendar =
     open Fable.Core
     open Fable.Core.JsInterop
+    open Fable.PowerPack.Keyboard
 
     [<Emit("bulmaCalendar.attach($0, $1)[0].on('date:selected', date => { $2(date) });")>]
     let private attachCalendarScript (selector: string) (opts:obj) (fn:obj -> unit) : unit = jsNative
@@ -41,6 +42,8 @@ module Calendar =
         }
         member this.ToJsOpts() = jsOptions(fun x ->
             x?dateFormat <- jsFormat
+            x?todayButton <- false
+            x?clearButton <- false
             x?weekStart <- this.WeekStart
             x?lang <- this.Lang
             x?displayMode <- this.DisplayMode |> string |> fun x -> x.ToLower()
@@ -71,6 +74,7 @@ module Calendar =
                 )
 
     let view (opts:Options) (componentId:string) (onDateChange: DateTime option * DateTime option -> unit) =
+        //Fable.Import.Browser.console.log opts
         let dValue (st:DateTime option) (en:DateTime option) =
             (match st, en with
             | Some s, Some e -> sprintf "%s - %s" (s.ToString(netFormat)) (e.ToString(netFormat))

@@ -4,6 +4,7 @@ open Yobo.Shared.Communication
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Yobo.Shared
+open Thoth.Elmish
 
 let errorBox content =
     article [ ClassName "message is-danger has-text-centered" ] [
@@ -39,6 +40,16 @@ let infoBox content =
 
 let serverErrorToView (serverError:ServerError) =
     serverError |> Locale.serverErrorToCz |> str |> errorBox
+
+let serverErrorToToast (serverError:ServerError) =
+    serverError
+    |> Locale.serverErrorToCz
+    |> Toast.message
+    |> Toast.title "Error"
+    |> Toast.position Toast.TopCenter
+    |> Toast.noTimeout
+    |> Toast.withCloseButton
+    |> Toast.error
 
 let resultToView successView (res:Result<_,ServerError>) =
     match res with

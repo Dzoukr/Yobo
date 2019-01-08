@@ -28,9 +28,15 @@ with
         AddCreditsForm = AddCreditsForm.Init
     }
 
+type AddCreditsFormMsg =
+    | CalendarChanged of DateTime option
+    | CreditsChanged of int
+    | SubmitForm
+    | FormSubmitted of Result<unit, ServerError>
+
 type Msg =
     | Init
-    | ToggleAddCreditsForm of Guid
     | LoadUsers
     | UsersLoaded of Result<User list, ServerError>
-    | CalendarChanged of DateTime option
+    | ToggleAddCreditsForm of Guid
+    | AddCreditsFormMsg of AddCreditsFormMsg

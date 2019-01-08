@@ -9,3 +9,9 @@ type User = {
     LastName : string
     ActivatedUtc : DateTime option
 }
+
+type AddCredits = {
+    UserId : Guid
+    Credits : int
+    ExpirationDate : DateTime
+}

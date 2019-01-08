@@ -23,6 +23,9 @@ let toCz = function
     | ActivationDate -> "datum aktivace"
     | Innactive -> "neaktivní"
     | AddCredits -> "přidat kredity"
+    | User -> "uživatel"
+    | CreditsCount -> "počet kreditů"
+    | ExpirationDate -> "datum expirace"
     
 let toCzMsg = function    
     | ActivatingYourAccount -> "Aktivuji váš účet..."

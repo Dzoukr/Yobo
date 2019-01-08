@@ -35,51 +35,29 @@ let private userRow dispatch (u:Admin.Domain.User) =
         td [] [ addCreditBtn ]
     ]
 
-open Fable.Core
-open Fable.Core.JsInterop
-open Fable.Import
-
-[<Emit("bulmaCalendar.attach($0, $1)[0].on('date:selected', date => { $2(date) });")>]
-let attachCalendarScript (selector: string) (opts:obj) (fn:obj -> unit) : unit = jsNative
-
-let attachCalendar (fn: DateTime option * DateTime option -> unit) (elm: Fable.Import.Browser.Element)  =
-    let opts = jsOptions(fun x ->
-        x?weekStart <- 1
-        x?lang <- "cs"
-    )
-
-    let toDateTime obj =
-        match obj with
-        | null -> None
-        | x -> x?toISOString() |> DateTime.Parse |> Some
-
-    if elm |> isNull |> not then
-        let selector = sprintf "[id=\"%s\"]" elm.id
-        if elm.nextSibling |> isNull then 
-            attachCalendarScript selector opts (fun d ->
-                let s = d?start |> toDateTime
-                let e = d?``end`` |> toDateTime
-                fn (s, e)
-            )
-
-let private showForm dispatch state (user:Admin.Domain.User option) =
+let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
     match user with
     | Some u ->
 
-        let root =
-            Input.date [
-                Input.Option.Id "mujcalc"
-                Input.Option.Ref(attachCalendar (fun t -> t |> fst |> CalendarChanged |> dispatch ));
-                Input.Option.Props [  Data("display-mode","inline"); ]
-            ]
-
+        let calendar =
+            let opts = { 
+                Yobo.Client.Components.Calendar.Options.Default 
+                    with 
+                        StartDate = state.AddCreditsForm.ExpirationDate |> Option.orElse (DateTime.Now.AddMonths(3) |> Some)
+                        DisplayMode = Yobo.Client.Components.Calendar.DisplayMode.Inline
+                        MinimumDate = Some (DateTime.Now.AddDays 7.)
+                        WeekStart = 1
+                        Lang = "cs"
+                }
+            Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> Msg.CalendarChanged >> dispatch)
+            
         div [ ]
             [ Quickview.quickview [ Quickview.IsActive true ]
                     [ Quickview.header [ ]
                         [ Quickview.title [ ] [ Text.AddCredits |> Locale.toTitleCz |> str ]
                           Delete.delete [ Delete.OnClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch) ] [ ] ]
                       Quickview.body [ ]
-                        [ p [ ] [ str "The body" ]; root ]
+                        [ p [ ] [ str "The body" ]; calendar ]
                       Quickview.footer [ ]
                         [ Button.button [ Button.OnClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch) ]
                                         [ str "Hide the quickview!" ] ] ]
@@ -105,5 +83,5 @@ let render (state : State) (dispatch : Msg -> unit) =
             ]
     div [] [
         table
-        state.Users |> List.tryFind (fun x -> Some x.Id = state.AddCreditsOpenedForm) |> showForm dispatch state
+        state.Users |> List.tryFind (fun x -> Some x.Id = state.AddCreditsForm.SelectedUserId) |> showForm dispatch state
     ]

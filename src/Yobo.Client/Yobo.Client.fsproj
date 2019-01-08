@@ -12,6 +12,7 @@
         <Compile Include="TokenStorage.fs" />
         <Compile Include="Http.fs" />
         <Compile Include="Router.fs" />
+        <Compile Include="Components.fs" />
         <Compile Include="Auth\Registration\Domain.fs" />
         <Compile Include="Auth\Registration\State.fs" />
         <Compile Include="Auth\Registration\View.fs" />

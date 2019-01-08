@@ -4,7 +4,8 @@ group Client
     Fable.Elmish.React
     Fable.Elmish.HMR
     Fable.Core
-    Fulma
     Fable.Elmish.Browser
     Fable.Remoting.Client
     dotnet-fable
+    Fulma
+    Fulma.Extensions.Wikiki.Quickview

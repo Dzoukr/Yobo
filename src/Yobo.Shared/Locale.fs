@@ -20,6 +20,9 @@ let toCz = function
     | Login -> "přihlásit se"
     | BackToLogin -> "zpět na přihlášení"
     | ResendActivationLink -> "poslat aktivační odkaz"
+    | ActivationDate -> "datum aktivace"
+    | Innactive -> "neaktivní"
+    | AddCredits -> "přidat kredity"
     
 let toCzMsg = function    
     | ActivatingYourAccount -> "Aktivuji váš účet..."

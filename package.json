@@ -7,6 +7,7 @@
         "@babel/preset-env": "^7.0.0",
         "@babel/runtime": "^7.0.0",
         "babel-loader": "^8.0.0",
+        "bulma-quickview": "^2.0.0",
         "copy-webpack-plugin": "^4.6.0",
         "css-loader": "^1.0.1",
         "fable-compiler": "^2.1.1",

@@ -12,6 +12,9 @@ type TextValue =
     | Login
     | BackToLogin
     | ResendActivationLink
+    | ActivationDate
+    | Innactive
+    | AddCredits
 
 type TextMessageValue =
     | ActivatingYourAccount

@@ -59,9 +59,10 @@ group Client
     nuget Fable.Elmish.React ~> 2
     nuget Fable.Elmish.HMR ~> 3
     nuget Fable.React ~> 4
-    nuget Fulma ~> 1
     nuget Fable.Elmish.Browser ~> 2
     nuget Fable.Remoting.Client
+    nuget Fulma ~> 1
+    nuget Fulma.Extensions.Wikiki.Quickview
     clitool dotnet-fable ~> 2
 
 group Build

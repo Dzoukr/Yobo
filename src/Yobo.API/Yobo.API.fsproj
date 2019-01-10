@@ -7,8 +7,9 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Extensions.fs" />
     <Compile Include="Configuration.fs" />
-    <Compile Include="Auth\ArgsBuilder.fs" />
+    <Compile Include="ArgsBuilder.fs" />
     <Compile Include="Auth\Functions.fs" />
     <Compile Include="Admin\Functions.fs" />
     <Compile Include="CompositionRoot.Services.fs" />

@@ -4,10 +4,11 @@ open System
 open Newtonsoft.Json.Linq
 open Yobo.Shared
 open Yobo.Shared.Validation
+open Yobo.Shared.Domain
 open FSharp.Rop
 open CosmoStore
 open FSharp.Control.Tasks.V2
-open Yobo.Shared.Domain
+open Yobo.Core.Metadata
 
 type EventStoreError = 
     | General of Exception
@@ -22,6 +23,8 @@ type CommandHandlerError =
     | EventStoreError of EventStoreError
     | DomainError of DomainError
     | ValidationError of ValidationError list
+
+type CommandHandler<'command,'event> = Metadata -> Guid -> 'command -> Result<'event list, CommandHandlerError>
 
 type EventSerializer<'event> = {
     EventToData : 'event -> string * JToken
@@ -41,7 +44,7 @@ type CompensatingCommandHandlerSettings<'state, 'command, 'event, 'outerCommand,
     Serializer : EventSerializer<'event>
     Validators : ('command -> Result<'command, ValidationError list>) list
     CompensationBuilder : 'outerCommand -> ('command * 'event list) option
-    OuterCommandHandler : Guid option -> 'outerCommand -> Result<'outerEvent list, CommandHandlerError>
+    OuterCommandHandler : CommandHandler<'outerCommand, 'outerEvent>
 }
 
 let private runValidators validators cmd =
@@ -51,13 +54,13 @@ let private runValidators validators cmd =
         | Ok _ -> acc
     validators |> List.fold foldFn []
 
-let private toEventWrite corrId (name, data) =
+let private toEventWrite metadata corrId (name, data) =
     {
         Id = Guid.NewGuid()
         CorrelationId = corrId
         Name = name
         Data = data
-        Metadata = None
+        Metadata = metadata |> Serialization.objectToJToken |> Some
     }
 
 let private getCurrentStateAndPosition<'state, 'event> (toEvent:string * JToken -> 'event) (init:'state) (apply:'state -> 'event -> 'state) (eventStore:EventStore) streamId = 
@@ -78,15 +81,14 @@ let private getCurrentStateAndPosition<'state, 'event> (toEvent:string * JToken 
 
 let getCompensatingCommandHandler<'state, 'command, 'event, 'outerCommand, 'outerEvent> 
     (settings:CompensatingCommandHandlerSettings<'state, 'command, 'event, 'outerCommand, 'outerEvent>) 
-    (eventStore:EventStore) =
+    (eventStore:EventStore) : CommandHandler<'outerCommand, 'outerEvent> =
     // state reader
     let getCurrentStateFn = getCurrentStateAndPosition settings.Serializer.DataToEvent settings.Aggregate.Init settings.Aggregate.Apply eventStore
 
     // handle function
-    let handleCmd corrId (outerCmd:'outerCommand) =
+    let handleCmd meta corrId (outerCmd:'outerCommand) =
         task {
             try
-                let corrId = defaultArg corrId (Guid.NewGuid())
                 match outerCmd |> settings.CompensationBuilder with
                 | Some (cmd, compensationEvents) -> 
                     match cmd |> runValidators settings.Validators with
@@ -97,32 +99,31 @@ let getCompensatingCommandHandler<'state, 'command, 'event, 'outerCommand, 'oute
                         | Ok (state,position) ->
                             match cmd |> settings.Aggregate.Execute state with
                             | Ok newEvents ->
-                                let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
-                                match settings.OuterCommandHandler (Some corrId) outerCmd with
+                                let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId) |> eventStore.AppendEvents streamId (Exact position)
+                                match settings.OuterCommandHandler meta corrId outerCmd with
                                 | Ok subEvents ->                           
                                     return Ok subEvents
                                 | Error e ->
                                     let newPosition = position + int64 newEvents.Length
-                                    let! _ = compensationEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact newPosition)
+                                    let! _ = compensationEvents |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId) |> eventStore.AppendEvents streamId (Exact newPosition)
                                     return Error e
                             | Error e -> return e |> CommandHandlerError.DomainError |> Error
                         | Error e -> return e |> Error
                     | errors -> return ValidationError(errors) |> Error
-                | None -> return settings.OuterCommandHandler (Some corrId) outerCmd
+                | None -> return settings.OuterCommandHandler meta corrId outerCmd
 
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
-    fun corrId -> handleCmd corrId >> Async.AwaitTask >> Async.RunSynchronously
+    fun meta corrId -> handleCmd meta corrId >> Async.AwaitTask >> Async.RunSynchronously
 
-let getCommandHandler<'state, 'command, 'event> (settings:CommandHandlerSettings<'state, 'command, 'event>) (eventStore:EventStore) =
+let getCommandHandler<'state, 'command, 'event> (settings:CommandHandlerSettings<'state, 'command, 'event>) (eventStore:EventStore) : CommandHandler<'command, 'event> =
     // state reader
     let getCurrentStateFn = getCurrentStateAndPosition settings.Serializer.DataToEvent settings.Aggregate.Init settings.Aggregate.Apply eventStore
 
     // handle function
-    let handleCmd corrId cmd =
+    let handleCmd meta corrId cmd =
         task {
             try
-                let corrId = defaultArg corrId (Guid.NewGuid())
                 match cmd |> runValidators settings.Validators with
                 | [] ->
                     let streamId = cmd |> settings.GetStreamId
@@ -131,14 +132,14 @@ let getCommandHandler<'state, 'command, 'event> (settings:CommandHandlerSettings
                     | Ok (state,position) ->
                         match cmd |> settings.Aggregate.Execute state with
                         | Ok newEvents ->
-                            let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite corrId) |> eventStore.AppendEvents streamId (Exact position)
+                            let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId) |> eventStore.AppendEvents streamId (Exact position)
                             return Ok newEvents
                         | Error e -> return e |> CommandHandlerError.DomainError |> Error
                     | Error e -> return e |> Error
                 | errors -> return ValidationError(errors) |> Error
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
-    fun corrId -> handleCmd corrId >> Async.AwaitTask >> Async.RunSynchronously
+    fun meta corrId -> handleCmd meta corrId >> Async.AwaitTask >> Async.RunSynchronously
 
 
 module Extractor =

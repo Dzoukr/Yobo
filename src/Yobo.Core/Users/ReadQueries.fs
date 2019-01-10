@@ -12,6 +12,8 @@ type User = {
     FirstName : string
     LastName : string
     ActivatedUtc : DateTime option
+    Credits : int
+    CreditsExpirationUtc : DateTime option
 }
 
 type UserQueries<'a> = {
@@ -32,6 +34,8 @@ let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         FirstName = u.FirstName
         LastName = u.LastName
         ActivatedUtc = u.ActivatedUtc
+        Credits = u.Credits
+        CreditsExpirationUtc = u.CreditsExpirationUtc
     }
 
 let private getById i (ctx:ReadDb.Db.dataContext) =

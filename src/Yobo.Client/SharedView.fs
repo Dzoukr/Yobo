@@ -45,11 +45,17 @@ let serverErrorToToast (serverError:ServerError) =
     serverError
     |> Locale.serverErrorToCz
     |> Toast.message
-    |> Toast.title "Error"
+    |> Toast.title (Text.TextMessageValue.ErrorOccured |> Locale.toCzMsg)
     |> Toast.position Toast.TopCenter
     |> Toast.noTimeout
     |> Toast.withCloseButton
     |> Toast.error
+
+let successToast msg =
+    msg
+    |> Toast.message
+    |> Toast.position Toast.TopCenter
+    |> Toast.success
 
 let resultToView successView (res:Result<_,ServerError>) =
     match res with

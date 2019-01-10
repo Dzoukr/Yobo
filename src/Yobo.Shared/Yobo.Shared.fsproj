@@ -21,6 +21,7 @@
     <Compile Include="Communication.fs" />
     <Compile Include="Locale.fs" />
     <Compile Include="Admin\Domain.fs" />
+    <Compile Include="Admin\Validation.fs" />
     <Compile Include="Admin\Communication.fs" />
     <Compile Include="Auth\Domain.fs" />
     <Compile Include="Auth\Validation.fs" />

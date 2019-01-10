@@ -5,6 +5,8 @@ open Elmish
 open Yobo.Client.Http
 open Thoth.Elmish
 open Yobo.Client
+open Yobo.Shared.Text
+open Yobo.Shared
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
@@ -26,15 +28,14 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             state,
                 ({  UserId = state.AddCreditsForm.SelectedUserId.Value
                     Credits = state.AddCreditsForm.Credits
-                    ExpirationDate = state.AddCreditsForm.ExpirationDate.Value } : Yobo.Shared.Admin.Domain.AddCredits)
+                    ExpirationUtc = state.AddCreditsForm.ExpirationDate.Value } : Yobo.Shared.Admin.Domain.AddCredits)
                 |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.AddCredits (FormSubmitted >> AddCreditsFormMsg)
         | FormSubmitted res ->
             match res with
             | Ok _ -> 
                 { state
-                    with AddCreditsForm = { state.AddCreditsForm with SelectedUserId = None }},
-                        Toast.message "I am toast of type Info"
-                        |> Toast.title "Info"
-                        |> Toast.position Toast.TopCenter
-                        |> Toast.success
+                    with AddCreditsForm = AddCreditsForm.Init }, [
+                        TextMessageValue.CreditsSuccessfullyAdded |> Locale.toCzMsg |> SharedView.successToast
+                        LoadUsers |> Cmd.ofMsg ]
+                        |> Cmd.batch
             | Error e -> state, (e |> SharedView.serverErrorToToast)

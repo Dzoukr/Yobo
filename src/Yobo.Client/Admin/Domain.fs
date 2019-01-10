@@ -14,7 +14,7 @@ type AddCreditsForm = {
 with
     static member Init = {
         SelectedUserId = None
-        ExpirationDate = None
+        ExpirationDate = DateTime.Now.AddMonths 4 |> Some
         Credits = 10
     }
 

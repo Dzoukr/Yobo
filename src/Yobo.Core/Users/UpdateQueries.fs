@@ -10,7 +10,7 @@ let private getById (ctx:ReadDb.Db.dataContext) i =
         select x
     } |> Seq.head
 
-let register (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
+let registered (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
     let item = ctx.Dbo.Users.Create()
     item.Id <- args.Id
     item.Email <- args.Email
@@ -19,14 +19,21 @@ let register (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
     item.ActivationKey <- args.ActivationKey
     item.PasswordHash <- args.PasswordHash
     item.RegisteredUtc <- DateTime.UtcNow
+    item.Credits <- 0
     ctx.SubmitUpdates()
 
-let activate (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =
+let activated (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.ActivatedUtc <- Some DateTime.UtcNow
     ctx.SubmitUpdates()
 
-let regenerateActivationKey (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
+let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.ActivationKey <- args.ActivationKey
+    ctx.SubmitUpdates()
+
+let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.Credits <- item.Credits + args.Credits
+    item.CreditsExpirationUtc <- item.CreditsExpirationUtc
     ctx.SubmitUpdates()

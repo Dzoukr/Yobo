@@ -44,4 +44,6 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
             }
         )
 
-    | Activated _ -> None
+    | Activated _
+    | CreditsAdded _ ->
+        None

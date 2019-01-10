@@ -55,10 +55,10 @@ let render (state : State) (dispatch : Msg -> unit) =
                 regInput state.Account.Email Input.email ChangeEmail Email
 
                 lbl Password
-                regInput "" Input.password ChangePassword Password
+                regInput state.Account.Password Input.password ChangePassword Password
                 
                 lbl SecondPassword
-                regInput "" Input.password ChangeSecondPassword SecondPassword
+                regInput state.Account.SecondPassword Input.password ChangeSecondPassword SecondPassword
 
                 btn state.IsRegistrating
 

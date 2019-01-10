@@ -20,9 +20,11 @@ type TextValue =
     | ExpirationDate
 
 type TextMessageValue =
+    | ErrorOccured
     | ActivatingYourAccount
     | AccountSuccessfullyActivated
     | RegistrationSuccessful
     | AccountNotActivatedYet
     | ActivationLinkSuccessfullyResent
     | ActivationLinkResendError
+    | CreditsSuccessfullyAdded

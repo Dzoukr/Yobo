@@ -18,6 +18,9 @@ let onlyIfActivationKeyMatch key state =
 let onlyIfNotAlreadyActivated state =
     if state.IsActivated then DomainError.UserAlreadyActivated |> Error else Ok state
 
+let onlyIfActivated state =
+    if state.IsActivated then Ok state else DomainError.UserNotActivated |> Error
+
 let normalizeCreate (args:CmdArgs.Register) = { args with Email = args.Email.ToLower() }
 
 let execute (state:State) = function
@@ -37,8 +40,13 @@ let execute (state:State) = function
         >>= onlyIfActivationKeyMatch args.ActivationKey
         <!> (fun _ -> Activated args)
         <!> List.singleton
+    | AddCredits args ->
+        onlyIfActivated state
+        <!> (fun _ -> CreditsAdded args)
+        <!> List.singleton
 
 let apply (state:State) = function
     | Registered args -> { state with Id = args.Id; ActivationKey = args.ActivationKey }
     | ActivationKeyRegenerated args -> { state with ActivationKey = args.ActivationKey }
     | Activated args -> { state with Id = args.Id; IsActivated = true }
+    | CreditsAdded args -> { state with Credits = state.Credits + args.Credits; CreditsExpirationUtc = Some args.ExpirationUtc }

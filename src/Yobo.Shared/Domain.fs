@@ -6,5 +6,6 @@ type DomainError =
     | ItemAlreadyExists of Text.TextValue
     | ItemDoesNotExist of Text.TextValue
     | UserAlreadyActivated
+    | UserNotActivated
     | ActivationKeyDoesNotMatch
 

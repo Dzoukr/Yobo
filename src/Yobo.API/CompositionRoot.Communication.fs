@@ -2,16 +2,36 @@ module Yobo.API.CompositionRoot.Communication
 
 open System
 open FSharp.Rop
+open Yobo.Shared.Communication
 
 let private toAsync f = async { return f }
+
+module Security =
+    open Yobo.Shared.Auth
+    open Yobo.Shared.Auth.Domain
+
+    let handleForUser f (user:LoggedUser, param)  =
+        let handleFn = Services.CommandHandler.handleForUser user.Id
+        f handleFn param
+
+    let onlyForLogged (sp:SecuredParam<_>) =
+        match sp.Token |> Services.Users.authorizator.ValidateToken with
+        | Some claims -> claims |> Yobo.API.Auth.Functions.claimsToUser |> fun user -> (user, sp.Param) |> Ok
+        | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
+
+    let onlyForAdmin (sp:SecuredParam<_>) =
+        sp |> onlyForLogged
+        >>= (fun (u,p) ->
+            match u with
+            | { IsAdmin = true } -> (u, p) |> Ok
+            | _ -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
+        )
 
 module Auth =
     open Yobo.API.Auth.Functions
     open Yobo.Libraries.Security 
     open Yobo.API.CompositionRoot
     open Yobo.API
-    open Yobo.Shared.Communication
-    open Yobo.Shared.Auth
     open Yobo.Shared.Auth.Domain
 
     let private adminUser =
@@ -28,29 +48,21 @@ module Auth =
         else
             Services.Users.authenticator.Login email pwd <!> mapToLoggedUser
 
-    let onlyForAdmin (sp:SecuredParam<_>) =
-        match sp.Token |> Services.Users.authorizator.ValidateToken with
-        | Some claims ->
-            match claims |> claimsToUser with
-            | { IsAdmin = true } -> Ok sp.Param
-            | _ -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
-        | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
-
     let api : Yobo.Shared.Auth.Communication.API = {
         GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
         RefreshToken = refreshToken Services.Users.authorizator.ValidateToken (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
         GetUserByToken = getUser Services.Users.authorizator.ValidateToken >> toAsync
-        ResendActivation = resendActivation Services.CommandHandler.handle >> toAsync
-        Register = register Services.CommandHandler.handle Password.createHash >> toAsync
-        ActivateAccount = activateAccount Services.CommandHandler.handle Services.Users.authenticator.GetByActivationKey >> toAsync
+        ResendActivation = resendActivation Services.CommandHandler.handleAnonymous >> toAsync
+        Register = register Services.CommandHandler.handleAnonymous Password.createHash >> toAsync
+        ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByActivationKey >> toAsync
     }
+
 
 module Admin =
     open Yobo.API.Admin.Functions
     open Yobo.API.CompositionRoot
-    open Yobo.API
-    
+
     let api : Yobo.Shared.Admin.Communication.API = {
-        GetAllUsers = fun x -> x |> Auth.onlyForAdmin >>= Services.Users.queries.GetAll <!> List.map mapToUser |> toAsync
-        AddCredits = fun x -> x |> Auth.onlyForAdmin >>= (fun _ -> Yobo.Shared.Communication.ServerError.Exception "TODO" |> Error) |> toAsync
+        GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Users.queries.GetAll <!> List.map mapToUser |> toAsync
+        AddCredits = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addCredits |> toAsync
     }

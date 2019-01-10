@@ -6,6 +6,8 @@ open Yobo.Shared.Text
 type ValidationError = 
     | IsEmpty of TextValue
     | MustBeLongerThan of TextValue * int
+    | MustBeBiggerThan of TextValue * int
+    | MustBeAfter of TextValue * DateTime
     | ValuesNotEqual of TextValue * TextValue
     | IsNotValidEmail of TextValue
 
@@ -31,7 +33,15 @@ let validateNotEmpty txt getter args =
 
 let validateLongerThan l txt getter args =
     let value : string = args |> getter
-    if value.Length <= l then MustBeLongerThan(txt,l) |> Some else None 
+    if value.Length <= l then MustBeLongerThan(txt,l) |> Some else None
+
+let validateBiggerThan v txt getter args =
+    let value : int = args |> getter
+    if value <= v then MustBeBiggerThan(txt,v) |> Some else None
+
+let validateIsAfter d txt getter args =
+    let value : DateTime = args |> getter
+    if value <= d then MustBeAfter(txt,d) |> Some else None
 
 let validateEquals fstTxt sndTxt fstGetter sndGetter args =
     let val1 = args |> fstGetter
@@ -48,7 +58,6 @@ let private isValidEmail (value:string) =
 let validateNotEmptyGuid txt getter args =
     let value : Guid = args |> getter
     if value = Guid.Empty then IsEmpty(txt) |> Some else None
-
 
 let validateEmail txt getter args =
     let value : string = args |> getter

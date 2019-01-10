@@ -8,10 +8,12 @@ type User = {
     FirstName : string
     LastName : string
     ActivatedUtc : DateTime option
+    Credits : int
+    CreditsExpirationUtc : DateTime option
 }
 
 type AddCredits = {
     UserId : Guid
     Credits : int
-    ExpirationDate : DateTime
+    ExpirationUtc : DateTime
 }

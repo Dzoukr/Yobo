@@ -18,6 +18,11 @@ let private userRow dispatch (u:Admin.Domain.User) =
         | Some a -> a.ToString("dd. MM. yyyy") |> str
         | None -> Tag.tag [ Tag.Color IsWarning ] [ TextValue.Innactive |> Locale.toTitleCz |> str ]
 
+    let expires =
+        match u.CreditsExpirationUtc with
+        | Some a -> a.ToString("dd. MM. yyyy") |> str
+        | None -> str "-"
+
     let addCreditBtn =
         match u.ActivatedUtc with
         | Some _ ->
@@ -31,6 +36,8 @@ let private userRow dispatch (u:Admin.Domain.User) =
         td [] [ str u.FirstName]
         td [] [ str u.Email]
         td [] [ activated ]
+        td [] [ u.Credits |> string |> str ]
+        td [] [ expires ]
         td [] [ addCreditBtn ]
     ]
 
@@ -42,7 +49,7 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
             let opts = { 
                 Yobo.Client.Components.Calendar.Options.Default 
                     with 
-                        StartDate = state.AddCreditsForm.ExpirationDate |> Option.orElse (DateTime.Now.AddMonths(3) |> Some)
+                        StartDate = state.AddCreditsForm.ExpirationDate
                         DisplayMode = Yobo.Client.Components.Calendar.DisplayMode.Inline
                         MinimumDate = Some (DateTime.Now.AddDays 7.)
                         WeekStart = 1
@@ -103,6 +110,8 @@ let render (state : State) (dispatch : Msg -> unit) =
                     th [ ] [ str (Text.TextValue.FirstName |> Locale.toTitleCz) ]
                     th [ ] [ str (Text.TextValue.Email |> Locale.toTitleCz) ]
                     th [ ] [ str (Text.TextValue.ActivationDate |> Locale.toTitleCz) ]
+                    th [ ] [ str (Text.TextValue.CreditsCount |> Locale.toTitleCz) ]
+                    th [ ] [ str (Text.TextValue.ExpirationDate |> Locale.toTitleCz) ]
                     th [ ] [ str "" ]
                 ]
             ] 

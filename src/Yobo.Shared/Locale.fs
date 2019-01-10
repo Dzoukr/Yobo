@@ -34,6 +34,8 @@ let toCzMsg = function
     | AccountNotActivatedYet -> "Zkuste se podívat do vaší emailové schránky, kam jsme vám poslali aktivační odkaz. Pokud ho nemůžete nalézt, klikněte na tlačítko níže a nechte si poslat nový."
     | ActivationLinkSuccessfullyResent -> "Aktivační odkaz byl úspěšně odeslán do vaší emailové schránky."
     | ActivationLinkResendError -> "Aktivační odkaz se nepodařilo odeslat. Zavřete okno prohlížeče a zkuste to prosím později."
+    | CreditsSuccessfullyAdded -> "Kredity úspěšně přidány."
+    | ErrorOccured -> "Došlo k chybě!"
 
 let title (s:string) = Char.ToUpperInvariant(s.[0]).ToString() + s.Substring(1).ToLowerInvariant()
 
@@ -45,11 +47,14 @@ let validationErrorToCz err =
     | MustBeLongerThan (field, l) -> sprintf "%s musí být delší než %i znaků." (field |> toTitleCz) l
     | ValuesNotEqual(f1,f2) -> sprintf "Hodnota u pole %s se neshoduje s hodnotu v poli %s." (toCz f1) (toCz f2)
     | IsNotValidEmail field -> sprintf "%s není ve správném formátu pro emailovou adresu." (toTitleCz field)
+    | MustBeBiggerThan (field, v) -> sprintf "%s musí být větší než %i." (field |> toTitleCz) v
+    | MustBeAfter (field, d) -> sprintf "%s musí být po datu %A." (field |> toTitleCz) d
 
 let domainErrorToCz err =
     match err with
     | DomainError.ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."
     | DomainError.UserAlreadyActivated -> "Uživatelský účet je již zaktivován."
+    | DomainError.UserNotActivated -> "Uživatelský účet není zaktivován."
     | DomainError.ItemAlreadyExists field -> sprintf "Tento %s již v systému existuje." (field |> toCz)
     | DomainError.ItemDoesNotExist field -> sprintf "Položka s touto hodnotou %s v systému neexistuje." (field |> toCz)
 

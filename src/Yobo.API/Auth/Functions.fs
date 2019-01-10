@@ -9,6 +9,22 @@ open Yobo.Shared.Auth
 open System.Security.Claims
 open Yobo.Shared.Communication
 
+module ArgsBuilder =
+    open Yobo.API
+
+    let buildRegister getHash =
+        ArgsBuilder.build (fun (acc:NewAccount) ->
+            ({
+                Id = Guid.NewGuid()
+                ActivationKey = Guid.NewGuid()
+                PasswordHash = acc.Password |> getHash
+                FirstName = acc.FirstName
+                LastName = acc.LastName
+                Email = acc.Email.ToLower()
+            } : CmdArgs.Register)
+        ) Validation.validateAccount
+        >> Result.mapError ServerError.ValidationError
+
 let mapToLoggedUser (u:Yobo.Core.Users.ReadQueries.User) =
     {
         Id = u.Id

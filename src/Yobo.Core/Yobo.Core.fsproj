@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Yobo.Core</AssemblyName>
@@ -6,15 +6,20 @@
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
+  <PropertyGroup>
+      <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+      <WarningsAsErrors>FS0025</WarningsAsErrors>
+      <NoWarn>2003</NoWarn>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\core\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
     <Compile Include="Serialization.fs" />
-    <Compile Include="ArgsBuilder.fs" />
     <Compile Include="ReadDb.fs" />
     <Compile Include="Data.fs" />
+    <Compile Include="Metadata.fs" />
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
     <Compile Include="EmailSettings.fs" />

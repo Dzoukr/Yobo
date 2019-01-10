@@ -52,9 +52,12 @@ module EventHandler =
 
 // command handler
 module CommandHandler =
+    open Yobo.Core.Metadata
 
-    let private handleFn = CommandHandler.getHandler cryptoProvider eventStore
-    let handle cmd =
-        cmd |> handleFn
+    let private handleFn : CommandHandler<CoreCommand, CoreEvent> = CommandHandler.getHandler cryptoProvider eventStore
+    let handle (meta:Metadata) cmd =
+        cmd |> handleFn meta (Guid.NewGuid())
         <!> List.map EventHandler.handle
         |> Result.mapError cmdHandlerErrorToServerError
+    let handleAnonymous = handle (Metadata.CreateAnonymous())
+    let handleForUser userId = handle (Metadata.Create userId)

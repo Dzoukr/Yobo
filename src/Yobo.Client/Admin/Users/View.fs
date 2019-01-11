@@ -1,11 +1,11 @@
-module Yobo.Client.Admin.View
+module Yobo.Client.Admin.Users.View
 
 open Fable.Core.JsInterop
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open System
-open Yobo.Client.Admin.Domain
+open Yobo.Client.Admin.Users.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
 open Yobo.Shared

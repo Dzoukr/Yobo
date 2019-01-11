@@ -1,6 +1,6 @@
-module Yobo.Client.Admin.State
+module Yobo.Client.Admin.Users.State
 
-open Yobo.Client.Admin.Domain
+open Yobo.Client.Admin.Users.Domain
 open Elmish
 open Yobo.Client.Http
 open Thoth.Elmish

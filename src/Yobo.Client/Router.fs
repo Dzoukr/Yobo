@@ -24,10 +24,12 @@ type AuthPage =
 
 type AdminPage =
     | Users
+    | Lessons
     with
         member x.ToPath() = 
             match x with
             | Users -> "/users"
+            | Lessons -> "/lessons"
 
 type Page =
     | Auth of AuthPage
@@ -48,6 +50,7 @@ let pageParser: Parser<Page -> Page, Page> =
         map ((fun (x:string) -> Guid(x)) >> AccountActivation >> Auth) (s "accountActivation" </> str)
 
         map (Admin(Users)) (s "users")
+        map (Admin(Lessons)) (s "lessons")
     ]
 
 let modifyUrl (route:Page) = route.ToPath() |> Navigation.modifyUrl
@@ -55,5 +58,5 @@ let newUrl (route:Page) = route.ToPath() |> Navigation.newUrl
 
 let goToUrl (e: React.MouseEvent) =
     e.preventDefault()
-    let href = !!e.target?href
+    let href = !!e.currentTarget?href
     Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore

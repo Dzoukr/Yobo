@@ -15,20 +15,28 @@ with
         AccountActivation = Auth.AccountActivation.Domain.State.Init
     }
 
+type AdminState = {
+    Users : Admin.Users.Domain.State
+}
+with
+    static member Init = {
+        Users = Admin.Users.Domain.State.Init
+    }
+
 type State = { 
     Page : Router.Page
     LoggedUser : Yobo.Shared.Auth.Domain.LoggedUser option
 
     // pages state
     Auth : AuthState
-    Admin : Admin.Domain.State
+    Admin : AdminState
 }
 with
     static member Init = {
         Page = Router.Page.DefaultPage
         LoggedUser = None
         Auth = AuthState.Init
-        Admin = Admin.Domain.State.Init
+        Admin = AdminState.Init
     }
 
 type AuthMsg =
@@ -36,9 +44,12 @@ type AuthMsg =
     | RegistrationMsg of Auth.Registration.Domain.Msg
     | AccountActivationMsg of Auth.AccountActivation.Domain.Msg
 
+type AdminMsg =
+    | UsersMsg of Admin.Users.Domain.Msg
+
 type Msg =
     | AuthMsg of AuthMsg
-    | AdminMsg of Admin.Domain.Msg
+    | AdminMsg of AdminMsg
     | LoadUserByToken of string
     | UserByTokenLoaded of Result<Yobo.Shared.Auth.Domain.LoggedUser,ServerError>
     | RefreshToken of string

@@ -18,29 +18,26 @@ with
         Credits = 10
     }
 
-//type LessonsState = {
-    
-//    S : string
-//}
-//with
-//    static member Init = {
-//        SelectedYear = 2019
-//        SelectedMonth = 1
-//        S = "AAAA"
-//    }
-
-type State = {
-    Users : User list
-    AddCreditsForm : AddCreditsForm
+type LessonsState = {
     SelectedYear : int
     SelectedMonth : int
 }
 with
     static member Init = {
+        SelectedYear = DateTime.UtcNow.Year
+        SelectedMonth = DateTime.UtcNow.Month
+   }
+
+type State = {
+    Users : User list
+    AddCreditsForm : AddCreditsForm
+    Lessons : LessonsState
+}
+with
+    static member Init = {
         Users = []
         AddCreditsForm = AddCreditsForm.Init
-        SelectedYear = 2019
-        SelectedMonth = 1
+        Lessons = LessonsState.Init
     }
 
 type AddCreditsFormMsg =

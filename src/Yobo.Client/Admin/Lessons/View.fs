@@ -79,7 +79,7 @@ module Calendar =
 
 let render (state : State) (dispatch : Msg -> unit) =
     
-    let s,e = getDateRange state.SelectedYear state.SelectedMonth
+    let s,e = getDateRange state.Lessons.SelectedYear state.Lessons.SelectedMonth
     //dispatch
     div [] [
         Calendar.render s e

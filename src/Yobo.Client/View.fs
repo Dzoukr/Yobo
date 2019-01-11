@@ -31,8 +31,10 @@ let displayLoggedPage (page:Router.Page) content =
                 ]
             ]
         ]
-        Container.container [ ] [
-            content
+        main [ Style [ PaddingTop "2rem" ] ] [
+            Container.container [ ] [
+                content
+            ]
         ]
     ]
 
@@ -49,6 +51,6 @@ let render (state : State) (dispatch : Msg -> unit) =
         let content =
             match admin with
             | Router.AdminPage.Users -> Admin.Users.View.render state.Admin (AdminMsg >> dispatch)
-            | Router.AdminPage.Lessons -> str "LEKCE" //Admin.View.render state.Admin (AdminMsg >> dispatch)
+            | Router.AdminPage.Lessons -> Admin.Lessons.View.render state.Admin (AdminMsg >> dispatch)
         
         displayLoggedPage state.Page content

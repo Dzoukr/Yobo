@@ -24,8 +24,8 @@
         <Compile Include="Auth\AccountActivation\View.fs" />
         <Compile Include="Admin\Domain.fs" />
         <Compile Include="Admin\State.fs" />
-        <Compile Include="Admin\Lessons\View.fs" />
         <Compile Include="Admin\Users\View.fs" />
+        <Compile Include="Admin\Lessons\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />

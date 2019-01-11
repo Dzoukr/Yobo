@@ -14,18 +14,33 @@ type AddCreditsForm = {
 with
     static member Init = {
         SelectedUserId = None
-        ExpirationDate = DateTime.Now.AddMonths 4 |> Some
+        ExpirationDate = DateTime.UtcNow.AddMonths 4 |> Some
         Credits = 10
     }
+
+//type LessonsState = {
+    
+//    S : string
+//}
+//with
+//    static member Init = {
+//        SelectedYear = 2019
+//        SelectedMonth = 1
+//        S = "AAAA"
+//    }
 
 type State = {
     Users : User list
     AddCreditsForm : AddCreditsForm
+    SelectedYear : int
+    SelectedMonth : int
 }
 with
     static member Init = {
         Users = []
         AddCreditsForm = AddCreditsForm.Init
+        SelectedYear = 2019
+        SelectedMonth = 1
     }
 
 type AddCreditsFormMsg =

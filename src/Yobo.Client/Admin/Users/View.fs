@@ -11,7 +11,6 @@ open Yobo.Shared.Text
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
 
-
 let private userRow dispatch (u:Admin.Domain.User) =
     let activated =
         match u.ActivatedUtc with

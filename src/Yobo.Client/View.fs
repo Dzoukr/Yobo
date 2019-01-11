@@ -48,7 +48,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     | Router.Page.Admin admin ->
         let content =
             match admin with
-            | Router.AdminPage.Users -> Admin.Users.View.render state.Admin.Users (UsersMsg >> AdminMsg >> dispatch)
+            | Router.AdminPage.Users -> Admin.Users.View.render state.Admin (AdminMsg >> dispatch)
             | Router.AdminPage.Lessons -> str "LEKCE" //Admin.View.render state.Admin (AdminMsg >> dispatch)
         
         displayLoggedPage state.Page content

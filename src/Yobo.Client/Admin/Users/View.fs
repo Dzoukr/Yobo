@@ -5,7 +5,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open System
-open Yobo.Client.Admin.Users.Domain
+open Yobo.Client.Admin.Domain
 open Yobo.Shared
 open Yobo.Shared.Text
 open Yobo.Shared

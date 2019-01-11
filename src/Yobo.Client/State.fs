@@ -27,7 +27,7 @@ let urlUpdate (result: Option<Router.Page>) state =
                         | None, Some t -> Cmd.ofMsg (Msg.LoadUserByToken t)
                         | _, None -> Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
             match admin with
-            | Router.AdminPage.Users -> state, Cmd.batch [cmd; (Admin.Users.Domain.Msg.Init |> UsersMsg |> AdminMsg |> Cmd.ofMsg) ]
+            | Router.AdminPage.Users -> state, Cmd.batch [cmd; (Admin.Domain.Msg.Init |> AdminMsg |> Cmd.ofMsg) ]
             | Router.AdminPage.Lessons -> state, cmd
         | Router.Page.Auth(Router.AuthPage.Logout) ->
             TokenStorage.removeToken()
@@ -52,11 +52,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | AccountActivationMsg m ->
             Auth.AccountActivation.State.update m state.Auth.AccountActivation
             |> mapUpdate (fun s -> { state with Auth = { state.Auth with AccountActivation = s } }) (AccountActivationMsg >> Msg.AuthMsg)
-    | AdminMsg m ->
-        match m with
-        | UsersMsg m ->
-            Admin.Users.State.update m state.Admin.Users
-            |> mapUpdate (fun u -> { state with Admin = { state.Admin with Users = u } }) (UsersMsg >> Msg.AdminMsg)
+    | AdminMsg m -> Admin.State.update m state.Admin |> mapUpdate (fun s -> { state with Admin = s }) (Msg.AdminMsg)
     | LoadUserByToken t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->
         match res with

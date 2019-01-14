@@ -20,11 +20,9 @@ let private closestSunday (date:DateTime) =
     let offset = 7 - current
     date.AddDays (offset |> float)
 
-let private getDateRange year month =
-    let startOfMonth = DateTime(year, month, 1)
-    let endOfMonth = DateTime(year, month, DateTime.DaysInMonth(year, month))
-    (startOfMonth |> closestMonday), (endOfMonth |> closestSunday)
-
+let private getWeekDateRange dayInWeek =
+    (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
+    
 let private datesBetween (startDate:DateTime) (endDate:DateTime) =
     endDate.Subtract(startDate).TotalDays
     |> int
@@ -33,54 +31,81 @@ let private datesBetween (startDate:DateTime) (endDate:DateTime) =
         startDate.AddDays (float x)
     )
 
-let private chunkBySize size list =
-    let foldFn acc item =
-        match acc with
-        | 0, li -> 1, [item] :: li
-        | x, li ->
-            let ni = if x = (size - 1) then 0 else x + 1
-            match li with
-            | h :: t -> ni, ((item :: h) :: t)
-            | [] -> ni, [[item]]
-    
-    list |> List.fold foldFn (0, []) |> snd |> List.rev |> List.map List.rev
-
-
 module Calendar =
+    open Yobo.Client
+
+    //let test =
+    //    div [ ClassName "popover is-popover-bottom"] [
+    //        Button.button [ Button.Option.CustomClass "is-primary popover-trigger"] [
+    //            str "Jemna joga"
+    //        ]
+    //        div [ ClassName "popover-content" ] [
+    //            Table.table [] [
+    //                thead [] [
+    //                    tr [][
+    //                        th [] [ str "Jemna joga s relaxaci"]
+    //                    ]
+    //                ]
+    //                tbody [] [
+    //                    tr [] [
+    //                        td [] [
+    //                            h1 [] [str "Klidná lekce s nenáročným průběhem s důrazem na dech a správnost provádění ve vazbě na zdravotní aspekt jógy. Jóga vhodná i pro seniory a pro všechny se sníženou pohyblivostí, těhotné a po porodu."]
+    //                        ]
+    //                    ]
+    //                ]
+    //            ]
+    //        ]
+    //    ]
 
     let col (date:DateTime) =
-        Column.column [ ] [ str <| date.ToString("dd. MM.") ]
+        Column.column [ ] [ str "TADY BUDE OBSAH" ] // <| date.ToString("dd. MM.") ]
 
-    let render (startDate:DateTime) (endDate:DateTime) =
-        let dates = datesBetween startDate endDate
-        let header =
-            [ "Pondělí";"Úterý";"Středa";"Čtvrtek";"Pátek";"Sobota";"Neděle"]
-            |> List.map (fun x ->
-                Column.column [ ] [
-                    strong [] [ str x ]
-                ]
-            )
+    let headerCol (date:DateTime) =
+        let n =
+            match date.DayOfWeek with
+            | DayOfWeek.Monday -> "Pondělí"
+            | DayOfWeek.Tuesday -> "Úterý"
+            | DayOfWeek.Wednesday -> "Středa"
+            | DayOfWeek.Thursday -> "Čtvrtek"
+            | DayOfWeek.Friday -> "Pátek"
+            | DayOfWeek.Saturday -> "Sobota"
+            | DayOfWeek.Sunday -> "Neděle"
+        Column.column [] [
+            div [] [ str n ]
+            div [] [ date.ToString("dd. MM. yyyy") |> str ]
+        ]
         
-        let row (dates:DateTime list) =
-            dates
-            |> List.map col
-            |> Columns.columns [] 
 
-        let rows =
-            dates
-            |> chunkBySize 7
-            |> List.map row
+    let navigation offset dispatch =
+        Columns.columns [] [
+            Column.column [ ] [
+                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(offset - 1) |> LessonsMsg |> dispatch) ] ] [
+                    i [ ClassName "fas fa-chevron-circle-left" ] [ ]
+                ]
+                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(0) |> LessonsMsg |> dispatch) ] ] [
+                    i [ ClassName "fas fa-home" ] [ ]
+                ]
+                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(offset + 1) |> LessonsMsg |> dispatch) ] ] [
+                    i [ ClassName "fas fa-chevron-circle-right" ] [ ]
+                ]
+            ]
+        ]
+
+    let render (state : State) (dispatch : Msg -> unit) (startDate:DateTime) (endDate:DateTime) =
+        let dates = datesBetween startDate endDate
+
+        let headerRow = dates |> List.map headerCol |> Columns.columns [] 
+        let row = dates |> List.map col |> Columns.columns [] 
 
         div [] [
-            yield Columns.columns [] header
-            yield! rows
+            yield navigation state.Lessons.WeekOffset dispatch
+            yield headerRow
+            yield row
         ]
 
 
 let render (state : State) (dispatch : Msg -> unit) =
-    
-    let s,e = getDateRange state.Lessons.SelectedYear state.Lessons.SelectedMonth
-    //dispatch
+    let s,e = getWeekDateRange (DateTime.UtcNow.AddDays(state.Lessons.WeekOffset * 7 |> float))
     div [] [
-        Calendar.render s e
+        Calendar.render state dispatch s e
     ]

@@ -19,13 +19,11 @@ with
     }
 
 type LessonsState = {
-    SelectedYear : int
-    SelectedMonth : int
+    WeekOffset : int
 }
 with
     static member Init = {
-        SelectedYear = DateTime.UtcNow.Year
-        SelectedMonth = DateTime.UtcNow.Month
+        WeekOffset = 0
    }
 
 type State = {
@@ -46,9 +44,13 @@ type AddCreditsFormMsg =
     | SubmitForm
     | FormSubmitted of Result<unit, ServerError>
 
+type LessonsMsg =
+    | WeekOffsetChanged of int
+
 type Msg =
     | Init
     | LoadUsers
     | UsersLoaded of Result<User list, ServerError>
     | ToggleAddCreditsForm of Guid
     | AddCreditsFormMsg of AddCreditsFormMsg
+    | LessonsMsg of LessonsMsg

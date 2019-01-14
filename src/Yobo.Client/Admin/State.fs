@@ -40,3 +40,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
                         LoadUsers |> Cmd.ofMsg ]
                         |> Cmd.batch
             | Error e -> state, (e |> SharedView.serverErrorToToast)
+    | LessonsMsg m ->
+        match m with
+        | WeekOffsetChanged o ->
+            { state with Lessons = { state.Lessons with WeekOffset = o } }, Cmd.none

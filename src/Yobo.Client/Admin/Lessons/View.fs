@@ -10,15 +10,16 @@ open Yobo.Shared
 open Yobo.Shared.Text
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
+open FSharp.Rop
 
 let private closestMonday (date:DateTime) =
     let offset = date.DayOfWeek - DayOfWeek.Monday
-    date.AddDays -(offset |> float)
+    date.AddDays -(offset |> float) |> fun x -> x.Date
 
 let private closestSunday (date:DateTime) =
     let current = date.DayOfWeek |> int
     let offset = 7 - current
-    date.AddDays (offset |> float)
+    date.AddDays (offset |> float) |> fun x -> x.Date
 
 let private getWeekDateRange dayInWeek =
     (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
@@ -57,8 +58,24 @@ module Calendar =
     //        ]
     //    ]
 
-    let col (date:DateTime) =
-        Column.column [ ] [ str "TADY BUDE OBSAH" ] // <| date.ToString("dd. MM.") ]
+    let col (selectedDates:DateTime list) (dispatch : Msg -> unit) (date:DateTime) =
+        let checkBox =
+            let isChecked = selectedDates |> List.tryFind (fun x -> x = date) |> Option.isSome
+            let cmd = if isChecked then LessonsMsg.DateUnselected >> LessonsMsg else LessonsMsg.DateSelected >> LessonsMsg
+            if date >= DateTime.UtcNow then
+                let i = date.Ticks.ToString()
+                div [] [
+                    Checkbox.input [
+                        CustomClass "is-checkradio"
+                        Props [ Props.Id i; Name i; Checked isChecked; OnChange (fun _ -> date |> cmd |> dispatch) ]
+                    ]
+                    Label.label [ Label.Option.For i ] [ str ""]
+                ]
+            else str ""
+
+        Column.column [ ] [
+            checkBox
+        ]
 
     let headerCol (date:DateTime) =
         let n =
@@ -91,17 +108,158 @@ module Calendar =
             ]
         ]
 
+    let tryToTimeSpan (s:string) =
+        let parts = s.Split([|':'|]) |> Array.toList
+        match parts with
+        | [h;m] ->
+            match Int32.TryParse h, Int32.TryParse m with
+            | (true, h), (true, m) ->
+                TimeSpan(h, m, 0) |> Some
+            | _ -> None
+        | _ -> None
+
+    let tryGetFromTo (s:string) (e:string) (d:DateTime) =
+        match tryToTimeSpan s, tryToTimeSpan e with
+        | Some st, Some en -> (d.Date.Add(st), d.Date.Add(en)) |> Some
+        | _ -> None
+
+    let getValidLessonsToAdd (state:LessonsState) =
+        state.SelectedDates
+        |> List.map (fun x ->
+            let st,en =
+                x
+                |> tryGetFromTo state.StartTime state.EndTime
+                |> Option.defaultValue (DateTime.MinValue, DateTime.MinValue)
+            ({
+                Start = st
+                End = en
+                Name = state.Name
+                Description = state.Description
+            } : Yobo.Shared.Admin.Domain.AddLesson)
+        )
+        |> List.filter (fun x -> x.Start <> DateTime.MinValue)
+        |> List.map Yobo.Shared.Admin.Validation.validateAddLesson
+        |> Result.partition
+        |> fst
+        
+
+    let lessonsForm (state:LessonsState) dispatch =
+        if state.SelectedDates.Length > 0 then
+            
+            let isSubmitable = getValidLessonsToAdd state |> List.isEmpty |> not
+
+            let dates =
+                state.SelectedDates
+                |> List.sort
+                |> List.map (fun x -> x.ToString("dd. MM. yyyy"))
+                |> String.concat ", "
+            Columns.columns [] [
+                Column.column [] [
+                    Field.div [ Field.Option.IsHorizontal ] [
+                        Field.label [ ] [ 
+                            Label.label [] [str "Dny"]
+                        ]
+                        Field.body [] [
+                            Field.div [ ] [
+                                div [ ClassName "control"] [
+                                    str dates
+                                ]
+                            ]
+                        ]
+                    ]
+                    Field.div [ Field.Option.IsHorizontal ] [
+                        Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                            Label.label [] [str "Začátek"]
+                        ]
+                        Field.body [] [
+                            Field.div [ ] [
+                                div [ ClassName "control"] [
+                                    Input.text [
+                                        Input.Option.Placeholder "Čas začátku lekce, např. 19:00"
+                                        Input.Option.Value state.StartTime
+                                        Input.Option.OnChange (fun e -> !!e.target?value |> StartChanged |> LessonsMsg |> dispatch)
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                    Field.div [ Field.Option.IsHorizontal ] [
+                        Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                            Label.label [] [str "Konec"]
+                        ]
+                        Field.body [] [
+                            Field.div [ ] [
+                                div [ ClassName "control"] [
+                                    Input.text [
+                                        Input.Option.Placeholder "Čas konce lekce, např. 20:10"
+                                        Input.Option.Value state.EndTime
+                                        Input.Option.OnChange (fun e -> !!e.target?value |> EndChanged |> LessonsMsg |> dispatch)
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                    Field.div [ Field.Option.IsHorizontal ] [
+                        Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                            Label.label [] [str "Název lekce"]
+                        ]
+                        Field.body [] [
+                            Field.div [ ] [
+                                div [ ClassName "control"] [
+                                    Input.text [
+                                        Input.Option.Value state.Name
+                                        Input.Option.OnChange (fun e -> !!e.target?value |> NameChanged |> LessonsMsg |> dispatch)
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                    Field.div [ Field.Option.IsHorizontal ] [
+                        Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                            Label.label [] [str "Popis lekce"]
+                        ]
+                        Field.body [] [
+                            Field.div [ ] [
+                                div [ ClassName "control"] [
+                                    Textarea.textarea [
+                                        Textarea.Option.Value state.Description
+                                        Textarea.Option.OnChange (fun e -> !!e.target?value |> DescriptionChanged |> LessonsMsg |> dispatch)
+                                    ] [ ]
+                                ]
+                            ]
+                        ]
+                    ]
+                    Field.div [ Field.Option.IsHorizontal ] [
+                        Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                            Label.label [] []
+                        ]
+                        Field.body [] [
+                            Field.div [ ] [
+                                div [ ClassName "control"] [
+                                    Button.a [ Button.Disabled (not isSubmitable); Button.Color IsPrimary; Button.Props [ (*OnClick (fun _ -> WeekOffsetChanged(offset - 1) |> LessonsMsg |> dispatch) ] ]*) ] ] [
+                                        sprintf "Přidat %i lekcí" (state.SelectedDates.Length) |> str
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        else str ""
+        
     let render (state : State) (dispatch : Msg -> unit) (startDate:DateTime) (endDate:DateTime) =
         let dates = datesBetween startDate endDate
 
         let headerRow = dates |> List.map headerCol |> Columns.columns [] 
-        let row = dates |> List.map col |> Columns.columns [] 
+        let row = dates |> List.map (col state.Lessons.SelectedDates dispatch) |> Columns.columns [] 
 
         div [] [
+            yield lessonsForm state.Lessons dispatch
             yield navigation state.Lessons.WeekOffset dispatch
             yield headerRow
             yield row
         ]
+
 
 
 let render (state : State) (dispatch : Msg -> unit) =

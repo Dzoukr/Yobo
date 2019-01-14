@@ -43,6 +43,11 @@ let validateIsAfter d txt getter args =
     let value : DateTime = args |> getter
     if value <= d then MustBeAfter(txt,d) |> Some else None
 
+let validateIsBeforeAnother txt beforeGetter afterGetter args =
+    let beforeValue : DateTime = args |> beforeGetter
+    let afterValue : DateTime = args |> afterGetter
+    if afterValue <= beforeValue then MustBeAfter(txt,afterValue) |> Some else None
+
 let validateEquals fstTxt sndTxt fstGetter sndGetter args =
     let val1 = args |> fstGetter
     let val2 = args |> sndGetter

@@ -20,10 +20,20 @@ with
 
 type LessonsState = {
     WeekOffset : int
+    SelectedDates : DateTime list
+    StartTime : string
+    EndTime : string
+    Name : string
+    Description : string
 }
 with
     static member Init = {
         WeekOffset = 0
+        SelectedDates = []
+        StartTime = ""
+        EndTime = ""
+        Name = ""
+        Description = ""
    }
 
 type State = {
@@ -46,6 +56,12 @@ type AddCreditsFormMsg =
 
 type LessonsMsg =
     | WeekOffsetChanged of int
+    | DateSelected of DateTime
+    | DateUnselected of DateTime
+    | StartChanged of string
+    | EndChanged of string
+    | NameChanged of string
+    | DescriptionChanged of string
 
 type Msg =
     | Init

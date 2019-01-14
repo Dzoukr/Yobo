@@ -35,5 +35,5 @@ let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.
 let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.Credits <- item.Credits + args.Credits
-    item.CreditsExpirationUtc <- item.CreditsExpirationUtc
+    item.CreditsExpirationUtc <- Some args.ExpirationUtc
     ctx.SubmitUpdates()

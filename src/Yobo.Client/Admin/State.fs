@@ -44,3 +44,15 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         match m with
         | WeekOffsetChanged o ->
             { state with Lessons = { state.Lessons with WeekOffset = o } }, Cmd.none
+        | DateSelected d ->
+            { state with Lessons = { state.Lessons with SelectedDates = d :: state.Lessons.SelectedDates } }, Cmd.none
+        | DateUnselected d ->
+            { state with Lessons = { state.Lessons with SelectedDates = state.Lessons.SelectedDates |> List.filter (fun x -> x <> d ) } }, Cmd.none
+        | StartChanged s ->
+            { state with Lessons = { state.Lessons with StartTime = s } }, Cmd.none
+        | EndChanged s ->
+            { state with Lessons = { state.Lessons with EndTime = s } }, Cmd.none
+        | NameChanged n ->
+            { state with Lessons = { state.Lessons with Name = n } }, Cmd.none
+        | DescriptionChanged n ->
+            { state with Lessons = { state.Lessons with Description = n } }, Cmd.none

@@ -17,3 +17,10 @@ type AddCredits = {
     Credits : int
     ExpirationUtc : DateTime
 }
+
+type AddLesson = {
+    Start : DateTime
+    End : DateTime
+    Name : string
+    Description : string
+}

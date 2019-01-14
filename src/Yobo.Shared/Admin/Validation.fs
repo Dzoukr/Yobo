@@ -11,3 +11,10 @@ let validateAddCredits (args:AddCredits) =
         validateIsAfter DateTime.UtcNow ExpirationDate (fun x -> x.ExpirationUtc)
         validateNotEmptyGuid Id (fun x -> x.UserId)
     ] |> validate args
+
+let validateAddLesson (args:AddLesson) =
+    [
+        validateNotEmpty CreditsCount (fun (x:AddLesson) -> x.Name)
+        validateNotEmpty CreditsCount (fun (x:AddLesson) -> x.Description)
+        validateIsBeforeAnother ExpirationDate (fun x -> x.Start) (fun x -> x.End)
+    ] |> validate args

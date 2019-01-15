@@ -7,7 +7,6 @@ open Fulma
 open Fable.Core.JsInterop
 open Yobo.Client.Auth.Registration.Domain
 open Yobo.Shared
-open Yobo.Shared.Text
 open Yobo.Client
 
 let render (state : State) (dispatch : Msg -> unit) =
@@ -16,7 +15,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]
-                        [ str (error.Value |> Locale.validationErrorToCz ) ]
+                        [ str (error.Value.Explain()) ]
                    else span [] []
         Control.div [] [
             typ [
@@ -27,10 +26,10 @@ let render (state : State) (dispatch : Msg -> unit) =
             help
         ]
 
-    let lbl txt = Label.label [] [ str (Locale.toTitleCz txt) ]
+    let lbl txt = Label.label [] [ str txt ]
 
     let btn isInProgress =
-        let content = if isInProgress then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str (Locale.toTitleCz Register)
+        let content = if isInProgress then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str "Registrovat"
         Control.div [] [
             Button.button 
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Msg.Register); Button.Disabled(isInProgress) ]
@@ -41,36 +40,39 @@ let render (state : State) (dispatch : Msg -> unit) =
         div 
             [ ClassName "box"] 
             [
-                Heading.h1 [ ] [ str (Locale.toTitleCz Registration) ]
+                Heading.h1 [ ] [ str "Registrace" ]
 
                 (SharedView.serverErrorToViewIfAny state.RegistrationResult)
 
-                lbl FirstName
-                regInput state.Account.FirstName Input.text ChangeFirstName FirstName
+                lbl "Křestní jméno"
+                regInput state.Account.FirstName Input.text ChangeFirstName "FirstName"
                 
-                lbl LastName
-                regInput state.Account.LastName Input.text ChangeLastName LastName
+                lbl "Příjmení"
+                regInput state.Account.LastName Input.text ChangeLastName "LastName"
 
-                lbl Email
-                regInput state.Account.Email Input.email ChangeEmail Email
+                lbl "Email"
+                regInput state.Account.Email Input.email ChangeEmail "Email"
 
-                lbl Password
-                regInput state.Account.Password Input.password ChangePassword Password
+                lbl "Heslo"
+                regInput state.Account.Password Input.password ChangePassword "Password"
                 
-                lbl SecondPassword
-                regInput state.Account.SecondPassword Input.password ChangeSecondPassword SecondPassword
+                lbl "Heslo (ještě jednou pro kontrolu)"
+                regInput state.Account.SecondPassword Input.password ChangeSecondPassword "SecondPassword"
 
                 btn state.IsRegistrating
 
                 a [ Href <| Router.Page.Auth(Router.AuthPage.Login).ToPath(); OnClick Router.goToUrl] [
-                    str (Text.TextValue.BackToLogin |> Locale.toTitleCz)
+                    str "Zpět na přihlášení"
                 ]   
             ]
 
     let content = 
         match state.RegistrationResult with
         | None | Some (Error _) -> form
-        | Some (Ok _) -> TextMessageValue.RegistrationSuccessful |> Locale.toCzMsg |> str |> SharedView.successBox
+        | Some (Ok _) ->
+            "Registrace proběhla úspěšně. Nyní je potřeba zaktivovat váš účet. Podívejte se prosím do emailu, kam by vám měl přijít aktivační odkaz a klikněte na něj."
+            |> str
+            |> SharedView.successBox
 
     Hero.hero [ ]
         [ Hero.body [ ]

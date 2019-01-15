@@ -14,12 +14,10 @@
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
-    <Compile Include="Text.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Validation.fs" />
     <Compile Include="Auth.fs" />
     <Compile Include="Communication.fs" />
-    <Compile Include="Locale.fs" />
     <Compile Include="Admin\Domain.fs" />
     <Compile Include="Admin\Validation.fs" />
     <Compile Include="Admin\Communication.fs" />

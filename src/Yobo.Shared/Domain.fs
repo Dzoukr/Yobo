@@ -1,11 +1,16 @@
 module Yobo.Shared.Domain
 
-open System
-
 type DomainError =
-    | ItemAlreadyExists of Text.TextValue
-    | ItemDoesNotExist of Text.TextValue
+    | ItemAlreadyExists of string
+    | ItemDoesNotExist of string
     | UserAlreadyActivated
     | UserNotActivated
     | ActivationKeyDoesNotMatch
-
+    with
+        member x.Explain() =
+            match x with
+            | ItemAlreadyExists v -> v |> sprintf "Tento %s již v systému existuje."
+            | ItemDoesNotExist v -> v |> sprintf "Položka s touto hodnotou %s v systému neexistuje." 
+            | UserAlreadyActivated -> "Uživatelský účet je již zaktivován." 
+            | UserNotActivated -> "Uživatelský účet není zaktivován."
+            | ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."

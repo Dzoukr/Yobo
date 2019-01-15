@@ -1,16 +1,15 @@
 module Yobo.Core.Users.Aggregate
 
 open FSharp.Rop
-open Yobo.Shared.Text
 open Yobo.Shared.Domain
 open Yobo.Core.Users
 
 let onlyIfDoesNotExist state =
     if state.Id = State.Init.Id then Ok state
-    else DomainError.ItemAlreadyExists(TextValue.Email) |> Error
+    else DomainError.ItemAlreadyExists "Email" |> Error
 
 let onlyIfExists state =
-    if state.Id = State.Init.Id then DomainError.ItemDoesNotExist(TextValue.Email) |> Error else Ok state
+    if state.Id = State.Init.Id then DomainError.ItemDoesNotExist "Email" |> Error else Ok state
 
 let onlyIfActivationKeyMatch key state =
     if state.ActivationKey = key then Ok state else DomainError.ActivationKeyDoesNotMatch |> Error

@@ -5,8 +5,6 @@ open Elmish
 open Yobo.Client.Http
 open Thoth.Elmish
 open Yobo.Client
-open Yobo.Shared.Text
-open Yobo.Shared
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
@@ -36,7 +34,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             | Ok _ -> 
                 { state
                     with AddCreditsForm = AddCreditsForm.Init }, [
-                        TextMessageValue.CreditsSuccessfullyAdded |> Locale.toCzMsg |> SharedView.successToast
+                        SharedView.successToast "Kredity úspěšně přidány."
                         LoadUsers |> Cmd.ofMsg ]
                         |> Cmd.batch
             | Error e -> state, (e |> SharedView.serverErrorToToast)

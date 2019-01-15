@@ -1,16 +1,23 @@
 module Yobo.Shared.Validation
 
 open System
-open Yobo.Shared.Text
 
 type ValidationError = 
-    | IsEmpty of TextValue
-    | MustBeLongerThan of TextValue * int
-    | MustBeBiggerThan of TextValue * int
-    | MustBeAfter of TextValue * DateTime
-    | ValuesNotEqual of TextValue * TextValue
-    | IsNotValidEmail of TextValue
-
+    | IsEmpty of string
+    | MustBeLongerThan of string * int
+    | MustBeBiggerThan of string * int
+    | MustBeAfter of string * DateTime
+    | ValuesNotEqual of string * string
+    | IsNotValidEmail of string
+    with
+        member x.Explain() =
+            match x with
+            | IsEmpty _ -> "Prosím vyplňte hodnotu."
+            | MustBeLongerThan (_, l) -> sprintf "Hodnota musí být delší než %i znaků." l
+            | ValuesNotEqual(_,_) -> sprintf "Hodnoty se neshodují"
+            | IsNotValidEmail _ -> "Vyplňte správný formát pro emailovou adresu."
+            | MustBeBiggerThan (_, v) -> sprintf "Hodnota musí být větší než %i." v
+            | MustBeAfter (_, d) -> sprintf "Hodnota musí být po datu %A." d
 
 type ValidationResult = {
     IsValid : bool

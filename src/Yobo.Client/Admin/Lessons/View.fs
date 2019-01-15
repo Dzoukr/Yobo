@@ -7,8 +7,6 @@ open Fulma
 open System
 open Yobo.Client.Admin.Domain
 open Yobo.Shared
-open Yobo.Shared.Text
-open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open FSharp.Rop
 
@@ -87,6 +85,7 @@ module Calendar =
             | DayOfWeek.Friday -> "Pátek"
             | DayOfWeek.Saturday -> "Sobota"
             | DayOfWeek.Sunday -> "Neděle"
+            | _ -> ""
         Column.column [] [
             div [] [ str n ]
             div [] [ date.ToString("dd. MM. yyyy") |> str ]

@@ -10,6 +10,13 @@ type ServerError =
     | DomainError of DomainError
     | AuthError of AuthError
     | Exception of string
+    with
+        member x.Explain() =
+            match x with
+            | ValidationError _ -> "Došlo k chybě správnosti dat. Prosím zkontrolujte formulář."
+            | DomainError e -> e.Explain()
+            | AuthError e -> e.Explain()
+            | Exception ex -> sprintf "Došlo k chybě : %s" ex
 
 type ServerResponse<'a> = Async<Result<'a, ServerError>>
 

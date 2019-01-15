@@ -9,7 +9,6 @@ open Yobo.Libraries.Emails
 open FSharp.Rop
 open Yobo.API
 open Yobo.Core.Data
-open Yobo.Shared.Text
 open Yobo.Shared.Domain
 
 // services
@@ -25,7 +24,7 @@ let private cmdHandlerErrorToServerError = function
     | CommandHandlerError.ValidationError err -> ServerError.ValidationError(err)
 
 let private dbErrorToServerError = function
-    | DbError.ItemNotFound id -> TextValue.Id |> DomainError.ItemDoesNotExist |> ServerError.DomainError
+    | DbError.ItemNotFound id -> DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError
     | DbError.Exception e -> e.Message |> ServerError.Exception
 
 module Users =

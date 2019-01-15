@@ -25,7 +25,7 @@ let successBox content =
 let inProgressBox content =
     article [ ClassName "message is-info has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fa fa-circle-o-notch fa-spin"; Style [ PaddingRight 10 ] ] [] 
+            i [ ClassName "fas fa-circle-notch fa-spin" ] [] 
             content
         ]
     ]        
@@ -39,13 +39,12 @@ let infoBox content =
     ]        
 
 let serverErrorToView (serverError:ServerError) =
-    serverError |> Locale.serverErrorToCz |> str |> errorBox
+    serverError.Explain() |> str |> errorBox
 
 let serverErrorToToast (serverError:ServerError) =
-    serverError
-    |> Locale.serverErrorToCz
+    serverError.Explain()
     |> Toast.message
-    |> Toast.title (Text.TextMessageValue.ErrorOccured |> Locale.toCzMsg)
+    |> Toast.title "Došlo k chybě"
     |> Toast.position Toast.TopCenter
     |> Toast.noTimeout
     |> Toast.withCloseButton

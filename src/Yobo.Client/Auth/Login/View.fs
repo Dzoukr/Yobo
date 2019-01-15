@@ -16,7 +16,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let pwd = 
         Control.div [] [
             Input.password [
-                Input.Option.Placeholder (Text.TextValue.Password |> Locale.toTitleCz)
+                Input.Option.Placeholder "Vaše heslo"
                 Input.Option.OnChange (fun e -> !!e.target?value |> ChangePassword |> dispatch) ]
         ]
 
@@ -24,12 +24,12 @@ let render (state : State) (dispatch : Msg -> unit) =
         Control.div [] [
             Input.text [
                 Input.Option.Value state.Login.Email
-                Input.Option.Placeholder (Text.TextValue.Email |> Locale.toTitleCz)
+                Input.Option.Placeholder "Váš email"
                 Input.Option.OnChange (fun e -> !!e.target?value |> ChangeEmail |> dispatch) ]
         ]
 
     let btn isLogging =
-        let content = if isLogging then i [ ClassName "fa fa-circle-o-notch fa-spin" ] [] else str (Text.TextValue.Login |> Locale.toTitleCz)
+        let content = if isLogging then i [ ClassName "fa fa-circle-notch fa-spin" ] [] else str "Přihlásit se"
         Control.div [] [
             Button.button 
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> dispatch Login)  ]
@@ -39,7 +39,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let footer = 
         div [] [
             a [ Href <| Router.Page.Auth(Router.AuthPage.Registration).ToPath(); OnClick Router.goToUrl] [
-                str (Text.TextValue.Registration |> Locale.toTitleCz)
+                str "Nemáte ještě účet? Zaregistrujte se."
             ]
             //str " · "
             //a [ Href <| Router.Page.ForgottenPassword.ToPath(); OnClick Router.goToUrl] [
@@ -53,16 +53,16 @@ let render (state : State) (dispatch : Msg -> unit) =
             let resendDiv =
                 match state.ResendActivationResult with
                 | Some (Error _) ->
-                    Text.TextMessageValue.ActivationLinkResendError |> Locale.toCzMsg |> str
+                    str "Aktivační odkaz se nepodařilo odeslat. Zavřete okno prohlížeče a zkuste to prosím později."
                 | Some (Ok _) ->
-                    Text.TextMessageValue.ActivationLinkSuccessfullyResent |> Locale.toCzMsg |> str
+                    str "Aktivační odkaz byl úspěšně odeslán do vaší emailové schránky."
                 | None ->
                     Button.button [ Button.Color IsInfo; Button.OnClick (fun _ -> id |> ResendActivation |> dispatch )] [
-                        Text.TextValue.ResendActivationLink |> Locale.toTitleCz |> str
+                        str "Poslat aktivační odkaz"
                     ]
 
             span [] [
-                Text.TextMessageValue.AccountNotActivatedYet |> Locale.toCzMsg |> str
+                str "Zkuste se podívat do vaší emailové schránky, kam jsme vám poslali aktivační odkaz. Pokud ho nemůžete nalézt, klikněte na tlačítko níže a nechte si poslat nový."
                 div [ Style [ MarginTop 10]] [
                     resendDiv
                 ]

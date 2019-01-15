@@ -7,15 +7,13 @@ open Fulma
 open System
 open Yobo.Client.Admin.Domain
 open Yobo.Shared
-open Yobo.Shared.Text
-open Yobo.Shared
 open Fulma.Extensions.Wikiki
 
 let private userRow dispatch (u:Admin.Domain.User) =
     let activated =
         match u.ActivatedUtc with
         | Some a -> a.ToString("dd. MM. yyyy") |> str
-        | None -> Tag.tag [ Tag.Color IsWarning ] [ TextValue.Innactive |> Locale.toTitleCz |> str ]
+        | None -> Tag.tag [ Tag.Color IsWarning ] [ str "Neaktivní" ]
 
     let expires =
         match u.CreditsExpirationUtc with
@@ -27,7 +25,7 @@ let private userRow dispatch (u:Admin.Domain.User) =
         | Some _ ->
             Button.button 
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch)  ]
-                [ TextValue.AddCredits |> Locale.toTitleCz |> str ]
+                [ str "Přidat kredity" ]
         | None -> str ""
 
     tr [] [
@@ -56,15 +54,15 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
                 }
             Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> CalendarChanged >> AddCreditsFormMsg >> dispatch)
 
-        let lbl txt = Label.label [] [ str (Locale.toTitleCz txt) ]
+        let lbl txt = Label.label [] [ str txt ]
 
         let form = div [] [
             Field.div [ ] [
-                lbl User
+                lbl "Uživatel"
                 div [] [ sprintf "%s %s" u.FirstName u.LastName |> str]
             ]
             Field.div [ ] [
-                lbl CreditsCount
+                lbl "Počet kreditů"
                 Control.div [ ] [
                     Input.number [
                         Input.Option.DefaultValue <| state.AddCreditsForm.Credits.ToString()
@@ -74,7 +72,7 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
                 ] 
             ]
             Field.div [ ] [
-                lbl ExpirationDate
+                lbl "Datum expirace"
                 Control.div [ ] [ calendar ] 
             ]
             Field.div [ Field.IsGrouped; Field.IsGroupedCentered ]
@@ -83,14 +81,14 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
                         Button.OnClick (fun _ -> SubmitForm |> AddCreditsFormMsg |> dispatch)
                         Button.Color IsPrimary
                         Button.Disabled (state.AddCreditsForm.Credits < 1 || state.AddCreditsForm.ExpirationDate.IsNone) ]
-                        [ str (AddCredits |> Locale.toTitleCz) ] ]
+                        [ str "Přidat kredity" ] ]
                 ] 
         ]
             
         div [ ] [
             Quickview.quickview [ Quickview.IsActive true ] [
                 Quickview.header [ ] [
-                    Quickview.title [ ] [ Text.AddCredits |> Locale.toTitleCz |> str ]
+                    Quickview.title [ ] [ str "Přidat kredity" ]
                     Delete.delete [ Delete.OnClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch) ] [ ]
                 ]
                 Quickview.body [ ]
@@ -105,12 +103,12 @@ let render (state : State) (dispatch : Msg -> unit) =
         Table.table [ Table.IsHoverable ] [
             thead [ ] [
                 tr [ ] [
-                    th [ ] [ str (Text.TextValue.LastName |> Locale.toTitleCz) ]
-                    th [ ] [ str (Text.TextValue.FirstName |> Locale.toTitleCz) ]
-                    th [ ] [ str (Text.TextValue.Email |> Locale.toTitleCz) ]
-                    th [ ] [ str (Text.TextValue.ActivationDate |> Locale.toTitleCz) ]
-                    th [ ] [ str (Text.TextValue.CreditsCount |> Locale.toTitleCz) ]
-                    th [ ] [ str (Text.TextValue.ExpirationDate |> Locale.toTitleCz) ]
+                    th [ ] [ str "Jméno" ]
+                    th [ ] [ str "Příjmení" ]
+                    th [ ] [ str "Email" ]
+                    th [ ] [ str "Datum aktivace" ]
+                    th [ ] [ str "Kredity" ]
+                    th [ ] [ str "Datum expirace" ]
                     th [ ] [ str "" ]
                 ]
             ] 

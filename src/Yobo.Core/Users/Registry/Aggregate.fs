@@ -3,15 +3,14 @@ module Yobo.Core.Users.Registry.Aggregate
 open FSharp.Rop
 open Yobo.Shared.Domain
 open Yobo.Core.Users.Registry
-open Yobo.Shared.Text
 
 let onlyIfDoesNotExist (state:State) (email:string) =
-    if state.Emails |> List.exists (fun (_,em) -> email = em) then DomainError.ItemAlreadyExists(TextValue.Email) |> Error
+    if state.Emails |> List.exists (fun (_,em) -> email = em) then DomainError.ItemAlreadyExists "Email" |> Error
     else Ok email
 
 let onlyIfExists (state:State) userId (email:string) =
     if state.Emails |> List.exists (fun (i,em) -> userId = i && email = em) then Ok email
-    else DomainError.ItemDoesNotExist(TextValue.Email) |> Error
+    else DomainError.ItemDoesNotExist "Email" |> Error
 
 let normalizeAdd (args:CmdArgs.Add) = { args with Email = args.Email.ToLower() }
 let normalizeRemove (args:CmdArgs.Remove) = { args with Email = args.Email.ToLower() }

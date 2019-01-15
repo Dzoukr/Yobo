@@ -1,3 +1,4 @@
+version 5.193.0
 group Shared
     source https://api.nuget.org/v3/index.json
     framework: netstandard2.0

@@ -18,13 +18,14 @@ with
         Credits = 10
     }
 
-type LessonsState = {
+type AddLessonsForm = {
     WeekOffset : int
     SelectedDates : DateTime list
     StartTime : string
     EndTime : string
     Name : string
     Description : string
+    FormOpened : bool
 }
 with
     static member Init = {
@@ -34,18 +35,21 @@ with
         EndTime = ""
         Name = ""
         Description = ""
+        FormOpened = false
    }
 
 type State = {
     Users : User list
+    Lessons : Lesson list
     AddCreditsForm : AddCreditsForm
-    Lessons : LessonsState
+    AddLessonsForm : AddLessonsForm
 }
 with
     static member Init = {
         Users = []
+        Lessons = []
         AddCreditsForm = AddCreditsForm.Init
-        Lessons = LessonsState.Init
+        AddLessonsForm = AddLessonsForm.Init
     }
 
 type AddCreditsFormMsg =
@@ -59,14 +63,19 @@ type LessonsMsg =
     | DateSelected of DateTime
     | DateUnselected of DateTime
     | StartChanged of string
+    | FormOpened of bool
     | EndChanged of string
     | NameChanged of string
     | DescriptionChanged of string
+    | SubmitLessonsForm
+    | LessonsFormSubmitted of Result<unit, ServerError>
 
 type Msg =
     | Init
     | LoadUsers
+    | LoadLessons
     | UsersLoaded of Result<User list, ServerError>
+    | LessonsLoaded of Result<Lesson list, ServerError>
     | ToggleAddCreditsForm of Guid
     | AddCreditsFormMsg of AddCreditsFormMsg
     | LessonsMsg of LessonsMsg

@@ -24,3 +24,11 @@ type AddLesson = {
     Name : string
     Description : string
 }
+
+type Lesson = {
+    Start : DateTime
+    End : DateTime
+    Name : string
+    Description : string
+    Reservations : User list
+}

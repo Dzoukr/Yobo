@@ -6,7 +6,6 @@ open FSharp.Rop
 open Yobo.Core.Users
 open Yobo.Core
 open Yobo.Shared.Admin
-open System.Security.Claims
 open Yobo.Shared.Communication
 open Yobo.API.Extensions
 
@@ -23,6 +22,17 @@ module ArgsBuilder =
         ) Validation.validateAddCredits
         >> Result.mapError ServerError.ValidationError
 
+    //let buildAddLessons =
+    //    ArgsBuilder.build (fun (acc:AddLesson) ->
+    //        ({
+    //            Id = acc.UserId
+    //            Credits = acc.Credits
+    //            ExpirationUtc = acc.ExpirationUtc
+    //        } : CmdArgs.AddLesson)
+    //    ) Validation.validateAddLesson
+    //    >> Result.mapError ServerError.ValidationError
+
+
 let mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
     {
         Id = u.Id
@@ -38,5 +48,12 @@ let addCredits cmdHandler (acc:AddCredits) =
     result {
         let! args = acc |> ArgsBuilder.buildAddCredits
         let! _ = args |> Command.AddCredits |> CoreCommand.Users |> cmdHandler
+        return ()
+    }
+
+let addLessons cmdHandler (acc:AddLesson list) =
+    result {
+        //let! args = acc |> ArgsBuilder.buildAddCredits
+        //let! _ = args |> Command.AddCredits |> CoreCommand.Users |> cmdHandler
         return ()
     }

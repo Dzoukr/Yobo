@@ -65,4 +65,6 @@ module Admin =
     let api : Yobo.Shared.Admin.Communication.API = {
         GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Users.queries.GetAll <!> List.map mapToUser |> toAsync
         AddCredits = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addCredits |> toAsync
+        GetAllLessons = fun x -> x |> Security.onlyForAdmin <!> snd >>= (fun _ -> Ok []) |> toAsync
+        AddLessons = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addLessons |> toAsync
     }

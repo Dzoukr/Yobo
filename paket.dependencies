@@ -8,12 +8,12 @@ group Shared
 
 group Tools
     source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.1
+    framework: netcoreapp2.2
     nuget FSharp.Compiler.Tools
 
 group Server
     source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.1
+    framework: netcoreapp2.2
     storage: none
 
     nuget FSharp.Core
@@ -24,7 +24,7 @@ group Server
 
 group Core
     source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.1
+    framework: netcoreapp2.2
     storage: none
 
     nuget FSharp.Core

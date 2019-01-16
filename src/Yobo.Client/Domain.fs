@@ -2,33 +2,29 @@ module Yobo.Client.Domain
 
 open Yobo.Shared.Communication
 
+type AuthPage =
+    | Login of Auth.Login.Domain.State
+    | Registration of Auth.Registration.Domain.State
+    | AccountActivation of Auth.AccountActivation.Domain.State
 
-type AuthState = {
-    Login : Auth.Login.Domain.State
-    Registration : Auth.Registration.Domain.State
-    AccountActivation : Auth.AccountActivation.Domain.State
-}
-with
-    static member Init = {
-        Login = Auth.Login.Domain.State.Init
-        Registration = Auth.Registration.Domain.State.Init
-        AccountActivation = Auth.AccountActivation.Domain.State.Init
-    }
+type AdminPage =
+    | Users of Admin.Users.Domain.State
+    | Lessons of Admin.Lessons.Domain.State
 
-type State = { 
-    Page : Router.Page
+type Page =
+    | Auth of AuthPage
+    | Admin of AdminPage
+
+type State = {
+    Page : Page
+    Route : string
     LoggedUser : Yobo.Shared.Auth.Domain.LoggedUser option
-
-    // pages state
-    Auth : AuthState
-    Admin : Admin.Domain.State
 }
 with
     static member Init = {
-        Page = Router.Page.DefaultPage
+        Page = AdminPage.Users(Admin.Users.Domain.State.Init) |> Page.Admin
         LoggedUser = None
-        Auth = AuthState.Init
-        Admin = Admin.Domain.State.Init
+        Route = ""
     }
 
 type AuthMsg =
@@ -36,10 +32,15 @@ type AuthMsg =
     | RegistrationMsg of Auth.Registration.Domain.Msg
     | AccountActivationMsg of Auth.AccountActivation.Domain.Msg
 
+type AdminMsg =
+    | UsersMsg of Admin.Users.Domain.Msg
+    | LessonsMsg of Admin.Lessons.Domain.Msg
+
 type Msg =
     | AuthMsg of AuthMsg
-    | AdminMsg of Admin.Domain.Msg
+    | AdminMsg of AdminMsg
     | LoadUserByToken of string
     | UserByTokenLoaded of Result<Yobo.Shared.Auth.Domain.LoggedUser,ServerError>
     | RefreshToken of string
     | TokenRefreshed of Result<string, ServerError>
+    | LoggedOut

@@ -5,7 +5,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open System
-open Yobo.Client.Admin.Domain
+open Yobo.Client.Admin.Users.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
 
@@ -46,13 +46,13 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
             let opts = { 
                 Yobo.Client.Components.Calendar.Options.Default 
                     with 
-                        StartDate = state.AddCreditsForm.ExpirationDate
+                        StartDate = state.ExpirationDate
                         DisplayMode = Yobo.Client.Components.Calendar.DisplayMode.Inline
                         MinimumDate = Some (DateTime.Now.AddDays 7.)
                         WeekStart = 1
                         Lang = "cs"
                 }
-            Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> CalendarChanged >> AddCreditsFormMsg >> dispatch)
+            Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> CalendarChanged >> dispatch)
 
         let lbl txt = Label.label [] [ str txt ]
 
@@ -65,9 +65,9 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
                 lbl "Počet kreditů"
                 Control.div [ ] [
                     Input.number [
-                        Input.Option.DefaultValue <| state.AddCreditsForm.Credits.ToString()
+                        Input.Option.DefaultValue <| state.Credits.ToString()
                         Input.Option.Props [ Props.Min 1 ];
-                        Input.Option.OnChange (fun e -> !!e.target?value |> int |> (CreditsChanged >> AddCreditsFormMsg >> dispatch))
+                        Input.Option.OnChange (fun e -> !!e.target?value |> int |> (CreditsChanged >> dispatch))
                     ]
                 ] 
             ]
@@ -78,9 +78,9 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
             Field.div [ Field.IsGrouped; Field.IsGroupedCentered ]
                 [ Control.div [ ]
                     [ Button.button [
-                        Button.OnClick (fun _ -> SubmitForm |> AddCreditsFormMsg |> dispatch)
+                        Button.OnClick (fun _ -> SubmitForm |> dispatch)
                         Button.Color IsPrimary
-                        Button.Disabled (state.AddCreditsForm.Credits < 1 || state.AddCreditsForm.ExpirationDate.IsNone) ]
+                        Button.Disabled (state.Credits < 1 || state.ExpirationDate.IsNone) ]
                         [ str "Přidat kredity" ] ]
                 ] 
         ]
@@ -97,8 +97,15 @@ let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
         ]
     | None -> str ""
 
+let private loadingRow =
+    tr [] [
+        td [ ColSpan 7 ] [
+            i [ ClassName "fas fa-circle-notch fa-spin" ] []
+        ]
+    ]
+
 let render (state : State) (dispatch : Msg -> unit) =
-    let rows = state.Users |> List.map (userRow dispatch)
+    let rows = if state.UsersLoading then [ loadingRow ] else state.Users |> List.map (userRow dispatch)
     let table =
         Table.table [ Table.IsHoverable ] [
             thead [ ] [
@@ -116,5 +123,5 @@ let render (state : State) (dispatch : Msg -> unit) =
         ]
     div [] [
         table
-        state.Users |> List.tryFind (fun x -> Some x.Id = state.AddCreditsForm.SelectedUserId) |> showForm dispatch state
+        state.Users |> List.tryFind (fun x -> Some x.Id = state.SelectedUserId) |> showForm dispatch state
     ]

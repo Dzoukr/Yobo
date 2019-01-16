@@ -5,7 +5,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
 open System
-open Yobo.Client.Admin.Domain
+open Yobo.Client.Admin.Lessons.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open FSharp.Rop
@@ -59,7 +59,7 @@ module Calendar =
     let col (selectedDates:DateTime list) (dispatch : Msg -> unit) (date:DateTime) =
         let checkBox =
             let isChecked = selectedDates |> List.tryFind (fun x -> x = date) |> Option.isSome
-            let cmd = if isChecked then LessonsMsg.DateUnselected >> LessonsMsg else LessonsMsg.DateSelected >> LessonsMsg
+            let cmd = if isChecked then DateUnselected else DateSelected 
             if date >= DateTime.UtcNow then
                 let i = date.Ticks.ToString()
                 div [] [
@@ -92,22 +92,22 @@ module Calendar =
         ]
         
 
-    let navigation (state:AddLessonsForm) dispatch =
+    let navigation (state:State) dispatch =
         let addBtn =
             if state.SelectedDates.Length > 0 then
-                Button.a [ Button.Color IsPrimary; Button.Props [ OnClick (fun _ -> FormOpened(true) |> LessonsMsg |> dispatch) ] ] [
+                Button.a [ Button.Color IsPrimary; Button.Props [ OnClick (fun _ -> FormOpened(true) |> dispatch) ] ] [
                     state.SelectedDates.Length |> sprintf "Přidat %i lekcí" |> str
                 ]
             else str ""
         Columns.columns [] [
             Column.column [ ] [
-                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> LessonsMsg |> dispatch) ] ] [
+                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-left" ] [ ]
                 ]
-                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(0) |> LessonsMsg |> dispatch) ] ] [
+                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(0) |> dispatch) ] ] [
                     i [ ClassName "fas fa-home" ] [ ]
                 ]
-                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset + 1) |> LessonsMsg |> dispatch) ] ] [
+                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset + 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-right" ] [ ]
                 ]
                 addBtn
@@ -115,9 +115,9 @@ module Calendar =
         ]
         
 
-    let lessonsForm (state:AddLessonsForm) dispatch =
+    let lessonsForm (state:State) dispatch =
             
-        let isSubmitable = Yobo.Client.Admin.State. getValidLessonsToAdd state |> List.isEmpty |> not
+        let isSubmitable = Yobo.Client.Admin.Lessons.State.getValidLessonsToAdd state |> List.isEmpty |> not
 
         let dates =
             state.SelectedDates
@@ -148,7 +148,7 @@ module Calendar =
                             Input.text [
                                 Input.Option.Placeholder "Čas začátku lekce, např. 19:00"
                                 Input.Option.Value state.StartTime
-                                Input.Option.OnChange (fun e -> !!e.target?value |> StartChanged |> LessonsMsg |> dispatch)
+                                Input.Option.OnChange (fun e -> !!e.target?value |> StartChanged |> dispatch)
                             ]
                         ]
                     ]
@@ -164,7 +164,7 @@ module Calendar =
                             Input.text [
                                 Input.Option.Placeholder "Čas konce lekce, např. 20:10"
                                 Input.Option.Value state.EndTime
-                                Input.Option.OnChange (fun e -> !!e.target?value |> EndChanged |> LessonsMsg |> dispatch)
+                                Input.Option.OnChange (fun e -> !!e.target?value |> EndChanged |> dispatch)
                             ]
                         ]
                     ]
@@ -179,7 +179,7 @@ module Calendar =
                         div [ ClassName "control"] [
                             Input.text [
                                 Input.Option.Value state.Name
-                                Input.Option.OnChange (fun e -> !!e.target?value |> NameChanged |> LessonsMsg |> dispatch)
+                                Input.Option.OnChange (fun e -> !!e.target?value |> NameChanged |> dispatch)
                             ]
                         ]
                     ]
@@ -194,7 +194,7 @@ module Calendar =
                         div [ ClassName "control"] [
                             Textarea.textarea [
                                 Textarea.Option.Value state.Description
-                                Textarea.Option.OnChange (fun e -> !!e.target?value |> DescriptionChanged |> LessonsMsg |> dispatch)
+                                Textarea.Option.OnChange (fun e -> !!e.target?value |> DescriptionChanged |> dispatch)
                             ] [ ]
                         ]
                     ]
@@ -220,7 +220,7 @@ module Calendar =
                 Quickview.quickview [ Quickview.IsActive state.FormOpened ] [
                     Quickview.header [ ] [
                         Quickview.title [ ] [ str "Přidat lekce" ]
-                        Delete.delete [ Delete.OnClick (fun _ -> FormOpened(false) |> LessonsMsg |> dispatch) ] [ ]
+                        Delete.delete [ Delete.OnClick (fun _ -> FormOpened(false) |> dispatch) ] [ ]
                     ]
                     Quickview.body [ ]
                         [ content ]
@@ -232,11 +232,11 @@ module Calendar =
         let dates = datesBetween startDate endDate
 
         let headerRow = dates |> List.map headerCol |> Columns.columns [] 
-        let row = dates |> List.map (col state.AddLessonsForm.SelectedDates dispatch) |> Columns.columns [] 
+        let row = dates |> List.map (col state.SelectedDates dispatch) |> Columns.columns [] 
 
         div [] [
-            yield lessonsForm state.AddLessonsForm dispatch
-            yield navigation state.AddLessonsForm dispatch
+            yield lessonsForm state dispatch
+            yield navigation state dispatch
             yield headerRow
             yield row
         ]
@@ -244,7 +244,7 @@ module Calendar =
 
 
 let render (state : State) (dispatch : Msg -> unit) =
-    let s,e = getWeekDateRange (DateTime.UtcNow.AddDays(state.AddLessonsForm.WeekOffset * 7 |> float))
+    let s,e = getWeekDateRange (DateTime.UtcNow.AddDays(state.WeekOffset * 7 |> float))
     div [] [
         Calendar.render state dispatch s e
     ]

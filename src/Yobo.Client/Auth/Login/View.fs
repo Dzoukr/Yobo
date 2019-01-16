@@ -38,13 +38,9 @@ let render (state : State) (dispatch : Msg -> unit) =
 
     let footer = 
         div [] [
-            a [ Href <| Router.Page.Auth(Router.AuthPage.Registration).ToPath(); OnClick Router.goToUrl] [
+            a [ Href <| Router.Routes.registration; OnClick Router.goToUrl] [
                 str "Nemáte ještě účet? Zaregistrujte se."
             ]
-            //str " · "
-            //a [ Href <| Router.Page.ForgottenPassword.ToPath(); OnClick Router.goToUrl] [
-            //    str "Zapomněl(a) jsem heslo!"
-            //]
         ]
 
     let resendActivationInfoBox =

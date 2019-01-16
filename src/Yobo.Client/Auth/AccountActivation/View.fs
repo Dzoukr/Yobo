@@ -13,7 +13,7 @@ let render (state : State) (dispatch : Msg -> unit) =
     let successContent msg = span [] [
         str msg
         div [] [
-            a [ Href <| Router.Page.Auth(Router.AuthPage.Login).ToPath(); OnClick Router.goToUrl] [
+            a [ Href Router.Routes.login; OnClick Router.goToUrl] [
                 str "Zpátky na přihlášení"
             ]
         ]

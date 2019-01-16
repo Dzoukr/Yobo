@@ -4,6 +4,7 @@ open Elmish
 open Yobo.Client.Auth.Login.Domain
 open Yobo.Client.Http
 open Yobo.Client
+open Elmish.Browser.Navigation
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
@@ -18,7 +19,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
                 LoginResult = None
                 ResendActivationResult = None
                 Login = Yobo.Shared.Auth.Domain.Login.Init
-            }, Router.newUrl(Router.Page.DefaultPage)
+            }, Navigation.newUrl Router.Routes.defaultPage
         | Error _ -> { state with IsLogging = false; LoginResult = Some res; ResendActivationResult = None }, Cmd.none
     | ActivationResent res -> { state with ResendActivationResult = Some res }, Cmd.none
     | ChangeEmail v -> { state with Login = { state.Login with Email = v }}, Cmd.none

@@ -13,7 +13,7 @@ open Elmish.HMR
 
 Program.mkProgram State.init State.update View.render
 |> Program.withSubscription State.subscribe
-|> Program.toNavigable (parsePath Router.pageParser) State.urlUpdate
+|> Program.toNavigable (parsePath State.pageParser) State.urlUpdate
 |> Toast.Program.withToast Toast.render
 #if DEBUG
 |> Program.withConsoleTrace

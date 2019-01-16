@@ -61,7 +61,7 @@ let render (state : State) (dispatch : Msg -> unit) =
 
                 btn state.IsRegistrating
 
-                a [ Href <| Router.Page.Auth(Router.AuthPage.Login).ToPath(); OnClick Router.goToUrl] [
+                a [ Href Router.Routes.login; OnClick Router.goToUrl] [
                     str "Zpět na přihlášení"
                 ]   
             ]

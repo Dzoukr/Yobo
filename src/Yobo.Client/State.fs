@@ -5,66 +5,91 @@ open Fable.Import
 open Yobo.Client.Domain
 open Http
 open System
+open Elmish.Browser.UrlParser
+open Elmish.Browser.Navigation
 
-let urlUpdate (result: Option<Router.Page>) state =
+let pageParser: Parser<Page -> Page, Page> =
+    oneOf [
+        map (Auth(Login(Auth.Login.Domain.State.Init))) (s "login")
+        map (Auth(Registration(Auth.Registration.Domain.State.Init))) (s "registration")
+        map ((fun (x:string) -> Guid(x)) >> Auth.AccountActivation.Domain.State.Init >> AccountActivation >> Auth) (s "accountActivation" </> str)
+        map (Admin(Users(Admin.Users.Domain.State.Init))) (s "users")
+        map (Admin(Lessons(Admin.Lessons.Domain.State.Init))) (s "lessons") ]
+
+let private withCheckingLogin (state:State) cmd =
+    let requiresLogin =
+        match state.Page with
+        | Auth _ -> false
+        | Admin _ -> true
+
+    if requiresLogin then
+        match state.LoggedUser, TokenStorage.tryGetToken() with
+        | None, Some t -> [ Cmd.ofMsg (Msg.LoadUserByToken t); cmd ] |> Cmd.batch
+        | Some _, Some _ -> cmd
+        | _ -> LoggedOut |> Cmd.ofMsg
+    else cmd
+
+
+
+let private withRoute (state:State) = { state with Route = Fable.Import.Browser.location.pathname }
+
+let urlUpdate (result: Option<Page>) state =
     match result with
     | None ->
-        state, Router.newUrl(Router.Page.DefaultPage)
+        state |> withRoute, Navigation.newUrl Router.Routes.defaultPage
     | Some page ->
         let state = { state with Page = page }
-        match page with
-        | Router.Page.Auth(Router.AuthPage.AccountActivation id) ->
-            state,
-                id
-                |> Auth.AccountActivation.Domain.Msg.Activate
-                |> AuthMsg.AccountActivationMsg
-                |> AuthMsg
-                |> Cmd.ofMsg
-        | Router.Page.Admin admin ->
-            let state, cmd =
-                state, match state.LoggedUser, TokenStorage.tryGetToken() with
-                        | Some _, Some _ -> Cmd.none
-                        | None, Some t -> Cmd.ofMsg (Msg.LoadUserByToken t)
-                        | _, None -> Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
-            match admin with
-            | Router.AdminPage.Users -> state, Cmd.batch [cmd; (Admin.Domain.Msg.Init |> AdminMsg |> Cmd.ofMsg) ]
-            | Router.AdminPage.Lessons -> state, cmd
-        | Router.Page.Auth(Router.AuthPage.Logout) ->
-            TokenStorage.removeToken()
-            { state with LoggedUser = None}, Router.newUrl(Router.Page.Auth(Router.AuthPage.Login))
-        | _ -> state, Cmd.none
-
-let private mapUpdate fn1 fn2 (f,s) = (fn1 f), (s |> Cmd.map fn2)
+        let cmd =
+            match page with
+            | Auth pg ->
+                match pg with
+                | AccountActivation s ->
+                    s.Id
+                    |> Auth.AccountActivation.Domain.Msg.Activate
+                    |> AuthMsg.AccountActivationMsg
+                    |> AuthMsg
+                    |> Cmd.ofMsg
+                | _ -> Cmd.none
+            | Admin pg ->
+                match pg with
+                | Users _ -> Admin.Users.Domain.Msg.Init |> UsersMsg |> AdminMsg |> Cmd.ofMsg
+                | Lessons _ -> Admin.Lessons.Domain.Msg.Init |> LessonsMsg |> AdminMsg |> Cmd.ofMsg
+        (state |> withRoute), (withCheckingLogin state cmd)
 
 let init result =
     urlUpdate result State.Init
  
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
+    let map stateMap cmdMap (subState,subCmd) =
+        { state with Page = (subState |> stateMap) }, (subCmd |> Cmd.map cmdMap)
+
     match msg with
     | AuthMsg m ->
-        match m with
-        | LoginMsg m ->
-            Auth.Login.State.update m state.Auth.Login
-            |> mapUpdate (fun s -> { state with Auth = { state.Auth with Login = s } }) (LoginMsg >> Msg.AuthMsg)
-        | RegistrationMsg m ->
-            Auth.Registration.State.update m state.Auth.Registration
-            |> mapUpdate (fun s -> { state with Auth = { state.Auth with Registration = s } }) (RegistrationMsg >> Msg.AuthMsg)
-        | AccountActivationMsg m ->
-            Auth.AccountActivation.State.update m state.Auth.AccountActivation
-            |> mapUpdate (fun s -> { state with Auth = { state.Auth with AccountActivation = s } }) (AccountActivationMsg >> Msg.AuthMsg)
-    | AdminMsg m -> Admin.State.update m state.Admin |> mapUpdate (fun s -> { state with Admin = s }) (Msg.AdminMsg)
+        match m, state.Page with
+        | LoginMsg msg, Auth(Login state) -> Auth.Login.State.update msg state |> map (Login >> Auth) (LoginMsg >> Msg.AuthMsg) 
+        | RegistrationMsg msg, Auth(Registration state) -> Auth.Registration.State.update msg state |> map (Registration >> Auth) (RegistrationMsg >> Msg.AuthMsg)
+        | AccountActivationMsg msg, Auth(AccountActivation state) -> Auth.AccountActivation.State.update msg state |> map (AccountActivation >> Auth) (AccountActivationMsg >> Msg.AuthMsg)
+        | _ -> state, Cmd.none
+    | AdminMsg m ->
+        match m, state.Page with
+        | UsersMsg msg, Admin(Users state) -> Admin.Users.State.update msg state |> map (Users >> Admin) (UsersMsg >> Msg.AdminMsg)
+        | LessonsMsg msg, Admin(Lessons state) -> Admin.Lessons.State.update msg state |> map (Lessons >> Admin) (LessonsMsg >> Msg.AdminMsg)
+        | _ -> state, Cmd.none
     | LoadUserByToken t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->
         match res with
         | Ok user -> { state with LoggedUser = Some user }, Cmd.none
-        | Error _ -> state, Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
+        | Error _ -> state, LoggedOut |> Cmd.ofMsg
     | RefreshToken t -> state, (t |> Cmd.ofAsyncResult authAPI.RefreshToken TokenRefreshed)
     | TokenRefreshed res ->
         match res with
         | Ok t ->
             t |> TokenStorage.setToken
             state, Cmd.none
-        | Error _ -> state, Router.newUrl(Router.Page.Auth(Router.AuthPage.Logout))
+        | Error _ -> state, LoggedOut |> Cmd.ofMsg
+    | LoggedOut ->
+        TokenStorage.removeToken()
+        { state with LoggedUser = None}, Navigation.newUrl Router.Routes.login
 
 let subscribe (_:State) =
     let sub dispatch = 

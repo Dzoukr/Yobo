@@ -16,6 +16,7 @@
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
+    <Compile Include="Extensions.fs" />
     <Compile Include="Serialization.fs" />
     <Compile Include="ReadDb.fs" />
     <Compile Include="Data.fs" />
@@ -23,6 +24,13 @@
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
     <Compile Include="EmailSettings.fs" />
+    <Compile Include="Lessons\Lessons.fs" />
+    <Compile Include="Lessons\Aggregate.fs" />
+    <Compile Include="Lessons\EventSerializer.fs" />
+    <Compile Include="Lessons\CommandHandler.fs" />
+    <Compile Include="Lessons\UpdateQueries.fs" />
+    <Compile Include="Lessons\DbEventHandler.fs" />
+    <Compile Include="Lessons\ReadQueries.fs" />
     <EmbeddedResource Include="Users\EmailTemplates\RegenerateActivation.html" />
     <EmbeddedResource Include="Users\EmailTemplates\Register.html" />
     <Compile Include="Users\Registry\Registry.fs" />

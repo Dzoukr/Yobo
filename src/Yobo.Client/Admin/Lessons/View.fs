@@ -9,18 +9,6 @@ open Yobo.Client.Admin.Lessons.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open FSharp.Rop
-
-let private closestMonday (date:DateTime) =
-    let offset = date.DayOfWeek - DayOfWeek.Monday
-    date.AddDays -(offset |> float) |> fun x -> x.Date
-
-let private closestSunday (date:DateTime) =
-    let current = date.DayOfWeek |> int
-    let offset = 7 - current
-    date.AddDays (offset |> float) |> fun x -> x.Date
-
-let private getWeekDateRange dayInWeek =
-    (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
     
 let private datesBetween (startDate:DateTime) (endDate:DateTime) =
     endDate.Subtract(startDate).TotalDays
@@ -32,6 +20,7 @@ let private datesBetween (startDate:DateTime) (endDate:DateTime) =
 
 module Calendar =
     open Yobo.Client
+    open Yobo.Shared.Admin.Domain
 
     //let test =
     //    div [ ClassName "popover is-popover-bottom"] [
@@ -56,16 +45,15 @@ module Calendar =
     //        ]
     //    ]
 
-    let col (selectedDates:DateTime list) (dispatch : Msg -> unit) (date:DateTime) =
+    let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTime) =
         let checkBox =
-            let isChecked = selectedDates |> List.tryFind (fun x -> x = date) |> Option.isSome
-            let cmd = if isChecked then DateUnselected else DateSelected 
+            let cmd = if isSelected then DateUnselected else DateSelected 
             if date >= DateTime.UtcNow then
                 let i = date.Ticks.ToString()
                 div [] [
                     Checkbox.input [
                         CustomClass "is-checkradio"
-                        Props [ Props.Id i; Name i; Checked isChecked; OnChange (fun _ -> date |> cmd |> dispatch) ]
+                        Props [ Props.Id i; Name i; Checked isSelected; OnChange (fun _ -> date |> cmd |> dispatch) ]
                     ]
                     Label.label [ Label.Option.For i ] [ str ""]
                 ]
@@ -73,6 +61,7 @@ module Calendar =
 
         Column.column [ ] [
             checkBox
+            lessons |> string |> str
         ]
 
     let headerCol (date:DateTime) =
@@ -95,19 +84,19 @@ module Calendar =
     let navigation (state:State) dispatch =
         let addBtn =
             if state.SelectedDates.Length > 0 then
-                Button.a [ Button.Color IsPrimary; Button.Props [ OnClick (fun _ -> FormOpened(true) |> dispatch) ] ] [
+                Button.button [ Button.Color IsPrimary; Button.Props [ OnClick (fun _ -> FormOpened(true) |> dispatch) ] ] [
                     state.SelectedDates.Length |> sprintf "Přidat %i lekcí" |> str
                 ]
             else str ""
         Columns.columns [] [
             Column.column [ ] [
-                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
+                Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-left" ] [ ]
                 ]
-                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(0) |> dispatch) ] ] [
+                Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(0) |> dispatch) ] ] [
                     i [ ClassName "fas fa-home" ] [ ]
                 ]
-                Button.a [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset + 1) |> dispatch) ] ] [
+                Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset + 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-right" ] [ ]
                 ]
                 addBtn
@@ -207,7 +196,11 @@ module Calendar =
                 Field.body [] [
                     Field.div [ ] [
                         div [ ClassName "control"] [
-                            Button.a [ Button.Disabled (not isSubmitable); Button.Color IsPrimary; Button.Props [ (*OnClick (fun _ -> WeekOffsetChanged(offset - 1) |> LessonsMsg |> dispatch) ] ]*) ] ] [
+                            Button.button [
+                                Button.Disabled (not isSubmitable)
+                                Button.Color IsPrimary
+                                Button.Props [ OnClick (fun _ -> SubmitLessonsForm |> dispatch) ]
+                            ] [
                                 sprintf "Přidat %i lekcí" (state.SelectedDates.Length) |> str
                             ]
                         ]
@@ -227,12 +220,23 @@ module Calendar =
                     ]
             ]
         )
-        
+
     let render (state : State) (dispatch : Msg -> unit) (startDate:DateTime) (endDate:DateTime) =
         let dates = datesBetween startDate endDate
+        let getLessonsForDate (date:DateTime) =
+            state.Lessons
+            |> List.filter (fun x -> x.StartDateUtc.Date = date.Date)
 
         let headerRow = dates |> List.map headerCol |> Columns.columns [] 
-        let row = dates |> List.map (col state.SelectedDates dispatch) |> Columns.columns [] 
+        let row =
+            dates
+            |> List.map (fun x ->
+                let lsns = x |> getLessonsForDate
+                let isSelected = state.SelectedDates |> List.tryFind (fun y -> x = y) |> Option.isSome
+                col isSelected lsns dispatch x
+
+            )
+            |> Columns.columns [] 
 
         div [] [
             yield lessonsForm state dispatch
@@ -241,10 +245,8 @@ module Calendar =
             yield row
         ]
 
-
-
 let render (state : State) (dispatch : Msg -> unit) =
-    let s,e = getWeekDateRange (DateTime.UtcNow.AddDays(state.WeekOffset * 7 |> float))
+    let s,e = State.getWeekDateRange (DateTime.Now.AddDays(state.WeekOffset * 7 |> float))
     div [] [
         Calendar.render state dispatch s e
     ]

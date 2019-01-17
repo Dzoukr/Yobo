@@ -46,7 +46,7 @@ module Auth =
     let private loginWithAdmin email pwd =
         if email = Configuration.Admin.email && pwd = Configuration.Admin.password then Ok adminUser
         else
-            Services.Users.authenticator.Login email pwd <!> mapToLoggedUser
+            Services.Users.authenticator.Login email pwd
 
     let api : Yobo.Shared.Auth.Communication.API = {
         GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
@@ -63,8 +63,8 @@ module Admin =
     open Yobo.API.CompositionRoot
 
     let api : Yobo.Shared.Admin.Communication.API = {
-        GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Users.queries.GetAll <!> List.map mapToUser |> toAsync
+        GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Users.queries.GetAll |> toAsync
         AddCredits = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addCredits |> toAsync
-        GetAllLessons = fun x -> x |> Security.onlyForAdmin <!> snd >>= (fun _ -> Ok []) |> toAsync
+        GetLessonsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Lessons.queries.GetAllForDateRange |> toAsync
         AddLessons = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addLessons |> toAsync
     }

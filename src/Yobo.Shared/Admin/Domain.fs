@@ -26,8 +26,9 @@ type AddLesson = {
 }
 
 type Lesson = {
-    Start : DateTime
-    End : DateTime
+    Id : Guid
+    StartDateUtc : DateTime
+    EndDateUtc : DateTime
     Name : string
     Description : string
     Reservations : User list

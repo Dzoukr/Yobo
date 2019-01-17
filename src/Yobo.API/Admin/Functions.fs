@@ -7,53 +7,43 @@ open Yobo.Core.Users
 open Yobo.Core
 open Yobo.Shared.Admin
 open Yobo.Shared.Communication
-open Yobo.API.Extensions
 
 module ArgsBuilder =
     open Yobo.API
 
     let buildAddCredits =
-        ArgsBuilder.build (fun (acc:AddCredits) ->
+        ArgsBuilder.build (fun (x:AddCredits) ->
             ({
-                Id = acc.UserId
-                Credits = acc.Credits
-                ExpirationUtc = acc.ExpirationUtc
-            } : CmdArgs.AddCredits)
+                Id = x.UserId
+                Credits = x.Credits
+                ExpirationUtc = x.ExpirationUtc
+            } : Users.CmdArgs.AddCredits)
         ) Validation.validateAddCredits
         >> Result.mapError ServerError.ValidationError
 
-    //let buildAddLessons =
-    //    ArgsBuilder.build (fun (acc:AddLesson) ->
-    //        ({
-    //            Id = acc.UserId
-    //            Credits = acc.Credits
-    //            ExpirationUtc = acc.ExpirationUtc
-    //        } : CmdArgs.AddLesson)
-    //    ) Validation.validateAddLesson
-    //    >> Result.mapError ServerError.ValidationError
+    let buildAddLessons =
+        ArgsBuilder.build (fun (x:AddLesson) ->
+            ({
+                Id = Guid.NewGuid()
+                StartDateUtc = x.Start
+                EndDateUtc = x.End
+                Name = x.Name
+                Description = x.Description
+            } : Lessons.CmdArgs.Create)
+        ) Validation.validateAddLesson
+        >> Result.mapError ServerError.ValidationError
 
-
-let mapToUser (u:Yobo.Core.Users.ReadQueries.User) =
-    {
-        Id = u.Id
-        Email = u.Email
-        FirstName = u.FirstName
-        LastName = u.LastName
-        ActivatedUtc = u.ActivatedUtc |> Option.map (fun x -> x.ToUtc())
-        Credits = u.Credits
-        CreditsExpirationUtc = u.CreditsExpirationUtc
-    } : Yobo.Shared.Admin.Domain.User
 
 let addCredits cmdHandler (acc:AddCredits) =
     result {
         let! args = acc |> ArgsBuilder.buildAddCredits
-        let! _ = args |> Command.AddCredits |> CoreCommand.Users |> cmdHandler
+        let! _ = args |> Users.Command.AddCredits |> CoreCommand.Users |> cmdHandler
         return ()
     }
 
 let addLessons cmdHandler (acc:AddLesson list) =
     result {
-        //let! args = acc |> ArgsBuilder.buildAddCredits
-        //let! _ = args |> Command.AddCredits |> CoreCommand.Users |> cmdHandler
+        let! args = acc |> Result.traverse ArgsBuilder.buildAddLessons
+        let! _ = args |> Result.traverse (Lessons.Command.Create >> CoreCommand.Lessons >> cmdHandler)
         return ()
     }

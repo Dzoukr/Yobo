@@ -7,6 +7,12 @@ trigger:
     include: [ master, develop ]
 
 steps:
+- task: DotNetCoreInstaller@0
+  displayName: Installing .net core sdk 2.2.100
+  inputs:
+    version: '2.2.100'
+    packageType: sdk
+
 - script: fake build -t publish
   displayName: 'Build'
 

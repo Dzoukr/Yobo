@@ -25,15 +25,6 @@ module ArgsBuilder =
         ) Validation.validateAccount
         >> Result.mapError ServerError.ValidationError
 
-let mapToLoggedUser (u:Yobo.Core.Users.ReadQueries.User) =
-    {
-        Id = u.Id
-        Email = u.Email
-        FirstName = u.FirstName
-        LastName = u.LastName
-        IsAdmin = false
-    } : Yobo.Shared.Auth.Domain.LoggedUser
-
 let claimsToUser (claims:seq<Claim>) =
     let find key = claims |> Seq.find (fun x -> x.Type = key) |> (fun x -> x.Value)
     {
@@ -84,7 +75,7 @@ let register cmdHandler createHashFn (acc:NewAccount) =
 
 let activateAccount cmdHandler getUserByActivationKey (activationKey:Guid) =
     result {
-        let! (user : ReadQueries.User) = getUserByActivationKey activationKey
+        let! (user : LoggedUser) = getUserByActivationKey activationKey
         let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> Command.Activate |> CoreCommand.Users |> cmdHandler
         return user.Id
     }

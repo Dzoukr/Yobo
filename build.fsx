@@ -91,6 +91,7 @@ Target.create "Publish" (fun _ ->
     let publishArgs = sprintf "publish -c Release -o \"%s\"" deployDir
     runDotNet publishArgs serverPath
     Shell.copyDir publicDir "src/Yobo.Client/output" FileFilter.allFiles
+    Path.combine deployDir "config.development.json" |> File.delete
 )
 
 Target.create "RefreshSchema" (fun _ -> 

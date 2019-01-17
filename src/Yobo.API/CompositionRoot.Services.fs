@@ -40,6 +40,12 @@ module Users =
 
     let authorizator = Configuration.Authorization.get |> Yobo.Libraries.Authorization.Jwt.createAuthorizator
 
+module Lessons =
+    let queries =
+        Configuration.ReadDb.connectionString
+        |> Lessons.ReadQueries.createDefault
+        |> Lessons.ReadQueries.withError dbErrorToServerError
+
 // event handlers
 module EventHandler =
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.connectionString

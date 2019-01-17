@@ -3,18 +3,8 @@ module Yobo.Core.Users.ReadQueries
 open Yobo.Core
 open System
 open FSharp.Rop
-open Yobo.Shared.Auth
-open Yobo.Core.Data
-
-type User = {
-    Id : Guid
-    Email : string
-    FirstName : string
-    LastName : string
-    ActivatedUtc : DateTime option
-    Credits : int
-    CreditsExpirationUtc : DateTime option
-}
+open Yobo.Shared.Admin.Domain
+open Extensions
 
 type UserQueries<'a> = {
     GetById : Guid -> Result<User, 'a>
@@ -27,15 +17,15 @@ let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
 
 }
 
-let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
+let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
     {
         Id = u.Id
         Email = u.Email
         FirstName = u.FirstName
         LastName = u.LastName
-        ActivatedUtc = u.ActivatedUtc
+        ActivatedUtc = u.ActivatedUtc |> Option.map (fun x -> x.ToUtc())
         Credits = u.Credits
-        CreditsExpirationUtc = u.CreditsExpirationUtc
+        CreditsExpirationUtc = u.CreditsExpirationUtc |> Option.map (fun x -> x.ToUtc())
     }
 
 let private getById i (ctx:ReadDb.Db.dataContext) =
@@ -61,5 +51,4 @@ let createDefault (connString:string) =
     {
         GetById = getById >> Data.tryQueryResult ctx
         GetAll = getAll >> Data.tryQuery ctx
-        
     }

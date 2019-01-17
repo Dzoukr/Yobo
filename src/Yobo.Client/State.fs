@@ -8,6 +8,9 @@ open System
 open Elmish.Browser.UrlParser
 open Elmish.Browser.Navigation
 
+let private removeSlash (s:string) = s.TrimStart([|'/'|])
+let inline private s p = p |> removeSlash |> s
+
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
         map (Auth(Login(Auth.Login.Domain.State.Init))) (s "login")
@@ -28,8 +31,6 @@ let private withCheckingLogin (state:State) cmd =
         | Some _, Some _ -> cmd
         | _ -> LoggedOut |> Cmd.ofMsg
     else cmd
-
-
 
 let private withRoute (state:State) = { state with Route = Fable.Import.Browser.location.pathname }
 

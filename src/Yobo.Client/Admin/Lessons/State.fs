@@ -42,17 +42,34 @@ let getValidLessonsToAdd (state:State) =
     |> Result.partition
     |> fst
 
+let private closestMonday (date:DateTime) =
+    let offset = date.DayOfWeek - DayOfWeek.Monday
+    date.AddDays -(offset |> float) |> fun x -> x.Date
+
+let private closestSunday (date:DateTime) =
+    let current = date.DayOfWeek |> int
+    let offset = 7 - current
+    date.AddDays (offset |> float) |> fun x -> x.Date.Add(TimeSpan(23,59,59))
+
+let getWeekDateRange dayInWeek =
+    (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
+
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
     | Init -> state, LoadLessons |> Cmd.ofMsg
-    | LoadLessons -> state, (() |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.GetAllLessons LessonsLoaded)
+    | LoadLessons ->
+        state,
+            (DateTime.Now.AddDays(state.WeekOffset * 7 |> float)
+            |> getWeekDateRange
+            |> SecuredParam.create
+            |> Cmd.ofAsyncResult adminAPI.GetLessonsForDateRange LessonsLoaded)
     | LessonsLoaded res ->
         match res with
         | Ok less ->
             { state with Lessons = less}, Cmd.none
         | Error _ -> state, Cmd.none
     | WeekOffsetChanged o ->
-        { state with WeekOffset = o }, Cmd.none
+        { state with WeekOffset = o }, LoadLessons |> Cmd.ofMsg
     | DateSelected d ->
         { state with SelectedDates = d :: state.SelectedDates }, Cmd.none
     | DateUnselected d ->

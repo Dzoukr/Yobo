@@ -48,4 +48,4 @@ let apply (state:State) = function
     | Registered args -> { state with Id = args.Id; ActivationKey = args.ActivationKey }
     | ActivationKeyRegenerated args -> { state with ActivationKey = args.ActivationKey }
     | Activated args -> { state with Id = args.Id; IsActivated = true }
-    | CreditsAdded args -> { state with Credits = state.Credits + args.Credits; CreditsExpirationUtc = Some args.ExpirationUtc }
+    | CreditsAdded args -> { state with Credits = state.Credits + args.Credits; CreditsExpiration = Some args.Expiration }

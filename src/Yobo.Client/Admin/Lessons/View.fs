@@ -10,13 +10,16 @@ open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open FSharp.Rop
     
-let private datesBetween (startDate:DateTime) (endDate:DateTime) =
+let private datesBetween (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
     endDate.Subtract(startDate).TotalDays
     |> int
     |> (fun d -> [0..d])
     |> List.map (fun x ->
         startDate.AddDays (float x)
     )
+
+let private toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
+let private toCzTime (date:DateTimeOffset) = date.ToString("HH. mm.")
 
 module Calendar =
     open Yobo.Client
@@ -45,10 +48,10 @@ module Calendar =
     //        ]
     //    ]
 
-    let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTime) =
+    let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         let checkBox =
             let cmd = if isSelected then DateUnselected else DateSelected 
-            if date >= DateTime.UtcNow then
+            if date >= DateTimeOffset.Now then
                 let i = date.Ticks.ToString()
                 div [] [
                     Checkbox.input [
@@ -59,12 +62,28 @@ module Calendar =
                 ]
             else str ""
 
+        let lessonDiv (lesson:Lesson) =
+            let st = lesson.StartDate |> toCzTime
+            let en = lesson.EndDate |> toCzTime
+            let cap = sprintf "Přihlášeno %i z 12" lesson.Reservations.Length
+            let res (u:User) =
+                div [] [
+                    sprintf "%s %s" u.FirstName u.LastName |> str
+                ]
+
+            div [] [
+                div [] [ sprintf "%s - %s" st en |> str ]
+                div [] [ cap |> str ]
+                div [] (lesson.Reservations |> List.map res)
+                hr []
+            ]
+
         Column.column [ ] [
             checkBox
-            lessons |> string |> str
+            div [] (lessons |> List.map lessonDiv)
         ]
 
-    let headerCol (date:DateTime) =
+    let headerCol (date:DateTimeOffset) =
         let n =
             match date.DayOfWeek with
             | DayOfWeek.Monday -> "Pondělí"
@@ -111,7 +130,7 @@ module Calendar =
         let dates =
             state.SelectedDates
             |> List.sort
-            |> List.map (fun x -> x.ToString("dd. MM. yyyy"))
+            |> List.map toCzDate
             |> String.concat ", "
 
         div [] [
@@ -221,11 +240,11 @@ module Calendar =
             ]
         )
 
-    let render (state : State) (dispatch : Msg -> unit) (startDate:DateTime) (endDate:DateTime) =
+    let render (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
         let dates = datesBetween startDate endDate
-        let getLessonsForDate (date:DateTime) =
+        let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
-            |> List.filter (fun x -> x.StartDateUtc.Date = date.Date)
+            |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
         let headerRow = dates |> List.map headerCol |> Columns.columns [] 
         let row =
@@ -246,7 +265,7 @@ module Calendar =
         ]
 
 let render (state : State) (dispatch : Msg -> unit) =
-    let s,e = State.getWeekDateRange (DateTime.Now.AddDays(state.WeekOffset * 7 |> float))
+    let s,e = State.getWeekDateRange (DateTimeOffset.Now.AddDays(state.WeekOffset * 7 |> float))
     div [] [
         Calendar.render state dispatch s e
     ]

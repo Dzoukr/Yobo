@@ -62,7 +62,7 @@ module Calendar =
         let tryToDateTime obj =
             match obj with
             | null -> None
-            | x -> x?toISOString() |> DateTime.Parse |> Some
+            | x -> x?toISOString() |> DateTime.Parse |> fun x -> x.Date |> Some
 
         if elm |> isNull |> not then
             let selector = sprintf "[id=\"%s\"]" elm.id
@@ -74,7 +74,6 @@ module Calendar =
                 )
 
     let view (opts:Options) (componentId:string) (onDateChange: DateTime option * DateTime option -> unit) =
-        //Fable.Import.Browser.console.log opts
         let dValue (st:DateTime option) (en:DateTime option) =
             (match st, en with
             | Some s, Some e -> sprintf "%s - %s" (s.ToString(netFormat)) (e.ToString(netFormat))

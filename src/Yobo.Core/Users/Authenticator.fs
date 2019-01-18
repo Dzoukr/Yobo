@@ -43,7 +43,7 @@ let private login (verifyHashFn:string -> string -> bool) email pwd (ctx:ReadDb.
         } |> Seq.tryHead
     match user with
     | Some u ->
-        match (verifyHashFn pwd u.PasswordHash), u.ActivatedUtc with
+        match (verifyHashFn pwd u.PasswordHash), u.Activated with
         | true, Some _ ->  u |> userFromDbEntity |> Ok
         | true, None -> AccountNotActivated(u.Id) |> Error
         | false, _ -> InvalidLoginOrPassword |> Error

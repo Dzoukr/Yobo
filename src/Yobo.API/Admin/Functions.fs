@@ -16,7 +16,7 @@ module ArgsBuilder =
             ({
                 Id = x.UserId
                 Credits = x.Credits
-                ExpirationUtc = x.ExpirationUtc
+                Expiration = x.Expiration
             } : Users.CmdArgs.AddCredits)
         ) Validation.validateAddCredits
         >> Result.mapError ServerError.ValidationError
@@ -25,8 +25,8 @@ module ArgsBuilder =
         ArgsBuilder.build (fun (x:AddLesson) ->
             ({
                 Id = Guid.NewGuid()
-                StartDateUtc = x.Start
-                EndDateUtc = x.End
+                StartDate = x.Start
+                EndDate = x.End
                 Name = x.Name
                 Description = x.Description
             } : Lessons.CmdArgs.Create)

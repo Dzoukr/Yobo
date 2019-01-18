@@ -7,7 +7,7 @@ open Yobo.Shared.Admin.Domain
 type State = {
     Lessons : Lesson list
     WeekOffset : int
-    SelectedDates : DateTime list
+    SelectedDates : DateTimeOffset list
     StartTime : string
     EndTime : string
     Name : string
@@ -31,8 +31,8 @@ type Msg =
     | LoadLessons
     | LessonsLoaded of Result<Lesson list, ServerError>
     | WeekOffsetChanged of int
-    | DateSelected of DateTime
-    | DateUnselected of DateTime
+    | DateSelected of DateTimeOffset
+    | DateUnselected of DateTimeOffset
     | StartChanged of string
     | FormOpened of bool
     | EndChanged of string

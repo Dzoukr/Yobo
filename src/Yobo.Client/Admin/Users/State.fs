@@ -25,7 +25,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         state,
             ({  UserId = state.SelectedUserId.Value
                 Credits = state.Credits
-                ExpirationUtc = state.ExpirationDate.Value } : Yobo.Shared.Admin.Domain.AddCredits)
+                Expiration = state.ExpirationDate.Value } : Yobo.Shared.Admin.Domain.AddCredits)
             |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.AddCredits FormSubmitted
     | FormSubmitted res ->
         match res with

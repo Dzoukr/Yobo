@@ -25,7 +25,7 @@ module CmdArgs =
     type AddCredits = {
         Id : Guid
         Credits : int
-        ExpirationUtc : DateTime
+        Expiration : DateTimeOffset
     }
 
 type Command =
@@ -45,7 +45,7 @@ type State = {
     IsActivated : bool
     ActivationKey : Guid
     Credits : int
-    CreditsExpirationUtc : DateTime option
+    CreditsExpiration : DateTimeOffset option
 }
 with
     static member Init = {
@@ -53,5 +53,5 @@ with
         IsActivated = false
         ActivationKey = Guid.Empty
         Credits = 0
-        CreditsExpirationUtc = None
+        CreditsExpiration = None
     }

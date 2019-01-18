@@ -4,7 +4,6 @@ open Yobo.Core
 open System
 open FSharp.Rop
 open Yobo.Shared.Admin.Domain
-open Extensions
 
 type UserQueries<'a> = {
     GetById : Guid -> Result<User, 'a>
@@ -14,7 +13,6 @@ type UserQueries<'a> = {
 let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
     GetById = q.GetById >> Result.mapError fn
     GetAll = q.GetAll >> Result.mapError fn
-
 }
 
 let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
@@ -23,9 +21,9 @@ let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         Email = u.Email
         FirstName = u.FirstName
         LastName = u.LastName
-        ActivatedUtc = u.ActivatedUtc |> Option.map (fun x -> x.ToUtc())
+        Activated = u.Activated
         Credits = u.Credits
-        CreditsExpirationUtc = u.CreditsExpirationUtc |> Option.map (fun x -> x.ToUtc())
+        CreditsExpiration = u.CreditsExpiration
     }
 
 let private getById i (ctx:ReadDb.Db.dataContext) =

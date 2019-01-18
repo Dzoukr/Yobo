@@ -7,7 +7,7 @@ open Yobo.Shared.Admin.Domain
 let validateAddCredits (args:AddCredits) =
     [
         validateBiggerThan 0 "Credits" (fun (x:AddCredits) -> x.Credits)
-        validateIsAfter DateTime.UtcNow "ExpirationUtc" (fun x -> x.ExpirationUtc)
+        validateIsAfter DateTimeOffset.Now "Expiration" (fun x -> x.Expiration)
         validateNotEmptyGuid "UserId" (fun x -> x.UserId)
     ] |> validate args
 

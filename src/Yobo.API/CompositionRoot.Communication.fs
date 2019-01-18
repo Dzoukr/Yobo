@@ -57,6 +57,10 @@ module Auth =
         ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByActivationKey >> toAsync
     }
 
+let gimme (x:DateTimeOffset) =
+    let y = x
+    x |> ignore
+
 
 module Admin =
     open Yobo.API.Admin.Functions
@@ -67,4 +71,5 @@ module Admin =
         AddCredits = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addCredits |> toAsync
         GetLessonsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Lessons.queries.GetAllForDateRange |> toAsync
         AddLessons = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addLessons |> toAsync
+        Test = gimme >> Ok >> toAsync
     }

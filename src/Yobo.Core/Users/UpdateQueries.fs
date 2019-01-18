@@ -18,13 +18,13 @@ let registered (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
     item.LastName <- args.LastName
     item.ActivationKey <- args.ActivationKey
     item.PasswordHash <- args.PasswordHash
-    item.RegisteredUtc <- DateTime.UtcNow
+    item.Registered <- DateTimeOffset.Now
     item.Credits <- 0
     ctx.SubmitUpdates()
 
 let activated (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
-    item.ActivatedUtc <- Some DateTime.UtcNow
+    item.Activated <- Some DateTimeOffset.Now
     ctx.SubmitUpdates()
 
 let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
@@ -35,5 +35,5 @@ let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.
 let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.Credits <- item.Credits + args.Credits
-    item.CreditsExpirationUtc <- Some args.ExpirationUtc
+    item.CreditsExpiration <- Some args.Expiration
     ctx.SubmitUpdates()

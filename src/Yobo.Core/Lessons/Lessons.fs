@@ -6,8 +6,8 @@ module CmdArgs =
 
     type Create = {
         Id : Guid
-        StartDateUtc : DateTime
-        EndDateUtc : DateTime
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
         Name : string
         Description : string
     }

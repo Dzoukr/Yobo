@@ -8,20 +8,21 @@ open System
 open Yobo.Client.Admin.Users.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
+open Yobo.Shared.Extensions
 
 let private userRow dispatch (u:Admin.Domain.User) =
     let activated =
-        match u.ActivatedUtc with
+        match u.Activated with
         | Some a -> a.ToString("dd. MM. yyyy") |> str
         | None -> Tag.tag [ Tag.Color IsWarning ] [ str "Neaktivní" ]
 
     let expires =
-        match u.CreditsExpirationUtc with
+        match u.CreditsExpiration with
         | Some a -> a.ToString("dd. MM. yyyy") |> str
         | None -> str "-"
 
     let addCreditBtn =
-        match u.ActivatedUtc with
+        match u.Activated with
         | Some _ ->
             Button.button 
                 [ Button.Color IsPrimary; Button.IsFullWidth; Button.OnClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch)  ]
@@ -41,18 +42,18 @@ let private userRow dispatch (u:Admin.Domain.User) =
 let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
     match user with
     | Some u ->
-        
+        let toDateTimeOffset = Option.map (fun (x:DateTime) -> DateTimeOffset(x).EndOfTheDay())
         let calendar =
             let opts = { 
                 Yobo.Client.Components.Calendar.Options.Default 
                     with 
-                        StartDate = state.ExpirationDate
+                        StartDate = state.ExpirationDate |> Option.map (fun x -> x.Date)
                         DisplayMode = Yobo.Client.Components.Calendar.DisplayMode.Inline
-                        MinimumDate = Some (DateTime.Now.AddDays 7.)
+                        MinimumDate = Some (DateTimeOffset.Now.Date.AddDays 7.)
                         WeekStart = 1
                         Lang = "cs"
                 }
-            Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> CalendarChanged >> dispatch)
+            Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> toDateTimeOffset >> CalendarChanged >> dispatch)
 
         let lbl txt = Label.label [] [ str txt ]
 

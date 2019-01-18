@@ -7,6 +7,7 @@ open Yobo.Client.Http
 open Thoth.Elmish
 open Yobo.Client
 open FSharp.Rop
+open Yobo.Shared.Extensions
 
 let private tryToTimeSpan (s:string) =
     let parts = s.Split([|':'|]) |> Array.toList
@@ -18,9 +19,9 @@ let private tryToTimeSpan (s:string) =
         | _ -> None
     | _ -> None
 
-let private tryGetFromTo (s:string) (e:string) (d:DateTime) =
+let private tryGetFromTo (s:string) (e:string) (d:DateTimeOffset) =
     match tryToTimeSpan s, tryToTimeSpan e with
-    | Some st, Some en -> (d.Date.Add(st), d.Date.Add(en)) |> Some
+    | Some st, Some en -> (d.Add(st), d.Add(en)) |> Some
     | _ -> None
 
 let getValidLessonsToAdd (state:State) =
@@ -29,7 +30,7 @@ let getValidLessonsToAdd (state:State) =
         let st,en =
             x
             |> tryGetFromTo state.StartTime state.EndTime
-            |> Option.defaultValue (DateTime.MinValue, DateTime.MinValue)
+            |> Option.defaultValue (DateTimeOffset.MinValue, DateTimeOffset.MinValue)
         ({
             Start = st
             End = en
@@ -37,19 +38,19 @@ let getValidLessonsToAdd (state:State) =
             Description = state.Description
         } : Yobo.Shared.Admin.Domain.AddLesson)
     )
-    |> List.filter (fun x -> x.Start <> DateTime.MinValue)
+    |> List.filter (fun x -> x.Start <> DateTimeOffset.MinValue)
     |> List.map Yobo.Shared.Admin.Validation.validateAddLesson
     |> Result.partition
     |> fst
 
-let private closestMonday (date:DateTime) =
+let private closestMonday (date:DateTimeOffset) =
     let offset = date.DayOfWeek - DayOfWeek.Monday
-    date.AddDays -(offset |> float) |> fun x -> x.Date
+    date.AddDays -(offset |> float) |> fun x -> x.StartOfTheDay()
 
-let private closestSunday (date:DateTime) =
+let private closestSunday (date:DateTimeOffset) =
     let current = date.DayOfWeek |> int
     let offset = 7 - current
-    date.AddDays (offset |> float) |> fun x -> x.Date.Add(TimeSpan(23,59,59))
+    date.AddDays (offset |> float) |> fun x -> x.EndOfTheDay()
 
 let getWeekDateRange dayInWeek =
     (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
@@ -59,8 +60,12 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | Init -> state, LoadLessons |> Cmd.ofMsg
     | LoadLessons ->
         state,
-            (DateTime.Now.AddDays(state.WeekOffset * 7 |> float)
+            (DateTimeOffset.Now.AddDays(state.WeekOffset * 7 |> float)
             |> getWeekDateRange
+            |> (fun x ->
+                Fable.Import.Browser.console.log (x)
+                x
+            )
             |> SecuredParam.create
             |> Cmd.ofAsyncResult adminAPI.GetLessonsForDateRange LessonsLoaded)
     | LessonsLoaded res ->
@@ -94,7 +99,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             |> Cmd.ofAsyncResult adminAPI.AddLessons (LessonsFormSubmitted))
     | LessonsFormSubmitted res ->
         match res with
-        | Ok _ -> State.Init,
+        | Ok _ -> { State.Init with WeekOffset = state.WeekOffset },
                      [
                             SharedView.successToast "Lekce úspěšně přidány."
                             LoadLessons |> Cmd.ofMsg ]

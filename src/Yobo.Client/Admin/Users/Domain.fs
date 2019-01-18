@@ -3,12 +3,13 @@ module Yobo.Client.Admin.Users.Domain
 open System
 open Yobo.Shared.Communication
 open Yobo.Shared.Admin.Domain
+open Yobo.Shared.Extensions
 
 type State = {
     Users : User list
     UsersLoading : bool
     SelectedUserId : Guid option
-    ExpirationDate : DateTime option
+    ExpirationDate : DateTimeOffset option
     Credits : int
 }
 with
@@ -16,13 +17,13 @@ with
         Users = []
         UsersLoading = false
         SelectedUserId = None
-        ExpirationDate = DateTime.UtcNow.AddMonths 4 |> Some
+        ExpirationDate = DateTimeOffset.Now.EndOfTheDay().AddMonths 4 |> Some
         Credits = 10
     }
 
 type Msg =
     | Init
-    | CalendarChanged of DateTime option
+    | CalendarChanged of DateTimeOffset option
     | CreditsChanged of int
     | SubmitForm
     | FormSubmitted of Result<unit, ServerError>

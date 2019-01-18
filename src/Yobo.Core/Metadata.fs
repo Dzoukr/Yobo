@@ -4,14 +4,14 @@ open System
 
 type Metadata = {
     UserId : Guid option
-    CreatedUtc : DateTime
+    Created : DateTimeOffset
 }
 with
     static member Create userId = {
         UserId = Some userId
-        CreatedUtc = DateTime.UtcNow
+        Created = DateTimeOffset.Now
     }
     static member CreateAnonymous() = {
         UserId = None
-        CreatedUtc = DateTime.UtcNow
+        Created = DateTimeOffset.Now
     }

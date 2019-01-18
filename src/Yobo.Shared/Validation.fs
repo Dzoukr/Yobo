@@ -6,7 +6,7 @@ type ValidationError =
     | IsEmpty of string
     | MustBeLongerThan of string * int
     | MustBeBiggerThan of string * int
-    | MustBeAfter of string * DateTime
+    | MustBeAfter of string * DateTimeOffset
     | ValuesNotEqual of string * string
     | IsNotValidEmail of string
     with
@@ -47,12 +47,12 @@ let validateBiggerThan v txt getter args =
     if value <= v then MustBeBiggerThan(txt,v) |> Some else None
 
 let validateIsAfter d txt getter args =
-    let value : DateTime = args |> getter
+    let value : DateTimeOffset = args |> getter
     if value <= d then MustBeAfter(txt,d) |> Some else None
 
 let validateIsBeforeAnother txt beforeGetter afterGetter args =
-    let beforeValue : DateTime = args |> beforeGetter
-    let afterValue : DateTime = args |> afterGetter
+    let beforeValue : DateTimeOffset = args |> beforeGetter
+    let afterValue : DateTimeOffset = args |> afterGetter
     if afterValue <= beforeValue then MustBeAfter(txt,afterValue) |> Some else None
 
 let validateEquals fstTxt sndTxt fstGetter sndGetter args =

@@ -7,28 +7,28 @@ type User = {
     Email : string
     FirstName : string
     LastName : string
-    ActivatedUtc : DateTime option
+    Activated : DateTimeOffset option
     Credits : int
-    CreditsExpirationUtc : DateTime option
+    CreditsExpiration : DateTimeOffset option
 }
 
 type AddCredits = {
     UserId : Guid
     Credits : int
-    ExpirationUtc : DateTime
+    Expiration : DateTimeOffset
 }
 
 type AddLesson = {
-    Start : DateTime
-    End : DateTime
+    Start : DateTimeOffset
+    End : DateTimeOffset
     Name : string
     Description : string
 }
 
 type Lesson = {
     Id : Guid
-    StartDateUtc : DateTime
-    EndDateUtc : DateTime
+    StartDate : DateTimeOffset
+    EndDate : DateTimeOffset
     Name : string
     Description : string
     Reservations : User list

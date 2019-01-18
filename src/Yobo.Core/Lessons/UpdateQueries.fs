@@ -15,7 +15,7 @@ let created (args:CmdArgs.Create) (ctx:ReadDb.Db.dataContext) =
     item.Id <- args.Id
     item.Name <- args.Name
     item.Description <- args.Description
-    item.StartDateUtc <- args.StartDateUtc
-    item.EndDateUtc <- args.EndDateUtc
-    item.CreatedUtc <- DateTime.UtcNow
+    item.StartDate <- args.StartDate
+    item.EndDate <- args.EndDate
+    item.Created <- DateTimeOffset.Now
     ctx.SubmitUpdates()

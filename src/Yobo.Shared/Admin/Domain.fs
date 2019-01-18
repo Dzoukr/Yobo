@@ -31,5 +31,5 @@ type Lesson = {
     EndDate : DateTimeOffset
     Name : string
     Description : string
-    Reservations : User list
+    Reservations : (User * int) list
 }

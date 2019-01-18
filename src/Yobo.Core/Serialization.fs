@@ -42,7 +42,7 @@ type RequireAllPropertiesContractResolver() =
 
 // settings
 let private settings = JsonSerializerSettings()
-//settings.DateTimeZoneHandling <- DateTimeZoneHandling.Utc
+settings.DateTimeZoneHandling <- DateTimeZoneHandling.Utc
 settings.NullValueHandling <- NullValueHandling.Ignore
 settings.ContractResolver <- RequireAllPropertiesContractResolver()
 settings.Converters.Add(OptionConverter())

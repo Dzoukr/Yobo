@@ -11,5 +11,4 @@ type API = {
     AddCredits : SecuredParam<AddCredits> -> ServerResponse<unit>
     GetLessonsForDateRange : SecuredParam<DateTimeOffset * DateTimeOffset> -> ServerResponse<Lesson list>
     AddLessons : SecuredParam<AddLesson list> -> ServerResponse<unit>
-    Test : DateTimeOffset -> ServerResponse<unit>
 } 

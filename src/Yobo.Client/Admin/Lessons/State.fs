@@ -43,31 +43,17 @@ let getValidLessonsToAdd (state:State) =
     |> Result.partition
     |> fst
 
-let private closestMonday (date:DateTimeOffset) =
-    let offset = date.DayOfWeek - DayOfWeek.Monday
-    date.AddDays -(offset |> float) |> fun x -> x.StartOfTheDay()
 
-let private closestSunday (date:DateTimeOffset) =
-    let current = date.DayOfWeek |> int
-    let offset = 7 - current
-    date.AddDays (offset |> float) |> fun x -> x.EndOfTheDay()
-
-let getWeekDateRange dayInWeek =
-    (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
     | Init -> state, LoadLessons |> Cmd.ofMsg
     | LoadLessons ->
         state,
-            (DateTimeOffset.Now.AddDays(state.WeekOffset * 7 |> float)
-            |> getWeekDateRange
-            |> (fun x ->
-                Fable.Import.Browser.console.log (x)
-                x
-            )
+            state.WeekOffset
+            |> DateRange.getDateRangeForWeekOffset
             |> SecuredParam.create
-            |> Cmd.ofAsyncResult adminAPI.GetLessonsForDateRange LessonsLoaded)
+            |> Cmd.ofAsyncResult adminAPI.GetLessonsForDateRange LessonsLoaded
     | LessonsLoaded res ->
         match res with
         | Ok less ->

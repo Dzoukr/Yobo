@@ -11,8 +11,10 @@ module Routes =
     let defaultPage = "/users"
     let login = "/login"
     let registration = "/registration"
+    let accountActivation = "/accountActivation"
     let users = "/users"
     let lessons = "/lessons"
+    let calendar = "/calendar"
 
 let goToUrl (e: React.MouseEvent) =
     e.preventDefault()

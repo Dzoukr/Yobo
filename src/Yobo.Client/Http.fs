@@ -22,6 +22,12 @@ let adminAPI =
     |> Remoting.withRouteBuilder Yobo.Shared.Admin.Communication.routeBuilder
     |> Remoting.buildProxy<Yobo.Shared.Admin.Communication.API>
 
+let calendarAPI =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
+    |> Remoting.buildProxy<Yobo.Shared.Calendar.Communication.API>
+
+
 
 module SecuredParam =
     open Yobo.Shared.Communication

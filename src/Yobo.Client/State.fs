@@ -13,17 +13,19 @@ let inline private s p = p |> removeSlash |> s
 
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
-        map (Auth(Login(Auth.Login.Domain.State.Init))) (s "login")
-        map (Auth(Registration(Auth.Registration.Domain.State.Init))) (s "registration")
-        map ((fun (x:string) -> Guid(x)) >> Auth.AccountActivation.Domain.State.Init >> AccountActivation >> Auth) (s "accountActivation" </> str)
-        map (Admin(Users(Admin.Users.Domain.State.Init))) (s "users")
-        map (Admin(Lessons(Admin.Lessons.Domain.State.Init))) (s "lessons") ]
+        map (Auth(Login(Auth.Login.Domain.State.Init))) (s Router.Routes.login)
+        map (Auth(Registration(Auth.Registration.Domain.State.Init))) (s Router.Routes.registration)
+        map ((fun (x:string) -> Guid(x)) >> Auth.AccountActivation.Domain.State.Init >> AccountActivation >> Auth) (s Router.Routes.accountActivation </> str)
+        map (Admin(Users(Admin.Users.Domain.State.Init))) (s Router.Routes.users)
+        map (Admin(Lessons(Admin.Lessons.Domain.State.Init))) (s Router.Routes.lessons)
+        map (Calendar(Calendar.Domain.State.Init)) (s Router.Routes.calendar)
+    ]
 
 let private withCheckingLogin (state:State) cmd =
     let requiresLogin =
         match state.Page with
         | Auth _ -> false
-        | Admin _ -> true
+        | _ -> true
 
     if requiresLogin then
         match state.LoggedUser, TokenStorage.tryGetToken() with
@@ -55,6 +57,7 @@ let urlUpdate (result: Option<Page>) state =
                 match pg with
                 | Users _ -> Admin.Users.Domain.Msg.Init |> UsersMsg |> AdminMsg |> Cmd.ofMsg
                 | Lessons _ -> Admin.Lessons.Domain.Msg.Init |> LessonsMsg |> AdminMsg |> Cmd.ofMsg
+            | Calendar _ -> Calendar.Domain.Msg.Init |> CalendarMsg |> Cmd.ofMsg
         (state |> withRoute), (withCheckingLogin state cmd)
 
 let init result =
@@ -75,6 +78,10 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         match m, state.Page with
         | UsersMsg msg, Admin(Users state) -> Admin.Users.State.update msg state |> map (Users >> Admin) (UsersMsg >> Msg.AdminMsg)
         | LessonsMsg msg, Admin(Lessons state) -> Admin.Lessons.State.update msg state |> map (Lessons >> Admin) (LessonsMsg >> Msg.AdminMsg)
+        | _ -> state, Cmd.none
+    | CalendarMsg msg ->
+        match state.Page with
+        | Calendar state ->  Calendar.State.update msg state |> map Calendar Msg.CalendarMsg
         | _ -> state, Cmd.none
     | LoadUserByToken t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->

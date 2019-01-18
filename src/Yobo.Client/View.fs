@@ -17,6 +17,9 @@ let private displayLoggedPage (page:string) content dispatch =
     div [] [
         Navbar.navbar [ Navbar.Color IsLight; ] [
             Container.container [] [
+                Navbar.Start.div [] [
+                    item Router.Routes.calendar "fas fa-calendar-alt" "Kalendář"
+                ]
                 Navbar.End.div [] [
                     item Router.Routes.users "fas fa-users" "Uživatelé"
                     item Router.Routes.lessons "fas fa-calendar-alt" "Lekce"
@@ -39,6 +42,8 @@ let private displayLoggedPage (page:string) content dispatch =
     ]
 
 let render (state : State) (dispatch : Msg -> unit) =
+    let showInTemplate content =
+        displayLoggedPage state.Route content dispatch
     match state.Page with
     | Auth pg ->
         match pg with
@@ -50,4 +55,6 @@ let render (state : State) (dispatch : Msg -> unit) =
             match pg with
             | Users state -> Admin.Users.View.render state (UsersMsg >> AdminMsg >> dispatch)
             | Lessons state -> Admin.Lessons.View.render state (LessonsMsg >> AdminMsg >> dispatch)
-        displayLoggedPage state.Route content dispatch
+        content |> showInTemplate
+    | Calendar state ->
+        Calendar.View.render state (CalendarMsg >> dispatch) |> showInTemplate

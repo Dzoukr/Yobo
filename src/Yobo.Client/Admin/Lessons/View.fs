@@ -8,7 +8,7 @@ open System
 open Yobo.Client.Admin.Lessons.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
-open FSharp.Rop
+open Yobo.Client
     
 let private datesBetween (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
     endDate.Subtract(startDate).TotalDays
@@ -66,9 +66,9 @@ module Calendar =
             let st = lesson.StartDate |> toCzTime
             let en = lesson.EndDate |> toCzTime
             let cap = sprintf "Přihlášeno %i z 12" lesson.Reservations.Length
-            let res (u:User) =
+            let res (u:User,c:int) =
                 div [] [
-                    sprintf "%s %s" u.FirstName u.LastName |> str
+                    sprintf "%s %s - %ix" u.FirstName u.LastName c |> str
                 ]
 
             div [] [
@@ -265,7 +265,7 @@ module Calendar =
         ]
 
 let render (state : State) (dispatch : Msg -> unit) =
-    let s,e = State.getWeekDateRange (DateTimeOffset.Now.AddDays(state.WeekOffset * 7 |> float))
+    let s,e = DateRange.getDateRangeForWeekOffset state.WeekOffset
     div [] [
         Calendar.render state dispatch s e
     ]

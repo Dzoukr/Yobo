@@ -7,6 +7,7 @@
         <NoWarn>2003</NoWarn>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="DateRange.fs" />
         <Compile Include="Validation.fs" />
         <Compile Include="SharedView.fs" />
         <Compile Include="TokenStorage.fs" />
@@ -28,6 +29,9 @@
         <Compile Include="Admin\Lessons\Domain.fs" />
         <Compile Include="Admin\Lessons\State.fs" />
         <Compile Include="Admin\Lessons\View.fs" />
+        <Compile Include="Calendar\Domain.fs" />
+        <Compile Include="Calendar\State.fs" />
+        <Compile Include="Calendar\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />

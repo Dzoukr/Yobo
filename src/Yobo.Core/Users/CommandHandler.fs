@@ -22,18 +22,14 @@ let private settings cryptoProvider = {
         DataToEvent = EventSerializer.toEvent cryptoProvider
     }
     Validators = [ ]
+    RollbackEvents = fun _ -> []
 }
 
-let private compensationBuilder = function
-    | Register args -> 
-        let cmd = Registry.Add { UserId = args.Id; Email = args.Email }
-        let events = Registry.Removed { UserId = args.Id; Email = args.Email } |> List.singleton
-        Some (cmd, events)
+let private cmdBuilder = function
+    | Register args -> Registry.Add { UserId = args.Id; Email = args.Email } |> Some
     | _ -> None
 
 let get (cryptoProvider:SymetricCryptoProvider) store =
-    let userCmdHandler = store |> getCommandHandler (settings cryptoProvider)
-    store |> Registry.CommandHandler.get compensationBuilder userCmdHandler
-    
-    
-
+    let registryHandler = store |> Registry.CommandHandler.get
+    store |> getRollbackCommandHandler (settings cryptoProvider) registryHandler cmdBuilder
+   

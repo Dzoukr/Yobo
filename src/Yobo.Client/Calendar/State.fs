@@ -12,7 +12,9 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | LoadUserLessons -> state, (state.WeekOffset |> DateRange.getDateRangeForWeekOffset |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.GetLessonsForDateRange UserLessonsLoaded)
     | UserLessonsLoaded res ->
         match res with
-        | Ok users ->
-           state, Cmd.none
+        | Ok lsns ->
+           { state with Lessons = lsns }, Cmd.none
         | Error _ -> state, Cmd.none
     | WeekOffsetChanged o -> { state with WeekOffset = o }, LoadUserLessons |> Cmd.ofMsg
+    | AddReservation args -> state, (args |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.AddReservation ReservationAdded)
+    | ReservationAdded res ->  state, (res |> SharedView.resultToToast "Lekce byla úspěšně zarezervována")

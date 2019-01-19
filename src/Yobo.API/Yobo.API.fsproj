@@ -11,6 +11,7 @@
     <Compile Include="ArgsBuilder.fs" />
     <Compile Include="Auth\Functions.fs" />
     <Compile Include="Admin\Functions.fs" />
+    <Compile Include="Calendar\Functions.fs" />
     <Compile Include="CompositionRoot.Services.fs" />
     <Compile Include="CompositionRoot.Communication.fs" />
     <Compile Include="Routes.fs" />

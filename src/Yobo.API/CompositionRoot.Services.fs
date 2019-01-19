@@ -59,7 +59,7 @@ module EventHandler =
 module CommandHandler =
     open Yobo.Core.Metadata
 
-    let private handleFn : CommandHandler<CoreCommand, CoreEvent> = CommandHandler.getHandler cryptoProvider eventStore
+    let private handleFn = CommandHandler.getHandleFn cryptoProvider eventStore
     let handle (meta:Metadata) cmd =
         cmd |> handleFn meta (Guid.NewGuid())
         <!> List.map EventHandler.handle

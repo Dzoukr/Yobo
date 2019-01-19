@@ -4,9 +4,11 @@ open Yobo.Client.Domain
 open Fulma
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
+open Yobo.Shared.Auth.Domain
 
-let private displayLoggedPage (page:string) content dispatch =
-
+let private displayLoggedPage (user:LoggedUser option) (page:string) content dispatch =
+    let adminMenuDisplayed =
+        user |> Option.map (fun x -> x.IsAdmin) |> Option.defaultValue false
     let item (pg:string) icon text =
         let isActive = page = pg
         Navbar.Item.a [ Navbar.Item.IsActive isActive ; Navbar.Item.Option.Props [ Href pg; OnClick Router.goToUrl ] ] [
@@ -14,6 +16,13 @@ let private displayLoggedPage (page:string) content dispatch =
             str text
         ]
 
+    let adminButtons =
+        match user with
+        | Some { IsAdmin = true } ->
+                [ item Router.Routes.users "fas fa-users" "Uživatelé"
+                  item Router.Routes.lessons "fas fa-calendar-alt" "Lekce" ]
+        | _ -> []
+    
     div [] [
         Navbar.navbar [ Navbar.Color IsLight; ] [
             Container.container [] [
@@ -21,10 +30,8 @@ let private displayLoggedPage (page:string) content dispatch =
                     item Router.Routes.calendar "fas fa-calendar-alt" "Kalendář"
                 ]
                 Navbar.End.div [] [
-                    item Router.Routes.users "fas fa-users" "Uživatelé"
-                    item Router.Routes.lessons "fas fa-calendar-alt" "Lekce"
-                    // buttons
-                    Navbar.Item.div [] [
+                    yield! adminButtons
+                    yield Navbar.Item.div [] [
                         div [ ClassName "buttons" ] [
                             Button.a [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> LoggedOut |> dispatch) ] ] [
                                 str "Odhlásit"
@@ -43,7 +50,7 @@ let private displayLoggedPage (page:string) content dispatch =
 
 let render (state : State) (dispatch : Msg -> unit) =
     let showInTemplate content =
-        displayLoggedPage state.Route content dispatch
+        displayLoggedPage state.LoggedUser state.Route content dispatch
     match state.Page with
     | Auth pg ->
         match pg with

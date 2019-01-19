@@ -5,6 +5,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Yobo.Shared
 open Thoth.Elmish
+open System
 
 let errorBox content =
     article [ ClassName "message is-danger has-text-centered" ] [
@@ -56,6 +57,11 @@ let successToast msg =
     |> Toast.position Toast.TopCenter
     |> Toast.success
 
+let resultToToast successMsg (res:Result<_,ServerError>) =
+    match res with
+    | Ok _ -> successMsg |> successToast 
+    | Error err -> err |> serverErrorToToast
+
 let resultToView successView (res:Result<_,ServerError>) =
     match res with
     | Ok v -> v |> successView
@@ -65,3 +71,6 @@ let serverErrorToViewIfAny (res:Result<_,ServerError> option) =
     match res with
     | Some (Error er) -> er |> serverErrorToView
     | _ -> str ""
+
+let toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
+let toCzTime (date:DateTimeOffset) = date.ToString("HH. mm.")

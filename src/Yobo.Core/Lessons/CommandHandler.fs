@@ -4,6 +4,7 @@ open Yobo.Core.EventStoreCommandHandler
 
 let private getId = function
     | Create args -> args |> Extractor.getIdFromCommand
+    | AddReservation args -> args |> Extractor.getIdFromCommand
 
 let private settings = {
     Aggregate = {
@@ -16,7 +17,8 @@ let private settings = {
         EventToData = EventSerializer.toData
         DataToEvent = EventSerializer.toEvent
     }
-    Validators = [ ]
+    Validators = []
+    RollbackEvents = fun _ -> []
 }
 
 let get = getCommandHandler settings

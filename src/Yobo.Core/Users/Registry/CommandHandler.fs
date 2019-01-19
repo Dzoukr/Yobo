@@ -2,7 +2,7 @@ module Yobo.Core.Users.Registry.CommandHandler
 
 open Yobo.Core.EventStoreCommandHandler
 
-let private settings compensationBuilder outerCmdHandler = {
+let private settings = {
     Aggregate = {
         Init = State.Init
         Execute = Aggregate.execute
@@ -14,8 +14,9 @@ let private settings compensationBuilder outerCmdHandler = {
         DataToEvent = EventSerializer.toEvent
     }
     Validators = [ CommandValidator.validate ]
-    OuterCommandHandler = outerCmdHandler
-    CompensationBuilder = compensationBuilder
+    RollbackEvents = function
+        | Add args -> Removed { UserId = args.UserId; Email = args.Email } |> List.singleton
+        | _ -> []
 }
 
-let get compensationBuilder outerCmdHandler = getCompensatingCommandHandler (settings compensationBuilder outerCmdHandler)
+let get = getCommandHandler settings

@@ -23,13 +23,6 @@
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
     <Compile Include="EmailSettings.fs" />
-    <Compile Include="Lessons\Lessons.fs" />
-    <Compile Include="Lessons\Aggregate.fs" />
-    <Compile Include="Lessons\EventSerializer.fs" />
-    <Compile Include="Lessons\CommandHandler.fs" />
-    <Compile Include="Lessons\UpdateQueries.fs" />
-    <Compile Include="Lessons\DbEventHandler.fs" />
-    <Compile Include="Lessons\ReadQueries.fs" />
     <EmbeddedResource Include="Users\EmailTemplates\RegenerateActivation.html" />
     <EmbeddedResource Include="Users\EmailTemplates\Register.html" />
     <Compile Include="Users\Registry\Registry.fs" />
@@ -46,6 +39,13 @@
     <Compile Include="Users\Authenticator.fs" />
     <Compile Include="Users\DbEventHandler.fs" />
     <Compile Include="Users\EmailEventHandler.fs.fs" />
+    <Compile Include="Lessons\Lessons.fs" />
+    <Compile Include="Lessons\Aggregate.fs" />
+    <Compile Include="Lessons\EventSerializer.fs" />
+    <Compile Include="Lessons\CommandHandler.fs" />
+    <Compile Include="Lessons\UpdateQueries.fs" />
+    <Compile Include="Lessons\DbEventHandler.fs" />
+    <Compile Include="Lessons\ReadQueries.fs" />
     <Compile Include="CQRS.fs" />
     <Compile Include="DbEventHandler.fs" />
     <Compile Include="EmailEventHandler.fs" />

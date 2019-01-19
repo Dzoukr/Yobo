@@ -20,5 +20,11 @@ let admin : HttpHandler =
     |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Admin.api
     |> Remoting.buildHttpHandler
 
+let calendar : HttpHandler =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
+    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Calendar.api
+    |> Remoting.buildHttpHandler
+    
 let webApp wwwRootPath : HttpHandler =
-    choose [ users; admin; frontend wwwRootPath ] 
+    choose [ users; admin; calendar; frontend wwwRootPath ] 

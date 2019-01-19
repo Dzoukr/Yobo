@@ -19,3 +19,11 @@ let created (args:CmdArgs.Create) (ctx:ReadDb.Db.dataContext) =
     item.EndDate <- args.EndDate
     item.Created <- DateTimeOffset.Now
     ctx.SubmitUpdates()
+
+let reservationAdded (args:CmdArgs.AddReservation) (ctx:ReadDb.Db.dataContext) =
+    let item = ctx.Dbo.LessonReservations.Create()
+    item.LessonId <- args.Id
+    item.UserId <- args.UserId
+    item.Count <- args.Count
+    item.Created <- DateTimeOffset.Now
+    ctx.SubmitUpdates()

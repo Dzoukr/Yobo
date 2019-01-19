@@ -2,6 +2,7 @@ module Yobo.Client.Calendar.Domain
 
 open Yobo.Shared.Calendar.Domain
 open Yobo.Shared.Communication
+open System
 
 type State = {
     Lessons : Lesson list
@@ -16,5 +17,7 @@ with
 type Msg =
     | Init
     | LoadUserLessons
-    | UserLessonsLoaded of Result<Lesson list, ServerError>
+    | UserLessonsLoaded of ServerResult<Lesson list>
     | WeekOffsetChanged of int
+    | AddReservation of AddReservation
+    | ReservationAdded of ServerResult<unit>

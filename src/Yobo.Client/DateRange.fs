@@ -16,3 +16,11 @@ let getWeekDateRange dayInWeek =
     (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
 
 let getDateRangeForWeekOffset offset = DateTimeOffset.Now.AddDays(offset * 7 |> float) |> getWeekDateRange
+    
+let dateRangeToDays (startDate:DateTimeOffset,endDate:DateTimeOffset) =
+    endDate.Subtract(startDate).TotalDays
+    |> int
+    |> (fun d -> [0..d])
+    |> List.map (fun x ->
+        startDate.AddDays (float x)
+    )

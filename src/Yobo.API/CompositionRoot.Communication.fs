@@ -10,9 +10,13 @@ module Security =
     open Yobo.Shared.Auth
     open Yobo.Shared.Auth.Domain
 
-    let handleForUser f (user:LoggedUser, param)  =
+    let handleForUser f (user:LoggedUser, param) =
         let handleFn = Services.CommandHandler.handleForUser user.Id
         f handleFn param
+
+    let handleForUserWithId f (user:LoggedUser, param) =
+        let handleFn = Services.CommandHandler.handleForUser user.Id
+        f user.Id handleFn param
 
     let onlyForLogged (sp:SecuredParam<_>) =
         match sp.Token |> Services.Users.authorizator.ValidateToken with
@@ -71,6 +75,7 @@ module Admin =
 module Calendar =
     open Yobo.API.CompositionRoot
     open Yobo.Shared.Calendar.Domain
+    open Yobo.API.Calendar.Functions
 
     let api : Yobo.Shared.Calendar.Communication.API = {
         GetLessonsForDateRange =
@@ -81,4 +86,5 @@ module Calendar =
                 ) 
                 |> toAsync
             )
+        AddReservation = fun x -> x |> Security.onlyForLogged >>= Security.handleForUserWithId addReservation |> toAsync
     }

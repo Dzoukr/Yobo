@@ -6,6 +6,8 @@ type DomainError =
     | UserAlreadyActivated
     | UserNotActivated
     | ActivationKeyDoesNotMatch
+    | LessonIsFull
+    | LessonIsAlreadyReserved
     with
         member x.Explain() =
             match x with
@@ -14,3 +16,5 @@ type DomainError =
             | UserAlreadyActivated -> "Uživatelský účet je již zaktivován." 
             | UserNotActivated -> "Uživatelský účet není zaktivován."
             | ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."
+            | LessonIsFull -> "Lekce je již plně obsazená."
+            | LessonIsAlreadyReserved -> "Lekce je již zarezervována."

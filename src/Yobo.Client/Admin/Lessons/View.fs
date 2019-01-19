@@ -9,44 +9,15 @@ open Yobo.Client.Admin.Lessons.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open Yobo.Client
-    
-let private datesBetween (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
-    endDate.Subtract(startDate).TotalDays
-    |> int
-    |> (fun d -> [0..d])
-    |> List.map (fun x ->
-        startDate.AddDays (float x)
-    )
 
-let private toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
-let private toCzTime (date:DateTimeOffset) = date.ToString("HH. mm.")
+
+
 
 module Calendar =
     open Yobo.Client
     open Yobo.Shared.Admin.Domain
 
-    //let test =
-    //    div [ ClassName "popover is-popover-bottom"] [
-    //        Button.button [ Button.Option.CustomClass "is-primary popover-trigger"] [
-    //            str "Jemna joga"
-    //        ]
-    //        div [ ClassName "popover-content" ] [
-    //            Table.table [] [
-    //                thead [] [
-    //                    tr [][
-    //                        th [] [ str "Jemna joga s relaxaci"]
-    //                    ]
-    //                ]
-    //                tbody [] [
-    //                    tr [] [
-    //                        td [] [
-    //                            h1 [] [str "Klidná lekce s nenáročným průběhem s důrazem na dech a správnost provádění ve vazbě na zdravotní aspekt jógy. Jóga vhodná i pro seniory a pro všechny se sníženou pohyblivostí, těhotné a po porodu."]
-    //                        ]
-    //                    ]
-    //                ]
-    //            ]
-    //        ]
-    //    ]
+    
 
     let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         let checkBox =
@@ -63,8 +34,8 @@ module Calendar =
             else str ""
 
         let lessonDiv (lesson:Lesson) =
-            let st = lesson.StartDate |> toCzTime
-            let en = lesson.EndDate |> toCzTime
+            let st = lesson.StartDate |> SharedView.toCzTime
+            let en = lesson.EndDate |> SharedView.toCzTime
             let cap = sprintf "Přihlášeno %i z 12" lesson.Reservations.Length
             let res (u:User,c:int) =
                 div [] [
@@ -96,7 +67,7 @@ module Calendar =
             | _ -> ""
         Column.column [] [
             div [] [ str n ]
-            div [] [ date.ToString("dd. MM. yyyy") |> str ]
+            div [] [ date |> SharedView.toCzDate |> str ]
         ]
         
 
@@ -130,7 +101,7 @@ module Calendar =
         let dates =
             state.SelectedDates
             |> List.sort
-            |> List.map toCzDate
+            |> List.map SharedView.toCzDate
             |> String.concat ", "
 
         div [] [
@@ -240,8 +211,8 @@ module Calendar =
             ]
         )
 
-    let render (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset) (endDate:DateTimeOffset) =
-        let dates = datesBetween startDate endDate
+    let render (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset, endDate:DateTimeOffset) =
+        let dates = DateRange.dateRangeToDays(startDate, endDate)
         let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
@@ -265,7 +236,6 @@ module Calendar =
         ]
 
 let render (state : State) (dispatch : Msg -> unit) =
-    let s,e = DateRange.getDateRangeForWeekOffset state.WeekOffset
     div [] [
-        Calendar.render state dispatch s e
+        Calendar.render state dispatch (DateRange.getDateRangeForWeekOffset state.WeekOffset)
     ]

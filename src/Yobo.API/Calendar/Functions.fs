@@ -1,0 +1,27 @@
+module Yobo.API.Calendar.Functions
+
+open System
+open Yobo.Shared.Calendar.Domain
+open FSharp.Rop
+open Yobo.Core.Users
+open Yobo.Core
+open Yobo.Shared.Calendar
+open Yobo.Shared.Communication
+
+module ArgsBuilder =
+    open Yobo.API
+
+    let buildAddReservation userId (x:AddReservation) =
+        ({
+            Id = x.LessonId
+            UserId = userId
+            Count = x.UserReservation.ToInt
+        } : Lessons.CmdArgs.AddReservation)
+
+        
+let addReservation userId cmdHandler (x:AddReservation) =
+    result {
+        let args = x |> ArgsBuilder.buildAddReservation userId
+        let! _ = args |> (Lessons.Command.AddReservation >> CoreCommand.Lessons >> cmdHandler)
+        return ()
+    }

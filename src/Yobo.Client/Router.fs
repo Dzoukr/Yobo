@@ -8,7 +8,7 @@ open Fable.Helpers
 open Fable.Core.JsInterop
 
 module Routes =
-    let defaultPage = "/users"
+    let defaultPage = "/calendar"
     let login = "/login"
     let registration = "/registration"
     let accountActivation = "/accountActivation"

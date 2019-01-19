@@ -18,7 +18,8 @@ type ServerError =
             | AuthError e -> e.Explain()
             | Exception ex -> sprintf "Došlo k chybě : %s" ex
 
-type ServerResponse<'a> = Async<Result<'a, ServerError>>
+type ServerResult<'a> = Result<'a, ServerError>
+type ServerResponse<'a> = Async<ServerResult<'a>>
 
 type SecuredParam<'a> = {
     Token : string

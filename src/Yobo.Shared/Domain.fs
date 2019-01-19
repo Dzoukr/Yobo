@@ -8,6 +8,9 @@ type DomainError =
     | ActivationKeyDoesNotMatch
     | LessonIsFull
     | LessonIsAlreadyReserved
+    | LessonIsNotReserved
+    | NotEnoughCredits
+    | CashReservationIsBlocked
     with
         member x.Explain() =
             match x with
@@ -18,3 +21,6 @@ type DomainError =
             | ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."
             | LessonIsFull -> "Lekce je již plně obsazená."
             | LessonIsAlreadyReserved -> "Lekce je již zarezervována."
+            | LessonIsNotReserved -> "Lekce není zarezervována."
+            | NotEnoughCredits -> "Nemáte dostatek kreditů."
+            | CashReservationIsBlocked -> "Rezervaci v hotovosti nelze provést."

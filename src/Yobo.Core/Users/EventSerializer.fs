@@ -21,6 +21,10 @@ let toEvent (cryptoProvider:SymetricCryptoProvider) = function
     | "ActivationKeyRegenerated", data -> data |> Serialization.objectFromJToken<CmdArgs.RegenerateActivationKey> |> ActivationKeyRegenerated
     | "Activated", data -> data |> Serialization.objectFromJToken<CmdArgs.Activate> |> Activated
     | "CreditsAdded", data -> data |> Serialization.objectFromJToken<CmdArgs.AddCredits> |> CreditsAdded
+    | "CreditsWithdrawn", data -> data |> Serialization.objectFromJToken<CmdArgs.WithdrawCredits> |> CreditsWithdrawn
+    | "CreditsRefunded", data -> data |> Serialization.objectFromJToken<CmdArgs.RefundCredits> |> CreditsRefunded
+    | "CashReservationsBlocked", data -> data |> Serialization.objectFromJToken<CmdArgs.BlockCashReservations> |> CashReservationsBlocked
+    | "CashReservationsUnblocked", data -> data |> Serialization.objectFromJToken<CmdArgs.UnblockCashReservations> |> CashReservationsUnblocked
     | n,_ -> failwithf "Unrecognized event %s" n
 
 let toData (cryptoProvider:SymetricCryptoProvider) = function
@@ -28,3 +32,7 @@ let toData (cryptoProvider:SymetricCryptoProvider) = function
     | ActivationKeyRegenerated args -> "ActivationKeyRegenerated", (args |> Serialization.objectToJToken)
     | Activated args -> "Activated", (args |> Serialization.objectToJToken)
     | CreditsAdded args -> "CreditsAdded", (args |> Serialization.objectToJToken)
+    | CreditsWithdrawn args -> "CreditsWithdrawn", (args |> Serialization.objectToJToken)
+    | CreditsRefunded args -> "CreditsRefunded", (args |> Serialization.objectToJToken)
+    | CashReservationsBlocked args -> "CashReservationsBlocked", (args |> Serialization.objectToJToken)
+    | CashReservationsUnblocked args -> "CashReservationsUnblocked", (args |> Serialization.objectToJToken)

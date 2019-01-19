@@ -12,10 +12,12 @@ module ArgsBuilder =
     open Yobo.API
 
     let buildAddReservation userId (x:AddReservation) =
+        let count,useCredits = x.UserReservation.ToIntAndBool
         ({
             Id = x.LessonId
             UserId = userId
-            Count = x.UserReservation.ToInt
+            Count = count
+            UseCredits = useCredits
         } : Lessons.CmdArgs.AddReservation)
 
         

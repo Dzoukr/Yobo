@@ -14,9 +14,11 @@ let private settings = {
         DataToEvent = EventSerializer.toEvent
     }
     Validators = [ CommandValidator.validate ]
-    RollbackEvents = function
-        | Add args -> Removed { UserId = args.UserId; Email = args.Email } |> List.singleton
-        | _ -> []
+    RollbackEvents =
+        fun _ cmd ->
+            match cmd with
+            | Add args -> Removed { UserId = args.UserId; Email = args.Email } |> List.singleton
+            | _ -> []
 }
 
 let get = getCommandHandler settings

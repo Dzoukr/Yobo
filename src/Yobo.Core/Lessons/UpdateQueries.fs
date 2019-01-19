@@ -3,10 +3,10 @@ module Yobo.Core.Lessons.UpdateQueries
 open Yobo.Core
 open System
 
-let private getById (ctx:ReadDb.Db.dataContext) i =
+let private getById (ctx:ReadDb.Db.dataContext) userId lessonId =
     query {
-        for x in ctx.Dbo.Lessons do
-        where (x.Id = i)
+        for x in ctx.Dbo.LessonReservations do
+        where (x.UserId = userId && x.LessonId = lessonId)
         select x
     } |> Seq.head
 
@@ -26,4 +26,9 @@ let reservationAdded (args:CmdArgs.AddReservation) (ctx:ReadDb.Db.dataContext) =
     item.UserId <- args.UserId
     item.Count <- args.Count
     item.Created <- DateTimeOffset.Now
+    ctx.SubmitUpdates()
+
+let reservationCancelled (args:CmdArgs.CancelReservation) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx args.UserId
+    item.Delete()
     ctx.SubmitUpdates()

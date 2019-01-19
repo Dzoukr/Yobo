@@ -7,6 +7,7 @@ open Fulma
 open System
 open Yobo.Shared
 open Yobo.Client
+open Yobo.Shared.Admin.Domain
 
 module Calendar =
     open Yobo.Shared.Calendar.Domain
@@ -22,11 +23,11 @@ module Calendar =
                 | LastFreeSpot -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
                 | Full -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již plná" ]
             | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás + 1" ]
-            | Some(ForOne) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
+            | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
 
         let bookBtn =
             let items =
-                let forOne = { LessonId = lesson.Id; UserReservation = ForOne }
+                let forOne = { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) }
                 let forTwo = { LessonId = lesson.Id; UserReservation = ForTwo }
                 match lesson.Availability with
                 | Free ->

@@ -1,25 +1,12 @@
 module Yobo.Shared.Calendar.Domain
 
 open System
+open Yobo.Shared.Admin.Domain
 
 type Availability =
     | Full
     | LastFreeSpot
     | Free
-
-type UserReservation =
-    | ForOne
-    | ForTwo
-with
-    static member FromInt x =
-        match x with
-        | 1 -> ForOne
-        | 2 -> ForTwo
-        | _ -> failwith "Only two reservations are allowed"
-    member x.ToInt =
-        match x with
-        | ForOne -> 1
-        | ForTwo -> 2
 
 let maxCapacity = 12
 
@@ -43,7 +30,6 @@ with
             lesson.Reservations
             |> List.tryFind (fun (u,_) -> u.Id = currentUserId)
             |> Option.map snd
-            |> Option.map UserReservation.FromInt
         {
             Id = lesson.Id
             StartDate = lesson.StartDate

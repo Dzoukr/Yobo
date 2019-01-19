@@ -37,9 +37,11 @@ module Calendar =
             let st = lesson.StartDate |> SharedView.toCzTime
             let en = lesson.EndDate |> SharedView.toCzTime
             let cap = sprintf "Přihlášeno %i z 12" lesson.Reservations.Length
-            let res (u:User,c:int) =
+            let res (u:User,r:UserReservation) =
+                let c,useCredits = r.ToIntAndBool
+                let cInfo = if not useCredits then "(hotově)" else ""
                 div [] [
-                    sprintf "%s %s - %ix" u.FirstName u.LastName c |> str
+                    sprintf "%s %s - %ix %s" u.FirstName u.LastName c cInfo |> str
                 ]
 
             div [] [

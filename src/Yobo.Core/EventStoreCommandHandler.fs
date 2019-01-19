@@ -34,7 +34,7 @@ type CommandHandlerSettings<'state, 'command, 'event> = {
     GetStreamId : 'command -> string
     Serializer : EventSerializer<'event>
     Validators : ('command -> Result<'command, ValidationError list>) list
-    RollbackEvents : 'command -> 'event list
+    RollbackEvents : 'state -> 'command -> 'event list
 }
 
 type CommandHandler<'command, 'event> = {
@@ -85,13 +85,17 @@ let getCommandHandler<'state,'command, 'event>
     let applyRollbackEvents meta corrId cmd =
         task {
             try
-            let streamId = cmd |> settings.GetStreamId
-            let! _ =
-                cmd
-                |> settings.RollbackEvents
-                |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
-                |> eventStore.AppendEvents streamId Any
-            return Ok ()
+                let streamId = cmd |> settings.GetStreamId
+                let! state,_ = streamId |> getCurrentStateFn
+                let rollbackEvents =
+                    cmd
+                    |> settings.RollbackEvents state
+                    |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
+                match rollbackEvents.Length with
+                | 0 -> return Ok ()
+                | _ ->
+                    let! _ = eventStore.AppendEvents streamId Any rollbackEvents
+                    return Ok ()
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
@@ -119,7 +123,7 @@ let getCommandHandler<'state,'command, 'event>
 let getRollbackCommandHandler<'state, 'command, 'event, 'innerCommand, 'innerEvent>
     (settings:CommandHandlerSettings<'state, 'command, 'event>)
     (innerCmdHandler:CommandHandler<'innerCommand, 'innerEvent>)
-    (innerCmdBuilder:'command -> 'innerCommand option)
+    (innerCmdBuilder:'state -> 'command -> 'innerCommand option)
     (eventStore:EventStore) : CommandHandler<'command, 'event> =
 
     // state reader
@@ -128,38 +132,44 @@ let getRollbackCommandHandler<'state, 'command, 'event, 'innerCommand, 'innerEve
     let applyRollbackEvents meta corrId cmd =
         task {
             try
-            let streamId = cmd |> settings.GetStreamId
-            let! _ =
-                cmd
-                |> settings.RollbackEvents
-                |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
-                |> eventStore.AppendEvents streamId Any
-            return Ok ()
+                let streamId = cmd |> settings.GetStreamId
+                let! state,_ = streamId |> getCurrentStateFn
+                let rollbackEvents =
+                    cmd
+                    |> settings.RollbackEvents state
+                    |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
+                match rollbackEvents.Length with
+                | 0 -> return Ok ()
+                | _ ->
+                    let! _ = eventStore.AppendEvents streamId Any rollbackEvents
+                    return Ok ()
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
     let handleCmd meta corrId (cmd:'command) =
         task {
-            let innerCmd = cmd |> innerCmdBuilder
-            let errorWithRollback err =
+            let errorWithRollback (innerCmd:'innerCommand option) err =
                 if innerCmd.IsSome then innerCmdHandler.ApplyRollbackEvents meta corrId innerCmd.Value |> ignore
                 err |> Error
 
             try
                 match cmd |> runValidators settings.Validators with
                 | Ok cmd ->
+                    let streamId = cmd |> settings.GetStreamId
+                    let! state,position = streamId |> getCurrentStateFn
+                    let innerCmd = cmd |> innerCmdBuilder state
                     match innerCmd |> Option.map (innerCmdHandler.HandleCommand meta corrId) |> Option.defaultValue (Ok []) with
                     | Ok _ ->
-                        let streamId = cmd |> settings.GetStreamId
-                        let! state,position = streamId |> getCurrentStateFn
-                        match cmd |> settings.Aggregate.Execute state with
-                        | Ok newEvents ->
-                            let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId) |> eventStore.AppendEvents streamId (Exact position)
-                            return Ok newEvents
-                        | Error e -> return e |> CommandHandlerError.DomainError |> errorWithRollback
-                    | Error e -> return e |> errorWithRollback
-                | Error e -> return e |> errorWithRollback
-            with ex -> return (EventStoreError.General(ex) |> EventStoreError |> errorWithRollback)
+                        try
+                            match cmd |> settings.Aggregate.Execute state with
+                            | Ok newEvents ->
+                                let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId) |> eventStore.AppendEvents streamId (Exact position)
+                                return Ok newEvents
+                            | Error e -> return e |> CommandHandlerError.DomainError |> errorWithRollback innerCmd
+                        with ex -> return (EventStoreError.General(ex) |> EventStoreError |> errorWithRollback innerCmd)
+                    | Error e -> return e |> Error
+                | Error e -> return e |> Error
+            with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
     {

@@ -13,7 +13,7 @@ let private onlyIfDoesExist state =
     else DomainError.ItemAlreadyExists "Id" |> Error
 
 let private onlyIfNotFull count state =
-    let foldFn acc item = acc + (snd item)
+    let foldFn acc (_,item,_) = acc + item
     let res = state.Reservations |> List.fold foldFn 0
     if res + count > Yobo.Shared.Calendar.Domain.maxCapacity then
         DomainError.LessonIsFull |> Error
@@ -21,10 +21,17 @@ let private onlyIfNotFull count state =
 
 let private onlyIfUserNotAlreadyReserved userId state =
     state.Reservations
-    |> List.tryFind (fun (u,_) -> u = userId)
+    |> List.tryFind (fun (u,_,_) -> u = userId)
     |> function
         | Some _ -> DomainError.LessonIsAlreadyReserved |> Error
         | None -> Ok state
+
+let private onlyIfUserHasReservation userId state =
+    state.Reservations
+    |> List.tryFind (fun (u,_,_) -> u = userId)
+    |> function
+        | Some _ -> Ok state
+        | None -> DomainError.LessonIsNotReserved |> Error
 
 let execute (state:State) = function
     | Create args ->
@@ -37,8 +44,13 @@ let execute (state:State) = function
         >>= onlyIfUserNotAlreadyReserved args.UserId
         <!> (fun _ -> ReservationAdded args)
         <!> List.singleton
-        
+    | CancelReservation args ->
+        onlyIfDoesExist state
+        >>= onlyIfUserHasReservation args.UserId
+        <!> (fun _ -> ReservationCancelled args)
+        <!> List.singleton
     
 let apply (state:State) = function
-    | Created args -> { state with Id = args.Id }
-    | ReservationAdded args -> { state with Reservations = (args.UserId, args.Count) :: state.Reservations}
+    | Created args -> { state with Id = args.Id; EndDate = args.EndDate }
+    | ReservationAdded args -> { state with Reservations = (args.UserId, args.Count, args.UseCredits) :: state.Reservations}
+    | ReservationCancelled args -> { state with Reservations = state.Reservations |> List.filter (fun (x,_,_) -> x <> args.UserId ) }

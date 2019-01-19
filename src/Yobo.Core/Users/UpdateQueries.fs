@@ -37,3 +37,23 @@ let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
     item.Credits <- item.Credits + args.Credits
     item.CreditsExpiration <- Some args.Expiration
     ctx.SubmitUpdates()
+
+let creditsWithdrawn (args:CmdArgs.WithdrawCredits) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.Credits <- item.Credits - args.Amount
+    ctx.SubmitUpdates()
+
+let creditsRefunded (args:CmdArgs.RefundCredits) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.Credits <- item.Credits + args.Amount
+    ctx.SubmitUpdates()
+
+let cashReservationBlocked (args:CmdArgs.BlockCashReservations) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.CashReservationBlockedUntil <- Some args.Expires
+    ctx.SubmitUpdates()
+
+let cashReservationUnblocked (args:CmdArgs.UnblockCashReservations) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.CashReservationBlockedUntil <- None
+    ctx.SubmitUpdates()

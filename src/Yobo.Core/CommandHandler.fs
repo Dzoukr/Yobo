@@ -6,7 +6,7 @@ open Yobo.Libraries.Security.SymetricCryptoProvider
 
 let getHandleFn (cryptoProvider:SymetricCryptoProvider) (eventStore:EventStore) =
     let usersHandler = Users.CommandHandler.get cryptoProvider eventStore
-    let lessonsHandler = Lessons.CommandHandler.get eventStore
+    let lessonsHandler = Lessons.CommandHandler.get usersHandler eventStore
 
     let handle meta corrId cmd =
         match cmd with

@@ -6,11 +6,11 @@ open Fable.Helpers.React.Props
 open Fulma
 open System
 open Yobo.Client.Admin.Users.Domain
-open Yobo.Shared
+open Yobo.Shared.Domain
 open Fulma.Extensions.Wikiki
 open Yobo.Shared.Extensions
 
-let private userRow dispatch (u:Admin.Domain.User) =
+let private userRow dispatch (u:User) =
     let activated =
         match u.Activated with
         | Some a -> a.ToString("dd. MM. yyyy") |> str
@@ -39,7 +39,7 @@ let private userRow dispatch (u:Admin.Domain.User) =
         td [] [ addCreditBtn ]
     ]
 
-let private showForm dispatch (state:State) (user:Admin.Domain.User option) =
+let private showForm dispatch (state:State) (user:User option) =
     match user with
     | Some u ->
         let toDateTimeOffset = Option.map (fun (x:DateTime) -> DateTimeOffset(x).EndOfTheDay())

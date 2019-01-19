@@ -10,14 +10,9 @@ open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open Yobo.Client
 
-
-
-
 module Calendar =
     open Yobo.Client
-    open Yobo.Shared.Admin.Domain
-
-    
+    open Yobo.Shared.Domain
 
     let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         let checkBox =

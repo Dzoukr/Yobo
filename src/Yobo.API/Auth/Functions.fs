@@ -8,6 +8,7 @@ open Yobo.Core
 open Yobo.Shared.Auth
 open System.Security.Claims
 open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 
 module ArgsBuilder =
     open Yobo.API
@@ -25,23 +26,17 @@ module ArgsBuilder =
         ) Validation.validateAccount
         >> Result.mapError ServerError.ValidationError
 
-let claimsToUser (claims:seq<Claim>) =
+let claimsToUser getUserById (claims:seq<Claim>) =
     let find key = claims |> Seq.find (fun x -> x.Type = key) |> (fun x -> x.Value)
-    {
-        Id = find "Id" |> Guid
-        Email = find "Email"
-        FirstName = find "FirstName"
-        LastName = find "LastName"
-        IsAdmin = find "IsAdmin" |> Boolean.Parse
-    } : Yobo.Shared.Auth.Domain.LoggedUser
-
-let userToClaims (u:Yobo.Shared.Auth.Domain.LoggedUser) =
+    let id = find "Id" |> Guid
+    id |> getUserById
+    
+let userToClaims (u:User) =
     seq [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)
         Claim("FirstName", u.FirstName)
         Claim("LastName", u.LastName)
-        Claim("IsAdmin", (u.IsAdmin.ToString()))
     ]
 
 let getToken loginFn tokenCreator (acc:Login) =
@@ -61,9 +56,9 @@ let resendActivation cmdHandler (userId:Guid) =
         return userId
     }
 
-let getUser validateFn token =
+let getUser getById validateFn token =
     match token |> validateFn with
-    | Some claims -> claims |> claimsToUser |> Ok
+    | Some claims -> claims |> claimsToUser getById
     | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
 let register cmdHandler createHashFn (acc:NewAccount) =
@@ -75,7 +70,7 @@ let register cmdHandler createHashFn (acc:NewAccount) =
 
 let activateAccount cmdHandler getUserByActivationKey (activationKey:Guid) =
     result {
-        let! (user : LoggedUser) = getUserByActivationKey activationKey
+        let! (user : User) = getUserByActivationKey activationKey
         let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> Command.Activate |> CoreCommand.Users |> cmdHandler
         return user.Id
     }

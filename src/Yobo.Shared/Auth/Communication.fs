@@ -12,6 +12,6 @@ type API = {
     ActivateAccount : Guid -> ServerResponse<Guid>
     GetToken : Login -> ServerResponse<string>
     RefreshToken : string -> ServerResponse<string>
-    GetUserByToken : string -> ServerResponse<LoggedUser>
+    GetUserByToken : string -> ServerResponse<User>
     ResendActivation: Guid -> ServerResponse<Guid>
 } 

@@ -3,7 +3,7 @@ module Yobo.Core.Users.ReadQueries
 open Yobo.Core
 open System
 open FSharp.Rop
-open Yobo.Shared.Admin.Domain
+open Yobo.Shared.Domain
 
 type UserQueries<'a> = {
     GetById : Guid -> Result<User, 'a>
@@ -15,7 +15,7 @@ let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
     GetAll = q.GetAll >> Result.mapError fn
 }
 
-let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
+let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
     {
         Id = u.Id
         Email = u.Email
@@ -24,6 +24,7 @@ let private userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         Activated = u.Activated
         Credits = u.Credits
         CreditsExpiration = u.CreditsExpiration
+        IsAdmin = false
     }
 
 let private getById i (ctx:ReadDb.Db.dataContext) =

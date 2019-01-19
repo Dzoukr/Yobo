@@ -1,7 +1,7 @@
 module Yobo.Shared.Calendar.Domain
 
 open System
-open Yobo.Shared.Admin.Domain
+open Yobo.Shared.Domain
 
 type Availability =
     | Full
@@ -20,7 +20,7 @@ type Lesson = {
     UserReservation : UserReservation option
 }
 with
-    static member FromAdminLesson currentUserId (lesson:Yobo.Shared.Admin.Domain.Lesson) =
+    static member FromAdminLesson currentUserId (lesson:Yobo.Shared.Domain.Lesson) =
         let av =
             match maxCapacity - lesson.Reservations.Length with
             | 1 -> LastFreeSpot

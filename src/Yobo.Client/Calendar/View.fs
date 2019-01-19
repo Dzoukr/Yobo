@@ -7,7 +7,7 @@ open Fulma
 open System
 open Yobo.Shared
 open Yobo.Client
-open Yobo.Shared.Admin.Domain
+open Yobo.Shared.Domain
 
 module Calendar =
     open Yobo.Shared.Calendar.Domain

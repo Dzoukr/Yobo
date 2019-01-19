@@ -2,7 +2,7 @@ module Yobo.Client.Admin.Users.Domain
 
 open System
 open Yobo.Shared.Communication
-open Yobo.Shared.Admin.Domain
+open Yobo.Shared.Domain
 open Yobo.Shared.Extensions
 
 type State = {

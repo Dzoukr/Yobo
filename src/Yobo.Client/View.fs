@@ -4,9 +4,9 @@ open Yobo.Client.Domain
 open Fulma
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
-open Yobo.Shared.Auth.Domain
+open Yobo.Shared.Domain
 
-let private displayLoggedPage (user:LoggedUser option) (page:string) content dispatch =
+let private displayLoggedPage (user:User option) (page:string) content dispatch =
     let adminMenuDisplayed =
         user |> Option.map (fun x -> x.IsAdmin) |> Option.defaultValue false
     let item (pg:string) icon text =

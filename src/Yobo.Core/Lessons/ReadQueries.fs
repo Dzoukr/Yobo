@@ -3,7 +3,7 @@ module Yobo.Core.Lessons.ReadQueries
 open Yobo.Core
 open System
 open FSharp.Rop
-open Yobo.Shared.Admin.Domain
+open Yobo.Shared.Domain
 
 type LessonsQueries<'a> = {
     GetAllForDateRange : (DateTimeOffset * DateTimeOffset) -> Result<Lesson list, 'a>

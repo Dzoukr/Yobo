@@ -8,19 +8,20 @@ let private toAsync f = async { return f }
 
 module Security =
     open Yobo.Shared.Auth
-    open Yobo.Shared.Auth.Domain
+    open Yobo.Shared.Domain
 
-    let handleForUser f (user:LoggedUser, param) =
+    let handleForUser f (user:User, param) =
         let handleFn = Services.CommandHandler.handleForUser user.Id
         f handleFn param
 
-    let handleForUserWithId f (user:LoggedUser, param) =
+    let handleForUserWithId f (user:User, param) =
         let handleFn = Services.CommandHandler.handleForUser user.Id
         f user.Id handleFn param
 
     let onlyForLogged (sp:SecuredParam<_>) =
         match sp.Token |> Services.Users.authorizator.ValidateToken with
-        | Some claims -> claims |> Yobo.API.Auth.Functions.claimsToUser |> fun user -> (user, sp.Param) |> Ok
+        | Some claims ->
+            claims |> Yobo.API.Auth.Functions.claimsToUser Services.Users.queries.GetById <!> fun user -> (user, sp.Param)
         | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
     let onlyForAdmin (sp:SecuredParam<_>) =
@@ -36,7 +37,7 @@ module Auth =
     open Yobo.Libraries.Security 
     open Yobo.API.CompositionRoot
     open Yobo.API
-    open Yobo.Shared.Auth.Domain
+    open Yobo.Shared.Domain
 
     let private adminUser =
         {
@@ -45,7 +46,10 @@ module Auth =
             FirstName = "Admin"
             LastName = "Admin"
             IsAdmin = true
-        } : LoggedUser
+            Activated = Some DateTimeOffset.MinValue
+            Credits = 0
+            CreditsExpiration = None
+        } : User
 
     let private loginWithAdmin email pwd =
         if email = Configuration.Admin.email && pwd = Configuration.Admin.password then Ok adminUser
@@ -55,7 +59,7 @@ module Auth =
     let api : Yobo.Shared.Auth.Communication.API = {
         GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
         RefreshToken = refreshToken Services.Users.authorizator.ValidateToken (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
-        GetUserByToken = getUser Services.Users.authorizator.ValidateToken >> toAsync
+        GetUserByToken = getUser Services.Users.queries.GetById Services.Users.authorizator.ValidateToken >> toAsync
         ResendActivation = resendActivation Services.CommandHandler.handleAnonymous >> toAsync
         Register = register Services.CommandHandler.handleAnonymous Password.createHash >> toAsync
         ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByActivationKey >> toAsync

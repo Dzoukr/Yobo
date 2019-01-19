@@ -19,7 +19,7 @@ type Page =
 type State = {
     Page : Page
     Route : string
-    LoggedUser : Yobo.Shared.Auth.Domain.LoggedUser option
+    LoggedUser : Yobo.Shared.Domain.User option
 }
 with
     static member Init = {
@@ -42,7 +42,7 @@ type Msg =
     | AdminMsg of AdminMsg
     | CalendarMsg of Calendar.Domain.Msg
     | LoadUserByToken of string
-    | UserByTokenLoaded of Result<Yobo.Shared.Auth.Domain.LoggedUser,ServerError>
+    | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
     | RefreshToken of string
     | TokenRefreshed of Result<string, ServerError>
     | LoggedOut

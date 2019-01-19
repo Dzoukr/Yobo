@@ -48,21 +48,27 @@ module Lessons =
 
 // event handlers
 module EventHandler =
+    open Yobo.Core.Users.EventSerializer
+    open Yobo.Core.Lessons.EventSerializer
+
+
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.connectionString
     let private emailHandleFn = EmailEventHandler.getHandler Users.queries emailService emailSettings
     let handle evn =
         evn |> dbHandleFn |> ignore
         evn |> emailHandleFn |> ignore
-        evn
+
+    eventStore.EventAppended.Add(function
+        | LessonsEvent evn -> evn |> CoreEvent.Lessons |> handle
+        | UsersEvent cryptoProvider evn -> evn |> CoreEvent.Users |> handle
+        | _ -> ()
+    )
 
 // command handler
 module CommandHandler =
     open Yobo.Core.Metadata
 
     let private handleFn = CommandHandler.getHandleFn cryptoProvider eventStore
-    let handle (meta:Metadata) cmd =
-        cmd |> handleFn meta (Guid.NewGuid())
-        <!> List.map EventHandler.handle
-        |> Result.mapError cmdHandlerErrorToServerError
+    let handle (meta:Metadata) cmd = cmd |> handleFn meta (Guid.NewGuid()) |> Result.mapError cmdHandlerErrorToServerError
     let handleAnonymous = handle (Metadata.CreateAnonymous())
     let handleForUser userId = handle (Metadata.Create userId)

@@ -36,3 +36,8 @@ let toData (cryptoProvider:SymetricCryptoProvider) = function
     | CreditsRefunded args -> "CreditsRefunded", (args |> Serialization.objectToJToken)
     | CashReservationsBlocked args -> "CashReservationsBlocked", (args |> Serialization.objectToJToken)
     | CashReservationsUnblocked args -> "CashReservationsUnblocked", (args |> Serialization.objectToJToken)
+
+let (|UsersEvent|_|) cryptoProvider (event:CosmoStore.EventRead) =
+    if event.StreamId.StartsWith("Users-") then
+        toEvent cryptoProvider (event.Name, event.Data) |> Some
+    else None

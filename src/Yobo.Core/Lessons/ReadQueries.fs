@@ -13,6 +13,16 @@ let withError (fn:'a -> 'b) (q:LessonsQueries<'a>) = {
     GetAllForDateRange = q.GetAllForDateRange >> Result.mapError fn
 }
 
+let private reservationFromDbEntity (r:ReadDb.Db.dataContext.``dbo.LessonReservationsEntity``) =
+    let res =
+        match r.Count, r.UseCredits with
+        | 2, _ -> ForTwo
+        | 1, true -> ForOne(Credits)
+        | 1, false -> ForOne(Cash)
+        | _ -> failwith "Invalid value in DB for reservations"
+    let user = r.``dbo.Users by Id`` |> Seq.head |> Users.ReadQueries.userFromDbEntity
+    user, res
+
 let internal lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) =
     {
         Id = u.Id
@@ -20,7 +30,7 @@ let internal lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) 
         Description = u.Description
         StartDate = u.StartDate
         EndDate = u.EndDate
-        Reservations = [] // TODO:
+        Reservations = u.``dbo.LessonReservations by Id`` |> Seq.map reservationFromDbEntity |> Seq.toList
     }
 
 let private getAllForDateRange (st, en) (ctx:ReadDb.Db.dataContext) =

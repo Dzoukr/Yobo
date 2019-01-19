@@ -26,6 +26,7 @@ let reservationAdded (args:CmdArgs.AddReservation) (ctx:ReadDb.Db.dataContext) =
     item.UserId <- args.UserId
     item.Count <- args.Count
     item.Created <- DateTimeOffset.Now
+    item.UseCredits <- args.UseCredits
     ctx.SubmitUpdates()
 
 let reservationCancelled (args:CmdArgs.CancelReservation) (ctx:ReadDb.Db.dataContext) =

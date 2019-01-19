@@ -35,6 +35,7 @@ type User = {
     Activated : DateTimeOffset option
     Credits : int
     CreditsExpiration : DateTimeOffset option
+    CashReservationBlockedUntil : DateTimeOffset option
     IsAdmin : bool
 }
 

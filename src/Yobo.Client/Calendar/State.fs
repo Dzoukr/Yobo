@@ -14,7 +14,8 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         match res with
         | Ok lsns ->
            { state with Lessons = lsns }, Cmd.none
-        | Error _ -> state, Cmd.none
+        | Error err -> state, (err |> SharedView.serverErrorToToast)
     | WeekOffsetChanged o -> { state with WeekOffset = o }, LoadUserLessons |> Cmd.ofMsg
     | AddReservation args -> state, (args |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.AddReservation ReservationAdded)
-    | ReservationAdded res ->  state, (res |> SharedView.resultToToast "Lekce byla úspěšně zarezervována")
+    | ReservationAdded res ->
+        state, [ (res |> SharedView.resultToToast "Lekce byla úspěšně zarezervována"); LoadUserLessons |> Cmd.ofMsg ] |> Cmd.batch

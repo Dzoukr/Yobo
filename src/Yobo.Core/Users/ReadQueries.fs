@@ -24,6 +24,7 @@ let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         Activated = u.Activated
         Credits = u.Credits
         CreditsExpiration = u.CreditsExpiration
+        CashReservationBlockedUntil = u.CashReservationBlockedUntil
         IsAdmin = false
     }
 

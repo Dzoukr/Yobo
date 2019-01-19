@@ -12,7 +12,7 @@ open Yobo.Shared.Domain
 module Calendar =
     open Yobo.Shared.Calendar.Domain
 
-    let lessonDiv dispatch (lesson:Lesson) =
+    let lessonDiv (user:User) dispatch (lesson:Lesson) =
         let st = lesson.StartDate |> SharedView.toCzTime
         let en = lesson.EndDate |> SharedView.toCzTime
         let avail =
@@ -26,20 +26,22 @@ module Calendar =
             | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
 
         let bookBtn =
-            let items =
-                let forOne = { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) }
-                let forTwo = { LessonId = lesson.Id; UserReservation = ForTwo }
-                match lesson.Availability with
-                | Free ->
-                    [ Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> forOne |> AddReservation |> dispatch ) ] ] [ str "Zarezervovat místo jen pro mě" ]
-                      Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> forTwo |> AddReservation |> dispatch ) ] ] [ str "Přivedu s sebou kamaráda/ku" ] ]
-                | LastFreeSpot -> [ Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> forOne |> AddReservation |> dispatch ) ] ] [ str "Zarezervovat místo jen pro mě" ] ]
-                | Full -> []
 
-            let isBtnVisible =
-                match lesson.UserReservation, lesson.Availability with
-                | None, LastFreeSpot | None, Free -> true
-                | _ -> false
+            let items =
+                let forOneCash = Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ] [ str "Zarezervovat místo (platba v hotovosti)" ]
+                let forOne = Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ] [ str "Zarezervovat místo jen pro mě" ]
+                let forTwo = Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForTwo } |> AddReservation |> dispatch ) ] ] [ str "Přivedu s sebou kamaráda/ku" ]
+
+                match user.Credits, user.CashReservationBlockedUntil, lesson.Availability with
+                | 0, Some d, Free | 0, Some d, LastFreeSpot ->
+                    if DateTimeOffset.Now > d then [ forOneCash ] else []
+                | 0, None, Free | 0, None, LastFreeSpot -> [ forOneCash ]
+                | 1, _, Free | 1, _, LastFreeSpot -> [ forOne ]
+                | _, _, Free -> [ forOne; forTwo ]
+                | _, _, LastFreeSpot -> [ forOne; forTwo ]
+                | _, _, Full -> []
+
+            let isBtnVisible = items.Length > 0 && not user.IsAdmin && lesson.UserReservation.IsNone
 
             if isBtnVisible then
                 Dropdown.dropdown [ Dropdown.IsHoverable ] [
@@ -110,12 +112,12 @@ module Calendar =
             div [] [ date.ToString("dd. MM. yyyy") |> str ]
         ]
 
-    let col (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
+    let col user (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         Column.column [ ] [
-            div [] (lessons |> List.map (lessonDiv dispatch))
+            div [] (lessons |> List.map (lessonDiv user dispatch))
         ]
 
-    let render (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset, endDate:DateTimeOffset) =
+    let render user (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset, endDate:DateTimeOffset) =
         let dates = DateRange.dateRangeToDays(startDate, endDate)
         let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
@@ -126,7 +128,7 @@ module Calendar =
             dates
             |> List.map (fun x ->
                 let lsns = x |> getLessonsForDate
-                col lsns dispatch x
+                col user lsns dispatch x
             )
             |> Columns.columns [] 
 
@@ -137,7 +139,7 @@ module Calendar =
         ]
     
 
-let render (state : State) (dispatch : Msg -> unit) =
+let render user (state : State) (dispatch : Msg -> unit) =
     div [] [
-        Calendar.render state dispatch (DateRange.getDateRangeForWeekOffset state.WeekOffset)
+        Calendar.render user state dispatch (DateRange.getDateRangeForWeekOffset state.WeekOffset)
     ]

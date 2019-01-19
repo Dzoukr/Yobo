@@ -63,5 +63,9 @@ let render (state : State) (dispatch : Msg -> unit) =
             | Users state -> Admin.Users.View.render state (UsersMsg >> AdminMsg >> dispatch)
             | Lessons state -> Admin.Lessons.View.render state (LessonsMsg >> AdminMsg >> dispatch)
         content |> showInTemplate
-    | Calendar state ->
-        Calendar.View.render state (CalendarMsg >> dispatch) |> showInTemplate
+    | Calendar st ->
+        let content =
+            if state.LoggedUser.IsSome then
+                Calendar.View.render state.LoggedUser.Value st (CalendarMsg >> dispatch)
+            else str ""
+        content |> showInTemplate

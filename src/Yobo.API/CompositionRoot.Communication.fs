@@ -3,12 +3,27 @@ module Yobo.API.CompositionRoot.Communication
 open System
 open FSharp.Rop
 open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 
 let private toAsync f = async { return f }
 
+let private adminUser =
+        {
+            Id = Guid("f65203d4-60dd-4580-a31c-e538807ef720")
+            Email = Yobo.API.Configuration.Admin.email
+            FirstName = "Admin"
+            LastName = "Admin"
+            IsAdmin = true
+            Activated = Some DateTimeOffset.MinValue
+            Credits = 0
+            CreditsExpiration = None
+            CashReservationBlockedUntil = None
+        } : User
+
+let private getUserById i = if i = adminUser.Id then (Ok adminUser) else Services.Users.queries.GetById i
+
 module Security =
     open Yobo.Shared.Auth
-    open Yobo.Shared.Domain
 
     let handleForUser f (user:User, param) =
         let handleFn = Services.CommandHandler.handleForUser user.Id
@@ -21,7 +36,7 @@ module Security =
     let onlyForLogged (sp:SecuredParam<_>) =
         match sp.Token |> Services.Users.authorizator.ValidateToken with
         | Some claims ->
-            claims |> Yobo.API.Auth.Functions.claimsToUser Services.Users.queries.GetById <!> fun user -> (user, sp.Param)
+            claims |> Yobo.API.Auth.Functions.claimsToUser getUserById <!> fun user -> (user, sp.Param)
         | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
     let onlyForAdmin (sp:SecuredParam<_>) =
@@ -37,29 +52,16 @@ module Auth =
     open Yobo.Libraries.Security 
     open Yobo.API.CompositionRoot
     open Yobo.API
-    open Yobo.Shared.Domain
-
-    let private adminUser =
-        {
-            Id = Guid("f65203d4-60dd-4580-a31c-e538807ef720")
-            Email = Configuration.Admin.email
-            FirstName = "Admin"
-            LastName = "Admin"
-            IsAdmin = true
-            Activated = Some DateTimeOffset.MinValue
-            Credits = 0
-            CreditsExpiration = None
-        } : User
 
     let private loginWithAdmin email pwd =
         if email = Configuration.Admin.email && pwd = Configuration.Admin.password then Ok adminUser
         else
             Services.Users.authenticator.Login email pwd
-
+    
     let api : Yobo.Shared.Auth.Communication.API = {
         GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
         RefreshToken = refreshToken Services.Users.authorizator.ValidateToken (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
-        GetUserByToken = getUser Services.Users.queries.GetById Services.Users.authorizator.ValidateToken >> toAsync
+        GetUserByToken = getUser getUserById Services.Users.authorizator.ValidateToken >> toAsync
         ResendActivation = resendActivation Services.CommandHandler.handleAnonymous >> toAsync
         Register = register Services.CommandHandler.handleAnonymous Password.createHash >> toAsync
         ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByActivationKey >> toAsync

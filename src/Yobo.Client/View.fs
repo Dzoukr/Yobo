@@ -22,6 +22,16 @@ let private displayLoggedPage (user:User option) (page:string) content dispatch 
                 [ item Router.Routes.users "fas fa-users" "Uživatelé"
                   item Router.Routes.lessons "fas fa-calendar-alt" "Lekce" ]
         | _ -> []
+
+    let userInfo =
+        match user with
+        | Some user ->
+            Navbar.Item.div [] [
+                Tag.tag [ Tag.Color IsInfo; Tag.Props [ Style [ MarginRight 10 ] ] ] [ sprintf "%i kreditů" user.Credits |> str ]
+                i [ ClassName "fas fa-user"; Style [ MarginRight 5 ] ] []
+                sprintf "%s %s" user.FirstName user.LastName |> str
+            ]
+        | None -> str ""
     
     div [] [
         Navbar.navbar [ Navbar.Color IsLight; ] [
@@ -31,6 +41,7 @@ let private displayLoggedPage (user:User option) (page:string) content dispatch 
                 ]
                 Navbar.End.div [] [
                     yield! adminButtons
+                    yield userInfo
                     yield Navbar.Item.div [] [
                         div [ ClassName "buttons" ] [
                             Button.a [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> LoggedOut |> dispatch) ] ] [

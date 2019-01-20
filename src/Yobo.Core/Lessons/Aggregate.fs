@@ -3,6 +3,7 @@ module Yobo.Core.Lessons.Aggregate
 open FSharp.Rop
 open Yobo.Shared.Domain
 open Yobo.Core.Lessons
+open System
 
 let private onlyIfDoesNotExist state =
     if state.Id = State.Init.Id then Ok state
@@ -26,12 +27,22 @@ let private onlyIfUserNotAlreadyReserved userId state =
         | Some _ -> DomainError.LessonIsAlreadyReserved |> Error
         | None -> Ok state
 
-let private onlyIfUserHasReservation userId state =
+let private onlyIfNotAlreadyStarted state =
+    if state.StartDate < DateTimeOffset.Now then
+        DomainError.LessonIsClosed |> Error
+    else Ok state
+
+let private onlyIfCanBeCancelled userId state =
     state.Reservations
     |> List.tryFind (fun (u,_,_) -> u = userId)
     |> function
-        | Some _ -> Ok state
+        | Some r ->
+            let limit = state.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
+            if DateTimeOffset.Now > limit then
+                DomainError.LessonCancellingIsClosed |> Error
+            else Ok state
         | None -> DomainError.LessonIsNotReserved |> Error
+
 
 let execute (state:State) = function
     | Create args ->
@@ -42,15 +53,16 @@ let execute (state:State) = function
         onlyIfDoesExist state
         >>= onlyIfNotFull args.Count
         >>= onlyIfUserNotAlreadyReserved args.UserId
+        >>= onlyIfNotAlreadyStarted
         <!> (fun _ -> ReservationAdded args)
         <!> List.singleton
     | CancelReservation args ->
         onlyIfDoesExist state
-        >>= onlyIfUserHasReservation args.UserId
+        >>= onlyIfCanBeCancelled args.UserId
         <!> (fun _ -> ReservationCancelled args)
         <!> List.singleton
     
 let apply (state:State) = function
-    | Created args -> { state with Id = args.Id; EndDate = args.EndDate }
+    | Created args -> { state with Id = args.Id; StartDate = args.StartDate; EndDate = args.EndDate }
     | ReservationAdded args -> { state with Reservations = (args.UserId, args.Count, args.UseCredits) :: state.Reservations}
     | ReservationCancelled args -> { state with Reservations = state.Reservations |> List.filter (fun (x,_,_) -> x <> args.UserId ) }

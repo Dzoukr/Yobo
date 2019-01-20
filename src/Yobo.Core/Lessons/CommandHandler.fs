@@ -14,7 +14,7 @@ let private settings = {
         Execute = Aggregate.execute
         Apply = Aggregate.apply
     }
-    GetStreamId = getId >> sprintf "Lessons-%s"
+    GetStreamId = getId >> sprintf "%s%s" EventSerializer.streamPrefix
     Serializer = {
         EventToData = EventSerializer.toData
         DataToEvent = EventSerializer.toEvent

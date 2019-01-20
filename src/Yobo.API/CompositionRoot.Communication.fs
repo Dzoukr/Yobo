@@ -93,4 +93,5 @@ module Calendar =
                 |> toAsync
             )
         AddReservation = fun x -> x |> Security.onlyForLogged >>= Security.handleForUserWithId addReservation |> toAsync
+        CancelReservation = fun x -> x |> Security.onlyForLogged >>= Security.handleForUserWithId cancelReservation |> toAsync 
     }

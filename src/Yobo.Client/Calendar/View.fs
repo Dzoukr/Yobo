@@ -13,17 +13,28 @@ module Calendar =
     open Yobo.Shared.Calendar.Domain
 
     let lessonDiv (user:User) dispatch (lesson:Lesson) =
+        let lessonAlreadyStarted = DateTimeOffset.Now > lesson.StartDate
+        let lessonCancellingDate = lesson.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
+        Fable.Import.Browser.console.log lessonCancellingDate
+        let lessonCancellingClosed = lessonAlreadyStarted || DateTimeOffset.Now > lessonCancellingDate
+
         let st = lesson.StartDate |> SharedView.toCzTime
         let en = lesson.EndDate |> SharedView.toCzTime
         let avail =
-            match lesson.UserReservation with
-            | None ->
-                match lesson.Availability with
-                | Free -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volné místo" ]
-                | LastFreeSpot -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
-                | Full -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již plná" ]
-            | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás + 1" ]
-            | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
+            if lessonAlreadyStarted then
+                match lesson.UserReservation with
+                | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste + 1" ]
+                | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste" ]
+                | None -> str ""
+            else
+                match lesson.UserReservation with
+                | None ->
+                    match lesson.Availability with
+                    | Free -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volné místo" ]
+                    | LastFreeSpot -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
+                    | Full -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již plná" ]
+                | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás + 1" ]
+                | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
 
         let bookBtn =
 
@@ -41,7 +52,11 @@ module Calendar =
                 | _, _, LastFreeSpot -> [ forOne; forTwo ]
                 | _, _, Full -> []
 
-            let isBtnVisible = items.Length > 0 && not user.IsAdmin && lesson.UserReservation.IsNone
+            let isBtnVisible =
+                items.Length > 0
+                && not user.IsAdmin
+                && lesson.UserReservation.IsNone
+                && not lessonAlreadyStarted
 
             if isBtnVisible then
                 Dropdown.dropdown [ Dropdown.IsHoverable ] [
@@ -56,6 +71,24 @@ module Calendar =
                     ]
                 ]
             else str ""
+
+        let cancelBtn =
+            if lesson.UserReservation.IsSome && not lessonCancellingClosed then
+                Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelReservation(lesson.Id) |> dispatch) ] ] [
+                    str "Zrušit rezervaci"
+                ]
+            else
+                str ""
+
+        let warning =
+            if lessonAlreadyStarted then
+                "Lekce již proběhla" |> str |> SharedView.infoBox
+            else
+                if lessonCancellingClosed && lesson.UserReservation.IsSome then
+                    "Odhlašování z lekce je již zavřeno" |> str |> SharedView.infoBox
+                else if lessonCancellingClosed && lesson.UserReservation.IsNone then
+                    "Odhlašování z lekce je již zavřeno. Lze se pouze přihlašovat." |> str |> SharedView.infoBox
+                else str ""
 
         div [ ClassName "popover is-popover-bottom"] [
             div [ ClassName "popover-trigger" ] [
@@ -75,8 +108,12 @@ module Calendar =
                 div [] [
                     str lesson.Description
                 ]
+                warning
                 div [] [
                     bookBtn
+                ]
+                div [] [
+                    cancelBtn
                 ]
             ]
         ]

@@ -20,6 +20,8 @@ let registered (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
     item.PasswordHash <- args.PasswordHash
     item.Registered <- DateTimeOffset.Now
     item.Credits <- 0
+    item.CreditsExpiration <- None
+    item.CashReservationBlockedUntil <- None
     ctx.SubmitUpdates()
 
 let activated (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =

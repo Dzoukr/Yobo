@@ -13,7 +13,9 @@ let toData = function
     | ReservationAdded args -> "ReservationAdded", (args |> Serialization.objectToJToken)
     | ReservationCancelled args -> "ReservationCancelled", (args |> Serialization.objectToJToken)
 
+let streamPrefix = "Lessons-"
+
 let (|LessonsEvent|_|) (event:CosmoStore.EventRead) =
-    if event.StreamId.StartsWith("Lessons-") then
+    if event.StreamId.StartsWith(streamPrefix) then
         toEvent (event.Name, event.Data) |> Some
     else None

@@ -51,7 +51,6 @@ module EventHandler =
     open Yobo.Core.Users.EventSerializer
     open Yobo.Core.Lessons.EventSerializer
 
-
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.connectionString
     let private emailHandleFn = EmailEventHandler.getHandler Users.queries emailService emailSettings
     let handle evn =

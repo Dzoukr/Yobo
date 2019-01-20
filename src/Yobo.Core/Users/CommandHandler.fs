@@ -20,7 +20,7 @@ let private settings cryptoProvider = {
         Execute = Aggregate.execute
         Apply = Aggregate.apply
     }
-    GetStreamId = getId >> sprintf "Users-%s"
+    GetStreamId = getId >> sprintf "%s%s" EventSerializer.streamPrefix
     Serializer = {
         EventToData = EventSerializer.toData cryptoProvider
         DataToEvent = EventSerializer.toEvent cryptoProvider

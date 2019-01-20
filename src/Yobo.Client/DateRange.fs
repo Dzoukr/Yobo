@@ -4,14 +4,16 @@ open System
 open Yobo.Shared.Extensions
 
 let private closestMonday (date:DateTimeOffset) =
-    let offset = date.DayOfWeek - DayOfWeek.Monday
-    date.AddDays -(offset |> float) |> fun x -> x.StartOfTheDay()
+    let offset = (date.DayOfWeek - DayOfWeek.Monday) |> float
+    let offset = if offset < 0. then 6. else offset
+    date.AddDays (-offset) |> fun x -> x.StartOfTheDay()
 
 let private closestSunday (date:DateTimeOffset) =
-    let current = date.DayOfWeek |> int
-    let offset = 7 - current
-    date.AddDays (offset |> float) |> fun x -> x.EndOfTheDay()
-
+    date 
+    |> closestMonday
+    |> fun x -> x.AddDays 6.
+    |> fun x -> x.EndOfTheDay()
+    
 let getWeekDateRange dayInWeek =
     (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
 

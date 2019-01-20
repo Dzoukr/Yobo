@@ -21,3 +21,5 @@ type Msg =
     | WeekOffsetChanged of int
     | AddReservation of AddReservation
     | ReservationAdded of ServerResult<unit>
+    | CancelReservation of Guid
+    | ReservationCancelled of ServerResult<unit>

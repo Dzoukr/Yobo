@@ -87,15 +87,12 @@ let getCommandHandler<'state,'command, 'event>
             try
                 let streamId = cmd |> settings.GetStreamId
                 let! state,_ = streamId |> getCurrentStateFn
-                let rollbackEvents =
+                let! _ =
                     cmd
                     |> settings.RollbackEvents state
                     |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
-                match rollbackEvents.Length with
-                | 0 -> return Ok ()
-                | _ ->
-                    let! _ = eventStore.AppendEvents streamId Any rollbackEvents
-                    return Ok ()
+                    |> eventStore.AppendEvents streamId Any
+                return Ok ()
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
@@ -134,15 +131,12 @@ let getRollbackCommandHandler<'state, 'command, 'event, 'innerCommand, 'innerEve
             try
                 let streamId = cmd |> settings.GetStreamId
                 let! state,_ = streamId |> getCurrentStateFn
-                let rollbackEvents =
+                let! _ =
                     cmd
                     |> settings.RollbackEvents state
                     |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
-                match rollbackEvents.Length with
-                | 0 -> return Ok ()
-                | _ ->
-                    let! _ = eventStore.AppendEvents streamId Any rollbackEvents
-                    return Ok ()
+                    |> eventStore.AppendEvents streamId Any
+                return Ok ()
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 

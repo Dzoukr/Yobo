@@ -11,6 +11,8 @@ type DomainError =
     | LessonIsFull
     | LessonIsAlreadyReserved
     | LessonIsNotReserved
+    | LessonCancellingIsClosed
+    | LessonIsClosed
     | NotEnoughCredits
     | CashReservationIsBlocked
     with
@@ -24,6 +26,8 @@ type DomainError =
             | LessonIsFull -> "Lekce je již plně obsazená."
             | LessonIsAlreadyReserved -> "Lekce je již zarezervována."
             | LessonIsNotReserved -> "Lekce není zarezervována."
+            | LessonCancellingIsClosed -> "Odhlašování z lekce bylo již uzavřeno."
+            | LessonIsClosed -> "Lekce je již uzavřena."
             | NotEnoughCredits -> "Nemáte dostatek kreditů."
             | CashReservationIsBlocked -> "Rezervaci v hotovosti nelze provést."
 

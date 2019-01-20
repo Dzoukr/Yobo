@@ -37,11 +37,13 @@ type Event =
 type State = {
     Id : Guid
     Reservations : (Guid * int * bool) list
+    StartDate : DateTimeOffset
     EndDate : DateTimeOffset
 }
 with
     static member Init = {
         Id = Guid.Empty
         Reservations = []
+        StartDate = DateTimeOffset.MinValue
         EndDate = DateTimeOffset.MinValue
     }

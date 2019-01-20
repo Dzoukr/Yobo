@@ -2,6 +2,7 @@ module Yobo.Shared.Calendar.Domain
 
 open System
 open Yobo.Shared.Domain
+open Yobo.Shared.Extensions
 
 type Availability =
     | Full
@@ -9,6 +10,9 @@ type Availability =
     | Free
 
 let maxCapacity = 12
+
+let getCancellingDate (d:DateTimeOffset) =
+    d.StartOfTheDay().AddHours 12.
 
 type Lesson = {
     Id : Guid
@@ -18,6 +22,7 @@ type Lesson = {
     Description : string
     Availability : Availability
     UserReservation : UserReservation option
+    CancellableUntil : DateTimeOffset
 }
 with
     static member FromAdminLesson currentUserId (lesson:Yobo.Shared.Domain.Lesson) =
@@ -38,6 +43,7 @@ with
             Description = lesson.Description
             Availability = av
             UserReservation = ur
+            CancellableUntil = lesson.StartDate |> getCancellingDate
         } : Lesson
 
 type AddReservation = {

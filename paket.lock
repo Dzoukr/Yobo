@@ -649,7 +649,7 @@ STORAGE: NONE
 RESTRICTION: == netcoreapp2.2
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    CosmoStore (1.5)
+    CosmoStore (1.5.1)
       FSharp.Core (>= 4.3.1)
       Microsoft.Azure.DocumentDB.Core (>= 2.0)
       Newtonsoft.Json (>= 11.0.1)

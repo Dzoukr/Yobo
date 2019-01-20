@@ -41,7 +41,7 @@ type Msg =
     | AuthMsg of AuthMsg
     | AdminMsg of AdminMsg
     | CalendarMsg of Calendar.Domain.Msg
-    | LoadUserByToken of string
+    | ReloadUser
     | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
     | RefreshToken of string
     | TokenRefreshed of Result<string, ServerError>

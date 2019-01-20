@@ -29,7 +29,7 @@ let private withCheckingLogin (state:State) cmd =
 
     if requiresLogin then
         match state.LoggedUser, TokenStorage.tryGetToken() with
-        | None, Some t -> [ Cmd.ofMsg (Msg.LoadUserByToken t); cmd ] |> Cmd.batch
+        | None, Some _ -> [ Cmd.ofMsg Msg.ReloadUser; cmd ] |> Cmd.batch
         | Some _, Some _ -> cmd
         | _ -> LoggedOut |> Cmd.ofMsg
     else cmd
@@ -67,6 +67,10 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     let map stateMap cmdMap (subState,subCmd) =
         { state with Page = (subState |> stateMap) }, (subCmd |> Cmd.map cmdMap)
 
+    let mapWithReloadUser stateMap cmdMap (subState,subCmd,reloadUser) =
+        let reloadCmd = if reloadUser then ReloadUser |> Cmd.ofMsg else Cmd.none
+        { state with Page = (subState |> stateMap) }, Cmd.batch [(subCmd |> Cmd.map cmdMap);reloadCmd]
+
     match msg with
     | AuthMsg m ->
         match m, state.Page with
@@ -81,9 +85,9 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | _ -> state, Cmd.none
     | CalendarMsg msg ->
         match state.Page with
-        | Calendar state ->  Calendar.State.update msg state |> map Calendar Msg.CalendarMsg
+        | Calendar state -> Calendar.State.update msg state |> mapWithReloadUser Calendar Msg.CalendarMsg
         | _ -> state, Cmd.none
-    | LoadUserByToken t -> state, (t |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
+    | ReloadUser -> state, (TokenStorage.tryGetToken() |> Option.defaultValue "" |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->
         match res with
         | Ok user -> { state with LoggedUser = Some user }, Cmd.none

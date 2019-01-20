@@ -9,12 +9,21 @@ let generateKeyAndVector () =
     let iv = aesAlg.IV
     (key |> System.Convert.ToBase64String), (iv |> System.Convert.ToBase64String)
 
+let toBase64String (t:string) =
+    let plainTextBytes = System.Text.Encoding.UTF8.GetBytes(t)
+    plainTextBytes |> System.Convert.ToBase64String
+
+let fromBase64String (t:string) =
+    let base64EncodedBytes = System.Convert.FromBase64String(t)
+    System.Text.Encoding.UTF8.GetString(base64EncodedBytes)
+
 let encrypt key iv (text:string) =
+    let safeText = text |> toBase64String 
     use aesAlg = Aes.Create()
     aesAlg.Key <- (key |> System.Convert.FromBase64String)
     aesAlg.IV <- (iv |> System.Convert.FromBase64String)
     use encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV)
-    use input = new MemoryStream(text.ToCharArray() |> Array.map System.Convert.ToByte)
+    use input = new MemoryStream(safeText.ToCharArray() |> Array.map System.Convert.ToByte)
     use csEncrypt = new CryptoStream(input, encryptor, CryptoStreamMode.Read)
     use msEncrypt = new MemoryStream()
     csEncrypt.CopyTo(msEncrypt)
@@ -30,4 +39,4 @@ let decrypt key iv (text:string) =
     use csDecrypt = new CryptoStream(input, decryptor, CryptoStreamMode.Read)
     use msDecrypt = new MemoryStream()
     csDecrypt.CopyTo(msDecrypt)
-    msDecrypt.ToArray() |> System.Text.Encoding.UTF8.GetString
+    msDecrypt.ToArray() |> System.Text.Encoding.UTF8.GetString |> fromBase64String

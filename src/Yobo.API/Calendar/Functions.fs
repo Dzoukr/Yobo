@@ -27,3 +27,9 @@ let addReservation userId cmdHandler (x:AddReservation) =
         let! _ = args |> (Lessons.Command.AddReservation >> CoreCommand.Lessons >> cmdHandler)
         return ()
     }
+
+let cancelReservation userId cmdHandler (x:Guid) =
+    result {
+        let! _ = ({ Id = x; UserId = userId } : Lessons.CmdArgs.CancelReservation) |> Lessons.CancelReservation |> CoreCommand.Lessons |> cmdHandler
+        return ()
+    }

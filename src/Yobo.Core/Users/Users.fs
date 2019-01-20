@@ -76,6 +76,7 @@ type State = {
     Credits : int
     CreditsExpiration : DateTimeOffset option
     CashReservationsBlockedUntil : DateTimeOffset option
+    LastCashBlockingDate : DateTimeOffset option
 }
 with
     static member Init = {
@@ -85,4 +86,5 @@ with
         Credits = 0
         CreditsExpiration = None
         CashReservationsBlockedUntil = None
+        LastCashBlockingDate = None
     }

@@ -1311,7 +1311,7 @@ NUGET
       Newtonsoft.Json (>= 10.0.2)
 GITHUB
   remote: Dzoukr/FSharp.Rop
-    FSharp.Rop.fs (3e12e1028aa115b448d9248e0ea0e9a8ddcb3a77)
+    FSharp.Rop.fs (c6f75e0eaf37b24a7230f3cc1348cae5d40b51e3)
 GROUP Libraries
 STORAGE: NONE
 RESTRICTION: == netstandard2.0
@@ -1739,7 +1739,7 @@ NUGET
       Newtonsoft.Json (>= 10.0.2)
 GITHUB
   remote: Dzoukr/FSharp.Rop
-    FSharp.Rop.fs (3e12e1028aa115b448d9248e0ea0e9a8ddcb3a77)
+    FSharp.Rop.fs (c6f75e0eaf37b24a7230f3cc1348cae5d40b51e3)
 GROUP Server
 STORAGE: NONE
 RESTRICTION: == netcoreapp2.2
@@ -1757,7 +1757,7 @@ NUGET
       Fable.Remoting.Json (>= 2.2)
       FSharp.Core (>= 4.3.4)
     FSharp.Core (4.5.4)
-    Giraffe (3.5)
+    Giraffe (3.5.1)
       FSharp.Core (>= 4.5.2)
       Microsoft.AspNetCore.Authentication (>= 2.2)
       Microsoft.AspNetCore.Authorization (>= 2.2)
@@ -2232,7 +2232,7 @@ NUGET
     FSharp.Core (4.5.4)
 GITHUB
   remote: Dzoukr/FSharp.Rop
-    FSharp.Rop.fs (3e12e1028aa115b448d9248e0ea0e9a8ddcb3a77)
+    FSharp.Rop.fs (c6f75e0eaf37b24a7230f3cc1348cae5d40b51e3)
 GROUP Tools
 RESTRICTION: == netcoreapp2.2
 NUGET

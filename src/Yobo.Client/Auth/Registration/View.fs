@@ -44,23 +44,35 @@ let render (state : State) (dispatch : Msg -> unit) =
 
                 (SharedView.serverErrorToViewIfAny state.RegistrationResult)
 
-                lbl "Křestní jméno"
-                regInput state.Account.FirstName Input.text ChangeFirstName "FirstName"
-                
-                lbl "Příjmení"
-                regInput state.Account.LastName Input.text ChangeLastName "LastName"
+                Field.div [] [
+                    lbl "Křestní jméno"
+                    regInput state.Account.FirstName Input.text ChangeFirstName "FirstName"
+                ]
 
-                lbl "Email"
-                regInput state.Account.Email Input.email ChangeEmail "Email"
+                Field.div [] [
+                    lbl "Příjmení"
+                    regInput state.Account.LastName Input.text ChangeLastName "LastName"
+                ]
 
-                lbl "Heslo"
-                regInput state.Account.Password Input.password ChangePassword "Password"
-                
-                lbl "Heslo (ještě jednou pro kontrolu)"
-                regInput state.Account.SecondPassword Input.password ChangeSecondPassword "SecondPassword"
+                Field.div [] [
+                    lbl "Email"
+                    regInput state.Account.Email Input.email ChangeEmail "Email"
+                ]
 
-                btn state.IsRegistrating
+                Field.div [] [
+                    lbl "Heslo"
+                    regInput state.Account.Password Input.password ChangePassword "Password"
+                ]
 
+                Field.div [] [
+                    lbl "Heslo (ještě jednou pro kontrolu)"
+                    regInput state.Account.SecondPassword Input.password ChangeSecondPassword "SecondPassword"
+
+                ]
+
+                Field.div [] [
+                    btn state.IsRegistrating
+                ]
                 a [ Href Router.Routes.login; OnClick Router.goToUrl] [
                     str "Zpět na přihlášení"
                 ]   

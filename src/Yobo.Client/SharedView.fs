@@ -73,4 +73,4 @@ let serverErrorToViewIfAny (res:Result<_,ServerError> option) =
     | _ -> str ""
 
 let toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
-let toCzTime (date:DateTimeOffset) = date.ToString("HH. mm.")
+let toCzTime (date:DateTimeOffset) = date.ToString("HH:mm")

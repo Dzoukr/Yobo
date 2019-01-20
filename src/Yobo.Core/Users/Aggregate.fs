@@ -80,5 +80,5 @@ let apply (state:State) = function
     | CreditsAdded args -> { state with Credits = state.Credits + args.Credits; CreditsExpiration = Some args.Expiration }
     | CreditsWithdrawn args -> { state with Credits = state.Credits - args.Amount }
     | CreditsRefunded args -> { state with Credits = state.Credits + args.Amount }
-    | CashReservationsBlocked args -> { state with CashReservationsBlockedUntil = Some args.Expires }
+    | CashReservationsBlocked args -> { state with CashReservationsBlockedUntil = Some args.Expires; LastCashBlockingDate = Some args.Expires }
     | CashReservationsUnblocked _ -> { state with CashReservationsBlockedUntil = None }

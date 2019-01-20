@@ -75,9 +75,9 @@ let render (state : State) (dispatch : Msg -> unit) =
                 (SharedView.serverErrorToViewIfAny state.LoginResult)
                 resendActivationInfoBox
 
-                email
-                pwd
-                btn state.IsLogging
+                Field.div [] [ email ]
+                Field.div [] [ pwd ]
+                Field.div [] [ btn state.IsLogging ]
                 footer
             ]
    

@@ -9,6 +9,7 @@ open Yobo.Client.Admin.Lessons.Domain
 open Yobo.Shared
 open Fulma.Extensions.Wikiki
 open Yobo.Client
+open Yobo.Shared.Extensions
 
 module Calendar =
     open Yobo.Client
@@ -17,7 +18,7 @@ module Calendar =
     let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         let checkBox =
             let cmd = if isSelected then DateUnselected else DateSelected 
-            if date >= DateTimeOffset.Now then
+            if date >= DateTimeOffset.Now.StartOfTheDay() then
                 let i = date.Ticks.ToString()
                 div [] [
                     Checkbox.input [

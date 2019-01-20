@@ -33,8 +33,8 @@ let private settings cryptoProvider = {
             | RefundCredits args -> CreditsWithdrawn { Id = args.Id; Amount = args.Amount; LessonId = args.LessonId } |> List.singleton
             | BlockCashReservations args -> CashReservationsUnblocked { Id = args.Id } |> List.singleton
             | UnblockCashReservations args ->
-                if state.CashReservationsBlockedUntil.IsSome then
-                    CashReservationsBlocked { Id = args.Id; Expires = state.CashReservationsBlockedUntil.Value } |> List.singleton
+                if state.LastCashBlockingDate.IsSome then
+                    CashReservationsBlocked { Id = args.Id; Expires = state.LastCashBlockingDate.Value } |> List.singleton
                 else []
             | _ -> []
 }

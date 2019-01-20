@@ -15,7 +15,6 @@ module Calendar =
     let lessonDiv (user:User) dispatch (lesson:Lesson) =
         let lessonAlreadyStarted = DateTimeOffset.Now > lesson.StartDate
         let lessonCancellingDate = lesson.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
-        Fable.Import.Browser.console.log lessonCancellingDate
         let lessonCancellingClosed = lessonAlreadyStarted || DateTimeOffset.Now > lessonCancellingDate
 
         let st = lesson.StartDate |> SharedView.toCzTime
@@ -30,26 +29,32 @@ module Calendar =
                 match lesson.UserReservation with
                 | None ->
                     match lesson.Availability with
-                    | Free -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volné místo" ]
+                    | Free -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volno" ]
                     | LastFreeSpot -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
-                    | Full -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již plná" ]
+                    | Full -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již obsazena" ]
                 | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás + 1" ]
                 | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
 
         let bookBtn =
 
             let items =
-                let forOneCash = Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ] [ str "Zarezervovat místo (platba v hotovosti)" ]
-                let forOne = Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ] [ str "Zarezervovat místo jen pro mě" ]
-                let forTwo = Dropdown.Item.a [ Dropdown.Item.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForTwo } |> AddReservation |> dispatch ) ] ] [ str "Přivedu s sebou kamaráda/ku" ]
+                let forOneCash =
+                    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
+                        [ str "Rezervovat (platba v hotovosti)" ]
+                let forOne =
+                    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
+                        [ str "Rezervovat" ]
+                //let forTwo =
+                //    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForTwo } |> AddReservation |> dispatch ) ] ]
+                //        [ str "+1" ]
 
                 match user.Credits, user.CashReservationBlockedUntil, lesson.Availability with
                 | 0, Some d, Free | 0, Some d, LastFreeSpot ->
                     if DateTimeOffset.Now > d then [ forOneCash ] else []
                 | 0, None, Free | 0, None, LastFreeSpot -> [ forOneCash ]
                 | 1, _, Free | 1, _, LastFreeSpot -> [ forOne ]
-                | _, _, Free -> [ forOne; forTwo ]
-                | _, _, LastFreeSpot -> [ forOne; forTwo ]
+                | _, _, Free -> [ forOne ] //[ forOne; forTwo ]
+                | _, _, LastFreeSpot -> [ forOne ]
                 | _, _, Full -> []
 
             let isBtnVisible =
@@ -58,18 +63,7 @@ module Calendar =
                 && lesson.UserReservation.IsNone
                 && not lessonAlreadyStarted
 
-            if isBtnVisible then
-                Dropdown.dropdown [ Dropdown.IsHoverable ] [
-                    div [ ] [
-                        Button.button [ ] [
-                            span [ ] [ str "Rezervace" ]
-                            Icon.icon [ Icon.Size IsSmall ] [ i [ ClassName "fas fa-angle-down" ] [ ] ]
-                        ]
-                    ]
-                    Dropdown.menu [ ] [
-                        Dropdown.content [ ] items
-                    ]
-                ]
+            if isBtnVisible then div [] items
             else str ""
 
         let cancelBtn =
@@ -91,9 +85,16 @@ module Calendar =
                 else str ""
 
         div [ ClassName "popover is-popover-bottom"] [
-            div [ ClassName "popover-trigger" ] [
-                str lesson.Name
-                avail
+            div [ ClassName "popover-trigger lesson-overview" ] [
+
+                div [ ClassName "time" ] [
+                    lesson.StartDate |> SharedView.toCzTime |> str
+                    str " - "
+                    lesson.EndDate |> SharedView.toCzTime |> str
+
+                ]
+                div [ ClassName "name"] [ str lesson.Name ]
+                div [ ClassName "availability" ] [ avail ]
             ]
             div [ ClassName "popover-content" ] [
                 div [] [
@@ -119,7 +120,7 @@ module Calendar =
         ]
 
     let navigation (state:State) dispatch =
-        Columns.columns [] [
+        Columns.columns [ Columns.Option.CustomClass "cal-control" ] [
             Column.column [ ] [
                 Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-left" ] [ ]
@@ -144,7 +145,7 @@ module Calendar =
             | DayOfWeek.Saturday -> "Sobota"
             | DayOfWeek.Sunday -> "Neděle"
             | _ -> ""
-        Column.column [] [
+        Column.column [ ] [
             div [] [ str n ]
             div [] [ date.ToString("dd. MM. yyyy") |> str ]
         ]
@@ -160,14 +161,14 @@ module Calendar =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
-        let headerRow = dates |> List.map headerCol |> Columns.columns [] 
+        let headerRow = dates |> List.map headerCol |> Columns.columns [ Columns.CustomClass "cal-day" ] 
         let row =
             dates
             |> List.map (fun x ->
                 let lsns = x |> getLessonsForDate
                 col user lsns dispatch x
             )
-            |> Columns.columns [] 
+            |> Columns.columns [ Columns.CustomClass "cal-lessons" ] 
 
         div [] [
             yield navigation state dispatch

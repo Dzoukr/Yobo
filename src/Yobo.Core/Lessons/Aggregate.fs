@@ -36,7 +36,7 @@ let private onlyIfCanBeCancelled userId state =
     state.Reservations
     |> List.tryFind (fun (u,_,_) -> u = userId)
     |> function
-        | Some r ->
+        | Some _ ->
             let limit = state.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
             if DateTimeOffset.Now > limit then
                 DomainError.LessonCancellingIsClosed |> Error

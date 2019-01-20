@@ -1,0 +1,52 @@
+.table-calendar {
+    table-layout: fixed;
+    border-radius: 2px;
+
+    .controls {
+        td {
+            height: 4rem;
+            border: none;
+            text-align: center;
+            button {
+                margin-left: 0.3rem;
+            }
+        }
+    }
+
+    .header td {
+        text-align: center;
+        
+        .date {
+            font-size: 0.8rem;
+        }
+    }
+
+    .day td {
+        height: 70vh;
+        div {
+            min-width: 100%;
+        }
+        .popover-content {
+            margin-top: -3rem;
+        }
+        .lesson {
+            padding: 0.5rem;
+            background-color: #c4dbe2;
+            margin-top: 1rem;
+            margin-bottom: 3rem;
+            border-radius: 0.5rem;
+            text-align: center;
+
+
+            .time {
+                margin-bottom: 1rem; 
+            }
+            
+            .name {
+                font-weight: 500;
+                margin-bottom: 2rem; 
+            }
+        }
+    }
+
+}

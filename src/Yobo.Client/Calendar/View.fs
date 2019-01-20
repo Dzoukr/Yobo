@@ -84,8 +84,14 @@ module Calendar =
                     "Odhlašování z lekce je již zavřeno. Lze se pouze přihlašovat." |> str |> SharedView.infoBox
                 else str ""
 
-        div [ ClassName "popover is-popover-bottom"] [
-            div [ ClassName "popover-trigger lesson-overview" ] [
+        let popoverClass =
+            match lesson.StartDate.DayOfWeek with
+            | DayOfWeek.Monday -> "is-popover-right"
+            | DayOfWeek.Sunday -> "is-popover-left"
+            | _ -> "is-popover-bottom"
+
+        div [ ClassName (sprintf "popover %s" popoverClass) ] [
+            div [ ClassName "popover-trigger lesson" ] [
 
                 div [ ClassName "time" ] [
                     lesson.StartDate |> SharedView.toCzTime |> str
@@ -120,8 +126,8 @@ module Calendar =
         ]
 
     let navigation (state:State) dispatch =
-        Columns.columns [ Columns.Option.CustomClass "cal-control" ] [
-            Column.column [ ] [
+        tr [ ClassName "controls" ] [
+            td [ ColSpan 7 ] [
                 Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-left" ] [ ]
                 ]
@@ -145,13 +151,13 @@ module Calendar =
             | DayOfWeek.Saturday -> "Sobota"
             | DayOfWeek.Sunday -> "Neděle"
             | _ -> ""
-        Column.column [ ] [
-            div [] [ str n ]
-            div [] [ date.ToString("dd. MM. yyyy") |> str ]
+        td [ ] [
+            div [ ClassName "name" ] [ str n ]
+            div [ ClassName "date" ] [ date.ToString("dd. MM. yyyy") |> str ]
         ]
 
     let col user (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
-        Column.column [ ] [
+        td [ ] [
             div [] (lessons |> List.map (lessonDiv user dispatch))
         ]
 
@@ -161,16 +167,18 @@ module Calendar =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
-        let headerRow = dates |> List.map headerCol |> Columns.columns [ Columns.CustomClass "cal-day" ] 
+        
+
+        let headerRow = dates |> List.map headerCol |> tr [ ClassName "header" ] 
         let row =
             dates
             |> List.map (fun x ->
                 let lsns = x |> getLessonsForDate
                 col user lsns dispatch x
             )
-            |> Columns.columns [ Columns.CustomClass "cal-lessons" ] 
+            |> tr [ ClassName "day" ] 
 
-        div [] [
+        Table.table [ Table.CustomClass "is-fullwidth is-bordered table-calendar" ] [
             yield navigation state dispatch
             yield headerRow
             yield row

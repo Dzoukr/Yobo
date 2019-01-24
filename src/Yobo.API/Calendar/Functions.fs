@@ -5,6 +5,7 @@ open Yobo.Shared.Calendar.Domain
 open FSharp.Rop
 open Yobo.Core.Users
 open Yobo.Core
+open Yobo.Core.CQRS
 open Yobo.Shared.Calendar
 open Yobo.Shared.Communication
 

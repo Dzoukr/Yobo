@@ -4,7 +4,7 @@ open Yobo.Core.EventStoreCommandHandler
 open Yobo.Core.Users
 open Yobo.Libraries.Security.SymetricCryptoProvider
 
-let private getId = function
+let private getIdFromCmd = function
     | Register args -> args |> Extractor.getIdFromCommand
     | RegenerateActivationKey args -> args |> Extractor.getIdFromCommand
     | Activate args -> args |> Extractor.getIdFromCommand
@@ -14,35 +14,43 @@ let private getId = function
     | BlockCashReservations args -> args |> Extractor.getIdFromCommand
     | UnblockCashReservations args -> args |> Extractor.getIdFromCommand
 
+let private getIdFromEvn = function
+    | Registered args -> args |> Extractor.getIdFromCommand
+    | ActivationKeyRegenerated args -> args |> Extractor.getIdFromCommand
+    | Activated args -> args |> Extractor.getIdFromCommand
+    | CreditsAdded args -> args |> Extractor.getIdFromCommand
+    | CreditsWithdrawn args -> args |> Extractor.getIdFromCommand
+    | CreditsRefunded args -> args |> Extractor.getIdFromCommand
+    | CashReservationsBlocked args -> args |> Extractor.getIdFromCommand
+    | CashReservationsUnblocked args -> args |> Extractor.getIdFromCommand
+
 let private settings cryptoProvider = {
     Aggregate = {
         Init = State.Init
         Execute = Aggregate.execute
         Apply = Aggregate.apply
     }
-    GetStreamId = getId >> sprintf "%s%s" EventSerializer.streamPrefix
+    StreamIdReader = {
+        FromEvent = getIdFromEvn >> sprintf "%s%s" EventSerializer.streamPrefix
+        FromCommand = getIdFromCmd >> sprintf "%s%s" EventSerializer.streamPrefix
+    }
     Serializer = {
         EventToData = EventSerializer.toData cryptoProvider
         DataToEvent = EventSerializer.toEvent cryptoProvider
     }
     Validators = [ ]
-    RollbackEvents =
-        fun state cmd ->
-            match cmd with
-            | WithdrawCredits args -> CreditsRefunded { Id = args.Id; Amount = args.Amount; LessonId = args.LessonId } |> List.singleton
-            | RefundCredits args -> CreditsWithdrawn { Id = args.Id; Amount = args.Amount; LessonId = args.LessonId } |> List.singleton
-            | BlockCashReservations args -> CashReservationsUnblocked { Id = args.Id } |> List.singleton
-            | UnblockCashReservations args ->
-                if state.LastCashBlockingDate.IsSome then
-                    CashReservationsBlocked { Id = args.Id; Expires = state.LastCashBlockingDate.Value } |> List.singleton
-                else []
-            | _ -> []
+    TryGetRollbackEvent =
+        fun state evn ->
+            match evn with
+            | CreditsWithdrawn args -> CreditsRefunded { Id = args.Id; Amount = args.Amount; LessonId = args.LessonId } |> Some
+            | CreditsRefunded args -> CreditsWithdrawn { Id = args.Id; Amount = args.Amount; LessonId = args.LessonId } |> Some
+            | CashReservationsBlocked args -> CashReservationsUnblocked { Id = args.Id } |> Some
+            | CashReservationsUnblocked args ->
+                if state.LastCashBlocking.IsSome then
+                    CashReservationsBlocked { Id = args.Id; Expires = snd state.LastCashBlocking.Value; LessonId = fst state.LastCashBlocking.Value } |> Some
+                else None
+            | _ -> None
 }
 
-let private cmdBuilder _ = function
-    | Register args -> Registry.Add { UserId = args.Id; Email = args.Email } |> Some
-    | _ -> None
-
 let get (cryptoProvider:SymetricCryptoProvider) store =
-    let registryHandler = store |> Registry.CommandHandler.get
-    store |> getRollbackCommandHandler (settings cryptoProvider) registryHandler cmdBuilder
+    store |> getCommandHandler (settings cryptoProvider)

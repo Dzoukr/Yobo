@@ -1,5 +1,7 @@
 module Yobo.Core.DbEventHandler
 
+open Yobo.Core.CQRS
+
 let private safeExecute (ctx:ReadDb.Db.dataContext) (fn:ReadDb.Db.dataContext -> unit) =
     try
         ctx |> fn |> Ok
@@ -12,4 +14,5 @@ let getHandler (connString:string) =
         match cmd with
         | CoreEvent.Users e -> e |> Users.DbEventHandler.handle |> safeExecute ctx
         | CoreEvent.Lessons e -> e |> Lessons.DbEventHandler.handle |> safeExecute ctx
+        | CoreEvent.UsersRegistry _ -> Ok ()
     handle

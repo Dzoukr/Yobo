@@ -43,8 +43,6 @@ let getValidLessonsToAdd (state:State) =
     |> Result.partition
     |> fst
 
-
-
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
     | Init -> state, LoadLessons |> Cmd.ofMsg
@@ -91,4 +89,8 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
                             LoadLessons |> Cmd.ofMsg ]
                      |> Cmd.batch
         | Error e -> state, (e |> SharedView.serverErrorToToast)
+    | CancelLesson id ->
+        state, (id |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.CancelLesson LessonCancelled)
+    | LessonCancelled res ->
+        state, [ (res |> SharedView.resultToToast "Lekce byla úspěšně zrušena"); LoadLessons |> Cmd.ofMsg ] |> Cmd.batch
                 

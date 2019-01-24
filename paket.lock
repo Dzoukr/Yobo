@@ -71,7 +71,7 @@ NUGET
     FSharp.Control.Reactive (4.1)
       FSharp.Core (>= 4.2.3)
       System.Reactive (>= 4.0)
-    FSharp.Core (4.5.4)
+    FSharp.Core (4.6)
     Microsoft.Build (15.9.20)
       Microsoft.Build.Framework (>= 15.9.20)
       Microsoft.Win32.Registry (>= 4.3)
@@ -116,7 +116,7 @@ NUGET
       System.Memory (>= 4.5)
       System.Security.AccessControl (>= 4.5)
       System.Security.Principal.Windows (>= 4.5)
-    MSBuild.StructuredLogger (2.0.64)
+    MSBuild.StructuredLogger (2.0.68)
       Microsoft.Build (>= 15.8.166)
       Microsoft.Build.Framework (>= 15.8.166)
       Microsoft.Build.Tasks.Core (>= 15.8.166)
@@ -625,7 +625,7 @@ NUGET
       Fable.Core (>= 2.0)
       Fable.Parsimmon (>= 3.1)
       FSharp.Core (>= 4.5.2)
-    FSharp.Core (4.5.4)
+    FSharp.Core (4.6)
     Fulma (1.1)
       Fable.Core (>= 2.0.2)
       Fable.React (>= 4.1.3)
@@ -656,11 +656,11 @@ NUGET
       System.Reactive (>= 4.0)
       TaskBuilder.fs (>= 2.0)
       WindowsAzure.Storage (>= 9.0)
-    FSharp.Core (4.5.4)
+    FSharp.Core (4.6)
     Fue (1.7)
       FSharp.Core (>= 4.2.3)
       HtmlAgilityPack (>= 1.5.2)
-    HtmlAgilityPack (1.8.13)
+    HtmlAgilityPack (1.8.14)
       System.Net.Http (>= 4.3.2)
       System.Xml.XmlDocument (>= 4.3)
       System.Xml.XPath (>= 4.3)
@@ -1311,26 +1311,26 @@ NUGET
       Newtonsoft.Json (>= 10.0.2)
 GITHUB
   remote: Dzoukr/FSharp.Rop
-    FSharp.Rop.fs (c6f75e0eaf37b24a7230f3cc1348cae5d40b51e3)
+    FSharp.Rop.fs (361beaa4ac56dd362244475740fbf75de6705d66)
 GROUP Libraries
 STORAGE: NONE
 RESTRICTION: == netstandard2.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (4.5.4)
+    FSharp.Core (4.6)
     Mailjet.Api (1.2.2)
       NETStandard.Library (>= 1.6.1)
       Newtonsoft.Json (>= 9.0.1)
-    Microsoft.IdentityModel.JsonWebTokens (5.3)
-      Microsoft.IdentityModel.Tokens (>= 5.3)
+    Microsoft.IdentityModel.JsonWebTokens (5.4)
+      Microsoft.IdentityModel.Tokens (>= 5.4)
       Newtonsoft.Json (>= 10.0.1)
-    Microsoft.IdentityModel.Logging (5.3)
+    Microsoft.IdentityModel.Logging (5.4)
       System.Diagnostics.Tracing (>= 4.3)
       System.Globalization (>= 4.3)
       System.IO (>= 4.3)
       System.IO.FileSystem (>= 4.3)
-    Microsoft.IdentityModel.Tokens (5.3)
-      Microsoft.IdentityModel.Logging (>= 5.3)
+    Microsoft.IdentityModel.Tokens (5.4)
+      Microsoft.IdentityModel.Logging (>= 5.4)
       Newtonsoft.Json (>= 10.0.1)
       System.Collections (>= 4.3)
       System.Diagnostics.Tools (>= 4.3)
@@ -1426,9 +1426,9 @@ NUGET
       Microsoft.NETCore.Targets (>= 1.1)
       System.Globalization (>= 4.3)
       System.Runtime (>= 4.3)
-    System.IdentityModel.Tokens.Jwt (5.3)
-      Microsoft.IdentityModel.JsonWebTokens (>= 5.3)
-      Microsoft.IdentityModel.Tokens (>= 5.3)
+    System.IdentityModel.Tokens.Jwt (5.4)
+      Microsoft.IdentityModel.JsonWebTokens (>= 5.4)
+      Microsoft.IdentityModel.Tokens (>= 5.4)
       Newtonsoft.Json (>= 10.0.1)
     System.IO (4.3)
       Microsoft.NETCore.Platforms (>= 1.1)
@@ -1739,7 +1739,7 @@ NUGET
       Newtonsoft.Json (>= 10.0.2)
 GITHUB
   remote: Dzoukr/FSharp.Rop
-    FSharp.Rop.fs (c6f75e0eaf37b24a7230f3cc1348cae5d40b51e3)
+    FSharp.Rop.fs (361beaa4ac56dd362244475740fbf75de6705d66)
 GROUP Server
 STORAGE: NONE
 RESTRICTION: == netcoreapp2.2
@@ -1756,7 +1756,7 @@ NUGET
     Fable.Remoting.Server (4.4)
       Fable.Remoting.Json (>= 2.2)
       FSharp.Core (>= 4.3.4)
-    FSharp.Core (4.5.4)
+    FSharp.Core (4.6)
     Giraffe (3.5.1)
       FSharp.Core (>= 4.5.2)
       Microsoft.AspNetCore.Authentication (>= 2.2)
@@ -2229,10 +2229,10 @@ STORAGE: NONE
 RESTRICTION: == netstandard2.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (4.5.4)
+    FSharp.Core (4.6)
 GITHUB
   remote: Dzoukr/FSharp.Rop
-    FSharp.Rop.fs (c6f75e0eaf37b24a7230f3cc1348cae5d40b51e3)
+    FSharp.Rop.fs (361beaa4ac56dd362244475740fbf75de6705d66)
 GROUP Tools
 RESTRICTION: == netcoreapp2.2
 NUGET

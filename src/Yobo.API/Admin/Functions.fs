@@ -5,6 +5,7 @@ open Yobo.Shared.Admin.Domain
 open FSharp.Rop
 open Yobo.Core.Users
 open Yobo.Core
+open Yobo.Core.CQRS
 open Yobo.Shared.Admin
 open Yobo.Shared.Communication
 
@@ -45,5 +46,11 @@ let addLessons cmdHandler (acc:AddLesson list) =
     result {
         let! args = acc |> Result.traverse ArgsBuilder.buildAddLessons
         let! _ = args |> Result.traverse (Lessons.Command.Create >> CoreCommand.Lessons >> cmdHandler)
+        return ()
+    }
+
+let cancelLesson cmdHandler (i:Guid) =
+    result {
+        let! _ = ({ Id = i } : Lessons.CmdArgs.Cancel) |> Lessons.Command.Cancel |> CoreCommand.Lessons |> cmdHandler
         return ()
     }

@@ -44,9 +44,6 @@ module Calendar =
                 let forOne =
                     Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
                         [ str "Rezervovat" ]
-                //let forTwo =
-                //    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForTwo } |> AddReservation |> dispatch ) ] ]
-                //        [ str "+1" ]
 
                 match user.Credits, user.CashReservationBlockedUntil, lesson.Availability with
                 | 0, Some d, Free | 0, Some d, LastFreeSpot ->
@@ -166,8 +163,6 @@ module Calendar =
         let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
-
-        
 
         let headerRow = dates |> List.map headerCol |> tr [ ClassName "header" ] 
         let row =

@@ -29,7 +29,7 @@ with
 type Msg =
     | Init
     | LoadLessons
-    | LessonsLoaded of Result<Lesson list, ServerError>
+    | LessonsLoaded of ServerResult<Lesson list>
     | WeekOffsetChanged of int
     | DateSelected of DateTimeOffset
     | DateUnselected of DateTimeOffset
@@ -39,4 +39,6 @@ type Msg =
     | NameChanged of string
     | DescriptionChanged of string
     | SubmitLessonsForm
-    | LessonsFormSubmitted of Result<unit, ServerError>
+    | LessonsFormSubmitted of ServerResult<unit>
+    | CancelLesson of Guid
+    | LessonCancelled of ServerResult<unit>

@@ -15,6 +15,7 @@ type DomainError =
     | LessonIsClosed
     | NotEnoughCredits
     | CashReservationIsBlocked
+    | LessonIsAlreadyCancelled
     with
         member x.Explain() =
             match x with
@@ -30,6 +31,7 @@ type DomainError =
             | LessonIsClosed -> "Lekce je již uzavřena."
             | NotEnoughCredits -> "Nemáte dostatek kreditů."
             | CashReservationIsBlocked -> "Rezervaci v hotovosti nelze provést."
+            | LessonIsAlreadyCancelled -> "Lekce je již zrušena."
 
 type User = {
     Id : Guid

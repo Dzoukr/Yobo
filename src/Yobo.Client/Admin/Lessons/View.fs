@@ -15,7 +15,56 @@ module Calendar =
     open Yobo.Client
     open Yobo.Shared.Domain
 
-    let col isSelected (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
+    let col dispatch (lessons:Lesson list) (date:DateTimeOffset) =
+        let lessonDiv (lesson:Lesson) =
+            let cap = sprintf "%i / 12" lesson.Reservations.Length
+            let res (u:User,r:UserReservation) =
+                let _,useCredits = r.ToIntAndBool
+                let cInfo = if not useCredits then "- (hotově)" else ""
+                div [] [
+                    i [ ClassName "fas fa-user"; Style [ MarginRight 5 ] ] []
+                    sprintf "%s %s %s" u.FirstName u.LastName cInfo |> str
+                ]
+
+            let tagColor =
+                match lesson.Reservations.Length with
+                | 0 -> Tag.Color IsBlack
+                | x when x > 0 && x < 12 -> Tag.Color IsWarning
+                | _ -> Tag.Color IsSuccess
+
+            let cancelBtn =
+                if lesson.StartDate > DateTimeOffset.Now then
+                    Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelLesson(lesson.Id) |> dispatch) ] ] [
+                        str "Zrušit lekci"
+                    ]
+                else "Lekce již proběhla" |> str |> SharedView.infoBox
+
+            div [ ClassName "popover is-popover-bottom" ][
+                div [ ClassName "popover-trigger lesson" ] [
+                    div [ ClassName "time" ] [
+                        lesson.StartDate |> SharedView.toCzTime |> str
+                        str " - "
+                        lesson.EndDate |> SharedView.toCzTime |> str
+                        span [ ClassName "availability"; Style [ MarginLeft 5] ] [
+                            Tag.tag [ tagColor ] [ str cap ]
+                        ]
+                    ]
+                    div [ ClassName "name"] [ str lesson.Name ]
+                    div [] (lesson.Reservations |> List.map res)
+                ]
+                div [ ClassName "popover-content" ] [
+                    cancelBtn
+                ]
+            ]
+
+            
+        td [ ] [
+            
+            div [] (lessons |> List.map lessonDiv)
+        ]
+
+    let headerCol (state:State) (dispatch : Msg -> unit) (date:DateTimeOffset) =
+        let isSelected = state.SelectedDates |> List.tryFind (fun y -> date = y) |> Option.isSome
         let checkBox =
             let cmd = if isSelected then DateUnselected else DateSelected 
             if date >= DateTimeOffset.Now.StartOfTheDay() then
@@ -28,31 +77,6 @@ module Calendar =
                     Label.label [ Label.Option.For i ] [ str ""]
                 ]
             else str ""
-
-        let lessonDiv (lesson:Lesson) =
-            let st = lesson.StartDate |> SharedView.toCzTime
-            let en = lesson.EndDate |> SharedView.toCzTime
-            let cap = sprintf "Přihlášeno %i z 12" lesson.Reservations.Length
-            let res (u:User,r:UserReservation) =
-                let c,useCredits = r.ToIntAndBool
-                let cInfo = if not useCredits then "(hotově)" else ""
-                div [] [
-                    sprintf "%s %s - %ix %s" u.FirstName u.LastName c cInfo |> str
-                ]
-
-            div [] [
-                div [] [ sprintf "%s - %s" st en |> str ]
-                div [] [ cap |> str ]
-                div [] (lesson.Reservations |> List.map res)
-                hr []
-            ]
-
-        Column.column [ ] [
-            checkBox
-            div [] (lessons |> List.map lessonDiv)
-        ]
-
-    let headerCol (date:DateTimeOffset) =
         let n =
             match date.DayOfWeek with
             | DayOfWeek.Monday -> "Pondělí"
@@ -63,9 +87,10 @@ module Calendar =
             | DayOfWeek.Saturday -> "Sobota"
             | DayOfWeek.Sunday -> "Neděle"
             | _ -> ""
-        Column.column [] [
-            div [] [ str n ]
-            div [] [ date |> SharedView.toCzDate |> str ]
+        td [ ] [
+            div [] [ checkBox ]
+            div [ ClassName "name" ] [ str n ]
+            div [ ClassName "date" ] [ date.ToString("dd. MM. yyyy") |> str ]
         ]
         
 
@@ -76,8 +101,8 @@ module Calendar =
                     state.SelectedDates.Length |> sprintf "Přidat %i lekcí" |> str
                 ]
             else str ""
-        Columns.columns [] [
-            Column.column [ ] [
+        tr [ ClassName "controls" ] [
+            td [ ColSpan 7 ] [
                 Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-left" ] [ ]
                 ]
@@ -215,18 +240,20 @@ module Calendar =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
-        let headerRow = dates |> List.map headerCol |> Columns.columns [] 
+        let headerRow =
+            dates
+            |> List.map (headerCol state dispatch)
+            |> tr [ ClassName "header" ]
+
         let row =
             dates
             |> List.map (fun x ->
                 let lsns = x |> getLessonsForDate
-                let isSelected = state.SelectedDates |> List.tryFind (fun y -> x = y) |> Option.isSome
-                col isSelected lsns dispatch x
-
+                col dispatch lsns x
             )
-            |> Columns.columns [] 
+            |> tr [ ClassName "day" ]
 
-        div [] [
+        Table.table [ Table.CustomClass "is-fullwidth is-bordered table-calendar" ] [
             yield lessonsForm state dispatch
             yield navigation state dispatch
             yield headerRow

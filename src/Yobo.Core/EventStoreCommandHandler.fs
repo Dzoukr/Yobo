@@ -7,7 +7,7 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Domain
 open FSharp.Rop
 open CosmoStore
-open FSharp.Control.Tasks.V2
+open FSharp.Control.Tasks
 open Yobo.Core.Metadata
 
 type EventStoreError = 
@@ -29,17 +29,23 @@ type EventSerializer<'event> = {
     DataToEvent : string * JToken -> 'event
 }
 
-type CommandHandlerSettings<'state, 'command, 'event> = {
-    Aggregate : Aggregate<'state, 'command, 'event>
-    GetStreamId : 'command -> string
-    Serializer : EventSerializer<'event>
-    Validators : ('command -> Result<'command, ValidationError list>) list
-    RollbackEvents : 'state -> 'command -> 'event list
+type StreamIdReader<'command, 'event> = {
+    FromCommand : 'command -> string
+    FromEvent : 'event -> string
 }
 
-type CommandHandler<'command, 'event> = {
+type CommandHandlerSettings<'state, 'command, 'event> = {
+    Aggregate : Aggregate<'state, 'command, 'event>
+    StreamIdReader : StreamIdReader<'command, 'event>
+    Serializer : EventSerializer<'event>
+    Validators : ('command -> Result<'command, ValidationError list>) list
+    TryGetRollbackEvent : 'state -> 'event -> 'event option
+}
+
+type CommandHandler<'state, 'command, 'event> = {
     HandleCommand : Metadata -> Guid -> 'command -> Result<'event list, CommandHandlerError>
-    ApplyRollbackEvents : Metadata -> Guid -> 'command -> Result<unit, CommandHandlerError>
+    CompensateEvent : Metadata -> Guid -> 'event -> Result<unit, CommandHandlerError>
+    GetState : 'command -> Result<'state, CommandHandlerError>
 }
 
 let private runValidators validators cmd =
@@ -77,22 +83,21 @@ let private getCurrentStateAndPosition<'state, 'event> (toEvent:string * JToken 
 
 let getCommandHandler<'state,'command, 'event>
     (settings:CommandHandlerSettings<'state, 'command, 'event>)
-    (eventStore:EventStore) : CommandHandler<'command, 'event> =
+    (eventStore:EventStore) : CommandHandler<'state, 'command, 'event> =
 
     // state reader
     let getCurrentStateFn = getCurrentStateAndPosition settings.Serializer.DataToEvent settings.Aggregate.Init settings.Aggregate.Apply eventStore
 
-    let applyRollbackEvents meta corrId cmd =
+    let compensateEvent meta corrId (evn:'event) =
         task {
             try
-                let streamId = cmd |> settings.GetStreamId
+                let streamId = evn |> settings.StreamIdReader.FromEvent
                 let! state,_ = streamId |> getCurrentStateFn
-                let! _ =
-                    cmd
-                    |> settings.RollbackEvents state
-                    |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
-                    |> eventStore.AppendEvents streamId Any
-                return Ok ()
+                match evn |> settings.TryGetRollbackEvent state with
+                | None -> return Ok ()
+                | Some e ->
+                    let! _ = e |> settings.Serializer.EventToData |> toEventWrite meta corrId |> eventStore.AppendEvent streamId Any
+                    return Ok ()
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
@@ -101,7 +106,7 @@ let getCommandHandler<'state,'command, 'event>
             try
                 match cmd |> runValidators settings.Validators with
                 | Ok cmd ->
-                    let streamId = cmd |> settings.GetStreamId
+                    let streamId = cmd |> settings.StreamIdReader.FromCommand
                     let! state,position = streamId |> getCurrentStateFn
                     match cmd |> settings.Aggregate.Execute state with
                     | Ok newEvents ->
@@ -112,64 +117,21 @@ let getCommandHandler<'state,'command, 'event>
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
-    {
-        HandleCommand = fun m c -> handleCmd m c >> Async.AwaitTask >> Async.RunSynchronously
-        ApplyRollbackEvents = fun m c -> applyRollbackEvents m c >> Async.AwaitTask >> Async.RunSynchronously
-    }
-
-let getRollbackCommandHandler<'state, 'command, 'event, 'innerCommand, 'innerEvent>
-    (settings:CommandHandlerSettings<'state, 'command, 'event>)
-    (innerCmdHandler:CommandHandler<'innerCommand, 'innerEvent>)
-    (innerCmdBuilder:'state -> 'command -> 'innerCommand option)
-    (eventStore:EventStore) : CommandHandler<'command, 'event> =
-
-    // state reader
-    let getCurrentStateFn = getCurrentStateAndPosition settings.Serializer.DataToEvent settings.Aggregate.Init settings.Aggregate.Apply eventStore
-
-    let applyRollbackEvents meta corrId cmd =
+    let getState c =
         task {
             try
-                let streamId = cmd |> settings.GetStreamId
-                let! state,_ = streamId |> getCurrentStateFn
-                let! _ =
-                    cmd
-                    |> settings.RollbackEvents state
-                    |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId)
-                    |> eventStore.AppendEvents streamId Any
-                return Ok ()
+                let! s,_ = c |> settings.StreamIdReader.FromCommand |> getCurrentStateFn
+                return Ok s
             with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
         }
 
-    let handleCmd meta corrId (cmd:'command) =
-        task {
-            let errorWithRollback (innerCmd:'innerCommand option) err =
-                if innerCmd.IsSome then innerCmdHandler.ApplyRollbackEvents meta corrId innerCmd.Value |> ignore
-                err |> Error
-
-            try
-                match cmd |> runValidators settings.Validators with
-                | Ok cmd ->
-                    let streamId = cmd |> settings.GetStreamId
-                    let! state,position = streamId |> getCurrentStateFn
-                    let innerCmd = cmd |> innerCmdBuilder state
-                    match innerCmd |> Option.map (innerCmdHandler.HandleCommand meta corrId) |> Option.defaultValue (Ok []) with
-                    | Ok _ ->
-                        try
-                            match cmd |> settings.Aggregate.Execute state with
-                            | Ok newEvents ->
-                                let! _ = newEvents |> List.map (settings.Serializer.EventToData >> toEventWrite meta corrId) |> eventStore.AppendEvents streamId (Exact position)
-                                return Ok newEvents
-                            | Error e -> return e |> CommandHandlerError.DomainError |> errorWithRollback innerCmd
-                        with ex -> return (EventStoreError.General(ex) |> EventStoreError |> errorWithRollback innerCmd)
-                    | Error e -> return e |> Error
-                | Error e -> return e |> Error
-            with ex -> return (EventStoreError.General(ex) |> EventStoreError |> Error)
-        }
 
     {
         HandleCommand = fun m c -> handleCmd m c >> Async.AwaitTask >> Async.RunSynchronously
-        ApplyRollbackEvents = fun m c -> applyRollbackEvents m c >> Async.AwaitTask >> Async.RunSynchronously
+        CompensateEvent = fun m c -> compensateEvent m c >> Async.AwaitTask >> Async.RunSynchronously
+        GetState = getState >> Async.AwaitTask >> Async.RunSynchronously
     }
+
 
 
 module Extractor =

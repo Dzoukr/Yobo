@@ -43,6 +43,10 @@ let private onlyIfCanBeCancelled userId state =
             else Ok state
         | None -> DomainError.LessonIsNotReserved |> Error
 
+let private onlyIfNotAlreadyCancelled state =
+    if state.IsCancelled then DomainError.LessonIsAlreadyCancelled |> Error
+    else Ok state
+
 
 let execute (state:State) = function
     | Create args ->
@@ -61,8 +65,15 @@ let execute (state:State) = function
         >>= onlyIfCanBeCancelled args.UserId
         <!> (fun _ -> ReservationCancelled args)
         <!> List.singleton
+    | Cancel args ->
+        onlyIfDoesExist state
+        >>= onlyIfNotAlreadyCancelled
+        <!> (fun _ -> Cancelled args)
+        <!> List.singleton
     
 let apply (state:State) = function
     | Created args -> { state with Id = args.Id; StartDate = args.StartDate; EndDate = args.EndDate }
     | ReservationAdded args -> { state with Reservations = (args.UserId, args.Count, args.UseCredits) :: state.Reservations}
     | ReservationCancelled args -> { state with Reservations = state.Reservations |> List.filter (fun (x,_,_) -> x <> args.UserId ) }
+    | Cancelled _ -> { state with Reservations = []; IsCancelled = true }
+    | Reopened _ -> { state with Reservations = []; IsCancelled = false }

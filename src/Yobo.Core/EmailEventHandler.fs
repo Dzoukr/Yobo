@@ -1,6 +1,7 @@
 module Yobo.Core.EmailEventHandler
 
 open Yobo.Libraries.Emails
+open Yobo.Core.CQRS
 
 let getHandler (userQueries:Users.ReadQueries.UserQueries<_>) (sender:EmailProvider) (settings:EmailSettings.Settings) =
 
@@ -11,5 +12,6 @@ let getHandler (userQueries:Users.ReadQueries.UserQueries<_>) (sender:EmailProvi
     let handle cmd =
         match cmd with
         | CoreEvent.Users e -> e |> Users.EmailEventHandler.handle userQueries settings |> send
-        | CoreEvent.Lessons _ -> Ok ()
+        | CoreEvent.Lessons _
+        | CoreEvent.UsersRegistry _ -> Ok ()
     handle

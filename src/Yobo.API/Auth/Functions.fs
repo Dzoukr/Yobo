@@ -4,7 +4,7 @@ open System
 open Yobo.Shared.Auth.Domain
 open FSharp.Rop
 open Yobo.Core.Users
-open Yobo.Core
+open Yobo.Core.CQRS
 open Yobo.Shared.Auth
 open System.Security.Claims
 open Yobo.Shared.Communication

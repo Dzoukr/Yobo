@@ -8,17 +8,20 @@ let private settings = {
         Execute = Aggregate.execute
         Apply = Aggregate.apply
     }
-    GetStreamId = (fun _ -> sprintf "UserEmails")
+    StreamIdReader = {
+        FromEvent = (fun _ -> sprintf "UserEmails")
+        FromCommand = (fun _ -> sprintf "UserEmails")
+    }
     Serializer = {
         EventToData = EventSerializer.toData
         DataToEvent = EventSerializer.toEvent
     }
     Validators = [ CommandValidator.validate ]
-    RollbackEvents =
-        fun _ cmd ->
-            match cmd with
-            | Add args -> Removed { UserId = args.UserId; Email = args.Email } |> List.singleton
-            | _ -> []
+    TryGetRollbackEvent =
+        fun _ evn ->
+            match evn with
+            | Added args -> Removed { UserId = args.UserId; Email = args.Email } |> Some
+            | _ -> None
 }
 
 let get = getCommandHandler settings

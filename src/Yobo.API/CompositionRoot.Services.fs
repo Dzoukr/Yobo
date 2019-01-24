@@ -10,6 +10,7 @@ open FSharp.Rop
 open Yobo.API
 open Yobo.Core.Data
 open Yobo.Shared.Domain
+open Yobo.Core.CQRS
 
 // services
 let private eventStore = Configuration.EventStore.get |> CosmoStore.TableStorage.EventStore.getEventStore
@@ -67,7 +68,7 @@ module EventHandler =
 module CommandHandler =
     open Yobo.Core.Metadata
 
-    let private handleFn = CommandHandler.getHandleFn cryptoProvider eventStore
+    let private handleFn = CommandHandler.getHandler cryptoProvider eventStore
     let handle (meta:Metadata) cmd = cmd |> handleFn meta (Guid.NewGuid()) |> Result.mapError cmdHandlerErrorToServerError
     let handleAnonymous = handle (Metadata.CreateAnonymous())
     let handleForUser userId = handle (Metadata.Create userId)

@@ -55,8 +55,8 @@ module EventHandler =
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.connectionString
     let private emailHandleFn = EmailEventHandler.getHandler Users.queries emailService emailSettings
     let handle evn =
-        evn |> dbHandleFn |> ignore
         evn |> emailHandleFn |> ignore
+        evn |> dbHandleFn |> ignore
 
     eventStore.EventAppended.Add(function
         | LessonsEvent evn -> evn |> CoreEvent.Lessons |> handle

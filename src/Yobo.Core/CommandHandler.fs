@@ -17,7 +17,6 @@ module Users =
         | _ -> Direct
 
 module Lessons =
-    open Yobo.Core.EventStoreCommandHandler
     open Yobo.Core.Lessons
 
     let getSaga lessonsHandler cmd =
@@ -53,7 +52,7 @@ module Lessons =
             cmd |> lessonsHandler.GetState
             <!> (fun x -> x.Reservations)
             <!> List.map (toCmd >> CoreCommand.Users)
-            <!> BatchBefore
+            <!> BatchAfter
         | _ -> Ok Direct
         
 let getSagaSetup (cryptoProvider:SymetricCryptoProvider) (eventStore:EventStore) = 

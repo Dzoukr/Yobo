@@ -10,12 +10,20 @@ let private getReservationById (ctx:ReadDb.Db.dataContext) userId lessonId =
         select x
     } |> Seq.head
 
+let private getReservationsById (ctx:ReadDb.Db.dataContext) lessonId =
+    query {
+        for x in ctx.Dbo.LessonReservations do
+        where (x.LessonId = lessonId)
+        select x
+    }
+
 let private getById (ctx:ReadDb.Db.dataContext) lessonId =
     query {
         for x in ctx.Dbo.Lessons do
         where (x.Id = lessonId)
         select x
     } |> Seq.head
+
 
 let created (args:CmdArgs.Create) (ctx:ReadDb.Db.dataContext) =
     let item = ctx.Dbo.Lessons.Create()
@@ -45,6 +53,9 @@ let reservationCancelled (args:CmdArgs.CancelReservation) (ctx:ReadDb.Db.dataCon
 let cancelled (args:CmdArgs.Cancel) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.IsCancelled <- true
+    args.Id 
+    |> getReservationsById ctx 
+    |> Seq.iter (fun x -> x.Delete())
     ctx.SubmitUpdates()
 
 let reopened (args:CmdArgs.Reopen) (ctx:ReadDb.Db.dataContext) =

@@ -31,6 +31,7 @@ let internal lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) 
         StartDate = u.StartDate
         EndDate = u.EndDate
         Reservations = u.``dbo.LessonReservations by Id`` |> Seq.map reservationFromDbEntity |> Seq.toList
+        IsCancelled = u.IsCancelled
     }
 
 let private getAllForDateRange (st, en) (ctx:ReadDb.Db.dataContext) =

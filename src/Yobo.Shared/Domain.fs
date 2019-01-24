@@ -66,4 +66,5 @@ type Lesson = {
     Name : string
     Description : string
     Reservations : (User * UserReservation) list
+    IsCancelled : bool
 }

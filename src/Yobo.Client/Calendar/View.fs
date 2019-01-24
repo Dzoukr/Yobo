@@ -12,83 +12,86 @@ open Yobo.Shared.Domain
 module Calendar =
     open Yobo.Shared.Calendar.Domain
 
-    let lessonDiv (user:User) dispatch (lesson:Lesson) =
-        let lessonAlreadyStarted = DateTimeOffset.Now > lesson.StartDate
-        let lessonCancellingDate = lesson.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
-        let lessonCancellingClosed = lessonAlreadyStarted || DateTimeOffset.Now > lessonCancellingDate
+    type private BookAllowed =
+        | Cash
+        | Credit
 
+    type private LessonState =
+        | Cancelled
+        | AlreadyStarted of userBooked:bool
+        | Reserved of cancelAllowed:bool
+        | NotReserved of Availability option * bookAllowed:BookAllowed option * cancelAllowed:bool
+
+    let private toLessonState (user:User) (lesson:Lesson) =
+        let alreadyStarted = DateTimeOffset.Now > lesson.StartDate
+        let cancellingDate = lesson.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
+        let cancellingClosed = alreadyStarted || DateTimeOffset.Now > cancellingDate
+
+        let bookAllowed =
+            match lesson.Availability with
+            | None -> None
+            | Some _ ->
+                match user.Credits, user.CashReservationBlockedUntil with
+                | 0, Some d -> if DateTimeOffset.Now > d then Some Cash else None
+                | 0, None -> Some Cash
+                | x, _ when x > 0 -> Some Credit
+                | _ -> None
+
+        if lesson.IsCancelled then LessonState.Cancelled
+        else if alreadyStarted then LessonState.AlreadyStarted(lesson.UserReservation.IsSome)
+        else if lesson.UserReservation.IsSome then LessonState.Reserved(not cancellingClosed)
+        else NotReserved(lesson.Availability, bookAllowed, not cancellingClosed)
+
+    let lessonDiv (user:User) dispatch (lesson:Lesson) =
+
+        let lessonState = lesson |> toLessonState user
+        
         let st = lesson.StartDate |> SharedView.toCzTime
         let en = lesson.EndDate |> SharedView.toCzTime
+
         let avail =
-            if lessonAlreadyStarted then
-                match lesson.UserReservation with
-                | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste + 1" ]
-                | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste" ]
-                | None -> str ""
-            else
-                match lesson.UserReservation with
-                | None ->
-                    match lesson.Availability with
-                    | Free -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volno" ]
-                    | LastFreeSpot -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
-                    | Full -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již obsazena" ]
-                | Some(ForTwo) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás + 1" ]
-                | Some(ForOne _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
+            match lessonState with
+            | Cancelled -> Tag.tag [ Tag.Color IsBlack ] [ str "Lekce je zrušena" ]
+            | AlreadyStarted(true) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste se" ]
+            | AlreadyStarted(false) -> str ""
+            | Reserved _ -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
+            | NotReserved(Some Free, _, _) -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volno" ]
+            | NotReserved(Some LastFreeSpot, _, _) -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
+            | NotReserved(None, _, _) -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již obsazena" ]
 
         let bookBtn =
-
-            let items =
-                let forOneCash =
-                    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
+            match user.IsAdmin, lessonState with
+            | false, NotReserved(_,Some Cash,_) -> 
+                Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
                         [ str "Rezervovat (platba v hotovosti)" ]
-                let forOne =
-                    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
-                        [ str "Rezervovat" ]
-
-                match user.Credits, user.CashReservationBlockedUntil, lesson.Availability with
-                | 0, Some d, Free | 0, Some d, LastFreeSpot ->
-                    if DateTimeOffset.Now > d then [ forOneCash ] else []
-                | 0, None, Free | 0, None, LastFreeSpot -> [ forOneCash ]
-                | 1, _, Free | 1, _, LastFreeSpot -> [ forOne ]
-                | _, _, Free -> [ forOne ] //[ forOne; forTwo ]
-                | _, _, LastFreeSpot -> [ forOne ]
-                | _, _, Full -> []
-
-            let isBtnVisible =
-                items.Length > 0
-                && not user.IsAdmin
-                && lesson.UserReservation.IsNone
-                && not lessonAlreadyStarted
-
-            if isBtnVisible then div [] items
-            else str ""
+            | false, NotReserved(_, Some Credit,_) ->
+                Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
+                    [ str "Rezervovat" ]
+            | _ -> str ""
 
         let cancelBtn =
-            if lesson.UserReservation.IsSome && not lessonCancellingClosed then
+            match lessonState with
+            | Reserved(true) ->
                 Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelReservation(lesson.Id) |> dispatch) ] ] [
                     str "Zrušit rezervaci"
                 ]
-            else
-                str ""
+            | _ -> str ""
 
         let warning =
-            if lessonAlreadyStarted then
-                "Lekce již proběhla" |> str |> SharedView.infoBox
-            else
-                if lessonCancellingClosed && lesson.UserReservation.IsSome then
-                    "Odhlašování z lekce je již zavřeno" |> str |> SharedView.infoBox
-                else if lessonCancellingClosed && lesson.UserReservation.IsNone then
-                    "Odhlašování z lekce je již zavřeno. Lze se pouze přihlašovat." |> str |> SharedView.infoBox
-                else str ""
-
+            match lessonState with
+            | AlreadyStarted _ -> "Lekce již proběhla" |> str |> SharedView.infoBox
+            | _ -> str ""
+            
         let popoverClass =
             match lesson.StartDate.DayOfWeek with
             | DayOfWeek.Monday -> "is-popover-right"
             | DayOfWeek.Sunday -> "is-popover-left"
             | _ -> "is-popover-bottom"
 
+        let cancelledClass = if lesson.IsCancelled then "cancelled" else ""
+
         div [ ClassName (sprintf "popover %s" popoverClass) ] [
-            div [ ClassName "popover-trigger lesson" ] [
+            div [ ClassName (sprintf "popover-trigger lesson %s" cancelledClass) ] [
 
                 div [ ClassName "time" ] [
                     lesson.StartDate |> SharedView.toCzTime |> str

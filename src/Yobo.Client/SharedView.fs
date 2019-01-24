@@ -37,6 +37,14 @@ let infoBox content =
             i [ ClassName "fa fa-info-circle"; Style [ PaddingRight 10 ] ] [] 
             content
         ]
+    ]
+
+let warningBox content =
+    article [ ClassName "message is-warning has-text-centered" ] [
+        div [ ClassName "message-body"][
+            i [ ClassName "fa fa-exclamation-triangle"; Style [ PaddingRight 10 ] ] [] 
+            content
+        ]
     ]        
 
 let serverErrorToView (serverError:ServerError) =

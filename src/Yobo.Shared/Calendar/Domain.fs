@@ -5,7 +5,6 @@ open Yobo.Shared.Domain
 open Yobo.Shared.Extensions
 
 type Availability =
-    | Full
     | LastFreeSpot
     | Free
 
@@ -20,17 +19,18 @@ type Lesson = {
     EndDate : DateTimeOffset
     Name : string
     Description : string
-    Availability : Availability
+    Availability : Availability option
     UserReservation : UserReservation option
     CancellableUntil : DateTimeOffset
+    IsCancelled : bool
 }
 with
     static member FromAdminLesson currentUserId (lesson:Yobo.Shared.Domain.Lesson) =
         let av =
             match maxCapacity - lesson.Reservations.Length with
-            | 1 -> LastFreeSpot
-            | x when x >= 2 -> Free
-            | _ -> Full
+            | 1 -> LastFreeSpot |> Some
+            | x when x >= 2 -> Free |> Some
+            | _ -> None
         let ur =
             lesson.Reservations
             |> List.tryFind (fun (u,_) -> u.Id = currentUserId)
@@ -44,6 +44,7 @@ with
             Availability = av
             UserReservation = ur
             CancellableUntil = lesson.StartDate |> getCancellingDate
+            IsCancelled = lesson.IsCancelled
         } : Lesson
 
 type AddReservation = {

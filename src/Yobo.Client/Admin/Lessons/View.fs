@@ -17,7 +17,9 @@ module Calendar =
 
     let col dispatch (lessons:Lesson list) (date:DateTimeOffset) =
         let lessonDiv (lesson:Lesson) =
-            let cap = sprintf "%i / 12" lesson.Reservations.Length
+            let cap =
+                if lesson.IsCancelled then "Lekce je zrušena"
+                else sprintf "%i / 12" lesson.Reservations.Length
             let res (u:User,r:UserReservation) =
                 let _,useCredits = r.ToIntAndBool
                 let cInfo = if not useCredits then "- (hotově)" else ""
@@ -33,14 +35,18 @@ module Calendar =
                 | _ -> Tag.Color IsSuccess
 
             let cancelBtn =
-                if lesson.StartDate > DateTimeOffset.Now then
-                    Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelLesson(lesson.Id) |> dispatch) ] ] [
-                        str "Zrušit lekci"
-                    ]
-                else "Lekce již proběhla" |> str |> SharedView.infoBox
+                if lesson.IsCancelled then
+                    "Lekce je zrušena" |> str |> SharedView.warningBox
+                else
+                    if lesson.StartDate > DateTimeOffset.Now then
+                        Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelLesson(lesson.Id) |> dispatch) ] ] [
+                            str "Zrušit lekci"
+                        ]
+                    else "Lekce již proběhla" |> str |> SharedView.infoBox
 
+            let cancelledClass = if lesson.IsCancelled then "cancelled" else ""
             div [ ClassName "popover is-popover-bottom" ][
-                div [ ClassName "popover-trigger lesson" ] [
+                div [ ClassName (sprintf "popover-trigger lesson %s" cancelledClass) ] [
                     div [ ClassName "time" ] [
                         lesson.StartDate |> SharedView.toCzTime |> str
                         str " - "

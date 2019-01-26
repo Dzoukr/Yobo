@@ -9,6 +9,7 @@ type ValidationError =
     | MustBeAfter of string * DateTimeOffset
     | ValuesNotEqual of string * string
     | IsNotValidEmail of string
+    | RulesNotAgreed of string
     with
         member x.Explain() =
             match x with
@@ -18,6 +19,7 @@ type ValidationError =
             | IsNotValidEmail _ -> "Vyplňte správný formát pro emailovou adresu."
             | MustBeBiggerThan (_, v) -> sprintf "Hodnota musí být větší než %i." v
             | MustBeAfter (_, d) -> sprintf "Hodnota musí být po datu %A." d
+            | RulesNotAgreed _ -> "Potvrďte souhlas s obchodními podmínkami"
 
 type ValidationResult = {
     IsValid : bool
@@ -33,6 +35,10 @@ with
         match result with
         | Ok _ -> ValidationResult.Empty
         | Error errs -> ValidationResult.FromErrorList errs
+
+let validateRulesAgreed txt getter args =
+    let value = args |> getter
+    if value = false then RulesNotAgreed(txt) |> Some else None
 
 let validateNotEmpty txt getter args = 
     let value = args |> getter

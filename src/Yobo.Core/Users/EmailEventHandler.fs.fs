@@ -10,7 +10,7 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
     | Registered args ->
         let name = sprintf "%s %s" args.FirstName args.LastName
         let tos = { Email = args.Email; Name = name }
-        let subject = "TODO"
+        let subject = "Registrace Mindful Yoga"
         let message =
             Fue.Data.init
             |> Fue.Data.add "activate" (Uri(settings.BaseUrl, sprintf FrontendRoutes.activateAccount args.ActivationKey))
@@ -30,7 +30,7 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
         |> Option.map (fun user ->
             let name = sprintf "%s %s" user.FirstName user.LastName
             let tos = { Email = user.Email; Name = name }
-            let subject = "TODO"
+            let subject = "Registrace Mindful Yoga"
             let message =
                 Fue.Data.init
                 |> Fue.Data.add "activate" (Uri(settings.BaseUrl, sprintf FrontendRoutes.activateAccount args.ActivationKey))

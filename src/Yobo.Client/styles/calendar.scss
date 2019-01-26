@@ -26,30 +26,52 @@
         div {
             min-width: 100%;
         }
-        .popover-content {
-            margin-top: -3rem;
-        }
         .lesson.cancelled {
             opacity: 0.5;
         }
-        .lesson {
-            padding: 0.5rem;
-            background-color: #c4dbe2;
-            margin-top: 1rem;
-            margin-bottom: 3rem;
-            border-radius: 0.5rem;
-            text-align: center;
 
+        .name {
+            font-weight: 500;
+        }
+        .time {
+            margin-bottom: 1rem; 
+        }
+        
 
-            .time {
-                margin-bottom: 1rem; 
-            }
-            
+        .popover-content {
+            margin-top: -3rem;
             .name {
-                font-weight: 500;
-                margin-bottom: 2rem; 
+                margin-top: 1rem;
+                margin-bottom: 1rem;
+            }
+
+
+            .buttons {
+                text-align: center;
+                margin-bottom: 1rem;
+
+                div {
+                    margin-top: 2rem;
+                }
             }
         }
+        .popover {
+            
+            .lesson {
+                padding: 0.5rem;
+                background-color: #c4dbe2;
+                margin-top: 1rem;
+                margin-bottom: 3rem;
+                border-radius: 0.5rem;
+                text-align: center;
+                
+                
+                .name {
+                    margin-bottom: 2rem; 
+                }
+            }
+        }
+       
     }
 
 }

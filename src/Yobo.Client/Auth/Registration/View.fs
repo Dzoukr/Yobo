@@ -10,18 +10,44 @@ open Yobo.Shared
 open Yobo.Client
 
 let render (state : State) (dispatch : Msg -> unit) =
-    let regInput value typ msgType txt =
+
+    let errorAndColor txt =
         let error = state.ValidationResult |> Validation.tryGetFieldError txt
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]
                         [ str (error.Value.Explain()) ]
                    else span [] []
+        help,clr
+
+
+    let regInput value typ msgType txt =
+        let help,clr = errorAndColor txt
         Control.div [] [
             typ [
                 clr
                 Input.Option.Value value
                 Input.Option.OnChange (fun e -> !!e.target?value |> msgType |> dispatch)
+            ]
+            help
+        ]
+
+    let checkRules =
+        let help,_ = errorAndColor "Rules"
+        div [] [
+            SharedView.rulesModal state.ShowRules (fun _ -> ToggleRules |> dispatch)
+
+            Checkbox.input [
+                CustomClass "is-checkradio"
+                Props [ Id "rules"; Checked state.Account.AgreeButtonChecked; OnChange (fun _ -> ToggleAgreement |> dispatch) ]
+            ]
+            label [ HTMLAttr.HtmlFor "rules" ] [
+                str "Souhlasím s obchodními podmínkami"
+            ]
+            div [] [
+                a [ OnClick (fun _ -> ToggleRules |> dispatch ) ] [
+                    str "Obchodní podmínky"
+                ]
             ]
             help
         ]
@@ -70,6 +96,10 @@ let render (state : State) (dispatch : Msg -> unit) =
 
                 ]
 
+                Field.div [] [ checkRules ]
+
+                
+
                 Field.div [] [
                     btn state.IsRegistrating
                 ]
@@ -82,7 +112,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         match state.RegistrationResult with
         | None | Some (Error _) -> form
         | Some (Ok _) ->
-            "Registrace proběhla úspěšně. Nyní je potřeba zaktivovat váš účet. Podívejte se prosím do emailu, kam by vám měl přijít aktivační odkaz a klikněte na něj."
+            "Registrace proběhla úspěšně! Pro aktivaci účtu klikněte na odkaz v registračním emailu."
             |> str
             |> SharedView.successBox
 

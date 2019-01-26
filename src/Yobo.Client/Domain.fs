@@ -20,12 +20,14 @@ type State = {
     Page : Page
     Route : string
     LoggedUser : Yobo.Shared.Domain.User option
+    TermsDisplayed : bool
 }
 with
     static member Init = {
         Page = AdminPage.Users(Admin.Users.Domain.State.Init) |> Page.Admin
         LoggedUser = None
         Route = ""
+        TermsDisplayed = false
     }
 
 type AuthMsg =
@@ -45,4 +47,5 @@ type Msg =
     | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
     | RefreshToken of string
     | TokenRefreshed of Result<string, ServerError>
+    | ToggleTermsView
     | LoggedOut

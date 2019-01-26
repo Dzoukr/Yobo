@@ -11,7 +11,7 @@ type Availability =
 let maxCapacity = 12
 
 let getCancellingDate (d:DateTimeOffset) =
-    d.StartOfTheDay().AddHours 12.
+    d.StartOfTheDay().AddHours 9.
 
 type Lesson = {
     Id : Guid

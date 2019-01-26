@@ -6,6 +6,7 @@ open Fable.Helpers.React.Props
 open Yobo.Shared
 open Thoth.Elmish
 open System
+open Fulma
 
 let errorBox content =
     article [ ClassName "message is-danger has-text-centered" ] [
@@ -82,3 +83,16 @@ let serverErrorToViewIfAny (res:Result<_,ServerError> option) =
 
 let toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
 let toCzTime (date:DateTimeOffset) = date.ToString("HH:mm")
+let rulesModal isActive closeDisplay =
+    Modal.modal [ Modal.IsActive isActive ] [
+        Modal.background [ Props [ OnClick closeDisplay ] ] [ ]
+        Modal.Card.card [ ] [
+            Modal.Card.head [ ] [
+                Modal.Card.title [ ] [ str "Obchodní podmínky" ]
+                Delete.delete [ Delete.OnClick closeDisplay ] [ ]
+            ]
+            Modal.Card.body [ GenericOption.Props [ DangerouslySetInnerHTML { __html = StaticText.terms } ] ][ ]
+        ]
+    ]
+
+             

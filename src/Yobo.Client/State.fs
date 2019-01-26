@@ -102,6 +102,8 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | LoggedOut ->
         TokenStorage.removeToken()
         { state with LoggedUser = None}, Navigation.newUrl Router.Routes.login
+    | ToggleTermsView ->
+        { state with TermsDisplayed = not state.TermsDisplayed }, Cmd.none
 
 let subscribe (_:State) =
     let sub dispatch = 

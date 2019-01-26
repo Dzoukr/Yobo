@@ -51,14 +51,14 @@ let render (state : State) (dispatch : Msg -> unit) =
                 | Some (Error _) ->
                     str "Aktivační odkaz se nepodařilo odeslat. Zavřete okno prohlížeče a zkuste to prosím později."
                 | Some (Ok _) ->
-                    str "Aktivační odkaz byl úspěšně odeslán do vaší emailové schránky."
+                    str "Aktivační odkaz byl úspěšně odeslán do Vaší emailové schránky."
                 | None ->
                     Button.button [ Button.Color IsInfo; Button.OnClick (fun _ -> id |> ResendActivation |> dispatch )] [
                         str "Poslat aktivační odkaz"
                     ]
 
             span [] [
-                str "Zkuste se podívat do vaší emailové schránky, kam jsme vám poslali aktivační odkaz. Pokud ho nemůžete nalézt, klikněte na tlačítko níže a nechte si poslat nový."
+                str "Zkontrolujte Vaši emailovou schránku, kam jsme Vám po registraci poslali aktivační odkaz. Případně klikněte na tlačítko níže a nechte si poslat nový odkaz."
                 div [ Style [ MarginTop 10]] [
                     resendDiv
                 ]
@@ -70,7 +70,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         div 
             [ ClassName "box"] 
             [
-                Heading.h1 [ ] [ str "Yoga Booking" ]
+                img [ Src "img/logo.png" ]
 
                 (SharedView.serverErrorToViewIfAny state.LoginResult)
                 resendActivationInfoBox

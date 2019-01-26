@@ -51,37 +51,38 @@ module Calendar =
 
         let avail =
             match lessonState with
-            | Cancelled -> Tag.tag [ Tag.Color IsBlack ] [ str "Lekce je zrušena" ]
+            | Cancelled -> Tag.tag [ Tag.Color IsBlack ] [ str "Lekce zrušena" ]
             | AlreadyStarted(true) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste se" ]
             | AlreadyStarted(false) -> str ""
-            | Reserved _ -> Tag.tag [ Tag.Color IsInfo ] [ str "Rezervováno pro vás" ]
+            | Reserved _ -> Tag.tag [ Tag.Color IsInfo ] [ str "Zarezervováno" ]
             | NotReserved(Some Free, _, _) -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volno" ]
             | NotReserved(Some LastFreeSpot, _, _) -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
-            | NotReserved(None, _, _) -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce je již obsazena" ]
+            | NotReserved(None, _, _) -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce obsazena" ]
 
         let bookBtn =
             match user.IsAdmin, lessonState with
-            | false, NotReserved(_,Some Cash,_) -> 
-                Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
-                        [ str "Rezervovat (platba v hotovosti)" ]
+            | false, NotReserved(_,Some Cash,_) ->
+                div [] [
+                    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
+                            [ str "Rezervovat" ]
+                ]
             | false, NotReserved(_, Some Credit,_) ->
-                Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
-                    [ str "Rezervovat" ]
+                div [] [
+                    Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
+                        [ str "Rezervovat" ]
+                ]
             | _ -> str ""
 
         let cancelBtn =
             match lessonState with
             | Reserved(true) ->
-                Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelReservation(lesson.Id) |> dispatch) ] ] [
-                    str "Zrušit rezervaci"
+                div [] [
+                    Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelReservation(lesson.Id) |> dispatch) ] ] [
+                        str "Zrušit rezervaci"
+                    ]
                 ]
             | _ -> str ""
 
-        let warning =
-            match lessonState with
-            | AlreadyStarted _ -> "Lekce již proběhla" |> str |> SharedView.infoBox
-            | _ -> str ""
-            
         let popoverClass =
             match lesson.StartDate.DayOfWeek with
             | DayOfWeek.Monday -> "is-popover-right"
@@ -103,25 +104,17 @@ module Calendar =
                 div [ ClassName "availability" ] [ avail ]
             ]
             div [ ClassName "popover-content" ] [
-                div [] [
-                    i [ ClassName "fas fa-clock" ] []
-                    sprintf "%s - %s" st en |> str
-                    avail
-                ]
-                div [] [
+                div [ ClassName "name"] [
                     str lesson.Name
                 ]
-                hr []
+                div [ ClassName "time"] [
+                    i [ ClassName "far fa-clock"; Style [ MarginRight 5 ] ] []
+                    sprintf "%s od %s do %s" (lesson.StartDate |> SharedView.toCzDate)  st en |> str
+                ]
                 div [] [
                     str lesson.Description
                 ]
-                warning
-                div [] [
-                    bookBtn
-                ]
-                div [] [
-                    cancelBtn
-                ]
+                div [ ClassName "buttons" ] [ bookBtn; cancelBtn ]
             ]
         ]
 

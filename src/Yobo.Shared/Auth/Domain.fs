@@ -6,6 +6,7 @@ type NewAccount = {
     Email: string
     Password: string
     SecondPassword: string
+    AgreeButtonChecked : bool
 }
 with
     static member Init = {
@@ -14,6 +15,7 @@ with
         Email = ""
         Password = ""
         SecondPassword = ""
+        AgreeButtonChecked = false
     }
 
 type Login = {

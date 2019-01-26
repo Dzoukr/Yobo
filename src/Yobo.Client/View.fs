@@ -6,9 +6,7 @@ open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Yobo.Shared.Domain
 
-let private displayLoggedPage (user:User option) (page:string) content dispatch =
-    let adminMenuDisplayed =
-        user |> Option.map (fun x -> x.IsAdmin) |> Option.defaultValue false
+let private displayLoggedPage termsViewed (user:User option) (page:string) content dispatch =
     let item (pg:string) icon text =
         let isActive = page = pg
         Navbar.Item.a [ Navbar.Item.IsActive isActive ; Navbar.Item.Option.Props [ Href pg; OnClick Router.goToUrl ] ] [
@@ -56,12 +54,16 @@ let private displayLoggedPage (user:User option) (page:string) content dispatch 
             Container.container [ ] [
                 content
             ]
+            Container.container [ ] [
+                a [ OnClick (fun _ -> ToggleTermsView |> dispatch) ] [str "Obchodní podmínky"]
+                SharedView.rulesModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
+            ]
         ]
     ]
 
 let render (state : State) (dispatch : Msg -> unit) =
     let showInTemplate content =
-        displayLoggedPage state.LoggedUser state.Route content dispatch
+        displayLoggedPage state.TermsDisplayed state.LoggedUser state.Route content dispatch
     match state.Page with
     | Auth pg ->
         match pg with

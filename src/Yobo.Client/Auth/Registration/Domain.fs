@@ -11,6 +11,7 @@ type State = {
     Account : NewAccount
     ValidationResult: ValidationResult
     RegistrationResult: Result<Guid, ServerError> option
+    ShowRules : bool
 }
 with
     static member Init = {
@@ -19,6 +20,7 @@ with
         Account = NewAccount.Init
         ValidationResult = ValidationResult.Empty
         RegistrationResult = None
+        ShowRules = false
     }
 
 type Msg =
@@ -29,4 +31,6 @@ type Msg =
     | ChangeEmail of string
     | ChangePassword of string
     | ChangeSecondPassword of string
+    | ToggleAgreement
+    | ToggleRules
 

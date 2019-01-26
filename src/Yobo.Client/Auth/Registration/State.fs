@@ -35,4 +35,4 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | ChangePassword v -> { state with Account = { state.Account with Password = v }} |> updateValidation, Cmd.none
     | ChangeSecondPassword v -> { state with Account = { state.Account with SecondPassword = v }} |> updateValidation, Cmd.none
     | ToggleAgreement -> { state with Account = { state.Account with AgreeButtonChecked = not state.Account.AgreeButtonChecked } } |> updateValidation, Cmd.none
-    | ToggleRules -> { state with ShowRules = not state.ShowRules }, Cmd.none
+    | ToggleTerms -> { state with ShowTerms = not state.ShowTerms }, Cmd.none

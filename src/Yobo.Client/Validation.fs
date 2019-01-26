@@ -10,4 +10,5 @@ let tryGetFieldError txt (res:ValidationResult) =
         | MustBeAfter (t,_) -> txt = t
         | ValuesNotEqual (t1, t2) -> txt = t1 || txt = t2
         | IsNotValidEmail t -> txt = t
+        | TermsNotAgreed t -> txt = t
     res.Errors |> List.tryFind findFn

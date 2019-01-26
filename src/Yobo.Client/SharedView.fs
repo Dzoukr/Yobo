@@ -83,7 +83,7 @@ let serverErrorToViewIfAny (res:Result<_,ServerError> option) =
 
 let toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
 let toCzTime (date:DateTimeOffset) = date.ToString("HH:mm")
-let rulesModal isActive closeDisplay =
+let termsModal isActive closeDisplay =
     Modal.modal [ Modal.IsActive isActive ] [
         Modal.background [ Props [ OnClick closeDisplay ] ] [ ]
         Modal.Card.card [ ] [

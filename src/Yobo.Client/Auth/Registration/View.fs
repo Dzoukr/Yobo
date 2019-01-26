@@ -32,20 +32,20 @@ let render (state : State) (dispatch : Msg -> unit) =
             help
         ]
 
-    let checkRules =
-        let help,_ = errorAndColor "Rules"
+    let checkTerms =
+        let help,_ = errorAndColor "Terms"
         div [] [
-            SharedView.rulesModal state.ShowRules (fun _ -> ToggleRules |> dispatch)
+            SharedView.termsModal state.ShowTerms (fun _ -> ToggleTerms |> dispatch)
 
             Checkbox.input [
                 CustomClass "is-checkradio"
-                Props [ Id "rules"; Checked state.Account.AgreeButtonChecked; OnChange (fun _ -> ToggleAgreement |> dispatch) ]
+                Props [ Id "terms"; Checked state.Account.AgreeButtonChecked; OnChange (fun _ -> ToggleAgreement |> dispatch) ]
             ]
-            label [ HTMLAttr.HtmlFor "rules" ] [
+            label [ HTMLAttr.HtmlFor "terms" ] [
                 str "Souhlasím s obchodními podmínkami"
             ]
             div [] [
-                a [ OnClick (fun _ -> ToggleRules |> dispatch ) ] [
+                a [ OnClick (fun _ -> ToggleTerms |> dispatch ) ] [
                     str "Obchodní podmínky"
                 ]
             ]
@@ -96,7 +96,7 @@ let render (state : State) (dispatch : Msg -> unit) =
 
                 ]
 
-                Field.div [] [ checkRules ]
+                Field.div [] [ checkTerms ]
 
                 
 

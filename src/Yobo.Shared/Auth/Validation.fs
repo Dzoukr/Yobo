@@ -12,7 +12,7 @@ let validateAccount (acc:NewAccount) =
         validateLongerThan 5 "SecondPassword" (fun x -> x.SecondPassword)
         validateEquals "Password" "SecondPassword" (fun x -> x.Password) (fun x -> x.SecondPassword)
         validateEmail "Email" (fun x -> x.Email)
-        validateRulesAgreed "Rules" (fun x -> x.AgreeButtonChecked)
+        validateTermsAgreed "Terms" (fun x -> x.AgreeButtonChecked)
     ] |> validate acc
 
 let validateLogin (log:Login) =

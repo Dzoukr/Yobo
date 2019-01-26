@@ -56,7 +56,7 @@ let private displayLoggedPage termsViewed (user:User option) (page:string) conte
             ]
             Container.container [ ] [
                 a [ OnClick (fun _ -> ToggleTermsView |> dispatch) ] [str "Obchodní podmínky"]
-                SharedView.rulesModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
+                SharedView.termsModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
             ]
         ]
     ]

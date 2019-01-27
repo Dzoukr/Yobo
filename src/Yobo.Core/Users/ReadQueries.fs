@@ -4,6 +4,7 @@ open Yobo.Core
 open System
 open FSharp.Rop
 open Yobo.Shared.Domain
+open Extensions
 
 type UserQueries<'a> = {
     GetById : Guid -> Result<User, 'a>
@@ -23,8 +24,8 @@ let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         LastName = u.LastName
         Activated = u.Activated
         Credits = u.Credits
-        CreditsExpiration = u.CreditsExpiration
-        CashReservationBlockedUntil = u.CashReservationBlockedUntil
+        CreditsExpiration = u.CreditsExpiration |> Option.map (fun x -> x.ToCzDateTimeOffset())
+        CashReservationBlockedUntil = u.CashReservationBlockedUntil |> Option.map (fun x -> x.ToCzDateTimeOffset())
         IsAdmin = false
     }
 

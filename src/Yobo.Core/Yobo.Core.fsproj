@@ -16,6 +16,7 @@
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
+    <Compile Include="Extensions.fs" />
     <Compile Include="Serialization.fs" />
     <Compile Include="ReadDb.fs" />
     <Compile Include="Data.fs" />

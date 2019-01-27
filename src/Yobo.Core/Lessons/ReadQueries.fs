@@ -4,6 +4,7 @@ open Yobo.Core
 open System
 open FSharp.Rop
 open Yobo.Shared.Domain
+open Extensions
 
 type LessonsQueries<'a> = {
     GetAllForDateRange : (DateTimeOffset * DateTimeOffset) -> Result<Lesson list, 'a>
@@ -28,8 +29,8 @@ let internal lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) 
         Id = u.Id
         Name = u.Name
         Description = u.Description
-        StartDate = u.StartDate
-        EndDate = u.EndDate
+        StartDate = u.StartDate.ToCzDateTimeOffset()
+        EndDate = u.EndDate.ToCzDateTimeOffset()
         Reservations = u.``dbo.LessonReservations by Id`` |> Seq.map reservationFromDbEntity |> Seq.toList
         IsCancelled = u.IsCancelled
     }

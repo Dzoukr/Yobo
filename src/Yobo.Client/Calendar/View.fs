@@ -64,7 +64,7 @@ module Calendar =
             | false, NotReserved(_,Some Cash,_) ->
                 div [] [
                     Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
-                            [ str "Rezervovat" ]
+                            [ str "Rezervovat (hotovost)" ]
                 ]
             | false, NotReserved(_, Some Credit,_) ->
                 div [] [

@@ -23,6 +23,6 @@ let dateRangeToDays (startDate:DateTimeOffset,endDate:DateTimeOffset) =
     endDate.Subtract(startDate).TotalDays
     |> int
     |> (fun d -> [0..d])
-    |> List.map (fun x ->
-        startDate.AddDays (float x)
-    )
+    |> List.map (fun x -> startDate.AddDays (float x))
+    |> List.map (fun x -> DateTimeOffset(DateTime(x.Year, x.Month, x.Day, 0, 0, 0)))
+    

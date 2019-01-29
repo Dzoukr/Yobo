@@ -26,6 +26,7 @@
     <Compile Include="EmailSettings.fs" />
     <EmbeddedResource Include="Users\EmailTemplates\RegenerateActivation.html" />
     <EmbeddedResource Include="Users\EmailTemplates\Register.html" />
+    <EmbeddedResource Include="Users\EmailTemplates\ResetPassword.html" />
     <Compile Include="Users\Registry\Registry.fs" />
     <Compile Include="Users\Registry\CommandValidator.fs" />
     <Compile Include="Users\Registry\Aggregate.fs" />

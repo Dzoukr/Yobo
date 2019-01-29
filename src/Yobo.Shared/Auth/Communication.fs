@@ -13,5 +13,6 @@ type API = {
     GetToken : Login -> ServerResponse<string>
     RefreshToken : string -> ServerResponse<string>
     GetUserByToken : string -> ServerResponse<User>
-    ResendActivation: Guid -> ServerResponse<Guid>
+    ResendActivation : Guid -> ServerResponse<Guid>
+    InitiatePasswordReset : string -> ServerResponse<unit>
 } 

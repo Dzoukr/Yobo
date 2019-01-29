@@ -50,6 +50,11 @@ let execute (state:State) = function
         >>= onlyIfActivationKeyMatch args.ActivationKey
         <!> (fun _ -> Activated args)
         <!> List.singleton
+    | InitiatePasswordReset args ->
+        onlyIfExists state
+        >>= onlyIfActivated
+        <!> (fun _ -> PasswordResetInitiated args)
+        <!> List.singleton
     | AddCredits args ->
         onlyIfActivated state
         <!> (fun _ -> CreditsAdded args)
@@ -76,7 +81,8 @@ let execute (state:State) = function
 let apply (state:State) = function
     | Registered args -> { state with Id = args.Id; ActivationKey = args.ActivationKey }
     | ActivationKeyRegenerated args -> { state with ActivationKey = args.ActivationKey }
-    | Activated args -> { state with Id = args.Id; IsActivated = true }
+    | Activated _ -> { state with IsActivated = true }
+    | PasswordResetInitiated args -> { state with PasswordResetKey = Some args.PasswordResetKey }
     | CreditsAdded args -> { state with Credits = state.Credits + args.Credits; CreditsExpiration = Some args.Expiration }
     | CreditsWithdrawn args -> { state with Credits = state.Credits - args.Amount }
     | CreditsRefunded args -> { state with Credits = state.Credits + args.Amount }

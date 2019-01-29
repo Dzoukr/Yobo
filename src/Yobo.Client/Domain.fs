@@ -6,6 +6,8 @@ type AuthPage =
     | Login of Auth.Login.Domain.State
     | Registration of Auth.Registration.Domain.State
     | AccountActivation of Auth.AccountActivation.Domain.State
+    | ForgottenPassword of Auth.ForgottenPassword.Domain.State
+    | ResetPassword of Auth.ResetPassword.Domain.State
 
 type AdminPage =
     | Users of Admin.Users.Domain.State
@@ -34,6 +36,8 @@ type AuthMsg =
     | LoginMsg of Auth.Login.Domain.Msg
     | RegistrationMsg of Auth.Registration.Domain.Msg
     | AccountActivationMsg of Auth.AccountActivation.Domain.Msg
+    | ForgottenPasswordMsg of Auth.ForgottenPassword.Domain.Msg
+    | ResetPasswordMsg of Auth.ResetPassword.Domain.Msg
 
 type AdminMsg =
     | UsersMsg of Admin.Users.Domain.Msg

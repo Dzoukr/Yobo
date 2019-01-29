@@ -111,8 +111,8 @@ let render (state : State) (dispatch : Msg -> unit) =
         Table.table [ Table.IsHoverable ] [
             thead [ ] [
                 tr [ ] [
-                    th [ ] [ str "Jméno" ]
                     th [ ] [ str "Příjmení" ]
+                    th [ ] [ str "Jméno" ]
                     th [ ] [ str "Email" ]
                     th [ ] [ str "Datum aktivace" ]
                     th [ ] [ str "Kredity" ]

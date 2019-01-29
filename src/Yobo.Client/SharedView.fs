@@ -81,6 +81,12 @@ let serverErrorToViewIfAny (res:Result<_,ServerError> option) =
     | Some (Error er) -> er |> serverErrorToView
     | _ -> str ""
 
+let serverResultToViewIfAny successView (res:ServerResult<_> option) =
+    res
+    |> Option.map (resultToView successView)
+    |> Option.defaultValue (str "")
+
+
 let toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
 let toCzTime (date:DateTimeOffset) = date.ToString("HH:mm")
 let termsModal isActive closeDisplay =

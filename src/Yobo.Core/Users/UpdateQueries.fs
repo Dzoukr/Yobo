@@ -29,6 +29,11 @@ let activated (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =
     item.Activated <- Some DateTimeOffset.Now
     ctx.SubmitUpdates()
 
+let passwordResetInitiated (args:CmdArgs.InitiatePasswordReset) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.PasswordResetKey <- Some args.PasswordResetKey
+    ctx.SubmitUpdates()
+
 let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.ActivationKey <- args.ActivationKey

@@ -74,3 +74,10 @@ let activateAccount cmdHandler getUserByActivationKey (activationKey:Guid) =
         let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> Command.Activate |> CoreCommand.Users |> cmdHandler
         return user.Id
     }
+
+let initiatePasswordReset cmdHandler getUserByEmail (email:string) =
+    result {
+        let! (user : User) = getUserByEmail email
+        let! _ = ({ Id = user.Id; PasswordResetKey = Guid.NewGuid() } : CmdArgs.InitiatePasswordReset) |> Command.InitiatePasswordReset |> CoreCommand.Users |> cmdHandler
+        return ()
+    }

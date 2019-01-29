@@ -25,7 +25,8 @@ let private cmdHandlerErrorToServerError = function
     | CommandHandlerError.ValidationError err -> ServerError.ValidationError(err)
 
 let private dbErrorToServerError = function
-    | DbError.ItemNotFound id -> DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError
+    | DbError.ItemNotFoundByEmail _ -> DomainError.ItemDoesNotExist "Email" |> ServerError.DomainError
+    | DbError.ItemNotFoundById _ -> DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError
     | DbError.Exception e -> e.Message |> ServerError.Exception
 
 module Users =

@@ -70,6 +70,8 @@ let render (state : State) (dispatch : Msg -> unit) =
         | Login state -> Auth.Login.View.render state (LoginMsg >> AuthMsg >> dispatch)
         | Registration state -> Auth.Registration.View.render state (RegistrationMsg >> AuthMsg >> dispatch)
         | AccountActivation state -> Auth.AccountActivation.View.render state (AccountActivationMsg >> AuthMsg >> dispatch)
+        | ForgottenPassword state -> Auth.ForgottenPassword.View.render state (ForgottenPasswordMsg >> AuthMsg >> dispatch)
+        | ResetPassword state -> Auth.ResetPassword.View.render state (ResetPasswordMsg >> AuthMsg >> dispatch)
     | Admin pg ->
         let content =
             match pg with

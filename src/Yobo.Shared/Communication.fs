@@ -28,3 +28,4 @@ type SecuredParam<'a> = {
 
 module FrontendRoutes =
     let activateAccount : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/accountActivation/%O"
+    let resetPassword : PrintfFormat<(Guid -> string),unit,string,string,Guid> = "/resetPassword/%O"

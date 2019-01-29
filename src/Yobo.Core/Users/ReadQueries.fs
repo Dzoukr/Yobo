@@ -9,11 +9,13 @@ open Extensions
 type UserQueries<'a> = {
     GetById : Guid -> Result<User, 'a>
     GetAll : unit -> Result<User list, 'a>
+    GetByEmail : string -> Result<User, 'a>
 }
 
 let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
     GetById = q.GetById >> Result.mapError fn
     GetAll = q.GetAll >> Result.mapError fn
+    GetByEmail = q.GetByEmail >> Result.mapError fn
 }
 
 let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
@@ -35,7 +37,16 @@ let private getById i (ctx:ReadDb.Db.dataContext) =
         where (x.Id = i)
         select x
     }
-    |> Data.oneOrError i
+    |> Data.oneOrErrorById i
+    <!> userFromDbEntity
+
+let private getByEmail (e:string) (ctx:ReadDb.Db.dataContext) =
+    query {
+        for x in ctx.Dbo.Users do
+        where (x.Email.ToLower() = e.ToLower())
+        select x
+    }
+    |> Data.oneOrErrorByEmail e
     <!> userFromDbEntity
 
 let private getAll () (ctx:ReadDb.Db.dataContext) =
@@ -52,4 +63,5 @@ let createDefault (connString:string) =
     {
         GetById = getById >> Data.tryQueryResult ctx
         GetAll = getAll >> Data.tryQuery ctx
+        GetByEmail = getByEmail >> Data.tryQueryResult ctx
     }

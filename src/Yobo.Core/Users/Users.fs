@@ -22,6 +22,11 @@ module CmdArgs =
         ActivationKey : Guid
     }
 
+    type InitiatePasswordReset = {
+        Id : Guid
+        PasswordResetKey : Guid
+    }
+
     type AddCredits = {
         Id : Guid
         Credits : int
@@ -54,6 +59,7 @@ type Command =
     | Register of CmdArgs.Register
     | RegenerateActivationKey of CmdArgs.RegenerateActivationKey
     | Activate of CmdArgs.Activate
+    | InitiatePasswordReset of CmdArgs.InitiatePasswordReset
     | AddCredits of CmdArgs.AddCredits
     | WithdrawCredits of CmdArgs.WithdrawCredits
     | RefundCredits of CmdArgs.RefundCredits
@@ -64,6 +70,7 @@ type Event =
     | Registered of CmdArgs.Register
     | ActivationKeyRegenerated of CmdArgs.RegenerateActivationKey
     | Activated of CmdArgs.Activate
+    | PasswordResetInitiated of CmdArgs.InitiatePasswordReset
     | CreditsAdded of CmdArgs.AddCredits
     | CreditsWithdrawn of CmdArgs.WithdrawCredits
     | CreditsRefunded of CmdArgs.RefundCredits
@@ -74,6 +81,7 @@ type State = {
     Id : Guid
     IsActivated : bool
     ActivationKey : Guid
+    PasswordResetKey : Guid option
     Credits : int
     CreditsExpiration : DateTimeOffset option
     CashReservationsBlockedUntil : DateTimeOffset option
@@ -84,6 +92,7 @@ with
         Id = Guid.Empty
         IsActivated = false
         ActivationKey = Guid.Empty
+        PasswordResetKey = None
         Credits = 0
         CreditsExpiration = None
         CashReservationsBlockedUntil = None

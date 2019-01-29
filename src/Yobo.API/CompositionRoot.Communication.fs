@@ -65,6 +65,7 @@ module Auth =
         ResendActivation = resendActivation Services.CommandHandler.handleAnonymous >> toAsync
         Register = register Services.CommandHandler.handleAnonymous Password.createHash >> toAsync
         ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByActivationKey >> toAsync
+        InitiatePasswordReset = initiatePasswordReset Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByEmail >> toAsync
     }
 
 module Admin =

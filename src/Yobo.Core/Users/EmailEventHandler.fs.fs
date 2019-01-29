@@ -43,6 +43,26 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
                 HtmlMessage = message
             }
         )
+    | PasswordResetInitiated args ->
+        args.Id
+        |> q.GetById
+        |> Result.toOption
+        |> Option.map (fun user ->
+            let name = sprintf "%s %s" user.FirstName user.LastName
+            let tos = { Email = user.Email; Name = name }
+            let subject = "Požadavek na změnu hesla"
+            let message =
+                Fue.Data.init
+                |> Fue.Data.add "reset" (Uri(settings.BaseUrl, sprintf FrontendRoutes.resetPassword args.PasswordResetKey))
+                |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.ResetPassword.html")
+
+            { EmailMessage.Empty with
+                From = settings.From
+                To = tos |> List.singleton
+                Subject = subject
+                HtmlMessage = message
+            }
+        )
 
     | Activated _
     | CashReservationsBlocked _

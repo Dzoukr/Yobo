@@ -20,6 +20,7 @@ let toEvent (cryptoProvider:SymetricCryptoProvider) = function
     | "Registered", data -> data |> Serialization.objectFromJToken<CmdArgs.Register> |> decryptRegister cryptoProvider |> Registered
     | "ActivationKeyRegenerated", data -> data |> Serialization.objectFromJToken<CmdArgs.RegenerateActivationKey> |> ActivationKeyRegenerated
     | "Activated", data -> data |> Serialization.objectFromJToken<CmdArgs.Activate> |> Activated
+    | "PasswordResetInitiated", data -> data |> Serialization.objectFromJToken<CmdArgs.InitiatePasswordReset> |> PasswordResetInitiated
     | "CreditsAdded", data -> data |> Serialization.objectFromJToken<CmdArgs.AddCredits> |> CreditsAdded
     | "CreditsWithdrawn", data -> data |> Serialization.objectFromJToken<CmdArgs.WithdrawCredits> |> CreditsWithdrawn
     | "CreditsRefunded", data -> data |> Serialization.objectFromJToken<CmdArgs.RefundCredits> |> CreditsRefunded
@@ -31,6 +32,7 @@ let toData (cryptoProvider:SymetricCryptoProvider) = function
     | Registered args -> "Registered", (args |> encryptRegister cryptoProvider |> Serialization.objectToJToken)
     | ActivationKeyRegenerated args -> "ActivationKeyRegenerated", (args |> Serialization.objectToJToken)
     | Activated args -> "Activated", (args |> Serialization.objectToJToken)
+    | PasswordResetInitiated args -> "PasswordResetInitiated", (args |> Serialization.objectToJToken)
     | CreditsAdded args -> "CreditsAdded", (args |> Serialization.objectToJToken)
     | CreditsWithdrawn args -> "CreditsWithdrawn", (args |> Serialization.objectToJToken)
     | CreditsRefunded args -> "CreditsRefunded", (args |> Serialization.objectToJToken)

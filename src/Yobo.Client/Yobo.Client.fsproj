@@ -15,6 +15,12 @@
         <Compile Include="Http.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Components.fs" />
+        <Compile Include="Auth\ResetPassword\Domain.fs" />
+        <Compile Include="Auth\ResetPassword\State.fs" />
+        <Compile Include="Auth\ResetPassword\View.fs" />
+        <Compile Include="Auth\ForgottenPassword\Domain.fs" />
+        <Compile Include="Auth\ForgottenPassword\State.fs" />
+        <Compile Include="Auth\ForgottenPassword\View.fs" />
         <Compile Include="Auth\Registration\Domain.fs" />
         <Compile Include="Auth\Registration\State.fs" />
         <Compile Include="Auth\Registration\View.fs" />

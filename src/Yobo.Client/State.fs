@@ -13,9 +13,11 @@ let inline private s p = p |> removeSlash |> s
 
 let pageParser: Parser<Page -> Page, Page> =
     oneOf [
+        map (Auth(ForgottenPassword(Auth.ForgottenPassword.Domain.State.Init))) (s Router.Routes.forgottenPassword)
         map (Auth(Login(Auth.Login.Domain.State.Init))) (s Router.Routes.login)
         map (Auth(Registration(Auth.Registration.Domain.State.Init))) (s Router.Routes.registration)
         map ((fun (x:string) -> Guid(x)) >> Auth.AccountActivation.Domain.State.Init >> AccountActivation >> Auth) (s Router.Routes.accountActivation </> str)
+        map ((fun (x:string) -> Guid(x)) >> Auth.ResetPassword.Domain.State.Init >> ResetPassword >> Auth) (s Router.Routes.resetPassword </> str)
         map (Admin(Users(Admin.Users.Domain.State.Init))) (s Router.Routes.users)
         map (Admin(Lessons(Admin.Lessons.Domain.State.Init))) (s Router.Routes.lessons)
         map (Calendar(Calendar.Domain.State.Init)) (s Router.Routes.calendar)
@@ -77,6 +79,8 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | LoginMsg msg, Auth(Login state) -> Auth.Login.State.update msg state |> map (Login >> Auth) (LoginMsg >> Msg.AuthMsg) 
         | RegistrationMsg msg, Auth(Registration state) -> Auth.Registration.State.update msg state |> map (Registration >> Auth) (RegistrationMsg >> Msg.AuthMsg)
         | AccountActivationMsg msg, Auth(AccountActivation state) -> Auth.AccountActivation.State.update msg state |> map (AccountActivation >> Auth) (AccountActivationMsg >> Msg.AuthMsg)
+        | ForgottenPasswordMsg msg, Auth(ForgottenPassword state) -> Auth.ForgottenPassword.State.update msg state |> map (ForgottenPassword >> Auth) (ForgottenPasswordMsg >> Msg.AuthMsg)
+        | ResetPasswordMsg msg, Auth(ResetPassword state) -> Auth.ResetPassword.State.update msg state |> map (ResetPassword >> Auth) (ResetPasswordMsg >> Msg.AuthMsg)
         | _ -> state, Cmd.none
     | AdminMsg m ->
         match m, state.Page with

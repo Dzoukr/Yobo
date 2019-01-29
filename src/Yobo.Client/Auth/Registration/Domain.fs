@@ -10,7 +10,7 @@ type State = {
     AlreadyTried : bool
     Account : NewAccount
     ValidationResult: ValidationResult
-    RegistrationResult: Result<Guid, ServerError> option
+    RegistrationResult: ServerResult<Guid> option
     ShowTerms : bool
 }
 with
@@ -25,7 +25,7 @@ with
 
 type Msg =
     | Register
-    | Registered of Result<Guid,ServerError>
+    | Registered of ServerResult<Guid>
     | ChangeFirstName of string
     | ChangeLastName of string
     | ChangeEmail of string

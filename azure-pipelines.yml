@@ -17,7 +17,13 @@ steps:
   displayName: 'Build'
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifacts'
+  displayName: 'Publish App Artifacts'
   inputs:
-    pathtoPublish: './deploy'
+    pathtoPublish: './deploy/app'
     artifactName: 'yobo-app'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Migrations Artifacts'
+  inputs:
+    pathtoPublish: './deploy/dbMigrations'
+    artifactName: 'yobo-dbMigrations'

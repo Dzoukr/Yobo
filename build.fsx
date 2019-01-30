@@ -19,7 +19,10 @@ let clientPath = Path.getFullName "./src/Yobo.Client"
 let corePath = Path.getFullName "./src/Yobo.Core"
 let sharedPath = Path.getFullName "./src/Yobo.Shared"
 let clientOutputDir = clientPath + "/output"
-let deployDir = Path.getFullName "./deploy"
+let deployDir = Path.getFullName "./deploy/app"
+let migrationsPath = Path.getFullName "./tools/DbMigrations"
+let migrationsDeployDir = Path.getFullName "./deploy/dbMigrations"
+
 
 let platformTool tool winTool =
     let tool = if Environment.isUnix then tool else winTool
@@ -54,6 +57,7 @@ Target.create "Clean" (fun _ ->
     ++ "src/*/bin"
     ++ "src/*/obj"
     ++ deployDir
+    ++ migrationsDeployDir
     ++ clientOutputDir
     |> Shell.cleanDirs
 )
@@ -106,10 +110,21 @@ Target.create "RefreshSchema" (fun _ ->
     backup |> File.replaceContent original
 )
 
+Target.create "PublishDbMigrations" (fun  _ ->
+    let publishArgs = sprintf "publish -c Release -o \"%s\"" migrationsDeployDir
+    runDotNet publishArgs migrationsPath
+    !! "./database/*.sql" |> Shell.copyFiles (migrationsDeployDir + "\scripts")
+)
+
 "Clean"
     ==> "InstallClient"
     ==> "Build"
-    ==> "Publish"
+    
+"Build" ==> "Publish"
+
+"Clean" ==> "PublishDbMigrations"
+
+"PublishDbMigrations" ==> "Publish"
 
 "Clean"
     ==> "InstallClient"

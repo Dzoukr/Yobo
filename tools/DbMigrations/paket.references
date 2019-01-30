@@ -1,0 +1,3 @@
+group Migrations
+    FSharp.Core
+    dbup-sqlserver

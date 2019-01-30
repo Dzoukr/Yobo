@@ -98,6 +98,12 @@ Target.create "Publish" (fun _ ->
     Path.combine deployDir "config.development.json" |> File.delete
 )
 
+Target.create "RunDbMigrations" (fun _ ->
+    let connString = "..\Yobo.Private\ConnectionString.txt" |> File.readAsString
+    let cmd = sprintf "DbMigrations.dll \"%s\"" connString
+    runDotNet cmd migrationsDeployDir
+)
+
 Target.create "RefreshSchema" (fun _ -> 
     let srcFile = "..\Yobo.Private\ReadDb.fs"
     let original = corePath + "\ReadDb.fs"
@@ -122,7 +128,10 @@ Target.create "PublishDbMigrations" (fun  _ ->
     
 "Build" ==> "Publish"
 
-"Clean" ==> "PublishDbMigrations"
+"Clean" 
+    ==> "PublishDbMigrations" 
+    ==> "RunDbMigrations"
+    ==> "RefreshSchema"
 
 "PublishDbMigrations" ==> "Publish"
 

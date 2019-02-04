@@ -6,14 +6,14 @@ open Yobo.Shared.Admin.Domain
 
 let validateAddCredits (args:AddCredits) =
     [
-        validateBiggerThan 0 "Credits" (fun (x:AddCredits) -> x.Credits)
-        validateIsAfter DateTimeOffset.Now "Expiration" (fun x -> x.Expiration)
-        validateNotEmptyGuid "UserId" (fun x -> x.UserId)
+        "Credits", validateBiggerThan 0 (fun (x:AddCredits) -> x.Credits)
+        "Expiration", validateIsAfter DateTimeOffset.Now  (fun x -> x.Expiration)
+        "UserId", validateNotEmptyGuid  (fun x -> x.UserId)
     ] |> validate args
 
 let validateAddLesson (args:AddLesson) =
     [
-        validateNotEmpty "Name" (fun (x:AddLesson) -> x.Name)
-        validateNotEmpty "Description" (fun (x:AddLesson) -> x.Description)
-        validateIsBeforeAnother "End" (fun x -> x.Start) (fun x -> x.End)
+        "Name", validateNotEmpty (fun (x:AddLesson) -> x.Name)
+        "Description", validateNotEmpty (fun (x:AddLesson) -> x.Description)
+        "End", validateIsBeforeAnother (fun x -> x.Start) (fun x -> x.End)
     ] |> validate args

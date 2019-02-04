@@ -6,11 +6,17 @@ open FSharp.Rop
 let validate cmd =
     match cmd with
     | Add args ->
-        [ validateEmail "Email" (fun (x:CmdArgs.Add) -> x.Email); validateNotEmptyGuid "UserId" (fun x -> x.UserId) ]
+        [
+            "Email", validateEmail (fun (x:CmdArgs.Add) -> x.Email)
+            "UserId", validateNotEmptyGuid (fun x -> x.UserId)
+        ]
         |> validate args
         <!> (fun _ -> cmd)
     | Remove args ->
-        [ validateEmail "Email" (fun (x:CmdArgs.Remove) -> x.Email); validateNotEmptyGuid "UserId" (fun x -> x.UserId) ]
+        [
+            "Email", validateEmail (fun (x:CmdArgs.Remove) -> x.Email)
+            "UserId", validateNotEmptyGuid (fun x -> x.UserId)
+        ]
         |> validate args
         <!> (fun _ -> cmd)
         

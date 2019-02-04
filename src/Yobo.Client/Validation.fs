@@ -2,13 +2,11 @@ module Yobo.Client.Validation
 
 open Yobo.Shared.Validation
 
+let private isRelatedError n = function
+    | ValuesNotEqual v -> v = n
+    | _ -> false
+
 let tryGetFieldError txt (res:ValidationResult) =
-    let findFn = function
-        | IsEmpty t -> txt = t
-        | MustBeLongerThan (t,_) -> txt = t
-        | MustBeBiggerThan (t,_) -> txt = t
-        | MustBeAfter (t,_) -> txt = t
-        | ValuesNotEqual (t1, t2) -> txt = t1 || txt = t2
-        | IsNotValidEmail t -> txt = t
-        | TermsNotAgreed t -> txt = t
-    res.Errors |> List.tryFind findFn
+    res.Errors
+    |> List.tryFind (fun e -> e.Field = txt)
+    |> Option.orElse (res.Errors |> List.tryFind (fun x -> isRelatedError txt x.ErrorType))

@@ -16,7 +16,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
         let help = if error.IsSome then 
                     Help.help [ Help.Color IsDanger ]
-                        [ str (error.Value.Explain()) ]
+                        [ str (error.Value.ErrorType.Explain()) ]
                    else span [] []
         help,clr
 

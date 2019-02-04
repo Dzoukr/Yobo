@@ -5,18 +5,18 @@ open Yobo.Shared.Auth.Domain
 
 let validateAccount (acc:NewAccount) =
     [
-        validateNotEmpty "FirstName" (fun (x:NewAccount) -> x.FirstName)
-        validateNotEmpty "LastName" (fun x -> x.LastName)
-        validateNotEmpty "Email" (fun x -> x.Email)
-        validateLongerThan 5 "Password" (fun x -> x.Password)
-        validateLongerThan 5 "SecondPassword" (fun x -> x.SecondPassword)
-        validateEquals "Password" "SecondPassword" (fun x -> x.Password) (fun x -> x.SecondPassword)
-        validateEmail "Email" (fun x -> x.Email)
-        validateTermsAgreed "Terms" (fun x -> x.AgreeButtonChecked)
+        "FirstName", validateNotEmpty (fun (x:NewAccount) -> x.FirstName)
+        "LastName", validateNotEmpty (fun x -> x.LastName)
+        "Email", validateNotEmpty (fun x -> x.Email)
+        "Password", validateLongerThan 5 (fun x -> x.Password)
+        "SecondPassword", validateLongerThan 5 (fun x -> x.SecondPassword)
+        "Password", validateEquals "SecondPassword" (fun x -> x.Password) (fun x -> x.SecondPassword)
+        "Email", validateEmail (fun x -> x.Email)
+        "Terms", validateTermsAgreed  (fun x -> x.AgreeButtonChecked)
     ] |> validate acc
 
 let validateLogin (log:Login) =
     [
-        validateNotEmpty "Password" (fun x -> x.Password)
-        validateEmail "Email" (fun x -> x.Email)
+        "Password", validateNotEmpty (fun x -> x.Password)
+        "Email", validateEmail (fun x -> x.Email)
     ] |> validate log

@@ -15,7 +15,7 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Yobo.Libraries", "src\Yobo.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA5BC24D-BD6B-48FB-85A6-89C73FBD84CB}"
 EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DbMigration", "tools\DbMigration\DbMigration.fsproj", "{63914AA7-121F-4461-9A48-C4650B964160}"
+Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DbMigrations", "tools\DbMigrations\DbMigrations.fsproj", "{5BB85E62-F44C-492D-AA64-BDF4B2723371}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,16 +43,16 @@ Global
 		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{63914AA7-121F-4461-9A48-C4650B964160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{63914AA7-121F-4461-9A48-C4650B964160}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{63914AA7-121F-4461-9A48-C4650B964160}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{63914AA7-121F-4461-9A48-C4650B964160}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{63914AA7-121F-4461-9A48-C4650B964160} = {BA5BC24D-BD6B-48FB-85A6-89C73FBD84CB}
+		{5BB85E62-F44C-492D-AA64-BDF4B2723371} = {BA5BC24D-BD6B-48FB-85A6-89C73FBD84CB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C7A73719-4B55-49BD-9A88-23D7388764FA}

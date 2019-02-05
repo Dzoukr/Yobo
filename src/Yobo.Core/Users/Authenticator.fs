@@ -69,5 +69,5 @@ let createDefault (connString:string) (verifyHashFn:string -> string -> bool) =
         Login = fun l p -> login verifyHashFn l p |> Data.tryQueryResultM (fun _ -> InvalidLoginOrPassword) ctx
         GetByActivationKey = getByActivationKey >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.ActivationKeyDoesNotMatch)
         GetByEmail = getByEmail >> Data.tryQueryResult ctx  >> Result.mapError (fun _ -> AuthError.InvalidLogin)
-        GetByPasswordResetKey = getByPasswordResetKey >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.ActivationKeyDoesNotMatch)
+        GetByPasswordResetKey = getByPasswordResetKey >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.PasswordResetKeyDoesNotMatch)
     }

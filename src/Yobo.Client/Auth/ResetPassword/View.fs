@@ -3,7 +3,6 @@ module Yobo.Client.Auth.ResetPassword.View
 open Fable.Helpers.React
 open Fable.Helpers.React.Props
 open Fulma
-open Fable.Core.JsInterop
 open Yobo.Client
 open Yobo.Shared.Auth
 open Yobo.Shared
@@ -12,22 +11,20 @@ open FSharp.Rop
 
 let render (state : State) (dispatch : Msg -> unit) =
 
-    let formChanged setter v =
-        v |> setter |> FormChanged |> dispatch
-
     let pwd1 =
-        Control.div [] [
-            Input.password [
-                Input.Option.Value state.Form.Password
-                Input.Option.OnChange (fun e -> !!e.target?value |> formChanged (fun v -> { state.Form with Password = v })) ]
-        ]
-    let pwd2 =
-        Control.div [] [
-            Input.password [
-                Input.Option.Value state.Form.PasswordAgain
-                Input.Option.OnChange (fun e -> !!e.target?value |> formChanged (fun v -> { state.Form with PasswordAgain = v })) ]
-        ]
+        SharedView.Forms.password
+            state.ValidationResult
+            "Password"
+            state.Form.Password
+            (fun v -> { state.Form with Password = v } |> FormChanged |> dispatch)
 
+    let pwd2 =
+        SharedView.Forms.password
+            state.ValidationResult
+            "SecondPassword"
+            state.Form.SecondPassword
+            (fun v -> { state.Form with SecondPassword = v } |> FormChanged |> dispatch)
+    
     let btn =
         Control.div [] [
             Button.button 
@@ -36,9 +33,14 @@ let render (state : State) (dispatch : Msg -> unit) =
         ]
 
     let successMsg =
-        "Na email jsme Vám odeslali odkaz, pomocí kterého si změníte heslo."
-        |> str
-        |> SharedView.successBox
+        span [] [
+            str "Vaše heslo bylo úspěšně změněno."
+            div [] [
+                a [ Href Router.Routes.login; OnClick Router.goToUrl] [
+                    str "Zpátky na přihlášení"
+                ]
+            ]
+        ] |> SharedView.successBox
 
     let displayIf cond controls =
         if cond then controls else str ""

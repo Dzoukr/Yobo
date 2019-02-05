@@ -17,6 +17,13 @@ let validateAccount (acc:NewAccount) =
 
 let validateLogin (log:Login) =
     [
-        "Password", validateNotEmpty (fun x -> x.Password)
+        "Password", validateNotEmpty (fun (x:Login) -> x.Password)
         "Email", validateEmail (fun x -> x.Email)
     ] |> validate log
+
+let validatePasswordReset (r:PasswordReset) =
+    [
+        "Password", validateLongerThan 5 (fun x -> x.Password)
+        "SecondPassword", validateLongerThan 5 (fun x -> x.SecondPassword)
+        "Password", validateEquals "SecondPassword" (fun x -> x.Password) (fun x -> x.SecondPassword)
+    ] |> validate r

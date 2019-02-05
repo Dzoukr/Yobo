@@ -8,6 +8,7 @@ type DomainError =
     | UserAlreadyActivated
     | UserNotActivated
     | ActivationKeyDoesNotMatch
+    | PasswordResetKeyDoesNotMatch
     | LessonIsFull
     | LessonIsAlreadyReserved
     | LessonIsNotReserved
@@ -24,6 +25,7 @@ type DomainError =
             | UserAlreadyActivated -> "Uživatelský účet je již zaktivován." 
             | UserNotActivated -> "Uživatelský účet není zaktivován."
             | ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."
+            | PasswordResetKeyDoesNotMatch -> "Klíč pro reset hesla nebyl nalezen."
             | LessonIsFull -> "Lekce je již plně obsazená."
             | LessonIsAlreadyReserved -> "Lekce je již zarezervována."
             | LessonIsNotReserved -> "Lekce není zarezervována."

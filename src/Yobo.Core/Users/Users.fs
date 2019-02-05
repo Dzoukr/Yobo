@@ -27,6 +27,12 @@ module CmdArgs =
         PasswordResetKey : Guid
     }
 
+    type ResetPassword = {
+        Id : Guid
+        PasswordResetKey : Guid
+        PasswordHash : string
+    }
+
     type AddCredits = {
         Id : Guid
         Credits : int
@@ -60,6 +66,7 @@ type Command =
     | RegenerateActivationKey of CmdArgs.RegenerateActivationKey
     | Activate of CmdArgs.Activate
     | InitiatePasswordReset of CmdArgs.InitiatePasswordReset
+    | ResetPassword of CmdArgs.ResetPassword
     | AddCredits of CmdArgs.AddCredits
     | WithdrawCredits of CmdArgs.WithdrawCredits
     | RefundCredits of CmdArgs.RefundCredits
@@ -71,6 +78,7 @@ type Event =
     | ActivationKeyRegenerated of CmdArgs.RegenerateActivationKey
     | Activated of CmdArgs.Activate
     | PasswordResetInitiated of CmdArgs.InitiatePasswordReset
+    | PasswordReset of CmdArgs.ResetPassword
     | CreditsAdded of CmdArgs.AddCredits
     | CreditsWithdrawn of CmdArgs.WithdrawCredits
     | CreditsRefunded of CmdArgs.RefundCredits

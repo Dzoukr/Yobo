@@ -26,6 +26,16 @@ module ArgsBuilder =
         ) Validation.validateAccount
         >> Result.mapError ServerError.ValidationError
 
+    let buildPasswordReset userId key getHash =
+        ArgsBuilder.build (fun (pr:PasswordReset) ->
+            ({
+                Id = userId
+                PasswordResetKey = key
+                PasswordHash = pr.Password |> getHash
+            } : CmdArgs.ResetPassword)
+        ) Validation.validatePasswordReset
+        >> Result.mapError ServerError.ValidationError
+
 let claimsToUser getUserById (claims:seq<Claim>) =
     let find key = claims |> Seq.find (fun x -> x.Type = key) |> (fun x -> x.Value)
     let id = find "Id" |> Guid
@@ -79,5 +89,13 @@ let initiatePasswordReset cmdHandler getUserByEmail (email:string) =
     result {
         let! (user : User) = getUserByEmail email
         let! _ = ({ Id = user.Id; PasswordResetKey = Guid.NewGuid() } : CmdArgs.InitiatePasswordReset) |> Command.InitiatePasswordReset |> CoreCommand.Users |> cmdHandler
+        return ()
+    }
+
+let resetPassword cmdHandler createHashFn getByPwdResetKey (key:Guid,pwdReset:PasswordReset) =
+    result {
+        let! (user : User) = key |> getByPwdResetKey
+        let! args = pwdReset |> ArgsBuilder.buildPasswordReset user.Id key createHashFn
+        let! _ = args |> Command.ResetPassword |> CoreCommand.Users |> cmdHandler
         return ()
     }

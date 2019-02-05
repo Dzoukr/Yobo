@@ -1,5 +1,7 @@
 module Yobo.Shared.Auth.Domain
 
+open System
+
 type NewAccount = {
     FirstName: string
     LastName: string
@@ -26,4 +28,14 @@ with
     static member Init = {
         Email = ""
         Password = ""
+    }
+
+type PasswordReset = {
+    Password: string
+    SecondPassword: string
+}
+with
+    static member Init = {
+        Password = ""
+        SecondPassword = ""
     }

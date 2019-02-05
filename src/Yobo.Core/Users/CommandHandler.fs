@@ -9,6 +9,7 @@ let private getIdFromCmd = function
     | RegenerateActivationKey args -> args |> Extractor.getIdFromCommand
     | Activate args -> args |> Extractor.getIdFromCommand
     | InitiatePasswordReset args -> args |> Extractor.getIdFromCommand
+    | ResetPassword args -> args |> Extractor.getIdFromCommand
     | AddCredits args -> args |> Extractor.getIdFromCommand
     | WithdrawCredits args -> args |> Extractor.getIdFromCommand
     | RefundCredits args -> args |> Extractor.getIdFromCommand
@@ -20,6 +21,7 @@ let private getIdFromEvn = function
     | ActivationKeyRegenerated args -> args |> Extractor.getIdFromCommand
     | Activated args -> args |> Extractor.getIdFromCommand
     | PasswordResetInitiated args -> args |> Extractor.getIdFromCommand
+    | PasswordReset args -> args |> Extractor.getIdFromCommand
     | CreditsAdded args -> args |> Extractor.getIdFromCommand
     | CreditsWithdrawn args -> args |> Extractor.getIdFromCommand
     | CreditsRefunded args -> args |> Extractor.getIdFromCommand

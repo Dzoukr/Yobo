@@ -34,6 +34,12 @@ let passwordResetInitiated (args:CmdArgs.InitiatePasswordReset) (ctx:ReadDb.Db.d
     item.PasswordResetKey <- Some args.PasswordResetKey
     ctx.SubmitUpdates()
 
+let passwordReset (args:CmdArgs.ResetPassword) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.PasswordResetKey <- None
+    item.PasswordHash <- args.PasswordHash
+    ctx.SubmitUpdates()
+
 let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.ActivationKey <- args.ActivationKey

@@ -101,4 +101,29 @@ let termsModal isActive closeDisplay =
         ]
     ]
 
-             
+module Forms =
+    open Yobo.Shared.Validation
+    open Fable.Core.JsInterop
+
+    let private errorAndColor (res:ValidationResult) name =
+        let error = res |> Validation.tryGetFieldError name
+        let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
+        let help = if error.IsSome then 
+                    Help.help [ Help.Color IsDanger ]
+                        [ str (error.Value.ErrorType.Explain()) ]
+                   else span [] []
+        help,clr
+
+    let private genericControl typ (res:ValidationResult) name getter setter =
+        let help,clr = errorAndColor res name
+        Control.div [] [
+            typ [
+                clr
+                Input.Option.Value getter
+                Input.Option.OnChange (fun e -> !!e.target?value |> setter)
+            ]
+            help
+        ]
+
+    let text (res:ValidationResult) name getter setter = genericControl Input.text res name getter setter
+    let password (res:ValidationResult) name getter setter = genericControl Input.password res name getter setter

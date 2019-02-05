@@ -2,24 +2,27 @@ module Yobo.Client.Auth.ResetPassword.Domain
 
 open System
 open Yobo.Shared.Communication
+open Yobo.Shared.Validation
+open Yobo.Shared.Auth.Domain
 
-type FormState = {
-    Password : string
-    PasswordAgain : string
-}
 
 type State = {
-    Form : FormState
+    Form : PasswordReset
     PasswordResetKey : Guid
     ResetResult : ServerResult<unit> option
+    AlreadyTried : bool
+    ValidationResult : ValidationResult
 }
 with
     static member Init key = {
-        Form = { Password = ""; PasswordAgain = "" }
+        Form = PasswordReset.Init
         PasswordResetKey = key
         ResetResult = None
+        AlreadyTried = false
+        ValidationResult = ValidationResult.Empty
     }
 
 type Msg =
-    | FormChanged of FormState
+    | FormChanged of PasswordReset
     | ResetPassword
+    | PasswordReset of ServerResult<unit>

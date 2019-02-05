@@ -65,6 +65,7 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
         )
 
     | Activated _
+    | PasswordReset _
     | CashReservationsBlocked _
     | CashReservationsUnblocked _
     | CreditsRefunded _

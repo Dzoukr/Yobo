@@ -12,20 +12,20 @@ open Yobo.Shared.Domain
 module Calendar =
     open Yobo.Shared.Calendar.Domain
 
-    type private BookAllowed =
-        | Cash
-        | Credit
-
     type private LessonState =
         | Cancelled
         | AlreadyStarted of userBooked:bool
-        | Reserved of cancelAllowed:bool
-        | NotReserved of Availability option * bookAllowed:BookAllowed option * cancelAllowed:bool
+        | Reserved of typ:Payment * cancelAllowed:bool
+        | NotReserved of Availability option * bookAllowed:Payment option * cancelAllowed:bool
 
     let private toLessonState (user:User) (lesson:Lesson) =
         let alreadyStarted = DateTimeOffset.Now > lesson.StartDate
         let cancellingDate = lesson.StartDate |> Yobo.Shared.Calendar.Domain.getCancellingDate
         let cancellingClosed = alreadyStarted || DateTimeOffset.Now > cancellingDate
+        let getReservationType = function
+            | ForOne t -> t
+            | ForTwo -> Credits
+
 
         let bookAllowed =
             match lesson.Availability with
@@ -34,12 +34,12 @@ module Calendar =
                 match user.Credits, user.CashReservationBlockedUntil with
                 | 0, Some d -> if DateTimeOffset.Now > d then Some Cash else None
                 | 0, None -> Some Cash
-                | x, _ when x > 0 -> Some Credit
+                | x, _ when x > 0 -> Some Credits
                 | _ -> None
 
         if lesson.IsCancelled then LessonState.Cancelled
         else if alreadyStarted then LessonState.AlreadyStarted(lesson.UserReservation.IsSome)
-        else if lesson.UserReservation.IsSome then LessonState.Reserved(not cancellingClosed)
+        else if lesson.UserReservation.IsSome then LessonState.Reserved(getReservationType lesson.UserReservation.Value, not cancellingClosed)
         else NotReserved(lesson.Availability, bookAllowed, not cancellingClosed)
 
     let lessonDiv (user:User) dispatch (lesson:Lesson) =
@@ -54,7 +54,8 @@ module Calendar =
             | Cancelled -> Tag.tag [ Tag.Color IsBlack ] [ str "Lekce zrušena" ]
             | AlreadyStarted(true) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zůčastnili jste se" ]
             | AlreadyStarted(false) -> str ""
-            | Reserved _ -> Tag.tag [ Tag.Color IsInfo ] [ str "Zarezervováno" ]
+            | Reserved (Credits, _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zarezervováno" ]
+            | Reserved (Cash, _) -> Tag.tag [ Tag.Color IsInfo ] [ str "Zarezervováno (hotově)" ]
             | NotReserved(Some Free, _, _) -> Tag.tag [ Tag.Color IsSuccess ] [ str "Volno" ]
             | NotReserved(Some LastFreeSpot, _, _) -> Tag.tag [ Tag.Color IsWarning ] [ str "Poslední volné místo" ]
             | NotReserved(None, _, _) -> Tag.tag [ Tag.Color IsDanger ] [ str "Lekce obsazena" ]
@@ -66,7 +67,7 @@ module Calendar =
                     Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Cash) } |> AddReservation |> dispatch ) ] ]
                             [ str "Rezervovat (hotovost)" ]
                 ]
-            | false, NotReserved(_, Some Credit,_) ->
+            | false, NotReserved(_, Some Credits,_) ->
                 div [] [
                     Button.button [ Button.Color IsPrimary; Button.Option.Props [ OnClick (fun _ -> { LessonId = lesson.Id; UserReservation = ForOne(Payment.Credits) } |> AddReservation |> dispatch ) ] ]
                         [ str "Rezervovat" ]
@@ -75,7 +76,7 @@ module Calendar =
 
         let cancelBtn =
             match lessonState with
-            | Reserved(true) ->
+            | Reserved(_, true) ->
                 div [] [
                     Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelReservation(lesson.Id) |> dispatch) ] ] [
                         str "Zrušit rezervaci"

@@ -15,6 +15,9 @@ let onlyIfExists state =
 let onlyIfActivationKeyMatch key state =
     if state.ActivationKey = key then Ok state else DomainError.ActivationKeyDoesNotMatch |> Error
 
+let onlyIfPasswordResetKeyMatch key state =
+    if state.PasswordResetKey = Some key then Ok state else DomainError.PasswordResetKeyDoesNotMatch |> Error
+
 let onlyIfNotAlreadyActivated state =
     if state.IsActivated then DomainError.UserAlreadyActivated |> Error else Ok state
 
@@ -55,6 +58,12 @@ let execute (state:State) = function
         >>= onlyIfActivated
         <!> (fun _ -> PasswordResetInitiated args)
         <!> List.singleton
+    | ResetPassword args ->
+        onlyIfExists state
+        >>= onlyIfActivated
+        >>= onlyIfPasswordResetKeyMatch args.PasswordResetKey
+        <!> (fun _ -> PasswordReset args)
+        <!> List.singleton
     | AddCredits args ->
         onlyIfActivated state
         <!> (fun _ -> CreditsAdded args)
@@ -83,6 +92,7 @@ let apply (state:State) = function
     | ActivationKeyRegenerated args -> { state with ActivationKey = args.ActivationKey }
     | Activated _ -> { state with IsActivated = true }
     | PasswordResetInitiated args -> { state with PasswordResetKey = Some args.PasswordResetKey }
+    | PasswordReset args -> { state with PasswordResetKey = None }
     | CreditsAdded args -> { state with Credits = state.Credits + args.Credits; CreditsExpiration = Some args.Expiration }
     | CreditsWithdrawn args -> { state with Credits = state.Credits - args.Amount }
     | CreditsRefunded args -> { state with Credits = state.Credits + args.Amount }

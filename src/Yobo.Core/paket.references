@@ -1,6 +1,6 @@
 group Core
     FSharp.Core
-    CosmoStore
+    CosmoStore.TableStorage
     Newtonsoft.Json
     SQLProvider
     System.Data.SqlClient

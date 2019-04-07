@@ -62,7 +62,8 @@ let private runValidators validators cmd =
 let private toEventWrite metadata corrId (name, data) =
     {
         Id = Guid.NewGuid()
-        CorrelationId = corrId
+        CorrelationId = Some corrId
+        CausationId = None
         Name = name
         Data = data
         Metadata = metadata |> Serialization.objectToJToken |> Some

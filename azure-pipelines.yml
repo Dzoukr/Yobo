@@ -13,6 +13,12 @@ steps:
     version: '2.2.100'
     packageType: sdk
 
+- script: dotnet tool install --tool-path . paket
+  displayName: 'Install Paket'
+
+- script: dotnet tool install --tool-path . fake-cli
+  displayName: 'Install FAKE'
+
 - script: fake build -t publish
   displayName: 'Build'
 

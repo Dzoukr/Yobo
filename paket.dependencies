@@ -28,7 +28,7 @@ group Core
     storage: none
 
     nuget FSharp.Core
-    nuget CosmoStore
+    nuget CosmoStore.TableStorage
     nuget Newtonsoft.Json
     nuget SQLProvider
     nuget System.Data.SqlClient

@@ -59,17 +59,20 @@ let getSagaSetup (cryptoProvider:SymetricCryptoProvider) (eventStore:EventStore)
     let userRegistryHandler = Users.Registry.CommandHandler.get eventStore
     let usersHandler = Users.CommandHandler.get cryptoProvider eventStore
     let lessonsHandler = Lessons.CommandHandler.get eventStore
+    let workshopsHandler = Workshops.CommandHandler.get eventStore
 
     let handle meta corrId cmd =
         match cmd with
         | CoreCommand.Users c -> c |> usersHandler.HandleCommand meta corrId <!> List.map CoreEvent.Users
         | CoreCommand.Lessons c -> c |> lessonsHandler.HandleCommand meta corrId <!> List.map CoreEvent.Lessons
+        | CoreCommand.Workshops c -> c |> workshopsHandler.HandleCommand meta corrId <!> List.map CoreEvent.Workshops
         | CoreCommand.UsersRegistry c -> c |> userRegistryHandler.HandleCommand meta corrId <!> List.map CoreEvent.UsersRegistry
 
     let compensate meta corrId evn =
         (match evn with
         | CoreEvent.Users c -> c |> usersHandler.CompensateEvent meta corrId
         | CoreEvent.Lessons c -> c |> lessonsHandler.CompensateEvent meta corrId
+        | CoreEvent.Workshops c -> c |> workshopsHandler.CompensateEvent meta corrId
         | CoreEvent.UsersRegistry c -> c |> userRegistryHandler.CompensateEvent meta corrId
         ) |> ignore
 

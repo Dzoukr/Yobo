@@ -4,41 +4,53 @@ open System
 open Yobo.Shared.Communication
 open Yobo.Shared.Domain
 
-type State = {
-    Lessons : Lesson list
-    WeekOffset : int
-    SelectedDates : DateTimeOffset list
+type AddLessonForm = {
     StartTime : string
     EndTime : string
     Name : string
     Description : string
-    FormOpened : bool
 }
 with
     static member Init = {
-        Lessons = []
-        WeekOffset = 0
-        SelectedDates = []
         StartTime = ""
         EndTime = ""
         Name = ""
         Description = ""
+    }
+
+type State = {
+    Lessons : Lesson list
+    Workshops : Workshop list
+    WeekOffset : int
+    SelectedDates : DateTimeOffset list
+    FormOpened : bool
+    AddLessonForm : AddLessonForm
+}
+with
+    static member Init = {
+        Lessons = []
+        Workshops = []
+        WeekOffset = 0
+        SelectedDates = []
         FormOpened = false
+        AddLessonForm = AddLessonForm.Init
     }
 
 type Msg =
     | Init
     | LoadLessons
     | LessonsLoaded of ServerResult<Lesson list>
+    | LoadWorkshops
+    | WorkshopsLoaded of ServerResult<Workshop list>
     | WeekOffsetChanged of int
     | DateSelected of DateTimeOffset
     | DateUnselected of DateTimeOffset
-    | StartChanged of string
-    | FormOpened of bool
-    | EndChanged of string
-    | NameChanged of string
-    | DescriptionChanged of string
-    | SubmitLessonsForm
-    | LessonsFormSubmitted of ServerResult<unit>
+    | AddLessonFormOpened of bool
+    | AddLessonFormChanged of AddLessonForm
+    | SubmitAddLessonForm
+    | SubmitAddWorkshopForm
+    | AddLessonFormSubmitted of ServerResult<unit>
     | CancelLesson of Guid
+    | DeleteWorkshop of Guid
     | LessonCancelled of ServerResult<unit>
+    | WorkshopDeleted of ServerResult<unit>

@@ -17,3 +17,10 @@ let validateAddLesson (args:AddLesson) =
         "Description", validateNotEmpty (fun (x:AddLesson) -> x.Description)
         "End", validateIsBeforeAnother (fun x -> x.Start) (fun x -> x.End)
     ] |> validate args
+
+let validateAddWorkshop (args:AddWorkshop) =
+    [
+        "Name", validateNotEmpty (fun (x:AddWorkshop) -> x.Name)
+        "Description", validateNotEmpty (fun (x:AddWorkshop) -> x.Description)
+        "End", validateIsBeforeAnother (fun x -> x.Start) (fun x -> x.End)
+    ] |> validate args

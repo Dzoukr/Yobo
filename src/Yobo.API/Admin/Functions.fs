@@ -34,6 +34,18 @@ module ArgsBuilder =
         ) Validation.validateAddLesson
         >> Result.mapError ServerError.ValidationError
 
+    let buildAddWorkshop =
+        ArgsBuilder.build (fun (x:AddWorkshop) ->
+            ({
+                Id = Guid.NewGuid()
+                StartDate = x.Start
+                EndDate = x.End
+                Name = x.Name
+                Description = x.Description
+            } : Workshops.CmdArgs.Create)
+        ) Validation.validateAddWorkshop
+        >> Result.mapError ServerError.ValidationError
+
 
 let addCredits cmdHandler (acc:AddCredits) =
     result {
@@ -49,8 +61,21 @@ let addLessons cmdHandler (acc:AddLesson list) =
         return ()
     }
 
+let addWorkshops cmdHandler (acc:AddWorkshop list) =
+    result {
+        let! args = acc |> Result.traverse ArgsBuilder.buildAddWorkshop
+        let! _ = args |> Result.traverse (Workshops.Command.Create >> CoreCommand.Workshops >> cmdHandler)
+        return ()
+    }
+
 let cancelLesson cmdHandler (i:Guid) =
     result {
         let! _ = ({ Id = i } : Lessons.CmdArgs.Cancel) |> Lessons.Command.Cancel |> CoreCommand.Lessons |> cmdHandler
+        return ()
+    }
+
+let deleteWorkshop cmdHandler (i:Guid) =
+    result {
+        let! _ = ({ Id = i } : Workshops.CmdArgs.Delete) |> Workshops.Command.Delete |> CoreCommand.Workshops |> cmdHandler
         return ()
     }

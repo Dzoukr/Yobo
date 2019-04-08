@@ -13,5 +13,6 @@ let getHandler (userQueries:Users.ReadQueries.UserQueries<_>) (sender:EmailProvi
         match cmd with
         | CoreEvent.Users e -> e |> Users.EmailEventHandler.handle userQueries settings |> send
         | CoreEvent.Lessons _
+        | CoreEvent.Workshops _
         | CoreEvent.UsersRegistry _ -> Ok ()
     handle

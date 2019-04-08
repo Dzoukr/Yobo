@@ -48,6 +48,13 @@
     <Compile Include="Lessons\UpdateQueries.fs" />
     <Compile Include="Lessons\DbEventHandler.fs" />
     <Compile Include="Lessons\ReadQueries.fs" />
+    <Compile Include="Workshops\Workshops.fs" />
+    <Compile Include="Workshops\Aggregate.fs" />
+    <Compile Include="Workshops\EventSerializer.fs" />
+    <Compile Include="Workshops\CommandHandler.fs" />
+    <Compile Include="Workshops\UpdateQueries.fs" />
+    <Compile Include="Workshops\DbEventHandler.fs" />
+    <Compile Include="Workshops\ReadQueries.fs" />
     <Compile Include="CQRS.fs" />
     <Compile Include="DbEventHandler.fs" />
     <Compile Include="EmailEventHandler.fs" />

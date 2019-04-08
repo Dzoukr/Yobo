@@ -48,10 +48,17 @@ module Lessons =
         |> Lessons.ReadQueries.createDefault
         |> Lessons.ReadQueries.withError dbErrorToServerError
 
+module Workshops =
+    let queries =
+        Configuration.ReadDb.connectionString
+        |> Workshops.ReadQueries.createDefault
+        |> Workshops.ReadQueries.withError dbErrorToServerError
+
 // event handlers
 module EventHandler =
     open Yobo.Core.Users.EventSerializer
     open Yobo.Core.Lessons.EventSerializer
+    open Yobo.Core.Workshops.EventSerializer
 
     let private dbHandleFn = DbEventHandler.getHandler Configuration.ReadDb.connectionString
     let private emailHandleFn = EmailEventHandler.getHandler Users.queries emailService emailSettings
@@ -61,6 +68,7 @@ module EventHandler =
 
     eventStore.EventAppended.Add(function
         | LessonsEvent evn -> evn |> CoreEvent.Lessons |> handle
+        | WorkshopsEvent evn -> evn |> CoreEvent.Workshops |> handle
         | UsersEvent cryptoProvider evn -> evn |> CoreEvent.Users |> handle
         | _ -> ()
     )

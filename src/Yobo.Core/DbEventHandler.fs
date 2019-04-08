@@ -14,5 +14,6 @@ let getHandler (connString:string) =
         match cmd with
         | CoreEvent.Users e -> e |> Users.DbEventHandler.handle |> safeExecute ctx
         | CoreEvent.Lessons e -> e |> Lessons.DbEventHandler.handle |> safeExecute ctx
+        | CoreEvent.Workshops e -> e |> Workshops.DbEventHandler.handle |> safeExecute ctx
         | CoreEvent.UsersRegistry _ -> Ok ()
     handle

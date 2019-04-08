@@ -77,8 +77,11 @@ module Admin =
         GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Users.queries.GetAll |> toAsync
         AddCredits = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addCredits |> toAsync
         GetLessonsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Lessons.queries.GetAllForDateRange |> toAsync
+        GetWorkshopsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Workshops.queries.GetAllForDateRange |> toAsync
         AddLessons = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addLessons |> toAsync
+        AddWorkshops = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addWorkshops |> toAsync
         CancelLesson = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser cancelLesson |> toAsync
+        DeleteWorkshop = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser deleteWorkshop |> toAsync
     }
 
 module Calendar =

@@ -15,3 +15,9 @@ type AddLesson = {
     Description : string
 }
 
+type AddWorkshop = {
+    Start : DateTimeOffset
+    End : DateTimeOffset
+    Name : string
+    Description : string
+}

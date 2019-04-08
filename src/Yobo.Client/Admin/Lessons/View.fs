@@ -15,7 +15,29 @@ module Calendar =
     open Yobo.Client
     open Yobo.Shared.Domain
 
-    let col dispatch (lessons:Lesson list) (date:DateTimeOffset) =
+    let col dispatch (lessons:Lesson list) (workshops:Workshop list) (date:DateTimeOffset) =
+        let workshopDiv (workshop:Workshop) =
+            let deleteBtn =
+                if workshop.StartDate > DateTimeOffset.Now then
+                    Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> DeleteWorkshop(workshop.Id) |> dispatch) ] ] [
+                        str "Smazat workshop"
+                    ]
+                else "Workshop již proběhl" |> str |> SharedView.infoBox
+            
+            div [ ClassName "popover is-popover-bottom" ][
+                div [ ClassName "popover-trigger lesson" ] [
+                    div [ ClassName "time" ] [
+                        workshop.StartDate |> SharedView.toCzTime |> str
+                        str " - "
+                        workshop.EndDate |> SharedView.toCzTime |> str
+                    ]
+                    div [ ClassName "name"] [ str workshop.Name ]
+                ]
+                div [ ClassName "popover-content" ] [
+                    deleteBtn
+                ]
+            ]
+        
         let lessonDiv (lesson:Lesson) =
             let cap =
                 if lesson.IsCancelled then "Lekce je zrušena"
@@ -65,8 +87,8 @@ module Calendar =
 
             
         td [ ] [
-            
             div [] (lessons |> List.map lessonDiv)
+            div [] (workshops |> List.map workshopDiv)
         ]
 
     let headerCol (state:State) (dispatch : Msg -> unit) (date:DateTimeOffset) =
@@ -103,7 +125,7 @@ module Calendar =
     let navigation (state:State) dispatch =
         let addBtn =
             if state.SelectedDates.Length > 0 then
-                Button.button [ Button.Color IsPrimary; Button.Props [ OnClick (fun _ -> FormOpened(true) |> dispatch) ] ] [
+                Button.button [ Button.Color IsPrimary; Button.Props [ OnClick (fun _ -> AddLessonFormOpened(true) |> dispatch) ] ] [
                     state.SelectedDates.Length |> sprintf "Přidat %i lekcí" |> str
                 ]
             else str ""
@@ -155,8 +177,8 @@ module Calendar =
                         div [ ClassName "control"] [
                             Input.text [
                                 Input.Option.Placeholder "Čas začátku lekce, např. 19:00"
-                                Input.Option.Value state.StartTime
-                                Input.Option.OnChange (fun e -> !!e.target?value |> StartChanged |> dispatch)
+                                Input.Option.Value state.AddLessonForm.StartTime
+                                Input.Option.OnChange (fun e -> !!e.target?value |> (fun v -> { state.AddLessonForm with StartTime = v }) |> AddLessonFormChanged |> dispatch)
                             ]
                         ]
                     ]
@@ -171,8 +193,8 @@ module Calendar =
                         div [ ClassName "control"] [
                             Input.text [
                                 Input.Option.Placeholder "Čas konce lekce, např. 20:10"
-                                Input.Option.Value state.EndTime
-                                Input.Option.OnChange (fun e -> !!e.target?value |> EndChanged |> dispatch)
+                                Input.Option.Value state.AddLessonForm.EndTime
+                                Input.Option.OnChange (fun e -> !!e.target?value |> (fun v -> { state.AddLessonForm with EndTime = v }) |> AddLessonFormChanged |> dispatch)
                             ]
                         ]
                     ]
@@ -186,8 +208,8 @@ module Calendar =
                     Field.div [ ] [
                         div [ ClassName "control"] [
                             Input.text [
-                                Input.Option.Value state.Name
-                                Input.Option.OnChange (fun e -> !!e.target?value |> NameChanged |> dispatch)
+                                Input.Option.Value state.AddLessonForm.Name
+                                Input.Option.OnChange (fun e -> !!e.target?value |> (fun v -> { state.AddLessonForm with Name = v }) |> AddLessonFormChanged |> dispatch)
                             ]
                         ]
                     ]
@@ -201,8 +223,8 @@ module Calendar =
                     Field.div [ ] [
                         div [ ClassName "control"] [
                             Textarea.textarea [
-                                Textarea.Option.Value state.Description
-                                Textarea.Option.OnChange (fun e -> !!e.target?value |> DescriptionChanged |> dispatch)
+                                Textarea.Option.Value state.AddLessonForm.Description
+                                Textarea.Option.OnChange (fun e -> !!e.target?value |> (fun v -> { state.AddLessonForm with Description = v }) |> AddLessonFormChanged |> dispatch)
                             ] [ ]
                         ]
                     ]
@@ -218,10 +240,13 @@ module Calendar =
                             Button.button [
                                 Button.Disabled (not isSubmitable)
                                 Button.Color IsPrimary
-                                Button.Props [ OnClick (fun _ -> SubmitLessonsForm |> dispatch) ]
-                            ] [
-                                sprintf "Přidat %i lekcí" (state.SelectedDates.Length) |> str
-                            ]
+                                Button.Props [ OnClick (fun _ -> SubmitAddLessonForm |> dispatch) ]
+                            ] [ sprintf "Přidat %i lekcí" (state.SelectedDates.Length) |> str ]
+                            Button.button [
+                                Button.Disabled (not isSubmitable)
+                                Button.Color IsInfo
+                                Button.Props [ Style [ MarginLeft 10]; OnClick (fun _ -> SubmitAddWorkshopForm |> dispatch) ]
+                            ] [ sprintf "Přidat jako %i workshopů" (state.SelectedDates.Length) |> str ]
                         ]
                     ]
                 ]
@@ -232,7 +257,7 @@ module Calendar =
                 Quickview.quickview [ Quickview.IsActive state.FormOpened ] [
                     Quickview.header [ ] [
                         Quickview.title [ ] [ str "Přidat lekce" ]
-                        Delete.delete [ Delete.OnClick (fun _ -> FormOpened(false) |> dispatch) ] [ ]
+                        Delete.delete [ Delete.OnClick (fun _ -> AddLessonFormOpened(false) |> dispatch) ] [ ]
                     ]
                     Quickview.body [ ]
                         [ content ]
@@ -245,6 +270,9 @@ module Calendar =
         let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
+        let getWorkshopsForDate (date:DateTimeOffset) =
+            state.Workshops
+            |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
         let headerRow =
             dates
@@ -255,7 +283,8 @@ module Calendar =
             dates
             |> List.map (fun x ->
                 let lsns = x |> getLessonsForDate
-                col dispatch lsns x
+                let wrksps = x |> getWorkshopsForDate
+                col dispatch lsns wrksps x
             )
             |> tr [ ClassName "day" ]
 

@@ -6,11 +6,13 @@ type CoreCommand =
     | UsersRegistry of Users.Registry.Command
     | Users of Users.Command
     | Lessons of Lessons.Command
+    | Workshops of Workshops.Command
 
 type CoreEvent = 
     | UsersRegistry of Users.Registry.Event
     | Users of Users.Event
     | Lessons of Lessons.Event
+    | Workshops of Workshops.Event
 
 type Saga =
     | Direct

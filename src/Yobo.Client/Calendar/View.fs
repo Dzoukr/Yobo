@@ -175,7 +175,6 @@ module Calendar =
             yield headerRow
             yield row
         ]
-    
 
 let render user (state : State) (dispatch : Msg -> unit) =
     div [] [

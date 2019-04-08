@@ -17,6 +17,7 @@ type DomainError =
     | NotEnoughCredits
     | CashReservationIsBlocked
     | LessonIsAlreadyCancelled
+    | WorkshopIsAlreadyDeleted
     with
         member x.Explain() =
             match x with
@@ -34,6 +35,7 @@ type DomainError =
             | NotEnoughCredits -> "Nemáte dostatek kreditů."
             | CashReservationIsBlocked -> "Rezervaci v hotovosti nelze provést."
             | LessonIsAlreadyCancelled -> "Lekce je již zrušena."
+            | WorkshopIsAlreadyDeleted -> "Workshop je již smazán."
 
 type User = {
     Id : Guid
@@ -69,4 +71,12 @@ type Lesson = {
     Description : string
     Reservations : (User * UserReservation) list
     IsCancelled : bool
+}
+
+type Workshop = {
+    Id : Guid
+    StartDate : DateTimeOffset
+    EndDate : DateTimeOffset
+    Name : string
+    Description : string
 }

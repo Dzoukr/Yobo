@@ -88,7 +88,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
             { state with Workshops = v}, Cmd.none
         | Error _ -> state, Cmd.none
     | WeekOffsetChanged o ->
-        { state with WeekOffset = o }, LoadLessons |> Cmd.ofMsg
+        { state with WeekOffset = o }, [ LoadLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
     | DateSelected d ->
         { state with SelectedDates = d :: state.SelectedDates }, Cmd.none
     | DateUnselected d ->

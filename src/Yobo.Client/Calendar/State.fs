@@ -26,7 +26,7 @@ let private innerUpdate (msg : Msg) (state : State) : State * Cmd<Msg> =
         | Ok v ->
             { state with Workshops = v}, Cmd.none
         | Error err -> state, (err |> SharedView.serverErrorToToast)
-    | WeekOffsetChanged o -> { state with WeekOffset = o }, LoadUserLessons |> Cmd.ofMsg
+    | WeekOffsetChanged o -> { state with WeekOffset = o }, [LoadUserLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
     | AddReservation args -> state, (args |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.AddReservation ReservationAdded)
     | ReservationAdded res ->
         state, [ (res |> SharedView.resultToToast "Lekce byla úspěšně zarezervována"); LoadUserLessons |> Cmd.ofMsg ] |> Cmd.batch

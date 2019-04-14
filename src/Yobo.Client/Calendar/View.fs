@@ -72,9 +72,7 @@ module Calendar =
                     i [ ClassName "far fa-clock"; Style [ MarginRight 5 ] ] []
                     sprintf "%s od %s do %s" (workshop.StartDate |> SharedView.toCzDate)  st en |> str
                 ]
-                div [] [
-                    str workshop.Description
-                ]
+                div [ DangerouslySetInnerHTML { __html = workshop.Description.Replace("\n","<br/>") } ] [ ]
                 div [ ClassName "name"] [
                     str "Přihlášení přes email: "
                     a [ Href "mailto:jana@mindfulyoga.cz"] [ str "jana@mindfulyoga.cz"] 

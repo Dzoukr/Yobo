@@ -25,7 +25,7 @@ module Calendar =
                 else "Workshop již proběhl" |> str |> SharedView.infoBox
             
             div [ ClassName "popover is-popover-bottom" ][
-                div [ ClassName "popover-trigger lesson" ] [
+                div [ ClassName "popover-trigger lesson workshop" ] [
                     div [ ClassName "time" ] [
                         workshop.StartDate |> SharedView.toCzTime |> str
                         str " - "

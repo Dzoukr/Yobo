@@ -42,6 +42,47 @@ module Calendar =
         else if lesson.UserReservation.IsSome then LessonState.Reserved(getReservationType lesson.UserReservation.Value, not cancellingClosed)
         else NotReserved(lesson.Availability, bookAllowed, not cancellingClosed)
 
+    let workshopDiv (workshop:Workshop) =
+        
+        let st = workshop.StartDate |> SharedView.toCzTime
+        let en = workshop.EndDate |> SharedView.toCzTime
+        
+        let popoverClass =
+            match workshop.StartDate.DayOfWeek with
+            | DayOfWeek.Monday -> "is-popover-right"
+            | DayOfWeek.Sunday -> "is-popover-left"
+            | _ -> "is-popover-bottom"
+        
+        div [ ClassName (sprintf "popover %s" popoverClass) ] [
+            div [ ClassName ("popover-trigger lesson workshop") ] [
+
+                div [ ClassName "time" ] [
+                    workshop.StartDate |> SharedView.toCzTime |> str
+                    str " - "
+                    workshop.EndDate |> SharedView.toCzTime |> str
+
+                ]
+                div [ ClassName "name"] [ str workshop.Name ]
+            ]
+            div [ ClassName "popover-content" ] [
+                div [ ClassName "name"] [
+                    str workshop.Name
+                ]
+                div [ ClassName "time"] [
+                    i [ ClassName "far fa-clock"; Style [ MarginRight 5 ] ] []
+                    sprintf "%s od %s do %s" (workshop.StartDate |> SharedView.toCzDate)  st en |> str
+                ]
+                div [] [
+                    str workshop.Description
+                ]
+                div [ ClassName "name"] [
+                    str "Přihlášení přes email: "
+                    a [ Href "mailto:jana@mindfulyoga.cz"] [ str "jana@mindfulyoga.cz"] 
+                    str " nebo na tel. čísle 777 835 160"
+                ]
+            ]
+        ]
+            
     let lessonDiv (user:User) dispatch (lesson:Lesson) =
 
         let lessonState = lesson |> toLessonState user
@@ -150,9 +191,10 @@ module Calendar =
             div [ ClassName "date" ] [ date.ToString("dd. MM. yyyy") |> str ]
         ]
 
-    let col user (lessons:Lesson list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
+    let col user (lessons:Lesson list) (workshops:Workshop list) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         td [ ] [
             div [] (lessons |> List.map (lessonDiv user dispatch))
+            div [] (workshops |> List.map workshopDiv)
         ]
 
     let render user (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset, endDate:DateTimeOffset) =
@@ -161,12 +203,17 @@ module Calendar =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
+        let getWorkshopsForDate (date:DateTimeOffset) =
+            state.Workshops
+            |> List.filter (fun x -> x.StartDate.Date = date.Date)
+
         let headerRow = dates |> List.map headerCol |> tr [ ClassName "header" ] 
         let row =
             dates
             |> List.map (fun x ->
                 let lsns = x |> getLessonsForDate
-                col user lsns dispatch x
+                let workshps = x |> getWorkshopsForDate
+                col user lsns workshps dispatch x
             )
             |> tr [ ClassName "day" ] 
 

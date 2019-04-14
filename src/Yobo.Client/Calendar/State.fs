@@ -8,12 +8,23 @@ open Yobo.Client
 
 let private innerUpdate (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
-    | Init -> state, LoadUserLessons |> Cmd.ofMsg
+    | Init -> state, [LoadUserLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
     | LoadUserLessons -> state, (state.WeekOffset |> DateRange.getDateRangeForWeekOffset |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.GetLessonsForDateRange UserLessonsLoaded)
+    | LoadWorkshops ->
+        state,
+            state.WeekOffset
+            |> DateRange.getDateRangeForWeekOffset
+            |> SecuredParam.create
+            |> Cmd.ofAsyncResult calendarAPI.GetWorkshopsForDateRange WorkshopsLoaded
     | UserLessonsLoaded res ->
         match res with
         | Ok lsns ->
            { state with Lessons = lsns }, Cmd.none
+        | Error err -> state, (err |> SharedView.serverErrorToToast)
+    | WorkshopsLoaded res ->
+        match res with
+        | Ok v ->
+            { state with Workshops = v}, Cmd.none
         | Error err -> state, (err |> SharedView.serverErrorToToast)
     | WeekOffsetChanged o -> { state with WeekOffset = o }, LoadUserLessons |> Cmd.ofMsg
     | AddReservation args -> state, (args |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.AddReservation ReservationAdded)

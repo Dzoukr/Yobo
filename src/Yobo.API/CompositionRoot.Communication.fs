@@ -90,6 +90,7 @@ module Calendar =
     open Yobo.API.Calendar.Functions
 
     let api : Yobo.Shared.Calendar.Communication.API = {
+        GetWorkshopsForDateRange = fun x -> x |> Security.onlyForLogged <!> snd >>= Services.Workshops.queries.GetAllForDateRange |> toAsync
         GetLessonsForDateRange =
             (fun x ->
                 x |> Security.onlyForLogged

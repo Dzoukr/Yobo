@@ -19,7 +19,7 @@ steps:
 - script: dotnet tool install --tool-path . fake-cli
   displayName: 'Install FAKE'
 
-- script: dotnet run -p tools\EventStoreBackup\ $(keysTable) $(accountName) $(authKey)
+- script: dotnet run -p tools\EventStoreBackup\ "$(keysTable)" "$(accountName)" "$(authKey)"
   displayName: 'Build'
 
 - task: PublishBuildArtifacts@1

@@ -84,3 +84,12 @@ group Migrations
 
     nuget FSharp.Core
     nuget dbup-sqlserver
+
+group EventStoreBackup
+    source https://api.nuget.org/v3/index.json
+    framework: netcoreapp2.2
+    storage: none
+
+    nuget FSharp.Core
+    nuget CosmoStore.TableStorage
+    nuget Microsoft.FSharpLu.Json

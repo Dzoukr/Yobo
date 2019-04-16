@@ -52,7 +52,7 @@ let main argv =
     let keysTable,config =
         match argv.Length with
         | 1 -> argv.[0], Configuration.CreateDefaultForLocalEmulator()
-        | _ -> argv.[0], Configuration.CreateDefault argv.[2] argv.[3]
+        | _ -> argv.[0], Configuration.CreateDefault argv.[1] argv.[2]
 
     let eventStore = config |> EventStore.getEventStore
 

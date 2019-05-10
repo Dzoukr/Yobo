@@ -39,6 +39,9 @@
         <Compile Include="Calendar\Domain.fs" />
         <Compile Include="Calendar\State.fs" />
         <Compile Include="Calendar\View.fs" />
+        <Compile Include="MyLessons\Domain.fs" />
+        <Compile Include="MyLessons\State.fs" />
+        <Compile Include="MyLessons\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="State.fs" />
         <Compile Include="View.fs" />

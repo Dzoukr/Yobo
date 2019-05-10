@@ -36,6 +36,7 @@ let private displayLoggedPage termsViewed (user:User option) (page:string) conte
             Container.container [] [
                 Navbar.Start.div [] [
                     item Router.Routes.calendar "fas fa-calendar-alt" "Kalendář"
+                    item Router.Routes.mylessons "fas fa-calendar-alt" "Moje lekce"
                 ]
                 Navbar.End.div [] [
                     yield! adminButtons
@@ -84,3 +85,5 @@ let render (state : State) (dispatch : Msg -> unit) =
                 Calendar.View.render state.LoggedUser.Value st (CalendarMsg >> dispatch)
             else str ""
         content |> showInTemplate
+    | MyLessons st ->
+        MyLessons.View.render st (MyLessonsMsg >> dispatch) |> showInTemplate

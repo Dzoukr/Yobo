@@ -17,6 +17,7 @@ module Routes =
     let calendar = "/calendar"
     let forgottenPassword = "/forgottenPassword"
     let resetPassword = "/resetPassword"
+    let mylessons = "/mylessons"
 
 let goToUrl (e: React.MouseEvent) =
     e.preventDefault()

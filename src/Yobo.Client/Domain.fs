@@ -17,6 +17,7 @@ type Page =
     | Auth of AuthPage
     | Admin of AdminPage
     | Calendar of Calendar.Domain.State
+    | MyLessons of MyLessons.Domain.State
 
 type State = {
     Page : Page
@@ -47,6 +48,7 @@ type Msg =
     | AuthMsg of AuthMsg
     | AdminMsg of AdminMsg
     | CalendarMsg of Calendar.Domain.Msg
+    | MyLessonsMsg of MyLessons.Domain.Msg
     | ReloadUser
     | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
     | RefreshToken of string

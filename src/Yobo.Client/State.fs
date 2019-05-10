@@ -21,6 +21,7 @@ let pageParser: Parser<Page -> Page, Page> =
         map (Admin(Users(Admin.Users.Domain.State.Init))) (s Router.Routes.users)
         map (Admin(Lessons(Admin.Lessons.Domain.State.Init))) (s Router.Routes.lessons)
         map (Calendar(Calendar.Domain.State.Init)) (s Router.Routes.calendar)
+        map (MyLessons(MyLessons.Domain.State.Init)) (s Router.Routes.mylessons)
     ]
 
 let private withCheckingLogin (state:State) cmd =
@@ -60,6 +61,7 @@ let urlUpdate (result: Option<Page>) state =
                 | Users _ -> Admin.Users.Domain.Msg.Init |> UsersMsg |> AdminMsg |> Cmd.ofMsg
                 | Lessons _ -> Admin.Lessons.Domain.Msg.Init |> LessonsMsg |> AdminMsg |> Cmd.ofMsg
             | Calendar _ -> Calendar.Domain.Msg.Init |> CalendarMsg |> Cmd.ofMsg
+            | MyLessons _ -> MyLessons.Domain.Msg.Init |> MyLessonsMsg |> Cmd.ofMsg
         (state |> withRoute), (withCheckingLogin state cmd)
 
 let init result =
@@ -90,6 +92,10 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | CalendarMsg msg ->
         match state.Page with
         | Calendar state -> Calendar.State.update msg state |> mapWithReloadUser Calendar Msg.CalendarMsg
+        | _ -> state, Cmd.none
+    | MyLessonsMsg msg ->
+        match state.Page with
+        | MyLessons state -> MyLessons.State.update msg state |> map MyLessons MyLessonsMsg
         | _ -> state, Cmd.none
     | ReloadUser -> state, (TokenStorage.tryGetToken() |> Option.defaultValue "" |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->

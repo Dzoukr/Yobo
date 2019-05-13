@@ -14,6 +14,7 @@ let private updateValidation (state : State) =
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
+    | Init id -> { state with PasswordResetKey = id }, Cmd.none
     | FormChanged f -> { state with Form = f } |> updateValidation, Cmd.none
     | ResetPassword ->
         let validation = state.Form |> Validation.validatePasswordReset |> ValidationResult.FromResult

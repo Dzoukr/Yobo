@@ -7,17 +7,56 @@ open Fable.Import
 open Fable.Helpers
 open Fable.Core.JsInterop
 
-module Routes =
-    let defaultPage = "/calendar"
-    let login = "/login"
-    let registration = "/registration"
-    let accountActivation = "/accountActivation"
-    let users = "/users"
-    let lessons = "/lessons"
-    let calendar = "/calendar"
-    let forgottenPassword = "/forgottenPassword"
-    let resetPassword = "/resetPassword"
-    let mylessons = "/mylessons"
+//module Routes =
+    //let defaultPage = "/calendar"
+    //let login = "/login"
+    //let registration = "/registration"
+    //let accountActivation = "/accountActivation"
+    //let users = "/users"
+    //let lessons = "/lessons"
+    //let calendar = "/calendar"
+    //let forgottenPassword = "/forgottenPassword"
+    //let resetPassword = "/resetPassword"
+    //let mylessons = "/mylessons"
+
+type AuthPage =
+    | Login
+    | Registration
+    | ForgottenPassword
+    | ResetPassword of Guid
+    | AccountActivation of Guid
+    with
+        member x.Path = 
+            match x with
+            | Login -> "/login"
+            | Registration -> "/registration"
+            | ForgottenPassword -> "/forgottenPassword"
+            | ResetPassword id -> sprintf "/resetPassword/%A" id
+            | AccountActivation id -> sprintf "/accountActivation/%A" id
+
+type AdminPage =
+    | Users
+    | Lessons
+    with
+        member x.Path = 
+            match x with
+            | Users -> "/users"
+            | Lessons -> "/lessons"
+
+type Page =
+    | Calendar
+    | MyLessons
+    | AuthPage of AuthPage
+    | AdminPage of AdminPage
+    with
+        member x.Path = 
+            match x with
+            | Calendar -> "/calendar"
+            | MyLessons -> "/mylessons"
+            | AuthPage p -> p.Path
+            | AdminPage p -> p.Path
+        static member Default = Calendar
+
 
 let goToUrl (e: React.MouseEvent) =
     e.preventDefault()

@@ -103,7 +103,7 @@ let render (state : State) (dispatch : Msg -> unit) =
                 Field.div [] [
                     btn state.IsRegistrating
                 ]
-                a [ Href Router.Routes.login; OnClick Router.goToUrl] [
+                a [ Href Router.Login.Path; OnClick Router.goToUrl] [
                     str "Zpět na přihlášení"
                 ]   
             ]

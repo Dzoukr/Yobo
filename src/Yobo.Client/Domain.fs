@@ -1,37 +1,54 @@
 module Yobo.Client.Domain
 
 open Yobo.Shared.Communication
+open System.Collections.Generic
+open Router
 
-type AuthPage =
-    | Login of Auth.Login.Domain.State
-    | Registration of Auth.Registration.Domain.State
-    | AccountActivation of Auth.AccountActivation.Domain.State
-    | ForgottenPassword of Auth.ForgottenPassword.Domain.State
-    | ResetPassword of Auth.ResetPassword.Domain.State
-
-type AdminPage =
-    | Users of Admin.Users.Domain.State
-    | Lessons of Admin.Lessons.Domain.State
-
-type Page =
-    | Auth of AuthPage
-    | Admin of AdminPage
-    | Calendar of Calendar.Domain.State
-    | MyLessons of MyLessons.Domain.State
+type States = {
+    Login : Auth.Login.Domain.State
+    Registration : Auth.Registration.Domain.State
+    AccountActivation : Auth.AccountActivation.Domain.State
+    ForgottenPassword : Auth.ForgottenPassword.Domain.State
+    ResetPassword : Auth.ResetPassword.Domain.State
+    Users : Admin.Users.Domain.State
+    Lessons : Admin.Lessons.Domain.State
+    Calendar : Calendar.Domain.State
+    MyLessons : MyLessons.Domain.State
+}
+with
+    static member Init = {
+        Login = Auth.Login.Domain.State.Init
+        Registration = Auth.Registration.Domain.State.Init
+        AccountActivation = Auth.AccountActivation.Domain.State.Init
+        ForgottenPassword = Auth.ForgottenPassword.Domain.State.Init
+        ResetPassword = Auth.ResetPassword.Domain.State.Init
+        Users = Admin.Users.Domain.State.Init
+        Lessons = Admin.Lessons.Domain.State.Init
+        Calendar = Calendar.Domain.State.Init
+        MyLessons = MyLessons.Domain.State.Init
+    }
 
 type State = {
-    Page : Page
-    Route : string
+    Page : Router.Page
+    States : States
     LoggedUser : Yobo.Shared.Domain.User option
     TermsDisplayed : bool
 }
 with
     static member Init = {
-        Page = AdminPage.Users(Admin.Users.Domain.State.Init) |> Page.Admin
+        Page = Page.AdminPage(AdminPage.Users)
+        States = States.Init
         LoggedUser = None
-        Route = ""
         TermsDisplayed = false
     }
+
+type Dictionary<'k,'v> with
+    member x.GetState name def =
+        if x.ContainsKey(name) then x.[name]
+        else
+            x.[name] <- def
+            def
+    member x.SetState name state = x.[name] <- state
 
 type AuthMsg =
     | LoginMsg of Auth.Login.Domain.Msg

@@ -14,15 +14,16 @@ type State = {
     ValidationResult : ValidationResult
 }
 with
-    static member Init key = {
+    static member Init = {
         Form = PasswordReset.Init
-        PasswordResetKey = key
+        PasswordResetKey = Guid.Empty
         ResetResult = None
         AlreadyTried = false
         ValidationResult = ValidationResult.Empty
     }
 
 type Msg =
+    | Init of Guid
     | FormChanged of PasswordReset
     | ResetPassword
     | PasswordReset of ServerResult<unit>

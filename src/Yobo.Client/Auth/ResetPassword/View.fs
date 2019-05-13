@@ -36,7 +36,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         span [] [
             str "Vaše heslo bylo úspěšně změněno."
             div [] [
-                a [ Href Router.Routes.login; OnClick Router.goToUrl] [
+                a [ Href Router.Login.Path; OnClick Router.goToUrl] [
                     str "Zpátky na přihlášení"
                 ]
             ]

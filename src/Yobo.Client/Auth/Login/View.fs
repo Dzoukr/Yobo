@@ -38,11 +38,11 @@ let render (state : State) (dispatch : Msg -> unit) =
 
     let footer = 
         div [] [
-            a [ Href <| Router.Routes.registration; OnClick Router.goToUrl] [
+            a [ Href <| Router.Registration.Path; OnClick Router.goToUrl] [
                 str "Registrace"
             ]
             str " · "
-            a [ Href <| Router.Routes.forgottenPassword; OnClick Router.goToUrl] [
+            a [ Href <| Router.ForgottenPassword.Path; OnClick Router.goToUrl] [
                 str "Zapomněl(a) jsem heslo!"
             ]
         ]

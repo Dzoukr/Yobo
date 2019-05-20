@@ -4,9 +4,8 @@ open System
 open Yobo.Libraries.Emails
 open Yobo.Core
 open Yobo.Shared.Communication
-open FSharp.Rop
 
-let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = function
+let handle (q:ReadQueries.UserQueries) (settings:EmailSettings.Settings) = function
     | Registered args ->
         let name = sprintf "%s %s" args.FirstName args.LastName
         let tos = { Email = args.Email; Name = name }
@@ -26,7 +25,6 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
     | ActivationKeyRegenerated args ->
         args.Id
         |> q.GetById
-        |> Result.toOption
         |> Option.map (fun user ->
             let name = sprintf "%s %s" user.FirstName user.LastName
             let tos = { Email = user.Email; Name = name }
@@ -46,7 +44,6 @@ let handle (q:ReadQueries.UserQueries<_>) (settings:EmailSettings.Settings) = fu
     | PasswordResetInitiated args ->
         args.Id
         |> q.GetById
-        |> Result.toOption
         |> Option.map (fun user ->
             let name = sprintf "%s %s" user.FirstName user.LastName
             let tos = { Email = user.Email; Name = name }

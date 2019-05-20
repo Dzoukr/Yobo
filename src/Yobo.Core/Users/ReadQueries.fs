@@ -2,20 +2,13 @@ module Yobo.Core.Users.ReadQueries
 
 open Yobo.Core
 open System
-open FSharp.Rop
 open Yobo.Shared.Domain
 open Extensions
 
-type UserQueries<'a> = {
-    GetById : Guid -> Result<User, 'a>
-    GetAll : unit -> Result<User list, 'a>
-    GetByEmail : string -> Result<User, 'a>
-}
-
-let withError (fn:'a -> 'b) (q:UserQueries<'a>) = {
-    GetById = q.GetById >> Result.mapError fn
-    GetAll = q.GetAll >> Result.mapError fn
-    GetByEmail = q.GetByEmail >> Result.mapError fn
+type UserQueries = {
+    GetById : Guid -> User option
+    GetAll : unit -> User list
+    GetByEmail : string -> User option
 }
 
 let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
@@ -31,25 +24,25 @@ let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         IsAdmin = false
     }
 
-let private getById i (ctx:ReadDb.Db.dataContext) =
+let private getById (ctx:ReadDb.Db.dataContext) i =
     query {
         for x in ctx.Dbo.Users do
         where (x.Id = i)
         select x
     }
-    |> Data.oneOrErrorById i
-    <!> userFromDbEntity
+    |> Seq.map userFromDbEntity
+    |> Seq.tryHead
 
-let private getByEmail (e:string) (ctx:ReadDb.Db.dataContext) =
+let private getByEmail (ctx:ReadDb.Db.dataContext) (e:string) =
     query {
         for x in ctx.Dbo.Users do
         where (x.Email.ToLower() = e.ToLower())
         select x
     }
-    |> Data.oneOrErrorByEmail e
-    <!> userFromDbEntity
+    |> Seq.map userFromDbEntity
+    |> Seq.tryHead
 
-let private getAll () (ctx:ReadDb.Db.dataContext) =
+let private getAll (ctx:ReadDb.Db.dataContext) () =
     query {
         for x in ctx.Dbo.Users do
         sortBy x.LastName
@@ -61,7 +54,7 @@ let private getAll () (ctx:ReadDb.Db.dataContext) =
 let createDefault (connString:string) =
     let ctx = ReadDb.Db.GetDataContext(connString)
     {
-        GetById = getById >> Data.tryQueryResult ctx
-        GetAll = getAll >> Data.tryQuery ctx
-        GetByEmail = getByEmail >> Data.tryQueryResult ctx
+        GetById = getById ctx
+        GetAll = getAll ctx
+        GetByEmail = getByEmail ctx
     }

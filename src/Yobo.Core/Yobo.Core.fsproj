@@ -1,74 +1,60 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <AssemblyName>Yobo.Core</AssemblyName>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
-  </PropertyGroup>
-  <PropertyGroup>
-      <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-      <WarningsAsErrors>FS0025</WarningsAsErrors>
-      <NoWarn>2003</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\core\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
+    <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+    <ProjectReference Include="..\..\src\Yobo.Libraries\Yobo.Libraries.fsproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="../../paket-files/core/Dzoukr/FSharp.Rop/FSharp.Rop.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
     <Compile Include="Extensions.fs" />
     <Compile Include="Serialization.fs" />
     <Compile Include="ReadDb.fs" />
-    <Compile Include="Data.fs" />
     <Compile Include="Metadata.fs" />
     <Compile Include="EventStoreCommandHandler.fs" />
     <Compile Include="EmailTemplateLoader.fs" />
     <Compile Include="EmailSettings.fs" />
-    <EmbeddedResource Include="Users\EmailTemplates\RegenerateActivation.html" />
-    <EmbeddedResource Include="Users\EmailTemplates\Register.html" />
-    <EmbeddedResource Include="Users\EmailTemplates\ResetPassword.html" />
-    <Compile Include="Users\Registry\Registry.fs" />
-    <Compile Include="Users\Registry\CommandValidator.fs" />
-    <Compile Include="Users\Registry\Aggregate.fs" />
-    <Compile Include="Users\Registry\EventSerializer.fs" />
-    <Compile Include="Users\Registry\CommandHandler.fs" />
-    <Compile Include="Users\Users.fs" />
-    <Compile Include="Users\Aggregate.fs" />
-    <Compile Include="Users\EventSerializer.fs" />
-    <Compile Include="Users\CommandHandler.fs" />
-    <Compile Include="Users\UpdateQueries.fs" />
-    <Compile Include="Users\ReadQueries.fs" />
-    <Compile Include="Users\Authenticator.fs" />
-    <Compile Include="Users\DbEventHandler.fs" />
-    <Compile Include="Users\EmailEventHandler.fs.fs" />
-    <Compile Include="Lessons\Lessons.fs" />
-    <Compile Include="Lessons\Aggregate.fs" />
-    <Compile Include="Lessons\EventSerializer.fs" />
-    <Compile Include="Lessons\CommandHandler.fs" />
-    <Compile Include="Lessons\UpdateQueries.fs" />
-    <Compile Include="Lessons\DbEventHandler.fs" />
-    <Compile Include="Lessons\ReadQueries.fs" />
-    <Compile Include="Workshops\Workshops.fs" />
-    <Compile Include="Workshops\Aggregate.fs" />
-    <Compile Include="Workshops\EventSerializer.fs" />
-    <Compile Include="Workshops\CommandHandler.fs" />
-    <Compile Include="Workshops\UpdateQueries.fs" />
-    <Compile Include="Workshops\DbEventHandler.fs" />
-    <Compile Include="Workshops\ReadQueries.fs" />
+    <EmbeddedResource Include="Users/EmailTemplates/RegenerateActivation.html" />
+    <EmbeddedResource Include="Users/EmailTemplates/Register.html" />
+    <EmbeddedResource Include="Users/EmailTemplates/ResetPassword.html" />
+    <Compile Include="Users/Registry/Registry.fs" />
+    <Compile Include="Users/Registry/CommandValidator.fs" />
+    <Compile Include="Users/Registry/Aggregate.fs" />
+    <Compile Include="Users/Registry/EventSerializer.fs" />
+    <Compile Include="Users/Registry/CommandHandler.fs" />
+    <Compile Include="Users/Users.fs" />
+    <Compile Include="Users/Aggregate.fs" />
+    <Compile Include="Users/EventSerializer.fs" />
+    <Compile Include="Users/CommandHandler.fs" />
+    <Compile Include="Users/UpdateQueries.fs" />
+    <Compile Include="Users/ReadQueries.fs" />
+    <Compile Include="Users/Authenticator.fs" />
+    <Compile Include="Users/DbEventHandler.fs" />
+    <Compile Include="Users/EmailEventHandler.fs.fs" />
+    <Compile Include="Lessons/Lessons.fs" />
+    <Compile Include="Lessons/Aggregate.fs" />
+    <Compile Include="Lessons/EventSerializer.fs" />
+    <Compile Include="Lessons/CommandHandler.fs" />
+    <Compile Include="Lessons/UpdateQueries.fs" />
+    <Compile Include="Lessons/DbEventHandler.fs" />
+    <Compile Include="Lessons/ReadQueries.fs" />
+    <Compile Include="Workshops/Workshops.fs" />
+    <Compile Include="Workshops/Aggregate.fs" />
+    <Compile Include="Workshops/EventSerializer.fs" />
+    <Compile Include="Workshops/CommandHandler.fs" />
+    <Compile Include="Workshops/UpdateQueries.fs" />
+    <Compile Include="Workshops/DbEventHandler.fs" />
+    <Compile Include="Workshops/ReadQueries.fs" />
     <Compile Include="CQRS.fs" />
     <Compile Include="DbEventHandler.fs" />
     <Compile Include="EmailEventHandler.fs" />
     <Compile Include="CommandHandler.fs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Yobo.Libraries\Yobo.Libraries.fsproj" />
-  </ItemGroup>
-  <PropertyGroup>
-    <FscToolPath>../../packages/tools/FSharp.Compiler.Tools/tools</FscToolPath>
-    <FscToolExe>fsc.exe</FscToolExe>
-  </PropertyGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -2,16 +2,11 @@ module Yobo.Core.Lessons.ReadQueries
 
 open Yobo.Core
 open System
-open FSharp.Rop
 open Yobo.Shared.Domain
 open Extensions
 
-type LessonsQueries<'a> = {
-    GetAllForDateRange : (DateTimeOffset * DateTimeOffset) -> Result<Lesson list, 'a>
-}
-
-let withError (fn:'a -> 'b) (q:LessonsQueries<'a>) = {
-    GetAllForDateRange = q.GetAllForDateRange >> Result.mapError fn
+type LessonsQueries = {
+    GetAllForDateRange : (DateTimeOffset * DateTimeOffset) -> Lesson list
 }
 
 let private reservationFromDbEntity (r:ReadDb.Db.dataContext.``dbo.LessonReservationsEntity``) =
@@ -35,7 +30,7 @@ let internal lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) 
         IsCancelled = u.IsCancelled
     }
 
-let private getAllForDateRange (st, en) (ctx:ReadDb.Db.dataContext) =
+let private getAllForDateRange (ctx:ReadDb.Db.dataContext) (st, en) =
     query {
         for x in ctx.Dbo.Lessons do
         where (x.StartDate >= st && x.StartDate <= en)
@@ -48,5 +43,5 @@ let private getAllForDateRange (st, en) (ctx:ReadDb.Db.dataContext) =
 let createDefault (connString:string) =
     let ctx = ReadDb.Db.GetDataContext(connString)
     {
-        GetAllForDateRange = getAllForDateRange >> Data.tryQuery ctx
+        GetAllForDateRange = getAllForDateRange ctx
     }

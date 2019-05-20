@@ -3,7 +3,7 @@ module Yobo.Core.EmailEventHandler
 open Yobo.Libraries.Emails
 open Yobo.Core.CQRS
 
-let getHandler (userQueries:Users.ReadQueries.UserQueries<_>) (sender:EmailProvider) (settings:EmailSettings.Settings) =
+let getHandler (userQueries:Users.ReadQueries.UserQueries) (sender:EmailProvider) (settings:EmailSettings.Settings) =
 
     let send = function
         | Some x -> x |> sender.Send

@@ -6,49 +6,42 @@ open FSharp.Rop
 open Yobo.Shared.Auth
 open Yobo.Shared.Domain
 
-type Authenticator<'a> = {
-    Login : string -> string -> Result<User, 'a>
-    GetByActivationKey : Guid -> Result<User, 'a>
-    GetByEmail : string -> Result<User, 'a>
-    GetByPasswordResetKey : Guid -> Result<User, 'a>
+type Authenticator = {
+    Login : string -> string -> Result<User,AuthError>
+    GetByActivationKey : Guid -> User option
+    GetByEmail : string -> User option
+    GetByPasswordResetKey : Guid -> User option
 }
 
-let withError (fn:'a -> 'b) (q:Authenticator<'a>) = {
-    Login = fun l p -> q.Login l p |> Result.mapError fn
-    GetByActivationKey = q.GetByActivationKey >> Result.mapError fn
-    GetByEmail = q.GetByEmail >> Result.mapError fn
-    GetByPasswordResetKey = q.GetByPasswordResetKey >> Result.mapError fn
-}
-
-let private getByActivationKey key (ctx:ReadDb.Db.dataContext) =
+let private getByActivationKey (ctx:ReadDb.Db.dataContext) key =
     query {
         for x in ctx.Dbo.Users do
         where (x.ActivationKey = key)
         select x
     }
-    |> Data.oneOrErrorById key
-    <!> ReadQueries.userFromDbEntity
+    |> Seq.tryHead
+    |> Option.map ReadQueries.userFromDbEntity
 
-let private getByPasswordResetKey key (ctx:ReadDb.Db.dataContext) =
+let private getByPasswordResetKey (ctx:ReadDb.Db.dataContext) key=
     query {
         for x in ctx.Dbo.Users do
         where (x.PasswordResetKey = Some key)
         select x
     }
-    |> Data.oneOrErrorById key
-    <!> ReadQueries.userFromDbEntity
+    |> Seq.tryHead
+    |> Option.map ReadQueries.userFromDbEntity
 
 
-let private getByEmail (e:string) (ctx:ReadDb.Db.dataContext) =
+let private getByEmail (ctx:ReadDb.Db.dataContext) (e:string) =
     query {
         for x in ctx.Dbo.Users do
         where (x.Email.ToLower() = e.ToLower())
         select x
     }
-    |> Data.oneOrErrorByEmail e
-    <!> ReadQueries.userFromDbEntity
+    |> Seq.tryHead
+    |> Option.map ReadQueries.userFromDbEntity
 
-let private login (verifyHashFn:string -> string -> bool) email pwd (ctx:ReadDb.Db.dataContext) =
+let private login (ctx:ReadDb.Db.dataContext) (verifyHashFn:string -> string -> bool) email pwd =
     let user =
         query {
             for x in ctx.Dbo.Users do
@@ -66,8 +59,8 @@ let private login (verifyHashFn:string -> string -> bool) email pwd (ctx:ReadDb.
 let createDefault (connString:string) (verifyHashFn:string -> string -> bool) =
     let ctx = ReadDb.Db.GetDataContext(connString)
     {
-        Login = fun l p -> login verifyHashFn l p |> Data.tryQueryResultM (fun _ -> InvalidLoginOrPassword) ctx
-        GetByActivationKey = getByActivationKey >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.ActivationKeyDoesNotMatch)
-        GetByEmail = getByEmail >> Data.tryQueryResult ctx  >> Result.mapError (fun _ -> AuthError.InvalidLogin)
-        GetByPasswordResetKey = getByPasswordResetKey >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.PasswordResetKeyDoesNotMatch)
+        Login = fun l p -> login ctx verifyHashFn l p // |> Data.tryQueryResultM (fun _ -> InvalidLoginOrPassword) ctx
+        GetByActivationKey = getByActivationKey ctx // >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.ActivationKeyDoesNotMatch)
+        GetByEmail = getByEmail ctx // >> Data.tryQueryResult ctx  >> Result.mapError (fun _ -> AuthError.InvalidLogin)
+        GetByPasswordResetKey = getByPasswordResetKey ctx //>> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.PasswordResetKeyDoesNotMatch)
     }

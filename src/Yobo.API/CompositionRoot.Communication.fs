@@ -8,19 +8,21 @@ open Yobo.Shared.Domain
 let private toAsync f = async { return f }
 
 let private adminUser =
-        {
-            Id = Guid("f65203d4-60dd-4580-a31c-e538807ef720")
-            Email = Yobo.API.Configuration.Admin.email
-            FirstName = "Admin"
-            LastName = "Admin"
-            IsAdmin = true
-            Activated = Some DateTimeOffset.MinValue
-            Credits = 0
-            CreditsExpiration = None
-            CashReservationBlockedUntil = None
-        } : User
+    {
+        Id = Guid("f65203d4-60dd-4580-a31c-e538807ef720")
+        Email = Yobo.API.Configuration.Admin.email
+        FirstName = "Admin"
+        LastName = "Admin"
+        IsAdmin = true
+        Activated = Some DateTimeOffset.MinValue
+        Credits = 0
+        CreditsExpiration = None
+        CashReservationBlockedUntil = None
+    } : User
 
-let private getUserById i = if i = adminUser.Id then (Ok adminUser) else Services.Users.queries.GetById i
+let private getUserById i =
+    if i = adminUser.Id then (Ok adminUser)
+    else (Services.Users.queries.GetById i |> Result.ofOption (ServerError.AuthError(Yobo.Shared.Auth.InvalidOrExpiredToken)))
 
 module Security =
     open Yobo.Shared.Auth
@@ -59,14 +61,14 @@ module Auth =
             Services.Users.authenticator.Login email pwd
     
     let api : Yobo.Shared.Auth.Communication.API = {
-        GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
+        GetToken = getToken loginWithAdmin (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> Result.mapError AuthError >> toAsync
         RefreshToken = refreshToken Services.Users.authorizator.ValidateToken (Services.Users.authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
         GetUserByToken = getUser getUserById Services.Users.authorizator.ValidateToken >> toAsync
         ResendActivation = resendActivation Services.CommandHandler.handleAnonymous >> toAsync
         Register = register Services.CommandHandler.handleAnonymous Password.createHash >> toAsync
-        ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByActivationKey >> toAsync
-        InitiatePasswordReset = initiatePasswordReset Services.CommandHandler.handleAnonymous Services.Users.authenticator.GetByEmail >> toAsync
-        ResetPassword = resetPassword Services.CommandHandler.handleAnonymous Password.createHash Services.Users.authenticator.GetByPasswordResetKey >> toAsync
+        ActivateAccount = activateAccount Services.CommandHandler.handleAnonymous (Services.Users.authenticator.GetByActivationKey >> Result.ofOption (AuthError(Yobo.Shared.Auth.ActivationKeyDoesNotMatch))) >> toAsync
+        InitiatePasswordReset = initiatePasswordReset Services.CommandHandler.handleAnonymous (Services.Users.authenticator.GetByEmail >> Result.ofOption (AuthError(Yobo.Shared.Auth.InvalidLogin))) >> toAsync
+        ResetPassword = resetPassword Services.CommandHandler.handleAnonymous Password.createHash (Services.Users.authenticator.GetByPasswordResetKey >> Result.ofOption (AuthError(Yobo.Shared.Auth.PasswordResetKeyDoesNotMatch))) >> toAsync
     }
 
 module Admin =
@@ -74,10 +76,10 @@ module Admin =
     open Yobo.API.CompositionRoot
 
     let api : Yobo.Shared.Admin.Communication.API = {
-        GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Users.queries.GetAll |> toAsync
+        GetAllUsers = fun x -> x |> Security.onlyForAdmin <!> snd <!> Services.Users.queries.GetAll |> toAsync
         AddCredits = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addCredits |> toAsync
-        GetLessonsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Lessons.queries.GetAllForDateRange |> toAsync
-        GetWorkshopsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd >>= Services.Workshops.queries.GetAllForDateRange |> toAsync
+        GetLessonsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd <!> Services.Lessons.queries.GetAllForDateRange |> toAsync
+        GetWorkshopsForDateRange = fun x -> x |> Security.onlyForAdmin <!> snd <!> Services.Workshops.queries.GetAllForDateRange |> toAsync
         AddLessons = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addLessons |> toAsync
         AddWorkshops = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser addWorkshops |> toAsync
         CancelLesson = fun x -> x |> Security.onlyForAdmin >>= Security.handleForUser cancelLesson |> toAsync
@@ -90,12 +92,12 @@ module Calendar =
     open Yobo.API.Calendar.Functions
 
     let api : Yobo.Shared.Calendar.Communication.API = {
-        GetWorkshopsForDateRange = fun x -> x |> Security.onlyForLogged <!> snd >>= Services.Workshops.queries.GetAllForDateRange |> toAsync
+        GetWorkshopsForDateRange = fun x -> x |> Security.onlyForLogged <!> snd <!> Services.Workshops.queries.GetAllForDateRange |> toAsync
         GetLessonsForDateRange =
             (fun x ->
                 x |> Security.onlyForLogged
-                >>= (fun (u,p) ->
-                    p |> Services.Lessons.queries.GetAllForDateRange <!> List.map (Lesson.FromAdminLesson u.Id)
+                <!> (fun (u,p) ->
+                    p |> Services.Lessons.queries.GetAllForDateRange |> List.map (Lesson.FromAdminLesson u.Id)
                 ) 
                 |> toAsync
             )

@@ -8,7 +8,6 @@ open Yobo.Libraries.Security
 open Yobo.Libraries.Emails
 open FSharp.Rop
 open Yobo.API
-open Yobo.Core.Data
 open Yobo.Shared.Domain
 open Yobo.Core.CQRS
 
@@ -24,21 +23,14 @@ let private cmdHandlerErrorToServerError = function
     | CommandHandlerError.DomainError err -> ServerError.DomainError(err)
     | CommandHandlerError.ValidationError err -> ServerError.ValidationError(err)
 
-let private dbErrorToServerError = function
-    | DbError.ItemNotFoundByEmail _ -> DomainError.ItemDoesNotExist "Email" |> ServerError.DomainError
-    | DbError.ItemNotFoundById _ -> DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError
-    | DbError.Exception e -> e.Message |> ServerError.Exception
-
 module Users =
     let queries =
         Configuration.ReadDb.connectionString
         |> Users.ReadQueries.createDefault 
-        |> Users.ReadQueries.withError dbErrorToServerError
 
     let authenticator =
         Password.verifyPassword
         |> Users.Authenticator.createDefault Configuration.ReadDb.connectionString
-        |> Users.Authenticator.withError ServerError.AuthError
 
     let authorizator = Configuration.Authorization.get |> Yobo.Libraries.Authorization.Jwt.createAuthorizator
 
@@ -46,13 +38,11 @@ module Lessons =
     let queries =
         Configuration.ReadDb.connectionString
         |> Lessons.ReadQueries.createDefault
-        |> Lessons.ReadQueries.withError dbErrorToServerError
 
 module Workshops =
     let queries =
         Configuration.ReadDb.connectionString
         |> Workshops.ReadQueries.createDefault
-        |> Workshops.ReadQueries.withError dbErrorToServerError
 
 // event handlers
 module EventHandler =

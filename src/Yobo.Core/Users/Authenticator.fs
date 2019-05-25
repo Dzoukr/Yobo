@@ -59,8 +59,8 @@ let private login (ctx:ReadDb.Db.dataContext) (verifyHashFn:string -> string -> 
 let createDefault (connString:string) (verifyHashFn:string -> string -> bool) =
     let ctx = ReadDb.Db.GetDataContext(connString)
     {
-        Login = fun l p -> login ctx verifyHashFn l p // |> Data.tryQueryResultM (fun _ -> InvalidLoginOrPassword) ctx
-        GetByActivationKey = getByActivationKey ctx // >> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.ActivationKeyDoesNotMatch)
-        GetByEmail = getByEmail ctx // >> Data.tryQueryResult ctx  >> Result.mapError (fun _ -> AuthError.InvalidLogin)
-        GetByPasswordResetKey = getByPasswordResetKey ctx //>> Data.tryQueryResult ctx >> Result.mapError (fun _ -> AuthError.PasswordResetKeyDoesNotMatch)
+        Login = fun l p -> login ctx verifyHashFn l p
+        GetByActivationKey = getByActivationKey ctx
+        GetByEmail = getByEmail ctx 
+        GetByPasswordResetKey = getByPasswordResetKey ctx 
     }

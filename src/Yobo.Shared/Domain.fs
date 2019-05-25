@@ -63,16 +63,6 @@ with
         | ForOne (Credits) -> 1, true
         | ForTwo -> 2, true
 
-type Lesson = {
-    Id : Guid
-    StartDate : DateTimeOffset
-    EndDate : DateTimeOffset
-    Name : string
-    Description : string
-    Reservations : (User * UserReservation) list
-    IsCancelled : bool
-}
-
 type Workshop = {
     Id : Guid
     StartDate : DateTimeOffset

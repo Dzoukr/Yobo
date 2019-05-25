@@ -27,6 +27,8 @@
     <Compile Include="Auth\Communication.fs" />
     <Compile Include="Calendar\Domain.fs" />
     <Compile Include="Calendar\Communication.fs" />
+    <Compile Include="MyLessons\Domain.fs" />
+    <Compile Include="MyLessons\Communication.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

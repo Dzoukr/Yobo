@@ -3,6 +3,7 @@ module Yobo.Client.Admin.Lessons.Domain
 open System
 open Yobo.Shared.Communication
 open Yobo.Shared.Domain
+open Yobo.Shared.Admin.Domain
 
 type AddLessonForm = {
     StartTime : string

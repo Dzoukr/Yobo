@@ -3,6 +3,7 @@ module Yobo.Core.Lessons.ReadQueries
 open Yobo.Core
 open System
 open Yobo.Shared.Domain
+open Yobo.Shared.Admin.Domain
 open Extensions
 
 type LessonsQueries = {

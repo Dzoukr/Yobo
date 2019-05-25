@@ -14,6 +14,7 @@ open Yobo.Shared.Extensions
 module Calendar =
     open Yobo.Client
     open Yobo.Shared.Domain
+    open Yobo.Shared.Admin.Domain
 
     let col dispatch (lessons:Lesson list) (workshops:Workshop list) (date:DateTimeOffset) =
         let workshopDiv (workshop:Workshop) =

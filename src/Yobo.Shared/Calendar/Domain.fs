@@ -25,7 +25,7 @@ type Lesson = {
     IsCancelled : bool
 }
 with
-    static member FromAdminLesson currentUserId (lesson:Yobo.Shared.Domain.Lesson) =
+    static member FromAdminLesson currentUserId (lesson:Yobo.Shared.Admin.Domain.Lesson) =
         let av =
             match maxCapacity - lesson.Reservations.Length with
             | 1 -> LastFreeSpot |> Some

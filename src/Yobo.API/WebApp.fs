@@ -1,8 +1,9 @@
-module Yobo.API.Routes
+module Yobo.API.WebApp
 
 open Giraffe
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
+open Yobo.API.Configuration
 
 let frontend wwwRootPath =
     let wwwRootPath = if isNull wwwRootPath then "" else wwwRootPath
@@ -26,5 +27,10 @@ let calendar : HttpHandler =
     |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Calendar.api
     |> Remoting.buildHttpHandler
     
-let webApp wwwRootPath : HttpHandler =
-    choose [ users; admin; calendar; frontend wwwRootPath ] 
+let webApp (cfg :ApplicationConfiguration): HttpHandler =
+    let services = cfg |> Services.createServices 
+    let commandHandler = services |> Pipeline.getCommandHandler
+    // register event handler
+    services.EventStore.EventAppended.Add <| Pipeline.getEventHandler cfg services
+    
+    choose [ users; admin; calendar; frontend cfg.Server.WwwRootPath ] 

@@ -8,13 +8,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Configuration.fs" />
+    <Compile Include="Services.fs" />
+    <Compile Include="Pipeline.fs" />
     <Compile Include="ArgsBuilder.fs" />
     <Compile Include="Auth\Functions.fs" />
     <Compile Include="Admin\Functions.fs" />
     <Compile Include="Calendar\Functions.fs" />
-    <Compile Include="CompositionRoot.Services.fs" />
     <Compile Include="CompositionRoot.Communication.fs" />
-    <Compile Include="Routes.fs" />
+    <Compile Include="WebApp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

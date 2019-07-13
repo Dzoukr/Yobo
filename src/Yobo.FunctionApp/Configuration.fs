@@ -10,7 +10,6 @@ type EmailConfiguration = {
 
 type ServerConfiguration = {
     BaseUrl : Uri
-    WwwRootPath : string
 }
 
 type AdminConfiguration = {
@@ -33,12 +32,12 @@ module private SymetricCryptoProvider =
 
     let get (conf:IConfigurationRoot) : Configuration = 
         let isDev = 
-            match conf.["crypto:useLocalEmulator"] |> Boolean.TryParse with
+            match conf.["CryptoUseLocalEmulator"] |> Boolean.TryParse with
             | true, v -> v
             | false, _ -> false
         {
-            TableName = conf.["crypto:tableName"]
-            Account = if isDev then StorageAccount.LocalEmulator else StorageAccount.Cloud(conf.["crypto:accountName"], conf.["crypto:authKey"])
+            TableName = conf.["CryptoTableName"]
+            Account = if isDev then StorageAccount.LocalEmulator else StorageAccount.Cloud(conf.["CryptoAccountName"], conf.["CryptoAuthKey"])
         }
 
 module private EventStore =
@@ -46,54 +45,53 @@ module private EventStore =
 
     let get (conf:IConfigurationRoot) : Configuration =
         let isDev = 
-            match conf.["eventStore:useLocalEmulator"] |> Boolean.TryParse with
+            match conf.["EventStoreUseLocalEmulator"] |> Boolean.TryParse with
             | true, v -> v
             | false, _ -> false
         if isDev then Configuration.CreateDefaultForLocalEmulator() 
-        else Configuration.CreateDefault conf.["eventStore:accountName"] conf.["eventStore:authKey"]
+        else Configuration.CreateDefault conf.["EventStoreAccountName"] conf.["EventStoreAuthKey"]
 
 module private Emails =
     open Yobo.Libraries.Emails
 
     let get (conf:IConfigurationRoot) : EmailConfiguration = {
         Mailjet =  {
-            ApiKey = conf.["emails:mailjet:apiKey"]
-            SecretKey = conf.["emails:mailjet:secretKey"]
+            ApiKey = conf.["MailjetApiKey"]
+            SecretKey = conf.["MailjetSecretKey"]
         }
         
         From = {
-            Name = conf.["emails:from:name"]
-            Email = conf.["emails:from:email"]
+            Name = conf.["EmailsFromName"]
+            Email = conf.["EmailsFromEmail"]
         }
     }
 
 module private Server =
     let get (conf:IConfigurationRoot) = {
-        BaseUrl = Uri(conf.["server:baseUrl"])
-        WwwRootPath = "./wwwroot"
+        BaseUrl = Uri(conf.["ServerBaseUrl"])
     }
 
 module private Authorization =
     open Yobo.Libraries.Authorization
 
     let get (conf:IConfigurationRoot) : Configuration = {
-        Issuer = conf.["auth:issuer"]
-        Audience = conf.["auth:audience"]
-        Secret = conf.["auth:secret"] |> Base64String.fromString
-        TokenLifetime = conf.["auth:tokenLifetime"] |> TimeSpan.Parse
+        Issuer = conf.["AuthIssuer"]
+        Audience = conf.["AuthAudience"]
+        Secret = conf.["AuthSecret"] |> Base64String.fromString
+        TokenLifetime = conf.["AuthTokenLifetime"] |> TimeSpan.Parse
     }
 
 module Admin =
     let get (conf:IConfigurationRoot) = {
-        Email = conf.["admin:email"]
-        Password = conf.["admin:password"]
+        Email = conf.["AdminEmail"]
+        Password = conf.["AdminPassword"]
     }
 
 let load (cfg:IConfigurationRoot) =
     {
         SymetricCryptoProvider = SymetricCryptoProvider.get cfg
         EventStore = EventStore.get cfg
-        ReadDbConnectionString = cfg.["readDb:connectionString"]
+        ReadDbConnectionString = cfg.["ReadDbConnectionString"]
         Emails = Emails.get cfg
         Server = Server.get cfg
         Authorization = Authorization.get cfg

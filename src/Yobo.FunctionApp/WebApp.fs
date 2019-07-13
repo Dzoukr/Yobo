@@ -5,10 +5,6 @@ open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Yobo.FunctionApp.Configuration
 
-let frontend wwwRootPath =
-    let wwwRootPath = if isNull wwwRootPath then "" else wwwRootPath
-    Giraffe.ResponseWriters.htmlFile <| System.IO.Path.Combine(wwwRootPath, "index.html")
-
 let auth (userSvc:Services.UsersServices) (cmdHandler:Pipeline.CommandHandler) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
@@ -37,5 +33,4 @@ let webApp (cfg :ApplicationConfiguration): HttpHandler =
         auth services.Users commandHandler
         admin services commandHandler
         calendar services commandHandler
-        frontend cfg.Server.WwwRootPath 
     ] 

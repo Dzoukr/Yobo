@@ -15,3 +15,4 @@ src/Yobo.Client/output/
 /src/Yobo.API/config.development.json
 /src/Yobo.API/Yobo.API.fsproj.user
 /.ionide
+local.settings.json

@@ -7,12 +7,26 @@ type UsersServices = {
     ReadQueries : ReadQueries.UserQueries
     Authenticator : Authenticator.Authenticator
     Authorizator : Authorizator
+    AdminUser : Yobo.Shared.Domain.User
+    AdminUserPassword : string
 }
 
-let createUsersService (conf:Configuration) (connString:string) = {
+let createUsersService (adminConf:Configuration.AdminConfiguration) (conf:Configuration) (connString:string) = {
     ReadQueries = connString |> ReadQueries.createDefault
     Authenticator = Password.verifyPassword |> Authenticator.createDefault connString
     Authorizator = conf |> Jwt.createAuthorizator
+    AdminUser = {
+        Id = System.Guid("f65203d4-60dd-4580-a31c-e538807ef720")
+        Email = adminConf.Email
+        FirstName = "Admin"
+        LastName = "Admin"
+        IsAdmin = true
+        Activated = Some System.DateTimeOffset.MinValue
+        Credits = 0
+        CreditsExpiration = None
+        CashReservationBlockedUntil = None
+    }
+    AdminUserPassword = adminConf.Password
 }
 
 open Yobo.Core.Lessons
@@ -36,7 +50,7 @@ let createWorkshopsService connString = {
     ReadQueries = connString |> ReadQueries.createDefault
 }
 
-type Services = {
+type ApplicationServices = {
     Users : UsersServices
     Lessons : LessonsServices
     Workshops : WorkshopsServices
@@ -45,9 +59,9 @@ type Services = {
     SymetricCryptoProvider : SymetricCryptoProvider.SymetricCryptoProvider
 }
 
-let createServices (conf:Configuration.ApplicationConfiguration) : Services =
+let createServices (conf:Configuration.ApplicationConfiguration) : ApplicationServices =
     {
-        Users = createUsersService conf.Authorization conf.ReadDbConnectionString
+        Users = createUsersService conf.Admin conf.Authorization conf.ReadDbConnectionString
         Lessons = createLessonsService conf.ReadDbConnectionString
         Workshops = createWorkshopsService conf.ReadDbConnectionString
         Emails = conf.Emails.Mailjet |> MailjetProvider.create

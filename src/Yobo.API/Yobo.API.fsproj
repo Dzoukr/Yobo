@@ -14,7 +14,7 @@
     <Compile Include="Auth\Functions.fs" />
     <Compile Include="Admin\Functions.fs" />
     <Compile Include="Calendar\Functions.fs" />
-    <Compile Include="CompositionRoot.Communication.fs" />
+    <Compile Include="Communication.fs" />
     <Compile Include="WebApp.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

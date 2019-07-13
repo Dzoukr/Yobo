@@ -9,22 +9,22 @@ let frontend wwwRootPath =
     let wwwRootPath = if isNull wwwRootPath then "" else wwwRootPath
     Giraffe.ResponseWriters.htmlFile <| System.IO.Path.Combine(wwwRootPath, "index.html")
 
-let users : HttpHandler =
+let auth (userSvc:Services.UsersServices) (cmdHandler:Pipeline.CommandHandler) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Auth.api
+    |> Remoting.fromValue (Communication.Auth.api userSvc cmdHandler)
     |> Remoting.buildHttpHandler
 
-let admin : HttpHandler =
+let admin (svc:Services.ApplicationServices) (cmdHandler:Pipeline.CommandHandler) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Admin.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Admin.api
+    |> Remoting.fromValue (Communication.Admin.api svc cmdHandler)
     |> Remoting.buildHttpHandler
 
-let calendar : HttpHandler =
+let calendar (svc:Services.ApplicationServices) (cmdHandler:Pipeline.CommandHandler) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
-    |> Remoting.fromValue Yobo.API.CompositionRoot.Communication.Calendar.api
+    |> Remoting.fromValue (Communication.Calendar.api svc cmdHandler)
     |> Remoting.buildHttpHandler
     
 let webApp (cfg :ApplicationConfiguration): HttpHandler =
@@ -32,5 +32,10 @@ let webApp (cfg :ApplicationConfiguration): HttpHandler =
     let commandHandler = services |> Pipeline.getCommandHandler
     // register event handler
     services.EventStore.EventAppended.Add <| Pipeline.getEventHandler cfg services
-    
-    choose [ users; admin; calendar; frontend cfg.Server.WwwRootPath ] 
+
+    choose [ 
+        auth services.Users commandHandler
+        admin services commandHandler
+        calendar services commandHandler
+        frontend cfg.Server.WwwRootPath 
+    ] 

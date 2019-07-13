@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Attach to process",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:pickProcess}"
+        },
+        {
+            "name": "Launch Yobo.API",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build Yobo.API",
+            "program": "${workspaceFolder}/src/Yobo.API/bin/Debug/netcoreapp2.2/Yobo.API.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false,
+            "console": "internalConsole"
+        },
+        {
+            "name": "Launch FunctionApp",
+            "type": "coreclr",
+            "request": "attach",
+            "processId": "${command:azureFunctions.pickProcess}"
+          }
+    ]
+}

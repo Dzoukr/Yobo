@@ -19,7 +19,7 @@ open Yobo.Core.Workshops.EventSerializer
 open Yobo.Core.Metadata
 open Yobo.Core.EventStoreCommandHandler
 
-let getEventHandler (conf:ApplicationConfiguration) (svc:Services.Services) =
+let getEventHandler (conf:ApplicationConfiguration) (svc:Services.ApplicationServices) =
     let emailSettings : EmailSettings.Settings = { From = conf.Emails.From; BaseUrl = conf.Server.BaseUrl }
     let dbHandleFn = DbEventHandler.getHandler conf.ReadDbConnectionString
     let emailHandleFn = EmailEventHandler.getHandler svc.Users.ReadQueries svc.Emails emailSettings
@@ -38,7 +38,7 @@ let private cmdHandlerErrorToServerError = function
     | CommandHandlerError.DomainError err -> ServerError.DomainError(err)
     | CommandHandlerError.ValidationError err -> ServerError.ValidationError(err)
 
-let getCommandHandler (svc:Services.Services) =
+let getCommandHandler (svc:Services.ApplicationServices) =
     let handleFn = CommandHandler.getHandler svc.SymetricCryptoProvider svc.EventStore
     let handle (meta:Metadata) cmd = cmd |> handleFn meta (Guid.NewGuid()) |> Result.mapError cmdHandlerErrorToServerError
     {

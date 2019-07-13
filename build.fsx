@@ -14,14 +14,14 @@ open Fake.IO
 open Fake.IO.Globbing.Operators
 open Fake.Core.TargetOperators
 
-let serverPath = Path.getFullName "./src/Yobo.API"
-let clientPath = Path.getFullName "./src/Yobo.Client"
-let corePath = Path.getFullName "./src/Yobo.Core"
-let sharedPath = Path.getFullName "./src/Yobo.Shared"
-let clientOutputDir = clientPath + "/output"
-let deployDir = Path.getFullName "./deploy/app"
+let functionAppPath = Path.getFullName "./src/Yobo.FunctionApp"
+let functionAppWatcherPath = Path.getFullName "./src/Yobo.FunctionApp.Local"
+let functionAppDeployPath = Path.getFullName "./deploy/functionApp"
+let functionAppCorePath = Path.getFullName "./src/Yobo.Core"
+let clientOutputPath = Path.getFullName "./src/Yobo.Client/output"
+let clientDeployPath = Path.getFullName "./deploy/client"
 let migrationsPath = Path.getFullName "./tools/DbMigrations"
-let migrationsDeployDir = Path.getFullName "./deploy/dbMigrations"
+let migrationsDeployPath = Path.getFullName "./deploy/dbMigrations"
 
 
 let platformTool tool winTool =
@@ -52,14 +52,12 @@ let runDotNet cmd workingDir =
         DotNet.exec (DotNet.Options.withWorkingDirectory workingDir) cmd ""
     if result.ExitCode <> 0 then failwithf "'dotnet %s' failed in %s" cmd workingDir
 
-Target.create "Clean" (fun _ ->
-    !! "obj"
-    ++ "src/*/bin"
-    ++ "src/*/obj"
-    ++ deployDir
-    ++ migrationsDeployDir
-    ++ clientOutputDir
-    |> Shell.cleanDirs
+Target.create "CleanClient" (fun _ ->
+    [ clientOutputPath; clientDeployPath ] |> Shell.cleanDirs
+)
+
+Target.create "CleanFunctionApp" (fun _ ->
+    [ functionAppDeployPath ] |> Shell.cleanDirs
 )
 
 Target.create "InstallClient" (fun _ ->
@@ -68,77 +66,64 @@ Target.create "InstallClient" (fun _ ->
     printfn "Yarn version:"
     runTool yarnTool "--version" __SOURCE_DIRECTORY__
     runTool yarnTool "install --frozen-lockfile" __SOURCE_DIRECTORY__
-    runDotNet "restore Yobo.Client.fsproj" clientPath
-)
-
-Target.create "Build" (fun _ ->
-    runDotNet "build" serverPath
-    runTool yarnTool "webpack-cli --config src/Yobo.Client/webpack.config.js -p" clientPath
 )
 
 Target.create "Run" (fun _ ->
-    runDotNet "build" sharedPath
     let server = async {
-        runDotNet "watch run" serverPath
+        runDotNet "watch run" functionAppWatcherPath
     }
     let client = async {
-        runTool yarnTool "webpack-dev-server --config src/Yobo.Client/webpack.config.js" clientPath
+        runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__
     }
-    [ client; server ]
+    
+    [client;server]
     |> Async.Parallel
     |> Async.RunSynchronously
     |> ignore
 )
 
-Target.create "Publish" (fun _ ->
-    let publicDir = Path.combine deployDir "wwwroot"
-    let publishArgs = sprintf "publish -c Release -o \"%s\"" deployDir
-    runDotNet publishArgs serverPath
-    Shell.copyDir publicDir "src/Yobo.Client/output" FileFilter.allFiles
-    Path.combine deployDir "config.development.json" |> File.delete
-)
-
 Target.create "RunDbMigrations" (fun _ ->
     let connString = "..\Yobo.Private\ConnectionString.txt" |> File.readAsString
     let cmd = sprintf "DbMigrations.dll \"%s\"" connString
-    runDotNet cmd migrationsDeployDir
+    runDotNet cmd migrationsDeployPath
 )
 
 Target.create "RefreshSchema" (fun _ -> 
     let srcFile = "..\Yobo.Private\ReadDb.fs"
-    let original = corePath + "\ReadDb.fs"
+    let original = functionAppCorePath + "\ReadDb.fs"
     let schemaFile = ".\database\yobo.schema"
 
     schemaFile |> File.delete
     let backup = original |> File.readAsString
     srcFile |> File.readAsString |> File.replaceContent original
-    runDotNet (sprintf "build %s" corePath) "."
+    runDotNet (sprintf "build %s" functionAppCorePath) "."
     backup |> File.replaceContent original
 )
 
 Target.create "PublishDbMigrations" (fun  _ ->
-    let publishArgs = sprintf "publish -c Release -o \"%s\"" migrationsDeployDir
+    let publishArgs = sprintf "publish -c Release -o \"%s\"" migrationsDeployPath
     runDotNet publishArgs migrationsPath
-    !! "./database/*.sql" |> Shell.copyFiles (migrationsDeployDir + "\scripts")
+    !! "./database/*.sql" |> Shell.copyFiles (migrationsDeployPath + "\scripts")
 )
 
-"Clean"
-    ==> "InstallClient"
-    ==> "Build"
-    
-"Build" ==> "Publish"
+Target.create "PublishFunctionApp" (fun _ ->
+    let publishArgs = sprintf "publish -c Release -o \"%s\"" functionAppDeployPath
+    runDotNet publishArgs functionAppPath
+)
 
-"Clean" 
-    ==> "PublishDbMigrations" 
-    ==> "RunDbMigrations"
-    ==> "RefreshSchema"
+Target.create "PublishClient" (fun _ ->
+    runTool yarnTool "webpack-cli -p" __SOURCE_DIRECTORY__
+    Shell.copyDir clientDeployPath clientOutputPath FileFilter.allFiles
+)
 
-"PublishDbMigrations" ==> "Publish"
+Target.create "Publish" (fun _ ->
+    ["PublishClient";"PublishFunctionApp"] |> List.iter (fun t -> Target.run 1 t [])
+)
 
-"Clean"
-    ==> "InstallClient"
-    ==> "Run"
+open Fake.Core.TargetOperators
 
+"CleanClient" ==> "InstallClient" ==> "PublishClient"    
+"CleanFunctionApp" ==> "PublishDbMigrations" ==> "PublishFunctionApp"    
+"PublishDbMigrations" ==> "RunDbMigrations" ==> "RefreshSchema"
 
-
-Target.runOrDefaultWithArguments "Build"
+Target.runOrDefaultWithArguments "Run" 

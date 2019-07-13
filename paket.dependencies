@@ -18,9 +18,15 @@ group Server
 
     nuget FSharp.Core
     nuget Giraffe
-    nuget Microsoft.AspNetCore
-    nuget Microsoft.AspNetCore.StaticFiles
     nuget Fable.Remoting.Giraffe
+    nuget TaskBuilder.fs
+    nuget Microsoft.NET.Sdk.Functions
+    nuget Microsoft.Azure.WebJobs.Extensions.Storage
+    nuget Microsoft.Azure.WebJobs.Extensions.DurableTask
+    nuget Microsoft.Extensions.Configuration
+    nuget Microsoft.Extensions.Configuration.Json
+    nuget Microsoft.Extensions.Configuration.EnvironmentVariables
+    
 
 group Core
     source https://api.nuget.org/v3/index.json

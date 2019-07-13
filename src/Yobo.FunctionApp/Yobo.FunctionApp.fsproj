@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>Yobo.API</AssemblyName>
-    <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <AzureFunctionsVersion>v2</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <None Update="host.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="local.settings.json" Condition="Exists('local.settings.json')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+    </None>
+
     <Compile Include="Configuration.fs" />
     <Compile Include="Services.fs" />
     <Compile Include="Pipeline.fs" />

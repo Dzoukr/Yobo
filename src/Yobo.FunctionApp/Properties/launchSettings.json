@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Yobo.API": {
+    "Yobo.FunctionApp": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

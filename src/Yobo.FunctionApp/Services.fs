@@ -1,4 +1,4 @@
-module Yobo.API.Services
+module Yobo.FunctionApp.Services
 open Yobo.Libraries.Security
 open Yobo.Core.Users
 open Yobo.Libraries.Authorization

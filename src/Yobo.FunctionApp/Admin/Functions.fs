@@ -1,4 +1,4 @@
-module Yobo.API.Admin.Functions
+module Yobo.FunctionApp.Admin.Functions
 
 open System
 open Yobo.Shared.Admin.Domain
@@ -10,7 +10,7 @@ open Yobo.Shared.Admin
 open Yobo.Shared.Communication
 
 module ArgsBuilder =
-    open Yobo.API
+    open Yobo.FunctionApp
 
     let buildAddCredits =
         ArgsBuilder.build (fun (x:AddCredits) ->

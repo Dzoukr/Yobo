@@ -1,4 +1,4 @@
-module Yobo.API.Calendar.Functions
+module Yobo.FunctionApp.Calendar.Functions
 
 open System
 open Yobo.Shared.Calendar.Domain
@@ -10,7 +10,7 @@ open Yobo.Shared.Calendar
 open Yobo.Shared.Communication
 
 module ArgsBuilder =
-    open Yobo.API
+    open Yobo.FunctionApp
 
     let buildAddReservation userId (x:AddReservation) =
         let count,useCredits = x.UserReservation.ToIntAndBool

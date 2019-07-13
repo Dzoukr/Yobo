@@ -1,4 +1,4 @@
-module Yobo.API.ArgsBuilder
+module Yobo.FunctionApp.ArgsBuilder
 
 open Yobo.Shared.Validation
 open FSharp.Rop

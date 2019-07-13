@@ -8,17 +8,6 @@
             "processId": "${command:pickProcess}"
         },
         {
-            "name": "Launch Yobo.API",
-            "type": "coreclr",
-            "request": "launch",
-            "preLaunchTask": "build Yobo.API",
-            "program": "${workspaceFolder}/src/Yobo.API/bin/Debug/netcoreapp2.2/Yobo.API.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}",
-            "stopAtEntry": false,
-            "console": "internalConsole"
-        },
-        {
             "name": "Launch FunctionApp",
             "type": "coreclr",
             "request": "attach",

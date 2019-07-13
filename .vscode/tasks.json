@@ -2,16 +2,6 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build Yobo.API",
-            "command": "dotnet build src/Yobo.API",
-            "type": "shell",
-            "group": "build",
-            "presentation": {
-                "reveal": "silent"
-            },
-            "problemMatcher": "$msCompile"
-        },
-        {
             "label": "build Yobo.FunctionApp",
             "command": "dotnet build src/Yobo.FunctionApp",
             "type": "shell",

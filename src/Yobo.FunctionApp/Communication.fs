@@ -1,4 +1,4 @@
-module Yobo.API.Communication
+module Yobo.FunctionApp.Communication
 
 open System
 open FSharp.Rop
@@ -7,26 +7,26 @@ open Yobo.Shared.Domain
 
 let private toAsync f = async { return f }
 
-let private getUserById (userSvc:Yobo.API.Services.UsersServices) i =
+let private getUserById (userSvc:Yobo.FunctionApp.Services.UsersServices) i =
     if i = userSvc.AdminUser.Id then (Ok userSvc.AdminUser)
     else (userSvc.ReadQueries.GetById i |> Result.ofOption (ServerError.AuthError(Yobo.Shared.Auth.InvalidOrExpiredToken)))
 
 module Security =
     open Yobo.Shared.Auth
-    open Yobo.API
+    open Yobo.FunctionApp
 
-    let handleForUser (cmdHandler:Yobo.API.Pipeline.CommandHandler) f (user:User, param) =
+    let handleForUser (cmdHandler:Yobo.FunctionApp.Pipeline.CommandHandler) f (user:User, param) =
         let handleFn = cmdHandler.HandleForUser user.Id
         f handleFn param
 
-    let handleForUserWithId (cmdHandler:Yobo.API.Pipeline.CommandHandler) f (user:User, param) =
+    let handleForUserWithId (cmdHandler:Yobo.FunctionApp.Pipeline.CommandHandler) f (user:User, param) =
         let handleFn = cmdHandler.HandleForUser user.Id
         f user.Id handleFn param
 
     let onlyForLogged (userSvc:Services.UsersServices) (sp:SecuredParam<_>) =
         match sp.Token |> userSvc.Authorizator.ValidateToken with
         | Some claims ->
-            claims |> Yobo.API.Auth.Functions.claimsToUser (getUserById userSvc) <!> fun user -> (user, sp.Param)
+            claims |> Yobo.FunctionApp.Auth.Functions.claimsToUser (getUserById userSvc) <!> fun user -> (user, sp.Param)
         | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
     let onlyForAdmin userSvc (sp:SecuredParam<_>) =
@@ -38,9 +38,9 @@ module Security =
         )
 
 module Auth =
-    open Yobo.API.Auth.Functions
+    open Yobo.FunctionApp.Auth.Functions
     open Yobo.Libraries.Security 
-    open Yobo.API
+    open Yobo.FunctionApp
 
     
     let api (userSvc:Services.UsersServices) (cmdHandler:Pipeline.CommandHandler) : Yobo.Shared.Auth.Communication.API = 
@@ -62,8 +62,8 @@ module Auth =
         }
 
 module Admin =
-    open Yobo.API
-    open Yobo.API.Admin.Functions
+    open Yobo.FunctionApp
+    open Yobo.FunctionApp.Admin.Functions
 
     let api (svc:Services.ApplicationServices) (cmdHandler:Pipeline.CommandHandler) : Yobo.Shared.Admin.Communication.API = 
         {
@@ -78,9 +78,9 @@ module Admin =
         }
 
 module Calendar =
-    open Yobo.API
+    open Yobo.FunctionApp
     open Yobo.Shared.Calendar.Domain
-    open Yobo.API.Calendar.Functions
+    open Yobo.FunctionApp.Calendar.Functions
 
     let api (svc:Services.ApplicationServices) (cmdHandler:Pipeline.CommandHandler) : Yobo.Shared.Calendar.Communication.API = {
         GetWorkshopsForDateRange = fun x -> x |> (Security.onlyForLogged svc.Users) <!> snd <!> svc.Workshops.ReadQueries.GetAllForDateRange |> toAsync

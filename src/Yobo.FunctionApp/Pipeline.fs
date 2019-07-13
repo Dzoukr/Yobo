@@ -1,4 +1,4 @@
-module Yobo.API.Pipeline
+module Yobo.FunctionApp.Pipeline
 
 open System
 open Yobo.Core.CQRS

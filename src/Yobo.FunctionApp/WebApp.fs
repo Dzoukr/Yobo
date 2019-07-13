@@ -1,9 +1,9 @@
-module Yobo.API.WebApp
+module Yobo.FunctionApp.WebApp
 
 open Giraffe
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
-open Yobo.API.Configuration
+open Yobo.FunctionApp.Configuration
 
 let frontend wwwRootPath =
     let wwwRootPath = if isNull wwwRootPath then "" else wwwRootPath

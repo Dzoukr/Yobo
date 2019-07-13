@@ -1,4 +1,4 @@
-module Yobo.API.Configuration
+module Yobo.FunctionApp.Configuration
 
 open System
 open Microsoft.Extensions.Configuration

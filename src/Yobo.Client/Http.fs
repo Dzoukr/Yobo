@@ -2,6 +2,8 @@ module Yobo.Client.Http
 
 open Fable.Remoting.Client
 
+let apiUrl : string = Fable.Core.JsInterop.importDefault "./public/configuration.js"
+
 module Cmd =
     open Elmish
     open Yobo.Shared.Communication
@@ -15,16 +17,19 @@ module Cmd =
 let authAPI =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
+    |> Remoting.withBaseUrl apiUrl
     |> Remoting.buildProxy<Yobo.Shared.Auth.Communication.API>
 
 let adminAPI =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Admin.Communication.routeBuilder
+    |> Remoting.withBaseUrl apiUrl
     |> Remoting.buildProxy<Yobo.Shared.Admin.Communication.API>
 
 let calendarAPI =
     Remoting.createApi()
     |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
+    |> Remoting.withBaseUrl apiUrl
     |> Remoting.buildProxy<Yobo.Shared.Calendar.Communication.API>
 
 

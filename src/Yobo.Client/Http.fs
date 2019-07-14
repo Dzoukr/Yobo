@@ -1,9 +1,10 @@
 module Yobo.Client.Http
 
 open Fable.Remoting.Client
+open Fable.Core
 
-let getUrl : unit -> string = Fable.Core.JsInterop.import "getUrl" "./public/configuration.js"
-let baseUrl = getUrl()
+[<Emit("config.baseUrl")>]
+let baseUrl : string = jsNative
 
 module Cmd =
     open Elmish

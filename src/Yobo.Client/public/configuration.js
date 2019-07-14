@@ -1,5 +1,3 @@
-module.exports = {
-    getUrl: function (_) {
-        return "http://localhost:8080/";
-    }
-}
+const config = {
+    baseUrl : "http://localhost:8080/"
+};

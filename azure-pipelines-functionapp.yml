@@ -1,16 +1,21 @@
 pool:
-  vmImage: 'vs2017-win2016'
+  vmImage: 'ubuntu-latest'
 
 trigger:
-  batch: true
+  batch: 'true'
   branches:
     include: [ master, develop ]
+  paths:
+    include:
+    - src/Yobo.FunctionApp/*
+    - src/Yobo.Shared/*
+    - src/Yobo.Libraries/*
 
 steps:
 - task: DotNetCoreInstaller@0
-  displayName: Installing .net core sdk 2.2.100
+  displayName: Installing .net core sdk 2.2.300
   inputs:
-    version: '2.2.100'
+    version: '2.2.300'
     packageType: sdk
 
 - script: dotnet tool install --tool-path . paket
@@ -19,17 +24,11 @@ steps:
 - script: dotnet tool install --tool-path . fake-cli
   displayName: 'Install FAKE'
 
-- script: fake build -t publish
+- script: ./fake build -t publishFunctionApp
   displayName: 'Build'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish App Artifacts'
   inputs:
-    pathtoPublish: './deploy/app'
-    artifactName: 'yobo-app'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Migrations Artifacts'
-  inputs:
-    pathtoPublish: './deploy/dbMigrations'
-    artifactName: 'yobo-dbMigrations'
+    pathtoPublish: './deploy/functionApp'
+    artifactName: 'functionApp'

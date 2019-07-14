@@ -1,2 +1,5 @@
-const apiUrl = "http://localhost:8080/";
-module.exports = apiUrl;
+module.exports = {
+    getUrl: function (_) {
+        return "http://localhost:8080/";
+    }
+}

@@ -24,7 +24,7 @@ let private createToken (config:Configuration) claims =
     createJwtToken config.Issuer config.TokenLifetime credentials config.Audience claims
     |> extractAccessToken config.TokenLifetime 
 
-let private validateToken (config:Configuration) token =
+let private validateToken (config:Configuration) (token:string) =
     try
         let parameters = 
             let validationParams = new TokenValidationParameters()

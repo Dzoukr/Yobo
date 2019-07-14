@@ -24,7 +24,7 @@ steps:
 - script: dotnet tool install --tool-path . fake-cli
   displayName: 'Install FAKE'
 
-- script: ./fake build -t publishFunctionApp
+- script: fake build -t publishFunctionApp
   displayName: 'Build'
 
 - task: PublishBuildArtifacts@1

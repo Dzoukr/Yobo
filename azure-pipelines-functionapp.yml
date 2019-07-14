@@ -32,3 +32,9 @@ steps:
   inputs:
     pathtoPublish: './deploy/functionApp'
     artifactName: 'functionApp'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Migrations Artifacts'
+  inputs:
+    pathtoPublish: './deploy/dbMigrations'
+    artifactName: 'yobo-dbMigrations'    

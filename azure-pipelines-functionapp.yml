@@ -13,9 +13,9 @@ trigger:
 
 steps:
 - task: DotNetCoreInstaller@0
-  displayName: Installing .net core sdk 2.2.300
+  displayName: Installing .net core sdk 2.2.100
   inputs:
-    version: '2.2.300'
+    version: '2.2.100'
     packageType: sdk
 
 - script: dotnet tool install --tool-path . paket

@@ -15,6 +15,7 @@
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>
     <Compile Include="Extensions.fs" />
+    <Compile Include="DateRange.fs" />
     <Compile Include="Domain.fs" />
     <Compile Include="Validation.fs" />
     <Compile Include="Auth.fs" />

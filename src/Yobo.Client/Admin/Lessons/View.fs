@@ -267,7 +267,7 @@ module Calendar =
         )
 
     let render (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset, endDate:DateTimeOffset) =
-        let dates = DateRange.dateRangeToDays(startDate, endDate)
+        let dates = Yobo.Shared.DateRange.dateRangeToDays(startDate, endDate)
         let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
@@ -298,5 +298,5 @@ module Calendar =
 
 let render (state : State) (dispatch : Msg -> unit) =
     div [] [
-        Calendar.render state dispatch (DateRange.getDateRangeForWeekOffset state.WeekOffset)
+        Calendar.render state dispatch (Yobo.Shared.DateRange.getDateRangeForWeekOffset state.WeekOffset)
     ]

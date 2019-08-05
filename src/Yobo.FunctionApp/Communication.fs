@@ -82,13 +82,20 @@ module Calendar =
     open Yobo.Shared.Calendar.Domain
     open Yobo.FunctionApp.Calendar.Functions
 
+    let private limit (st,en) =
+        let lower = Yobo.Shared.DateRange.getDateRangeForWeekOffset maxLowerOffset |> fst
+        let st = if st < lower then lower else st
+        st,en
+
     let api (svc:Services.ApplicationServices) (cmdHandler:Pipeline.CommandHandler) : Yobo.Shared.Calendar.Communication.API = {
-        GetWorkshopsForDateRange = fun x -> x |> (Security.onlyForLogged svc.Users) <!> snd <!> svc.Workshops.ReadQueries.GetAllForDateRange |> toAsync
+        GetWorkshopsForDateRange = fun x -> x |> (Security.onlyForLogged svc.Users) <!> (snd >> limit) <!> svc.Workshops.ReadQueries.GetAllForDateRange |> toAsync
         GetLessonsForDateRange =
             (fun x ->
                 x |> (Security.onlyForLogged svc.Users)
                 <!> (fun (u,p) ->
-                    p |> svc.Lessons.ReadQueries.GetAllForDateRange |> List.map (Lesson.FromAdminLesson u.Id)
+                    p 
+                    |> limit
+                    |> svc.Lessons.ReadQueries.GetAllForDateRange |> List.map (Lesson.FromAdminLesson u.Id)
                 ) 
                 |> toAsync
             )

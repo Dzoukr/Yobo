@@ -9,11 +9,11 @@ open Yobo.Client
 let private innerUpdate (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
     | Init -> state, [LoadUserLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
-    | LoadUserLessons -> state, (state.WeekOffset |> DateRange.getDateRangeForWeekOffset |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.GetLessonsForDateRange UserLessonsLoaded)
+    | LoadUserLessons -> state, (state.WeekOffset |> Yobo.Shared.DateRange.getDateRangeForWeekOffset |> SecuredParam.create |> Cmd.ofAsyncResult calendarAPI.GetLessonsForDateRange UserLessonsLoaded)
     | LoadWorkshops ->
         state,
             state.WeekOffset
-            |> DateRange.getDateRangeForWeekOffset
+            |> Yobo.Shared.DateRange.getDateRangeForWeekOffset
             |> SecuredParam.create
             |> Cmd.ofAsyncResult calendarAPI.GetWorkshopsForDateRange WorkshopsLoaded
     | UserLessonsLoaded res ->

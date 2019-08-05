@@ -68,13 +68,13 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | LoadLessons ->
         state,
             state.WeekOffset
-            |> DateRange.getDateRangeForWeekOffset
+            |> Yobo.Shared.DateRange.getDateRangeForWeekOffset
             |> SecuredParam.create
             |> Cmd.ofAsyncResult adminAPI.GetLessonsForDateRange LessonsLoaded
     | LoadWorkshops ->
         state,
             state.WeekOffset
-            |> DateRange.getDateRangeForWeekOffset
+            |> Yobo.Shared.DateRange.getDateRangeForWeekOffset
             |> SecuredParam.create
             |> Cmd.ofAsyncResult adminAPI.GetWorkshopsForDateRange WorkshopsLoaded
     | LessonsLoaded res ->

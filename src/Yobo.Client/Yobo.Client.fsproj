@@ -8,7 +8,6 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="StaticText.fs" />
-        <Compile Include="DateRange.fs" />
         <Compile Include="Validation.fs" />
         <Compile Include="SharedView.fs" />
         <Compile Include="TokenStorage.fs" />

@@ -159,11 +159,16 @@ module Calendar =
         ]
 
     let navigation (state:State) dispatch =
-        tr [ ClassName "controls" ] [
-            td [ ColSpan 7 ] [
-                Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
+        
+        let buttonBack =
+            if state.WeekOffset <= maxLowerOffset then str ""
+            else Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(state.WeekOffset - 1) |> dispatch) ] ] [
                     i [ ClassName "fas fa-chevron-circle-left" ] [ ]
                 ]
+        
+        tr [ ClassName "controls" ] [
+            td [ ColSpan 7 ] [
+                buttonBack
                 Button.button [ Button.Props [ OnClick (fun _ -> WeekOffsetChanged(0) |> dispatch) ] ] [
                     i [ ClassName "fas fa-home" ] [ ]
                 ]
@@ -196,7 +201,7 @@ module Calendar =
         ]
 
     let render user (state : State) (dispatch : Msg -> unit) (startDate:DateTimeOffset, endDate:DateTimeOffset) =
-        let dates = DateRange.dateRangeToDays(startDate, endDate)
+        let dates = Yobo.Shared.DateRange.dateRangeToDays(startDate, endDate)
         let getLessonsForDate (date:DateTimeOffset) =
             state.Lessons
             |> List.filter (fun x -> x.StartDate.Date = date.Date)
@@ -223,5 +228,5 @@ module Calendar =
 
 let render user (state : State) (dispatch : Msg -> unit) =
     div [] [
-        Calendar.render user state dispatch (DateRange.getDateRangeForWeekOffset state.WeekOffset)
+        Calendar.render user state dispatch (Yobo.Shared.DateRange.getDateRangeForWeekOffset state.WeekOffset)
     ]

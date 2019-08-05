@@ -1,4 +1,4 @@
-module Yobo.Client.DateRange
+module Yobo.Shared.DateRange
 
 open System
 open Yobo.Shared.Extensions

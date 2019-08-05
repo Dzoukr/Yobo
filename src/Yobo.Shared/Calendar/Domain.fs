@@ -9,6 +9,7 @@ type Availability =
     | Free
 
 let maxCapacity = 12
+let maxLowerOffset = -1
 
 let getCancellingDate (d:DateTimeOffset) =
     d.StartOfTheDay().AddHours 9.

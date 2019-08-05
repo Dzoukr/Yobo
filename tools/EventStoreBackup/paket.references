@@ -1,4 +1,3 @@
-group EventStoreBackup
-    FSharp.Core
-    CosmoStore.TableStorage
-    Microsoft.FSharpLu.Json
+FSharp.Core
+CosmoStore.TableStorage
+Microsoft.FSharpLu.Json

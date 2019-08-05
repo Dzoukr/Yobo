@@ -11,7 +11,7 @@ module Cmd =
     open Yobo.Shared.Communication
 
     let ofAsyncResult f msg i =
-        Cmd.ofAsync
+        Cmd.OfAsync.either
             f i            
             (msg)
             (fun ex -> ServerError.Exception(ex.Message) |> Error |> msg)

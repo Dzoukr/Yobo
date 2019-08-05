@@ -2,13 +2,13 @@ module Yobo.Client.App
 
 open Elmish
 open Elmish.React
-open Elmish.Browser.UrlParser
-open Elmish.Browser.Navigation
+open Elmish.Navigation
 open Thoth.Elmish
 
 #if DEBUG
 open Elmish.Debug
 open Elmish.HMR
+open Elmish.UrlParser
 #endif
 
 Program.mkProgram State.init State.update View.render
@@ -18,7 +18,7 @@ Program.mkProgram State.init State.update View.render
 #if DEBUG
 |> Program.withConsoleTrace
 #endif
-|> Program.withReact "elmish-app"
+|> Program.withReactBatched "elmish-app"
 #if DEBUG
 |> Program.withDebugger
 #endif

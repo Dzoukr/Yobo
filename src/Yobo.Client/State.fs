@@ -5,8 +5,8 @@ open Fable.Import
 open Yobo.Client.Domain
 open Http
 open System
-open Elmish.Browser.UrlParser
-open Elmish.Browser.Navigation
+open Elmish.UrlParser
+open Elmish.Navigation
 open Router
 
 let private removeSlash (s:string) = s.TrimStart([|'/'|])
@@ -119,5 +119,5 @@ let subscribe (_:State) =
             match TokenStorage.tryGetToken() with
             | Some t -> dispatch (RefreshToken t) |> ignore
             | None -> Cmd.none |> ignore
-        Fable.Import.Browser.window.setInterval(handler, timer) |> ignore
+        Browser.Dom.window.setInterval(handler, timer) |> ignore
     Cmd.ofSub sub

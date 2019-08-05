@@ -1,8 +1,8 @@
 module Yobo.Client.Auth.Registration.View
 
 open System
-open Fable.Helpers.React
-open Fable.Helpers.React.Props
+open Fable.React
+open Fable.React.Props
 open Fulma
 open Fable.Core.JsInterop
 open Yobo.Client.Auth.Registration.Domain

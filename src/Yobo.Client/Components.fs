@@ -2,11 +2,11 @@ module Yobo.Client.Components
 
 open System
 open Fulma
+open Browser.Types
 
 module Calendar =
     open Fable.Core
     open Fable.Core.JsInterop
-    open Fable.PowerPack.Keyboard
 
     [<Emit("bulmaCalendar.attach($0, $1)[0].on('date:selected', date => { $2(date) });")>]
     let private attachCalendarScript (selector: string) (opts:obj) (fn:obj -> unit) : unit = jsNative
@@ -58,7 +58,7 @@ module Calendar =
                 x?maxDate <- this.MaximumDate.Value.ToString(netFormat)
         )
 
-    let private attachCalendar (opts:Options) (onDateChange: DateTime option * DateTime option -> unit) (elm: Fable.Import.Browser.Element) =
+    let private attachCalendar (opts:Options) (onDateChange: DateTime option * DateTime option -> unit) (elm: Element) =
         let tryToDateTime obj =
             match obj with
             | null -> None

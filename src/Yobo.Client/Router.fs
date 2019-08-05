@@ -1,10 +1,11 @@
 module Yobo.Client.Router
 
 open System
-open Elmish.Browser.Navigation
+open Elmish.Navigation
 open Fable.Import
-open Fable.Helpers
 open Fable.Core.JsInterop
+open Browser.Types
+open Elmish.UrlParser
 
 type AuthPage =
     | Login
@@ -45,7 +46,7 @@ type Page =
         static member Default = Calendar
 
 
-let goToUrl (e: React.MouseEvent) =
+let goToUrl (e: MouseEvent) =
     e.preventDefault()
     let href = !!e.currentTarget?href
     Navigation.newUrl href |> List.map (fun f -> f ignore) |> ignore

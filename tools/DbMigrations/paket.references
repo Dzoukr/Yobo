@@ -1,3 +1,2 @@
-group Migrations
-    FSharp.Core
-    dbup-sqlserver
+FSharp.Core
+dbup-sqlserver

@@ -1,77 +1,56 @@
-version 5.206.0
-group Shared
-    source https://api.nuget.org/v3/index.json
-    framework: netstandard2.0
-    storage: none
-    nuget FSharp.Core
-    github Dzoukr/FSharp.Rop FSharp.Rop.fs
+version 5.215.0
+source https://api.nuget.org/v3/index.json
+framework: netstandard2.0, netcoreapp2.2
+storage: none
 
-group Tools
-    source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
-    nuget FSharp.Compiler.Tools
+// shared
+nuget FSharp.Core
+github Dzoukr/FSharp.Rop FSharp.Rop.fs
+nuget TaskBuilder.fs
+nuget Newtonsoft.Json
 
-group Server
-    source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
-    storage: none
+// tools
+nuget FSharp.Compiler.Tools
 
-    nuget FSharp.Core
-    nuget Giraffe
-    nuget Fable.Remoting.Giraffe
-    nuget TaskBuilder.fs
-    nuget Microsoft.NET.Sdk.Functions
-    nuget Microsoft.Azure.WebJobs.Extensions.Storage
-    nuget Microsoft.Azure.WebJobs.Extensions.DurableTask
-    nuget Microsoft.Extensions.Configuration
-    nuget Microsoft.Extensions.Configuration.Json
-    nuget Microsoft.Extensions.Configuration.EnvironmentVariables
+// server
+nuget Giraffe
+nuget Fable.Remoting.Giraffe
+nuget Microsoft.NET.Sdk.Functions
+nuget Microsoft.Azure.WebJobs.Extensions.Storage
+nuget Microsoft.Azure.WebJobs.Extensions.DurableTask
+nuget Microsoft.Extensions.Configuration
+nuget Microsoft.Extensions.Configuration.Json
+nuget Microsoft.Extensions.Configuration.EnvironmentVariables
     
+// core
+nuget CosmoStore.TableStorage
+nuget SQLProvider
+nuget System.Data.SqlClient
+nuget Fue
 
-group Core
-    source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
-    storage: none
+// libraries
+nuget WindowsAzure.Storage
+nuget Mailjet.Api
+nuget System.IdentityModel.Tokens.Jwt
 
-    nuget FSharp.Core
-    nuget CosmoStore.TableStorage
-    nuget Newtonsoft.Json
-    nuget SQLProvider
-    nuget System.Data.SqlClient
-    nuget Fue
-    
-    github Dzoukr/FSharp.Rop FSharp.Rop.fs
+// client
+nuget Fable.Core ~> 3
+nuget Fable.Elmish ~> 3
+nuget Fable.Elmish.Debugger ~> 3
+nuget Fable.Elmish.HMR ~> 4
+nuget Fable.Elmish.React ~> 3
+nuget Fable.Elmish.Browser ~> 3
+nuget Fable.React ~> 5
+nuget Fable.Remoting.Client ~> 5
+nuget Fulma ~> 2
+nuget Fulma.Extensions.Wikiki.Quickview
+nuget Thoth.Elmish.Toast
 
-group Libraries
-    source https://api.nuget.org/v3/index.json
-    framework: netstandard2.0
-    storage: none
+// migrations
+nuget dbup-sqlserver
 
-    nuget FSharp.Core
-    nuget Newtonsoft.Json
-    nuget WindowsAzure.Storage
-    nuget TaskBuilder.fs
-    nuget Mailjet.Api
-    nuget System.IdentityModel.Tokens.Jwt
-    github Dzoukr/FSharp.Rop FSharp.Rop.fs
-
-group Client
-    source https://api.nuget.org/v3/index.json
-    framework: netstandard2.0
-    storage: none
-
-    nuget Fable.Core ~> 2
-    nuget Fable.Elmish ~> 2
-    nuget Fable.Elmish.Debugger ~> 2
-    nuget Fable.Elmish.React ~> 2
-    nuget Fable.Elmish.HMR ~> 3
-    nuget Fable.React ~> 4
-    nuget Fable.Elmish.Browser ~> 2
-    nuget Fable.Remoting.Client
-    nuget Fulma ~> 1
-    nuget Fulma.Extensions.Wikiki.Quickview
-    nuget Thoth.Elmish.Toast
-    clitool dotnet-fable ~> 2
+// event store backup
+nuget Microsoft.FSharpLu.Json
 
 group Build
     source https://api.nuget.org/v3/index.json
@@ -82,20 +61,3 @@ group Build
     nuget Fake.Core.Target
     nuget Fake.DotNet.Cli
     nuget Fake.IO.FileSystem
-
-group Migrations
-    source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
-    storage: none
-
-    nuget FSharp.Core
-    nuget dbup-sqlserver
-
-group EventStoreBackup
-    source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
-    storage: none
-
-    nuget FSharp.Core
-    nuget CosmoStore.TableStorage
-    nuget Microsoft.FSharpLu.Json

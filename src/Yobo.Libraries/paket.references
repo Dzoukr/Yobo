@@ -1,9 +1,7 @@
-group Libraries
-    FSharp.Core
-    Newtonsoft.Json
-    File:FSharp.Rop.fs
-    WindowsAzure.Storage
-    TaskBuilder.fs
-    Mailjet.Api
-    System.IdentityModel.Tokens.Jwt
-    
+FSharp.Core
+Newtonsoft.Json
+File:FSharp.Rop.fs
+WindowsAzure.Storage
+TaskBuilder.fs
+Mailjet.Api
+System.IdentityModel.Tokens.Jwt

@@ -4,7 +4,7 @@ open Elmish
 open Yobo.Client.Auth.Login.Domain
 open Yobo.Client.Http
 open Yobo.Client
-open Elmish.Browser.Navigation
+open Elmish.Navigation
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with

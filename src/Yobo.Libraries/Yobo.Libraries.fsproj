@@ -5,7 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\libraries\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
+    <Compile Include="..\..\paket-files\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.fs</Link>
     </Compile>

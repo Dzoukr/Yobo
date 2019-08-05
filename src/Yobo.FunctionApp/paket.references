@@ -1,11 +1,10 @@
-group Server
-    FSharp.Core
-    Giraffe
-    Fable.Remoting.Giraffe
-    TaskBuilder.fs
-    Microsoft.NET.Sdk.Functions
-    Microsoft.Azure.WebJobs.Extensions.Storage
-    Microsoft.Azure.WebJobs.Extensions.DurableTask
-    Microsoft.Extensions.Configuration
-    Microsoft.Extensions.Configuration.Json
-    Microsoft.Extensions.Configuration.EnvironmentVariables
+FSharp.Core
+Giraffe
+Fable.Remoting.Giraffe
+TaskBuilder.fs
+Microsoft.NET.Sdk.Functions
+Microsoft.Azure.WebJobs.Extensions.Storage
+Microsoft.Azure.WebJobs.Extensions.DurableTask
+Microsoft.Extensions.Configuration
+Microsoft.Extensions.Configuration.Json
+Microsoft.Extensions.Configuration.EnvironmentVariables

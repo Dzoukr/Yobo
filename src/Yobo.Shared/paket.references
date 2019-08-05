@@ -1,3 +1,2 @@
-group Shared
-    FSharp.Core
-    File:FSharp.Rop.fs
+FSharp.Core
+File:FSharp.Rop.fs

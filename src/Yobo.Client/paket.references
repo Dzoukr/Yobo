@@ -1,12 +1,10 @@
-group Client
-    FSharp.Core
-    Fable.Elmish.Debugger
-    Fable.Elmish.React
-    Fable.Elmish.HMR
-    Fable.Core
-    Fable.Elmish.Browser
-    Fable.Remoting.Client
-    dotnet-fable
-    Fulma
-    Fulma.Extensions.Wikiki.Quickview
-    Thoth.Elmish.Toast
+FSharp.Core
+Fable.Elmish.Debugger
+Fable.Elmish.React
+Fable.Elmish.HMR
+Fable.Core
+Fable.Elmish.Browser
+Fable.Remoting.Client
+Fulma
+Fulma.Extensions.Wikiki.Quickview
+Thoth.Elmish.Toast

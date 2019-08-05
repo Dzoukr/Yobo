@@ -28,35 +28,34 @@ module CmdArgs =
         Id : Guid
     }
 
-    type Reopen = {
-        Id : Guid
+    type WithdrawCredits = {
+        UserId : Guid
+        Amount : int
+        LessonId : Guid
     }
 
-type Command =
-    | Create of CmdArgs.Create
-    | AddReservation of CmdArgs.AddReservation
-    | CancelReservation of CmdArgs.CancelReservation
-    | Cancel of CmdArgs.Cancel
+    type RefundCredits = {
+        UserId : Guid
+        Amount : int
+        LessonId : Guid
+    }
+
+    type BlockCashReservations = {
+        UserId : Guid
+        Expires : DateTimeOffset
+        LessonId : Guid
+    }
+
+    type UnblockCashReservations = {
+        UserId : Guid
+    }
 
 type Event =
     | Created of CmdArgs.Create
     | ReservationAdded of CmdArgs.AddReservation
     | ReservationCancelled of CmdArgs.CancelReservation
     | Cancelled of CmdArgs.Cancel
-    | Reopened of CmdArgs.Reopen
-
-type State = {
-    Id : Guid
-    Reservations : (Guid * int * bool) list
-    StartDate : DateTimeOffset
-    EndDate : DateTimeOffset
-    IsCancelled : bool
-}
-with
-    static member Init = {
-        Id = Guid.Empty
-        Reservations = []
-        StartDate = DateTimeOffset.MinValue
-        EndDate = DateTimeOffset.MinValue
-        IsCancelled = false
-    }
+    | CreditsWithdrawn of CmdArgs.WithdrawCredits
+    | CreditsRefunded of CmdArgs.RefundCredits
+    | CashReservationsBlocked of CmdArgs.BlockCashReservations
+    | CashReservationsUnblocked of CmdArgs.UnblockCashReservations

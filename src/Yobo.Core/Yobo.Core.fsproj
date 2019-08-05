@@ -40,13 +40,16 @@
     <Compile Include="Users\Authenticator.fs" />
     <Compile Include="Users\DbEventHandler.fs" />
     <Compile Include="Users\EmailEventHandler.fs.fs" />
+
     <Compile Include="Lessons\Lessons.fs" />
-    <Compile Include="Lessons\Aggregate.fs" />
-    <Compile Include="Lessons\EventSerializer.fs" />
-    <Compile Include="Lessons\CommandHandler.fs" />
+
+    <Compile Include="Lessons\Projections.fs" />
+    <Compile Include="Lessons\DbCommandHandler.fs" />
+
     <Compile Include="Lessons\UpdateQueries.fs" />
     <Compile Include="Lessons\DbEventHandler.fs" />
     <Compile Include="Lessons\ReadQueries.fs" />
+    
     <Compile Include="Workshops\Workshops.fs" />
     <Compile Include="Workshops\Aggregate.fs" />
     <Compile Include="Workshops\EventSerializer.fs" />

@@ -5,4 +5,7 @@ let handle = function
     | ReservationAdded args -> UpdateQueries.reservationAdded args
     | ReservationCancelled args -> UpdateQueries.reservationCancelled args
     | Cancelled args -> UpdateQueries.cancelled args
-    | Reopened args -> UpdateQueries.reopened args
+    | CreditsWithdrawn args -> UpdateQueries.creditsWithdrawn args
+    | CreditsRefunded args -> UpdateQueries.creditsRefunded args
+    | CashReservationsBlocked args -> UpdateQueries.cashReservationBlocked args
+    | CashReservationsUnblocked args -> UpdateQueries.cashReservationUnblocked args

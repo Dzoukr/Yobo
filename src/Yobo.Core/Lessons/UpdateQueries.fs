@@ -58,7 +58,22 @@ let cancelled (args:CmdArgs.Cancel) (ctx:ReadDb.Db.dataContext) =
     |> Seq.iter (fun x -> x.Delete())
     ctx.SubmitUpdates()
 
-let reopened (args:CmdArgs.Reopen) (ctx:ReadDb.Db.dataContext) =
+let creditsWithdrawn (args:CmdArgs.WithdrawCredits) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
-    item.IsCancelled <- false
+    item.Credits <- item.Credits - args.Amount
+    ctx.SubmitUpdates()
+
+let creditsRefunded (args:CmdArgs.RefundCredits) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.Credits <- item.Credits + args.Amount
+    ctx.SubmitUpdates()
+
+let cashReservationBlocked (args:CmdArgs.BlockCashReservations) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.CashReservationBlockedUntil <- Some args.Expires
+    ctx.SubmitUpdates()
+
+let cashReservationUnblocked (args:CmdArgs.UnblockCashReservations) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.CashReservationBlockedUntil <- None
     ctx.SubmitUpdates()

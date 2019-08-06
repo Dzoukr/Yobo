@@ -33,7 +33,7 @@ module DbProjections =
 
     let private toExistingUser (e:Db.dataContext.``dbo.UsersEntity``) = {
         UserId = e.Id
-        Credits = e.Credits
+        Credits = Yobo.Core.Auth.ReadQueries.calculateCredits e.Credits e.CreditsExpiration
         CreditsExpiration = e.CreditsExpiration
         CashReservationsBlockedUntil = e.CashReservationBlockedUntil
         IsActivated = e.Activated.IsSome

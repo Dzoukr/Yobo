@@ -13,7 +13,7 @@ let handle getById (settings:EmailSettings.Settings) = function
         let message =
             Fue.Data.init
             |> Fue.Data.add "activate" (Uri(settings.BaseUrl, sprintf FrontendRoutes.activateAccount args.ActivationKey))
-            |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.Register.html")
+            |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Auth.EmailTemplates.Register.html")
 
         { EmailMessage.Empty with
             From = settings.From
@@ -32,7 +32,7 @@ let handle getById (settings:EmailSettings.Settings) = function
             let message =
                 Fue.Data.init
                 |> Fue.Data.add "activate" (Uri(settings.BaseUrl, sprintf FrontendRoutes.activateAccount args.ActivationKey))
-                |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.RegenerateActivation.html")
+                |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Auth.EmailTemplates.RegenerateActivation.html")
 
             { EmailMessage.Empty with
                 From = settings.From
@@ -51,7 +51,7 @@ let handle getById (settings:EmailSettings.Settings) = function
             let message =
                 Fue.Data.init
                 |> Fue.Data.add "reset" (Uri(settings.BaseUrl, sprintf FrontendRoutes.resetPassword args.PasswordResetKey))
-                |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Users.EmailTemplates.ResetPassword.html")
+                |> Fue.Compiler.fromTextSafe (EmailTemplateLoader.loadTemplate "Auth.EmailTemplates.ResetPassword.html")
 
             { EmailMessage.Empty with
                 From = settings.From

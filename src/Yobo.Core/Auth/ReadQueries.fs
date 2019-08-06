@@ -11,6 +11,12 @@ type UserQueries = {
     GetByEmail : string -> User option
 }
 
+let calculateCredits amount expiration =
+    match expiration with
+    | None -> amount
+    | Some exp ->
+        if DateTimeOffset.UtcNow > exp then 0 else amount
+
 let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
     {
         Id = u.Id
@@ -18,7 +24,7 @@ let internal userFromDbEntity (u:ReadDb.Db.dataContext.``dbo.UsersEntity``) =
         FirstName = u.FirstName
         LastName = u.LastName
         Activated = u.Activated
-        Credits = u.Credits
+        Credits = calculateCredits u.Credits u.CreditsExpiration
         CreditsExpiration = u.CreditsExpiration |> Option.map (fun x -> x.ToCzDateTimeOffset())
         CashReservationBlockedUntil = u.CashReservationBlockedUntil |> Option.map (fun x -> x.ToCzDateTimeOffset())
         IsAdmin = false

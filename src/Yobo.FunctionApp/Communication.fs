@@ -44,6 +44,7 @@ module Auth =
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
+                    dbCtx.SubmitUpdates()
 
                     evns
                     |> List.choose (EmailEventHandler.handle svc.Auth.ReadQueries.GetById emailSettings)
@@ -82,6 +83,7 @@ module Admin =
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
+                    dbCtx.SubmitUpdates()
                 )
             innerHandle
 
@@ -116,6 +118,7 @@ module Calendar =
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
+                    dbCtx.SubmitUpdates()
                 )
             innerHandle
 

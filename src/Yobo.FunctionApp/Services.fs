@@ -1,9 +1,9 @@
 module Yobo.FunctionApp.Services
 open Yobo.Libraries.Security
-open Yobo.Core.Users
+open Yobo.Core.Auth
 open Yobo.Libraries.Authorization
 
-type UsersServices = {
+type AuthServices = {
     ReadQueries : ReadQueries.UserQueries
     Authenticator : Authenticator.Authenticator
     Authorizator : Authorizator
@@ -11,7 +11,7 @@ type UsersServices = {
     AdminUserPassword : string
 }
 
-let createUsersService (adminConf:Configuration.AdminConfiguration) (conf:Configuration) (connString:string) = {
+let createAuthService (adminConf:Configuration.AdminConfiguration) (conf:Configuration) (connString:string) = {
     ReadQueries = connString |> ReadQueries.createDefault
     Authenticator = Password.verifyPassword |> Authenticator.createDefault connString
     Authorizator = conf |> Jwt.createAuthorizator
@@ -32,39 +32,34 @@ let createUsersService (adminConf:Configuration.AdminConfiguration) (conf:Config
 open Yobo.Core.Lessons
 
 type LessonsServices = {
-    ReadQueries : ReadQueries.LessonsQueries
+    ReadQueries : ReadQueries.Lessons.LessonsQueries
 }
 
 let createLessonsService connString = {
-    ReadQueries = connString |> ReadQueries.createDefault
+    ReadQueries = connString |> ReadQueries.Lessons.createDefault
 }
 
-open Yobo.Core.Workshops
 open Yobo.Libraries.Emails
 
 type WorkshopsServices = {
-    ReadQueries : ReadQueries.WorkshopsQueries
+    ReadQueries : ReadQueries.Workshops.WorkshopsQueries
 }
 
 let createWorkshopsService connString = {
-    ReadQueries = connString |> ReadQueries.createDefault
+    ReadQueries = connString |> ReadQueries.Workshops.createDefault
 }
 
 type ApplicationServices = {
-    Users : UsersServices
+    Auth : AuthServices
     Lessons : LessonsServices
     Workshops : WorkshopsServices
     Emails : Yobo.Libraries.Emails.EmailProvider
-    EventStore : CosmoStore.EventStore
-    SymetricCryptoProvider : SymetricCryptoProvider.SymetricCryptoProvider
 }
 
 let createServices (conf:Configuration.ApplicationConfiguration) : ApplicationServices =
     {
-        Users = createUsersService conf.Admin conf.Authorization conf.ReadDbConnectionString
+        Auth = createAuthService conf.Admin conf.Authorization conf.ReadDbConnectionString
         Lessons = createLessonsService conf.ReadDbConnectionString
         Workshops = createWorkshopsService conf.ReadDbConnectionString
         Emails = conf.Emails.Mailjet |> MailjetProvider.create
-        EventStore = conf.EventStore |> CosmoStore.TableStorage.EventStore.getEventStore
-        SymetricCryptoProvider = conf.SymetricCryptoProvider |> TableStorageSymetricCryptoProvider.create
     }

@@ -47,10 +47,10 @@ let private onlyIfCanBeCancelled userId lesson =
             else Ok lesson
         | None -> DomainError.LessonIsNotReserved |> Error
 
-let private onlyIfActivated (user:Projections.User) =
+let private onlyIfActivated (user:Projections.ExistingUser) =
     if user.IsActivated then Ok user else DomainError.UserNotActivated |> Error
 
-let private onlyIfEnoughCredits amount (user:Projections.User) =
+let private onlyIfEnoughCredits amount (user:Projections.ExistingUser) =
     if user.Credits - amount < 0 then DomainError.NotEnoughCredits |> Error else Ok user
 
 let private onlyIfNotAlreadyBlocked state =
@@ -82,7 +82,7 @@ let cancelLesson (lesson:ExistingLesson) (args:CmdArgs.CancelLesson) =
         ]
     )
 
-let addReservation (lesson:ExistingLesson) (user:Projections.User) (args:CmdArgs.AddReservation) =
+let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:CmdArgs.AddReservation) =
     lesson
     |> onlyIfNotFull args.Count
     >>= onlyIfUserNotAlreadyReserved args.UserId
@@ -112,7 +112,7 @@ let cancelReservation (lesson:ExistingLesson) (args:CmdArgs.CancelReservation) =
         ]
     )
 
-let addCredits (user:Projections.User) (args:CmdArgs.AddCredits) =
+let addCredits (user:Projections.ExistingUser) (args:CmdArgs.AddCredits) =
     user
     |> onlyIfActivated
     <!> (fun _ -> CreditsAdded args)

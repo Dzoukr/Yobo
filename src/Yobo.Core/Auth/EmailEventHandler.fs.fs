@@ -5,7 +5,7 @@ open Yobo.Libraries.Emails
 open Yobo.Core
 open Yobo.Shared.Communication
 
-let handle (q:ReadQueries.UserQueries) (settings:EmailSettings.Settings) = function
+let handle getById (settings:EmailSettings.Settings) = function
     | Registered args ->
         let name = sprintf "%s %s" args.FirstName args.LastName
         let tos = { Email = args.Email; Name = name }
@@ -24,8 +24,8 @@ let handle (q:ReadQueries.UserQueries) (settings:EmailSettings.Settings) = funct
 
     | ActivationKeyRegenerated args ->
         args.Id
-        |> q.GetById
-        |> Option.map (fun user ->
+        |> getById
+        |> Option.map (fun (user:Yobo.Shared.Domain.User) ->
             let name = sprintf "%s %s" user.FirstName user.LastName
             let tos = { Email = user.Email; Name = name }
             let subject = "Registrace Mindful Yoga"
@@ -43,7 +43,7 @@ let handle (q:ReadQueries.UserQueries) (settings:EmailSettings.Settings) = funct
         )
     | PasswordResetInitiated args ->
         args.Id
-        |> q.GetById
+        |> getById
         |> Option.map (fun user ->
             let name = sprintf "%s %s" user.FirstName user.LastName
             let tos = { Email = user.Email; Name = name }

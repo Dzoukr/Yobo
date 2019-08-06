@@ -3,8 +3,7 @@ module Yobo.FunctionApp.Auth.Functions
 open System
 open Yobo.Shared.Auth.Domain
 open FSharp.Rop
-open Yobo.Core.Users
-open Yobo.Core.CQRS
+open Yobo.Core.Auth
 open Yobo.Shared.Auth
 open System.Security.Claims
 open Yobo.Shared.Communication
@@ -54,15 +53,17 @@ let getToken loginFn tokenCreator (acc:Login) =
         let! user = loginFn acc.Email acc.Password
         return user |> userToClaims |> tokenCreator
     }
+
 let refreshToken validateFn tokenCreator token =
     match token |> validateFn with
     | Some claims -> claims |> tokenCreator |> Ok
     | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
-let resendActivation cmdHandler (userId:Guid) =
+let resendActivation getProjection cmdHandler (userId:Guid) =
     result {
+        let! proj = getProjection userId |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
         let newKey = Guid.NewGuid()
-        let! _ = ({ Id = userId; ActivationKey = newKey } : CmdArgs.RegenerateActivationKey) |> Command.RegenerateActivationKey |> CoreCommand.Users |> cmdHandler
+        let! _ = ({ Id = userId; ActivationKey = newKey } : CmdArgs.RegenerateActivationKey) |> cmdHandler proj
         return userId
     }
 
@@ -71,31 +72,32 @@ let getUser getById validateFn token =
     | Some claims -> claims |> claimsToUser getById
     | None -> AuthError.InvalidOrExpiredToken |> ServerError.AuthError |> Error
 
-let register cmdHandler createHashFn (acc:NewAccount) =
+let register getProjection cmdHandler createHashFn (acc:NewAccount) =
     result {
+        let proj = getProjection ()
         let! args = acc |> ArgsBuilder.buildRegister createHashFn
-        let! _ = args |> Command.Register |> CoreCommand.Users |> cmdHandler
+        let! _ = args |> cmdHandler proj
         return args.Id
     }
 
-let activateAccount cmdHandler getUserByActivationKey (activationKey:Guid) =
+let activateAccount getProjection cmdHandler (activationKey:Guid) =
     result {
-        let! (user : User) = getUserByActivationKey activationKey
-        let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> Command.Activate |> CoreCommand.Users |> cmdHandler
+        let! (user : Yobo.Core.Auth.Projections.ExistingUser) = getProjection activationKey |> Result.ofOption (AuthError.ActivationKeyDoesNotMatch |> ServerError.AuthError)
+        let! _ = ({ Id = user.Id; ActivationKey = activationKey } : CmdArgs.Activate) |> cmdHandler user
         return user.Id
     }
 
-let initiatePasswordReset cmdHandler getUserByEmail (email:string) =
+let initiatePasswordReset getProjection cmdHandler (email:string) =
     result {
-        let! (user : User) = getUserByEmail email
-        let! _ = ({ Id = user.Id; PasswordResetKey = Guid.NewGuid() } : CmdArgs.InitiatePasswordReset) |> Command.InitiatePasswordReset |> CoreCommand.Users |> cmdHandler
+        let! (user : Yobo.Core.Auth.Projections.ExistingUser) = getProjection email |> Result.ofOption (AuthError.InvalidLogin |> ServerError.AuthError)
+        let! _ = ({ Id = user.Id; PasswordResetKey = Guid.NewGuid() } : CmdArgs.InitiatePasswordReset) |> cmdHandler user
         return ()
     }
 
-let resetPassword cmdHandler createHashFn getByPwdResetKey (key:Guid,pwdReset:PasswordReset) =
+let resetPassword getProjection cmdHandler createHashFn (key:Guid,pwdReset:PasswordReset) =
     result {
-        let! (user : User) = key |> getByPwdResetKey
+        let! (user : Yobo.Core.Auth.Projections.ExistingUser) = getProjection key |> Result.ofOption (AuthError.PasswordResetKeyDoesNotMatch |> ServerError.AuthError)
         let! args = pwdReset |> ArgsBuilder.buildPasswordReset user.Id key createHashFn
-        let! _ = args |> Command.ResetPassword |> CoreCommand.Users |> cmdHandler
+        let! _ = args |> cmdHandler user
         return ()
     }

@@ -3,11 +3,10 @@ module Yobo.FunctionApp.Calendar.Functions
 open System
 open Yobo.Shared.Calendar.Domain
 open FSharp.Rop
-open Yobo.Core.Users
 open Yobo.Core
-open Yobo.Core.CQRS
 open Yobo.Shared.Calendar
 open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 
 module ArgsBuilder =
     open Yobo.FunctionApp
@@ -22,15 +21,18 @@ module ArgsBuilder =
         } : Lessons.CmdArgs.AddReservation)
 
         
-let addReservation userId cmdHandler (x:AddReservation) =
+let addReservation getLessonProjection getUserProjection cmdHandler (user:Yobo.Shared.Domain.User,x:AddReservation) =
     result {
-        let args = x |> ArgsBuilder.buildAddReservation userId
-        let! _ = args |> (Lessons.Command.AddReservation >> CoreCommand.Lessons >> cmdHandler)
+        let! lessonProj = getLessonProjection x.LessonId |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
+        let! userProj = getUserProjection user.Id |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
+        let args = x |> ArgsBuilder.buildAddReservation user.Id
+        let! _ = args |> cmdHandler (lessonProj,userProj)
         return ()
     }
 
-let cancelReservation userId cmdHandler (x:Guid) =
+let cancelReservation getProjection cmdHandler (user:Yobo.Shared.Domain.User,id:Guid) =
     result {
-        let! _ = ({ Id = x; UserId = userId } : Lessons.CmdArgs.CancelReservation) |> Lessons.CancelReservation |> CoreCommand.Lessons |> cmdHandler
+        let! proj = getProjection id |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
+        let! _ = ({ Id = id; UserId = user.Id } : Lessons.CmdArgs.CancelReservation) |> cmdHandler proj
         return ()
     }

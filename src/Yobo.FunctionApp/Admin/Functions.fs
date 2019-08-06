@@ -3,11 +3,11 @@ module Yobo.FunctionApp.Admin.Functions
 open System
 open Yobo.Shared.Admin.Domain
 open FSharp.Rop
-open Yobo.Core.Users
+open Yobo.Core.Auth
 open Yobo.Core
-open Yobo.Core.CQRS
 open Yobo.Shared.Admin
 open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 
 module ArgsBuilder =
     open Yobo.FunctionApp
@@ -15,10 +15,10 @@ module ArgsBuilder =
     let buildAddCredits =
         ArgsBuilder.build (fun (x:AddCredits) ->
             ({
-                Id = x.UserId
+                UserId = x.UserId
                 Credits = x.Credits
                 Expiration = x.Expiration
-            } : Users.CmdArgs.AddCredits)
+            } : Lessons.CmdArgs.AddCredits)
         ) Validation.validateAddCredits
         >> Result.mapError ServerError.ValidationError
 
@@ -30,7 +30,7 @@ module ArgsBuilder =
                 EndDate = x.End
                 Name = x.Name
                 Description = x.Description
-            } : Lessons.CmdArgs.Create)
+            } : Lessons.CmdArgs.CreateLesson)
         ) Validation.validateAddLesson
         >> Result.mapError ServerError.ValidationError
 
@@ -42,40 +42,45 @@ module ArgsBuilder =
                 EndDate = x.End
                 Name = x.Name
                 Description = x.Description
-            } : Workshops.CmdArgs.Create)
+            } : Lessons.CmdArgs.CreateWorkshop)
         ) Validation.validateAddWorkshop
         >> Result.mapError ServerError.ValidationError
 
 
-let addCredits cmdHandler (acc:AddCredits) =
+let addCredits getProjection cmdHandler (acc:AddCredits) =
     result {
+        let! proj = getProjection acc.UserId |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
         let! args = acc |> ArgsBuilder.buildAddCredits
-        let! _ = args |> Users.Command.AddCredits |> CoreCommand.Users |> cmdHandler
+        let! _ = args |> cmdHandler proj
         return ()
     }
 
-let addLessons cmdHandler (acc:AddLesson list) =
+let addLessons getProjection cmdHandler (acc:AddLesson list) =
     result {
+        let proj = getProjection ()
         let! args = acc |> Result.traverse ArgsBuilder.buildAddLessons
-        let! _ = args |> Result.traverse (Lessons.Command.Create >> CoreCommand.Lessons >> cmdHandler)
+        let! _ = args |> Result.traverse (cmdHandler proj)
         return ()
     }
 
-let addWorkshops cmdHandler (acc:AddWorkshop list) =
+let addWorkshops getProjection cmdHandler (acc:AddWorkshop list) =
     result {
+        let proj = getProjection ()
         let! args = acc |> Result.traverse ArgsBuilder.buildAddWorkshop
-        let! _ = args |> Result.traverse (Workshops.Command.Create >> CoreCommand.Workshops >> cmdHandler)
+        let! _ = args |> Result.traverse (cmdHandler proj)
         return ()
     }
 
-let cancelLesson cmdHandler (i:Guid) =
+let cancelLesson getProjection cmdHandler (i:Guid) =
     result {
-        let! _ = ({ Id = i } : Lessons.CmdArgs.Cancel) |> Lessons.Command.Cancel |> CoreCommand.Lessons |> cmdHandler
+        let! proj = getProjection i |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
+        let! _ = ({ Id = i } : Lessons.CmdArgs.CancelLesson) |> cmdHandler proj
         return ()
     }
 
-let deleteWorkshop cmdHandler (i:Guid) =
+let deleteWorkshop getProjection cmdHandler (i:Guid) =
     result {
-        let! _ = ({ Id = i } : Workshops.CmdArgs.Delete) |> Workshops.Command.Delete |> CoreCommand.Workshops |> cmdHandler
+        let! proj = getProjection i |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
+        let! _ = ({ Id = i } : Lessons.CmdArgs.DeleteWorkshop) |> cmdHandler proj
         return ()
     }

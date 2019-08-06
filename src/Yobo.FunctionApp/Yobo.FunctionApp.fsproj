@@ -15,7 +15,6 @@
 
     <Compile Include="Configuration.fs" />
     <Compile Include="Services.fs" />
-    <Compile Include="Pipeline.fs" />
     <Compile Include="ArgsBuilder.fs" />
     <Compile Include="Auth\Functions.fs" />
     <Compile Include="Admin\Functions.fs" />

@@ -1,4 +1,4 @@
-module Yobo.Core.Lessons.DbCommandHandler
+module Yobo.Core.Lessons.CommandHandler
 
 open System
 open Projections
@@ -7,6 +7,10 @@ open FSharp.Rop
 
 let private tryFindById (allLessons:ExistingLesson list) (id:Guid) =
     allLessons
+    |> List.tryFind (fun x -> x.Id = id)
+
+let private tryFindWorkshopById (allWorkshops:ExistingWorkshop list) (id:Guid) =
+    allWorkshops
     |> List.tryFind (fun x -> x.Id = id)
 
 let private onlyIfNotAlreadyCancelled lesson =
@@ -43,12 +47,24 @@ let private onlyIfCanBeCancelled userId lesson =
             else Ok lesson
         | None -> DomainError.LessonIsNotReserved |> Error
 
-let create (allLessons:ExistingLesson list) (args:CmdArgs.Create) =
+let private onlyIfActivated (user:Projections.User) =
+    if user.IsActivated then Ok user else DomainError.UserNotActivated |> Error
+
+let private onlyIfEnoughCredits amount (user:Projections.User) =
+    if user.Credits - amount < 0 then DomainError.NotEnoughCredits |> Error else Ok user
+
+let private onlyIfNotAlreadyBlocked state =
+    match state.CashReservationsBlockedUntil with
+    | None -> Ok state
+    | Some d ->
+        if d < DateTimeOffset.Now then Ok state else DomainError.CashReservationIsBlocked |> Error
+
+let createLesson (allLessons:ExistingLesson list) (args:CmdArgs.CreateLesson) =
     match tryFindById allLessons args.Id with
     | Some e -> DomainError.ItemAlreadyExists "Id" |> Error
-    | None -> [ Created args ] |> Ok
+    | None -> [ LessonCreated args ] |> Ok
 
-let cancel (lesson:ExistingLesson) (args:CmdArgs.Cancel) =
+let cancelLesson (lesson:ExistingLesson) (args:CmdArgs.CancelLesson) =
     lesson
     |> onlyIfNotAlreadyCancelled
     <!> (fun lsn ->
@@ -62,15 +78,16 @@ let cancel (lesson:ExistingLesson) (args:CmdArgs.Cancel) =
         [ 
             yield! refunds
             yield! unblocks
-            yield Cancelled args 
+            yield LessonCancelled args 
         ]
     )
 
-let addReservation (lesson:ExistingLesson) (args:CmdArgs.AddReservation) =
+let addReservation (lesson:ExistingLesson) (user:Projections.User) (args:CmdArgs.AddReservation) =
     lesson
     |> onlyIfNotFull args.Count
     >>= onlyIfUserNotAlreadyReserved args.UserId
     >>= onlyIfNotAlreadyStarted
+    >>= (fun _ -> if args.UseCredits then onlyIfEnoughCredits args.Count user else onlyIfNotAlreadyBlocked user)
     <!> (fun _ -> 
         [
             yield ReservationAdded args
@@ -94,3 +111,19 @@ let cancelReservation (lesson:ExistingLesson) (args:CmdArgs.CancelReservation) =
                 yield CashReservationsUnblocked { UserId = args.UserId }
         ]
     )
+
+let addCredits (user:Projections.User) (args:CmdArgs.AddCredits) =
+    user
+    |> onlyIfActivated
+    <!> (fun _ -> CreditsAdded args)
+    <!> List.singleton
+
+let createWorkshop (allWorkshops:ExistingWorkshop list) (args:CmdArgs.CreateWorkshop) =
+    match tryFindWorkshopById allWorkshops args.Id with
+    | Some e -> DomainError.ItemAlreadyExists "Id" |> Error
+    | None -> [ WorkshopCreated args ] |> Ok
+
+let deleteWorkshop (workshop:ExistingWorkshop) (args:CmdArgs.DeleteWorkshop) =
+    WorkshopDeleted args
+    |> List.singleton
+    |> Ok

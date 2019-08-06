@@ -15,3 +15,15 @@ type ExistingLesson = {
     EndDate : DateTimeOffset
     IsCancelled : bool
 }
+
+type User = {
+    UserId : Guid
+    Credits : int
+    CreditsExpiration : DateTimeOffset option
+    CashReservationsBlockedUntil : DateTimeOffset option
+    IsActivated : bool
+}
+
+type ExistingWorkshop = {
+    Id : Guid
+}

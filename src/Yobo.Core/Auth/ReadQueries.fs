@@ -1,4 +1,4 @@
-module Yobo.Core.Users.ReadQueries
+module Yobo.Core.Auth.ReadQueries
 
 open Yobo.Core
 open System

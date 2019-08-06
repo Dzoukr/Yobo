@@ -24,8 +24,15 @@ let private getById (ctx:ReadDb.Db.dataContext) lessonId =
         select x
     } |> Seq.head
 
+let private getUserById (ctx:ReadDb.Db.dataContext) userId =
+    query {
+        for x in ctx.Dbo.Users do
+        where (x.Id = userId)
+        select x
+    } |> Seq.head
 
-let created (args:CmdArgs.Create) (ctx:ReadDb.Db.dataContext) =
+
+let lessonCreated (args:CmdArgs.CreateLesson) (ctx:ReadDb.Db.dataContext) =
     let item = ctx.Dbo.Lessons.Create()
     item.Id <- args.Id
     item.Name <- args.Name
@@ -34,7 +41,6 @@ let created (args:CmdArgs.Create) (ctx:ReadDb.Db.dataContext) =
     item.EndDate <- args.EndDate
     item.Created <- DateTimeOffset.Now
     item.IsCancelled <- false
-    ctx.SubmitUpdates()
 
 let reservationAdded (args:CmdArgs.AddReservation) (ctx:ReadDb.Db.dataContext) =
     let item = ctx.Dbo.LessonReservations.Create()
@@ -43,37 +49,55 @@ let reservationAdded (args:CmdArgs.AddReservation) (ctx:ReadDb.Db.dataContext) =
     item.Count <- args.Count
     item.Created <- DateTimeOffset.Now
     item.UseCredits <- args.UseCredits
-    ctx.SubmitUpdates()
 
 let reservationCancelled (args:CmdArgs.CancelReservation) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getReservationById ctx args.UserId
     item.Delete()
-    ctx.SubmitUpdates()
 
-let cancelled (args:CmdArgs.Cancel) (ctx:ReadDb.Db.dataContext) =
+let lessonCancelled (args:CmdArgs.CancelLesson) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.IsCancelled <- true
     args.Id 
     |> getReservationsById ctx 
     |> Seq.iter (fun x -> x.Delete())
-    ctx.SubmitUpdates()
+
+let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
+    let item = args.UserId |> getUserById ctx
+    item.Credits <- item.Credits + args.Credits
+    item.CreditsExpiration <- Some args.Expiration
 
 let creditsWithdrawn (args:CmdArgs.WithdrawCredits) (ctx:ReadDb.Db.dataContext) =
-    let item = args.Id |> getById ctx
+    let item = args.UserId |> getUserById ctx
     item.Credits <- item.Credits - args.Amount
-    ctx.SubmitUpdates()
 
 let creditsRefunded (args:CmdArgs.RefundCredits) (ctx:ReadDb.Db.dataContext) =
-    let item = args.Id |> getById ctx
+    let item = args.UserId |> getUserById ctx
     item.Credits <- item.Credits + args.Amount
-    ctx.SubmitUpdates()
 
 let cashReservationBlocked (args:CmdArgs.BlockCashReservations) (ctx:ReadDb.Db.dataContext) =
-    let item = args.Id |> getById ctx
+    let item = args.UserId |> getUserById ctx
     item.CashReservationBlockedUntil <- Some args.Expires
-    ctx.SubmitUpdates()
 
 let cashReservationUnblocked (args:CmdArgs.UnblockCashReservations) (ctx:ReadDb.Db.dataContext) =
-    let item = args.Id |> getById ctx
+    let item = args.UserId |> getUserById ctx
     item.CashReservationBlockedUntil <- None
-    ctx.SubmitUpdates()
+
+let private getWorkshopById (ctx:ReadDb.Db.dataContext) i =
+    query {
+        for x in ctx.Dbo.Workshops do
+        where (x.Id = i)
+        select x
+    } |> Seq.head
+
+let workshopCreated (args:CmdArgs.CreateWorkshop) (ctx:ReadDb.Db.dataContext) =
+    let item = ctx.Dbo.Workshops.Create()
+    item.Id <- args.Id
+    item.Name <- args.Name
+    item.Description <- args.Description
+    item.StartDate <- args.StartDate
+    item.EndDate <- args.EndDate
+    item.Created <- DateTimeOffset.Now
+
+let workshopDeleted (args:CmdArgs.DeleteWorkshop) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getWorkshopById ctx
+    item.Delete()

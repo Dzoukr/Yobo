@@ -4,7 +4,7 @@ open System
 
 module CmdArgs = 
 
-    type Create = {
+    type CreateLesson = {
         Id : Guid
         StartDate : DateTimeOffset
         EndDate : DateTimeOffset
@@ -24,8 +24,26 @@ module CmdArgs =
         UserId : Guid
     }
 
-    type Cancel = {
+    type CancelLesson = {
         Id : Guid
+    }
+
+    type CreateWorkshop = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+    }
+
+    type DeleteWorkshop = {
+        Id : Guid
+    }
+
+    type AddCredits = {
+        UserId : Guid
+        Credits : int
+        Expiration : DateTimeOffset
     }
 
     type WithdrawCredits = {
@@ -51,11 +69,14 @@ module CmdArgs =
     }
 
 type Event =
-    | Created of CmdArgs.Create
+    | LessonCreated of CmdArgs.CreateLesson
     | ReservationAdded of CmdArgs.AddReservation
     | ReservationCancelled of CmdArgs.CancelReservation
-    | Cancelled of CmdArgs.Cancel
+    | LessonCancelled of CmdArgs.CancelLesson
+    | CreditsAdded of CmdArgs.AddCredits
     | CreditsWithdrawn of CmdArgs.WithdrawCredits
     | CreditsRefunded of CmdArgs.RefundCredits
     | CashReservationsBlocked of CmdArgs.BlockCashReservations
     | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
+    | WorkshopCreated of CmdArgs.CreateWorkshop
+    | WorkshopDeleted of CmdArgs.DeleteWorkshop

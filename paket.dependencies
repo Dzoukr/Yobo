@@ -9,9 +9,6 @@ github Dzoukr/FSharp.Rop FSharp.Rop.fs
 nuget TaskBuilder.fs
 nuget Newtonsoft.Json
 
-// tools
-nuget FSharp.Compiler.Tools
-
 // server
 nuget Giraffe
 nuget Fable.Remoting.Giraffe
@@ -51,6 +48,11 @@ nuget dbup-sqlserver
 
 // event store backup
 nuget Microsoft.FSharpLu.Json
+
+group Tools
+    source https://api.nuget.org/v3/index.json
+    framework: netcoreapp2.2
+    nuget FSharp.Compiler.Tools
 
 group Build
     source https://api.nuget.org/v3/index.json

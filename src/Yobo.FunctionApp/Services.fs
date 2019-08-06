@@ -11,6 +11,7 @@ type AuthServices = {
     AdminUserPassword : string
 }
 
+
 let createAuthService (adminConf:Configuration.AdminConfiguration) (conf:Configuration) (connString:string) = {
     ReadQueries = connString |> ReadQueries.createDefault
     Authenticator = Password.verifyPassword |> Authenticator.createDefault connString

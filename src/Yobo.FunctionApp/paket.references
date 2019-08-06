@@ -8,3 +8,5 @@ Microsoft.Azure.WebJobs.Extensions.DurableTask
 Microsoft.Extensions.Configuration
 Microsoft.Extensions.Configuration.Json
 Microsoft.Extensions.Configuration.EnvironmentVariables
+SQLProvider
+System.Data.SqlClient

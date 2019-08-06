@@ -29,5 +29,9 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <FscToolPath>../../packages/tools/FSharp.Compiler.Tools/tools</FscToolPath>
+    <FscToolExe>fsc.exe</FscToolExe>
+  </PropertyGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

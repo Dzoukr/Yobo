@@ -1,4 +1,4 @@
-module internal Yobo.Core.ReadDb
+module Yobo.Core.ReadDb
 
 open FSharp.Data.Sql
 

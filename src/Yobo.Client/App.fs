@@ -4,11 +4,11 @@ open Elmish
 open Elmish.React
 open Elmish.Navigation
 open Thoth.Elmish
+open Elmish.UrlParser
 
 #if DEBUG
 open Elmish.Debug
 open Elmish.HMR
-open Elmish.UrlParser
 #endif
 
 Program.mkProgram State.init State.update View.render

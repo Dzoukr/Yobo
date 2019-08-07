@@ -53,6 +53,13 @@ let private onlyIfActivated (user:Projections.ExistingUser) =
 let private onlyIfEnoughCredits amount (user:Projections.ExistingUser) =
     if user.Credits - amount < 0 then DomainError.NotEnoughCredits |> Error else Ok user
 
+let private onlyIfNotAfterCreditsExpiration date (user:Projections.ExistingUser) =
+    match user.CreditsExpiration with
+    | None -> Ok user
+    | Some exp ->
+        if date > exp then Error DomainError.CreditsExpiresBeforeLessonStart
+        else Ok user
+
 let private onlyIfNotAlreadyBlocked state =
     match state.CashReservationsBlockedUntil with
     | None -> Ok state
@@ -88,6 +95,7 @@ let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:C
     >>= onlyIfUserNotAlreadyReserved args.UserId
     >>= onlyIfNotAlreadyStarted
     >>= (fun _ -> if args.UseCredits then onlyIfEnoughCredits args.Count user else onlyIfNotAlreadyBlocked user)
+    >>= onlyIfNotAfterCreditsExpiration lesson.StartDate
     <!> (fun _ -> 
         [
             yield ReservationAdded args

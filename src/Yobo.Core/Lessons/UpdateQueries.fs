@@ -63,7 +63,8 @@ let lessonCancelled (args:CmdArgs.CancelLesson) (ctx:ReadDb.Db.dataContext) =
 
 let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
     let item = args.UserId |> getUserById ctx
-    item.Credits <- item.Credits + args.Credits
+    let currentCredits = Yobo.Core.Auth.ReadQueries.calculateCredits item.Credits item.CreditsExpiration
+    item.Credits <- currentCredits + args.Credits
     item.CreditsExpiration <- Some args.Expiration
 
 let creditsWithdrawn (args:CmdArgs.WithdrawCredits) (ctx:ReadDb.Db.dataContext) =

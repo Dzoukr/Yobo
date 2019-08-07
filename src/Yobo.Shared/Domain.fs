@@ -15,6 +15,7 @@ type DomainError =
     | LessonCancellingIsClosed
     | LessonIsClosed
     | NotEnoughCredits
+    | CreditsExpiresBeforeLessonStart
     | CashReservationIsBlocked
     | LessonIsAlreadyCancelled
     | WorkshopIsAlreadyDeleted
@@ -33,6 +34,7 @@ type DomainError =
             | LessonCancellingIsClosed -> "Odhlašování z lekce bylo již uzavřeno."
             | LessonIsClosed -> "Lekce je již uzavřena."
             | NotEnoughCredits -> "Nemáte dostatek kreditů."
+            | CreditsExpiresBeforeLessonStart -> "Lekce začíná až po platnosti vašich kreditů."
             | CashReservationIsBlocked -> "Rezervaci v hotovosti nelze provést."
             | LessonIsAlreadyCancelled -> "Lekce je již zrušena."
             | WorkshopIsAlreadyDeleted -> "Workshop je již smazán."

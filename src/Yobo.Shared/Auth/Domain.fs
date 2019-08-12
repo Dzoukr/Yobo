@@ -9,6 +9,7 @@ type NewAccount = {
     Password: string
     SecondPassword: string
     AgreeButtonChecked : bool
+    NewslettersButtonChecked : bool
 }
 with
     static member Init = {
@@ -18,6 +19,7 @@ with
         Password = ""
         SecondPassword = ""
         AgreeButtonChecked = false
+        NewslettersButtonChecked = false
     }
 
 type Login = {

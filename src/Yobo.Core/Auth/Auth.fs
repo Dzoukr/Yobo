@@ -10,6 +10,7 @@ module CmdArgs =
         FirstName : string
         LastName : string
         Email : string
+        Newsletters : bool
     }
 
     type Activate = {

@@ -21,6 +21,7 @@ module ArgsBuilder =
                 FirstName = acc.FirstName
                 LastName = acc.LastName
                 Email = acc.Email.ToLower()
+                Newsletters = acc.NewslettersButtonChecked
             } : CmdArgs.Register)
         ) Validation.validateAccount
         >> Result.mapError ServerError.ValidationError

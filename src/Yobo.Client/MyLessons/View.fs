@@ -16,7 +16,7 @@ let render (state : State) (dispatch : Msg -> unit) =
         | Some user ->
             let exp = user.CreditsExpiration |> Option.map (fun x -> x.ToString("dd. MM. yyyy")) |> Option.defaultValue ""
             if user.Credits > 0 then
-                sprintf " Na účtu máte <strong>%i</strong> kreditů. Kredity platí do <strong>%s</strong>" user.Credits exp
+                sprintf " Na účtu máte <strong>%i</strong> kreditů. Platnost kreditů do <strong>%s</strong>" user.Credits exp
             else " Na účtu nemáte žádné kredity."
         | None -> ""
 
@@ -42,7 +42,7 @@ let render (state : State) (dispatch : Msg -> unit) =
             span [ DangerouslySetInnerHTML { __html = txt } ] [ ]
         ]
         
-        h1 [ Class "title"] [ str "Moje lekce" ]
+        h1 [ Class "title"] [ str "Rezervované lekce" ]
         Table.table [ Table.TableOption.IsFullWidth; Table.TableOption.IsStriped ] [
             thead [] [
                 tr [] [

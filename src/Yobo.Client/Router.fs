@@ -40,7 +40,7 @@ type Page =
         member x.Path = 
             match x with
             | Calendar -> "/calendar"
-            | MyLessons -> "/mylessons"
+            | MyLessons -> "/myaccount"
             | AuthPage p -> p.Path
             | AdminPage p -> p.Path
         static member Default = Calendar

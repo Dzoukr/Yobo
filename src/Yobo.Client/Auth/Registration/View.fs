@@ -52,6 +52,18 @@ let render (state : State) (dispatch : Msg -> unit) =
             help
         ]
 
+    let newsletters =
+        div [] [
+            Checkbox.input [
+                CustomClass "is-checkradio"
+                Props [ Id "newsletters"; Checked state.Account.NewslettersButtonChecked; OnChange (fun _ -> ToggleNewsletters |> dispatch) ]
+            ]
+            label [ HTMLAttr.HtmlFor "newsletters" ] [
+                str "Souhlasím se zasíláním informačních emailů (newsletterů)"
+            ]
+        ]
+                
+
     let lbl txt = Label.label [] [ str txt ]
 
     let btn isInProgress =
@@ -97,9 +109,8 @@ let render (state : State) (dispatch : Msg -> unit) =
                 ]
 
                 Field.div [] [ checkTerms ]
-
+                Field.div [] [ newsletters ]
                 
-
                 Field.div [] [
                     btn state.IsRegistrating
                 ]

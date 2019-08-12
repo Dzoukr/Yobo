@@ -32,5 +32,6 @@ type Msg =
     | ChangePassword of string
     | ChangeSecondPassword of string
     | ToggleAgreement
+    | ToggleNewsletters
     | ToggleTerms
 

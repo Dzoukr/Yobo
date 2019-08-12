@@ -22,6 +22,7 @@ let registered (args:CmdArgs.Register) (ctx:ReadDb.Db.dataContext) =
     item.Credits <- 0
     item.CreditsExpiration <- None
     item.CashReservationBlockedUntil <- None
+    item.Newsletters <- args.Newsletters
 
 let activated (args:CmdArgs.Activate) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx

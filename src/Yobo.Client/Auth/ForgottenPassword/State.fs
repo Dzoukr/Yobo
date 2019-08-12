@@ -1,7 +1,7 @@
 module Yobo.Client.Auth.ForgottenPassword.State
 
 open Elmish
-open Yobo.Client.Http
+open Yobo.Client.Server
 open Domain
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =

@@ -11,7 +11,7 @@
         <Compile Include="Validation.fs" />
         <Compile Include="SharedView.fs" />
         <Compile Include="TokenStorage.fs" />
-        <Compile Include="Http.fs" />
+        <Compile Include="Server.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Components.fs" />
         <Compile Include="Auth\ResetPassword\Domain.fs" />

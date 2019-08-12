@@ -3,7 +3,7 @@ module Yobo.Client.Admin.Users.State
 open System
 open Yobo.Client.Admin.Users.Domain
 open Elmish
-open Yobo.Client.Http
+open Yobo.Client.Server
 open Yobo.Client
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =

@@ -2,7 +2,7 @@ module Yobo.Client.Auth.AccountActivation.State
 
 open Yobo.Client.Auth.AccountActivation.Domain
 open Elmish
-open Yobo.Client.Http
+open Yobo.Client.Server
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with

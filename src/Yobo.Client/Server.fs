@@ -1,4 +1,4 @@
-module Yobo.Client.Http
+module Yobo.Client.Server
 
 open Fable.Remoting.Client
 open Fable.Core
@@ -33,6 +33,12 @@ let calendarAPI =
     |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
     |> Remoting.withBaseUrl baseUrl
     |> Remoting.buildProxy<Yobo.Shared.Calendar.Communication.API>
+
+let myLessonsAPI =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.MyLessons.Communication.routeBuilder
+    |> Remoting.withBaseUrl baseUrl
+    |> Remoting.buildProxy<Yobo.Shared.MyLessons.Communication.API>
 
 
 

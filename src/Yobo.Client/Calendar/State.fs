@@ -3,7 +3,7 @@ module Yobo.Client.Calendar.State
 open System
 open Yobo.Client.Calendar.Domain
 open Elmish
-open Yobo.Client.Http
+open Yobo.Client.Server
 open Yobo.Client
 
 let private innerUpdate (msg : Msg) (state : State) : State * Cmd<Msg> =

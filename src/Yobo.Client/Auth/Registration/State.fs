@@ -5,7 +5,7 @@ open Yobo.Shared.Validation
 open Yobo.Shared.Communication
 open Yobo.Shared.Auth.Validation
 open Yobo.Client.Auth.Registration.Domain
-open Yobo.Client.Http
+open Yobo.Client.Server
 
 let private updateValidation (state : State) =
     let validation = 

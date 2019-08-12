@@ -1,7 +1,7 @@
 module Yobo.Client.Auth.ResetPassword.State
 
 open Elmish
-open Yobo.Client.Http
+open Yobo.Client.Server
 open Domain
 open Yobo.Shared.Auth
 open Yobo.Shared.Validation

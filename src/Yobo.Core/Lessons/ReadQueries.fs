@@ -79,3 +79,26 @@ module Workshops =
         {
             GetAllForDateRange = getAllForDateRange ctx
         }
+
+module MyLessons =
+    open Yobo.Shared.MyLessons.Domain
+    let private lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``,credits:bool) =
+        {
+            Id = u.Id
+            Name = u.Name
+            Description = u.Description
+            StartDate = u.StartDate.ToCzDateTimeOffset()
+            EndDate = u.EndDate.ToCzDateTimeOffset()
+            CreditsUsed = credits
+        } : Lesson
+
+    let getMyLessons (ctx:ReadDb.Db.dataContext) userId =
+        query {
+            for x in ctx.Dbo.LessonReservations do
+            for y in x.``dbo.Lessons by Id`` do
+            where (x.UserId = userId && y.EndDate > DateTimeOffset.UtcNow)
+            sortBy y.StartDate
+            select (y, x.UseCredits)
+        }
+        |> Seq.toList
+        |> List.map lessonFromDbEntity

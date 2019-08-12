@@ -139,3 +139,16 @@ module Calendar =
             CancelReservation = fun x -> x |> (Security.onlyForLogged svc.Auth) >>= cancelReservation (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.cancelReservation) |> toAsync 
             AddReservation = fun x -> x |> (Security.onlyForLogged svc.Auth) >>= addReservation (Projections.DbProjections.getLessonById dbCtx) (Projections.DbProjections.getUserById dbCtx) (withHandlers CommandHandler.addReservation)  |> toAsync
         }
+
+module MyLessons =
+    let api dbCtx (svc:Services.ApplicationServices) : Yobo.Shared.MyLessons.Communication.API = 
+        {
+            GetMyLessons = 
+                (fun x -> 
+                    x |> (Security.onlyForLogged svc.Auth)
+                    <!> (fun (u,_) -> 
+                        Yobo.Core.Lessons.ReadQueries.MyLessons.getMyLessons dbCtx u.Id
+                    ) 
+                    |> toAsync
+                ) 
+        }

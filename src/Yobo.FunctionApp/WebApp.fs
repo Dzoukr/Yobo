@@ -23,6 +23,12 @@ let calendar dbCtx (svc:Services.ApplicationServices) : HttpHandler =
     |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
     |> Remoting.fromValue (Communication.Calendar.api dbCtx svc)
     |> Remoting.buildHttpHandler
+
+let myLessons dbCtx (svc:Services.ApplicationServices) : HttpHandler =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder Yobo.Shared.MyLessons.Communication.routeBuilder
+    |> Remoting.fromValue (Communication.MyLessons.api dbCtx svc)
+    |> Remoting.buildHttpHandler
     
 let webApp (cfg :ApplicationConfiguration): HttpHandler =
     let services = cfg |> Services.createServices 
@@ -33,4 +39,5 @@ let webApp (cfg :ApplicationConfiguration): HttpHandler =
         auth dbCtx emailSettings services
         admin dbCtx services
         calendar dbCtx services
+        myLessons dbCtx services
     ] 

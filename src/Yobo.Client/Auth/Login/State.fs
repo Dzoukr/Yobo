@@ -2,7 +2,7 @@ module Yobo.Client.Auth.Login.State
 
 open Elmish
 open Yobo.Client.Auth.Login.Domain
-open Yobo.Client.Http
+open Yobo.Client.Server
 open Yobo.Client
 open Elmish.Navigation
 

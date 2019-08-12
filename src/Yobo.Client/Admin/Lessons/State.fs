@@ -3,7 +3,7 @@ module Yobo.Client.Admin.Lessons.State
 open System
 open Yobo.Client.Admin.Lessons.Domain
 open Elmish
-open Yobo.Client.Http
+open Yobo.Client.Server
 open Thoth.Elmish
 open Yobo.Client
 open FSharp.Rop

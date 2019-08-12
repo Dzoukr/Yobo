@@ -37,7 +37,7 @@ let private displayLoggedPage termsViewed (user:User option) (page:Page) content
             Container.container [] [
                 Navbar.Start.div [] [
                     item Router.Calendar.Path "fas fa-calendar-alt" "Kalendář"
-                    item Router.MyLessons.Path "fas fa-calendar-alt" "Moje lekce"
+                    item Router.MyLessons.Path "fas fa-user" "Moje lekce"
                 ]
                 Navbar.End.div [] [
                     yield! adminButtons

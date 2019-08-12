@@ -3,7 +3,7 @@ module Yobo.Client.State
 open Elmish
 open Fable.Import
 open Yobo.Client.Domain
-open Http
+open Server
 open System
 open Elmish.UrlParser
 open Elmish.Navigation
@@ -96,7 +96,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | ReloadUser -> state, (TokenStorage.tryGetToken() |> Option.defaultValue "" |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
     | UserByTokenLoaded res ->
         match res with
-        | Ok user -> { state with LoggedUser = Some user }, Cmd.none
+        | Ok user -> { state with LoggedUser = Some user; States = { state.States with MyLessons = { state.States.MyLessons with LoggedUser = Some user }} }, Cmd.none
         | Error _ -> state, LoggedOut |> Cmd.ofMsg
     | RefreshToken t -> state, (t |> Cmd.ofAsyncResult authAPI.RefreshToken TokenRefreshed)
     | TokenRefreshed res ->

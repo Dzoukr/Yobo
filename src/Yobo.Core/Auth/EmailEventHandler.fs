@@ -61,4 +61,5 @@ let handle getById (settings:EmailSettings.Settings) = function
             }
         )
     | Activated _
+    | SubscribedToNewsletters _
     | PasswordReset _ -> None

@@ -10,3 +10,5 @@ Microsoft.Extensions.Configuration.Json
 Microsoft.Extensions.Configuration.EnvironmentVariables
 SQLProvider
 System.Data.SqlClient
+MailChimp.Net.V3
+Serilog.Sinks.MSSqlServer

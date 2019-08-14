@@ -36,19 +36,24 @@ module Auth =
     open Yobo.Core.Auth
     
     let api dbCtx emailSettings (svc:Services.ApplicationServices) : Yobo.Shared.Auth.Communication.API = 
-
         let withHandlers cmdHandler =
             let innerHandle proj cmd =
                 cmd
                 |> cmdHandler proj
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
+                    evns |> List.iter (Yobo.Libraries.Serialization.Serializer.serialize >> svc.Logger.Information)
+                    
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
                     dbCtx.SubmitUpdates()
 
                     evns
                     |> List.choose (EmailEventHandler.handle svc.Auth.ReadQueries.GetById emailSettings)
                     |> Result.traverse svc.Emails.Send
+                    |> ignore
+
+                    evns
+                    |> List.map (fun e -> MailChimpEventHandler.handle svc.Auth.ReadQueries.GetById e svc.MailChimpManager)
                     |> ignore
                 )
             innerHandle
@@ -82,6 +87,7 @@ module Admin =
                 |> cmdHandler proj
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
+                    evns |> List.iter (Yobo.Libraries.Serialization.Serializer.serialize >> svc.Logger.Information)
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
                     dbCtx.SubmitUpdates()
                 )
@@ -117,12 +123,11 @@ module Calendar =
                 |> cmdHandler proj
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
+                    evns |> List.iter (Yobo.Libraries.Serialization.Serializer.serialize >> svc.Logger.Information)
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
                     dbCtx.SubmitUpdates()
                 )
             innerHandle
-
-        let withUser fn (u,cmd) = (u,cmd) |> fn
 
         {
             GetWorkshopsForDateRange = fun x -> x |> (Security.onlyForLogged svc.Auth) <!> (snd >> limit) <!> svc.Workshops.ReadQueries.GetAllForDateRange |> toAsync

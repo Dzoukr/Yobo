@@ -35,7 +35,8 @@
     <Compile Include="Auth\ReadQueries.fs" />
     <Compile Include="Auth\Authenticator.fs" />
     <Compile Include="Auth\DbEventHandler.fs" />
-    <Compile Include="Auth\EmailEventHandler.fs.fs" />
+    <Compile Include="Auth\EmailEventHandler.fs" />
+    <Compile Include="Auth\MailChimpEventHandler.fs" />
 
     <Compile Include="Lessons\Lessons.fs" />
 

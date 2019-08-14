@@ -42,8 +42,12 @@ let activate (user:ExistingUser) (args:CmdArgs.Activate) =
     user
     |> onlyIfNotAlreadyActivated
     >>= onlyIfActivationKeyMatch args.ActivationKey
-    <!> (fun _ -> Activated args)
-    <!> List.singleton
+    <!> (fun _ -> 
+        [
+            yield Activated args
+            if user.Newsletters then yield SubscribedToNewsletters { Id = args.Id }
+        ]
+    )
 
 let initiatePasswordReset (user:ExistingUser) (args:CmdArgs.InitiatePasswordReset) =
     user

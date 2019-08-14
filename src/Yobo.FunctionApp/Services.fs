@@ -2,6 +2,7 @@ module Yobo.FunctionApp.Services
 open Yobo.Libraries.Security
 open Yobo.Core.Auth
 open Yobo.Libraries.Authorization
+open Serilog
 
 type AuthServices = {
     ReadQueries : ReadQueries.UserQueries
@@ -55,6 +56,8 @@ type ApplicationServices = {
     Lessons : LessonsServices
     Workshops : WorkshopsServices
     Emails : Yobo.Libraries.Emails.EmailProvider
+    MailChimpManager : MailChimp.Net.MailChimpManager
+    Logger : Serilog.Core.Logger
 }
 
 let createServices (conf:Configuration.ApplicationConfiguration) : ApplicationServices =
@@ -63,4 +66,12 @@ let createServices (conf:Configuration.ApplicationConfiguration) : ApplicationSe
         Lessons = createLessonsService conf.ReadDbConnectionString
         Workshops = createWorkshopsService conf.ReadDbConnectionString
         Emails = conf.Emails.Mailjet |> MailjetProvider.create
+        MailChimpManager = MailChimp.Net.MailChimpManager(conf.MailChimpApiKey)
+        Logger = 
+            LoggerConfiguration()
+                .WriteTo.MSSqlServer(
+                    connectionString = conf.ReadDbConnectionString,
+                    tableName = "EventLogs"
+                )
+                .CreateLogger()
     }

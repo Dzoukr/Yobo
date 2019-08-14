@@ -34,9 +34,14 @@ module CmdArgs =
         PasswordHash : string
     }
 
+    type SubscribeToNewsletters = {
+        Id : Guid
+    }
+
 type Event = 
     | Registered of CmdArgs.Register
     | ActivationKeyRegenerated of CmdArgs.RegenerateActivationKey
     | Activated of CmdArgs.Activate
     | PasswordResetInitiated of CmdArgs.InitiatePasswordReset
     | PasswordReset of CmdArgs.ResetPassword
+    | SubscribedToNewsletters of CmdArgs.SubscribeToNewsletters

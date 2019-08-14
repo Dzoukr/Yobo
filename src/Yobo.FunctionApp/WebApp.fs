@@ -5,6 +5,7 @@ open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open Yobo.FunctionApp.Configuration
 open Yobo.Core
+open Serilog
 
 let auth dbCtx emailSettings (svc:Services.ApplicationServices) : HttpHandler =
     Remoting.createApi()

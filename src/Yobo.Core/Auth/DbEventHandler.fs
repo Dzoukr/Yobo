@@ -6,5 +6,4 @@ let handle = function
     | ActivationKeyRegenerated args -> UpdateQueries.activationKeyRegenerated args
     | PasswordResetInitiated args -> UpdateQueries.passwordResetInitiated args
     | PasswordReset args -> UpdateQueries.passwordReset args
-    
-    
+    | SubscribedToNewsletters args -> UpdateQueries.subscribedToNewsletters args

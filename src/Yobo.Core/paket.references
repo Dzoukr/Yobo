@@ -5,3 +5,4 @@ SQLProvider
 System.Data.SqlClient
 Fue
 File:FSharp.Rop.fs
+MailChimp.Net.V3

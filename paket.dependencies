@@ -8,6 +8,7 @@ nuget FSharp.Core
 github Dzoukr/FSharp.Rop FSharp.Rop.fs
 nuget TaskBuilder.fs
 nuget Newtonsoft.Json
+nuget Microsoft.FSharpLu.Json
 
 // server
 nuget Giraffe
@@ -24,6 +25,7 @@ nuget CosmoStore.TableStorage
 nuget SQLProvider
 nuget System.Data.SqlClient
 nuget Fue
+nuget MailChimp.Net.V3
 
 // libraries
 nuget WindowsAzure.Storage
@@ -42,6 +44,9 @@ nuget Fable.Remoting.Client ~> 5
 nuget Fulma ~> 2
 nuget Fulma.Extensions.Wikiki.Quickview
 nuget Thoth.Elmish.Toast
+
+// logging
+nuget Serilog.Sinks.MSSqlServer
 
 // migrations
 nuget dbup-sqlserver

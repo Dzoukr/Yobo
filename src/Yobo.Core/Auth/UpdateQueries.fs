@@ -40,3 +40,7 @@ let passwordReset (args:CmdArgs.ResetPassword) (ctx:ReadDb.Db.dataContext) =
 let activationKeyRegenerated (args:CmdArgs.RegenerateActivationKey) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.ActivationKey <- args.ActivationKey
+
+let subscribedToNewsletters (args:CmdArgs.SubscribeToNewsletters) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.Newsletters <- true

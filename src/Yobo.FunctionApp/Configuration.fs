@@ -25,6 +25,7 @@ type ApplicationConfiguration = {
     Server : ServerConfiguration
     Authorization : Yobo.Libraries.Authorization.Configuration
     Admin : AdminConfiguration
+    MailChimpApiKey : string
 }
 
 module private SymetricCryptoProvider =
@@ -96,4 +97,5 @@ let load (cfg:IConfigurationRoot) =
         Server = Server.get cfg
         Authorization = Authorization.get cfg
         Admin = Admin.get cfg
+        MailChimpApiKey = cfg.["MailChimpApiKey"]
     }

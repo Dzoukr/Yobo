@@ -8,6 +8,7 @@ type ExistingUser = {
     IsActivated : bool
     ActivationKey : Guid
     PasswordResetKey : Guid option
+    Newsletters : bool
 }
 
 module DbProjections =
@@ -19,6 +20,7 @@ module DbProjections =
         IsActivated = e.Activated.IsSome
         ActivationKey = e.ActivationKey
         PasswordResetKey = e.PasswordResetKey
+        Newsletters = e.Newsletters
     }
 
     let getById (ctx:Db.dataContext) i =

@@ -18,8 +18,6 @@ type AdminConfiguration = {
 }
 
 type ApplicationConfiguration = {
-    SymetricCryptoProvider : Yobo.Libraries.Security.TableStorageSymetricCryptoProvider.Configuration
-    EventStore : CosmoStore.TableStorage.Configuration
     ReadDbConnectionString : string
     Emails : EmailConfiguration
     Server : ServerConfiguration
@@ -27,30 +25,6 @@ type ApplicationConfiguration = {
     Admin : AdminConfiguration
     MailChimpApiKey : string
 }
-
-module private SymetricCryptoProvider =
-    open Yobo.Libraries.Security.TableStorageSymetricCryptoProvider
-
-    let get (conf:IConfigurationRoot) : Configuration = 
-        let isDev = 
-            match conf.["CryptoUseLocalEmulator"] |> Boolean.TryParse with
-            | true, v -> v
-            | false, _ -> false
-        {
-            TableName = conf.["CryptoTableName"]
-            Account = if isDev then StorageAccount.LocalEmulator else StorageAccount.Cloud(conf.["CryptoAccountName"], conf.["CryptoAuthKey"])
-        }
-
-module private EventStore =
-    open CosmoStore.TableStorage
-
-    let get (conf:IConfigurationRoot) : Configuration =
-        let isDev = 
-            match conf.["EventStoreUseLocalEmulator"] |> Boolean.TryParse with
-            | true, v -> v
-            | false, _ -> false
-        if isDev then Configuration.CreateDefaultForLocalEmulator() 
-        else Configuration.CreateDefault conf.["EventStoreAccountName"] conf.["EventStoreAuthKey"]
 
 module private Emails =
     open Yobo.Libraries.Emails
@@ -90,8 +64,6 @@ module Admin =
 
 let load (cfg:IConfigurationRoot) =
     {
-        SymetricCryptoProvider = SymetricCryptoProvider.get cfg
-        EventStore = EventStore.get cfg
         ReadDbConnectionString = cfg.["ReadDbConnectionString"]
         Emails = Emails.get cfg
         Server = Server.get cfg

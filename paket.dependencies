@@ -51,9 +51,6 @@ nuget Serilog.Sinks.MSSqlServer
 // migrations
 nuget dbup-sqlserver
 
-// event store backup
-nuget Microsoft.FSharpLu.Json
-
 group Tools
     source https://api.nuget.org/v3/index.json
     framework: netcoreapp2.2

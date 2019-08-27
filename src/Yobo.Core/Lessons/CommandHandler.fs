@@ -95,7 +95,7 @@ let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:C
     >>= onlyIfUserNotAlreadyReserved args.UserId
     >>= onlyIfNotAlreadyStarted
     >>= (fun _ -> if args.UseCredits then onlyIfEnoughCredits args.Count user else onlyIfNotAlreadyBlocked user)
-    >>= onlyIfNotAfterCreditsExpiration lesson.StartDate
+    >>= (fun _ -> if args.UseCredits then onlyIfNotAfterCreditsExpiration lesson.StartDate else Ok user)
     <!> (fun _ -> 
         [
             yield ReservationAdded args

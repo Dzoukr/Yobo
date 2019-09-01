@@ -12,7 +12,7 @@ let maxCapacity = 12
 let maxLowerOffset = -1
 
 let getCancellingDate (d:DateTimeOffset) =
-    d.StartOfTheDay().AddHours 9.
+    d.StartOfTheDay().AddHours 10.
 
 type Lesson = {
     Id : Guid

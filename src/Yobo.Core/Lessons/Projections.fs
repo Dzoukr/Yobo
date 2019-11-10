@@ -4,6 +4,7 @@ open System
 
 type UserReservation = {
     UserId : Guid
+    CreditsExpiration : DateTimeOffset option
     Count : int
     UseCredits : bool
 }
@@ -41,6 +42,7 @@ module DbProjections =
 
     let private toUserReservation (e:Db.dataContext.``dbo.LessonReservationsEntity``) = {
         UserId = e.UserId
+        CreditsExpiration = e.``dbo.Users by Id`` |> Seq.head |> (fun x -> x.CreditsExpiration)
         Count = e.Count
         UseCredits = e.UseCredits
     }

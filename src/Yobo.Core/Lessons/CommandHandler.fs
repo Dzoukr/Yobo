@@ -76,16 +76,22 @@ let cancelLesson (lesson:ExistingLesson) (args:CmdArgs.CancelLesson) =
     |> onlyIfNotAlreadyCancelled
     <!> (fun lsn ->
         let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
-        let refunds = 
-            refund 
+        let refunds =
+            refund
             |> List.map ((fun x -> { UserId = x.UserId; Amount = x.Count; LessonId = lsn.Id } : CmdArgs.RefundCredits ) >> CreditsRefunded)
-        let unblocks = 
-            unblock 
+        let unblocks =
+            unblock
             |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
-        [ 
+        let extends =
+            refund
+            |> List.filter (fun x -> x.CreditsExpiration.IsSome)
+            |> List.map (fun x -> { UserId = x.UserId; Expiration = x.CreditsExpiration.Value.Add(TimeSpan.FromDays 7.) } : CmdArgs.ExtendExpiration)
+            |> List.map ExpirationExtended
+        [
             yield! refunds
             yield! unblocks
-            yield LessonCancelled args 
+            yield! extends
+            yield LessonCancelled args
         ]
     )
 
@@ -96,7 +102,7 @@ let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:C
     >>= onlyIfNotAlreadyStarted
     >>= (fun _ -> if args.UseCredits then onlyIfEnoughCredits args.Count user else onlyIfNotAlreadyBlocked user)
     >>= (fun _ -> if args.UseCredits then onlyIfNotAfterCreditsExpiration lesson.StartDate user else Ok user)
-    <!> (fun _ -> 
+    <!> (fun _ ->
         [
             yield ReservationAdded args
             if args.UseCredits then
@@ -109,13 +115,13 @@ let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:C
 let cancelReservation (lesson:ExistingLesson) (args:CmdArgs.CancelReservation) =
     lesson
     |> onlyIfCanBeCancelled args.UserId
-    <!> (fun l -> 
+    <!> (fun l ->
         let userReservation = l.Reservations |> List.find (fun x -> x.UserId = args.UserId)
         [
             yield ReservationCancelled args
             if userReservation.UseCredits then
                 yield CreditsRefunded { UserId = args.UserId; Amount = userReservation.Count; LessonId = l.Id }
-            else 
+            else
                 yield CashReservationsUnblocked { UserId = args.UserId }
         ]
     )

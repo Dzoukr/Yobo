@@ -2,7 +2,7 @@ namespace Yobo.Core.Lessons
 
 open System
 
-module CmdArgs = 
+module CmdArgs =
 
     type CreateLesson = {
         Id : Guid
@@ -68,6 +68,11 @@ module CmdArgs =
         UserId : Guid
     }
 
+    type ExtendExpiration = {
+        UserId : Guid
+        Expiration : DateTimeOffset
+    }
+
 type Event =
     | LessonCreated of CmdArgs.CreateLesson
     | ReservationAdded of CmdArgs.AddReservation
@@ -80,3 +85,4 @@ type Event =
     | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
     | WorkshopCreated of CmdArgs.CreateWorkshop
     | WorkshopDeleted of CmdArgs.DeleteWorkshop
+    | ExpirationExtended of CmdArgs.ExtendExpiration

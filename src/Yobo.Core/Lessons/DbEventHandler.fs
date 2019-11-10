@@ -12,3 +12,4 @@ let handle = function
     | CashReservationsUnblocked args -> UpdateQueries.cashReservationUnblocked args
     | WorkshopCreated args -> UpdateQueries.workshopCreated args
     | WorkshopDeleted args -> UpdateQueries.workshopDeleted args
+    | ExpirationExtended args -> UpdateQueries.expirationExtended args

@@ -57,8 +57,8 @@ let reservationCancelled (args:CmdArgs.CancelReservation) (ctx:ReadDb.Db.dataCon
 let lessonCancelled (args:CmdArgs.CancelLesson) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
     item.IsCancelled <- true
-    args.Id 
-    |> getReservationsById ctx 
+    args.Id
+    |> getReservationsById ctx
     |> Seq.iter (fun x -> x.Delete())
 
 let creditsAdded (args:CmdArgs.AddCredits) (ctx:ReadDb.Db.dataContext) =
@@ -102,3 +102,7 @@ let workshopCreated (args:CmdArgs.CreateWorkshop) (ctx:ReadDb.Db.dataContext) =
 let workshopDeleted (args:CmdArgs.DeleteWorkshop) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getWorkshopById ctx
     item.Delete()
+
+let expirationExtended (args:CmdArgs.ExtendExpiration) (ctx:ReadDb.Db.dataContext) =
+    let item = args.UserId |> getUserById ctx
+    item.CreditsExpiration <- Some args.Expiration

@@ -15,5 +15,7 @@ type API = {
     AddLessons : SecuredParam<AddLesson list> -> ServerResponse<unit>
     AddWorkshops : SecuredParam<AddWorkshop list> -> ServerResponse<unit>
     CancelLesson : SecuredParam<Guid> -> ServerResponse<unit>
+    DeleteLesson : SecuredParam<Guid> -> ServerResponse<unit>
     DeleteWorkshop : SecuredParam<Guid> -> ServerResponse<unit>
-} 
+    UpdateLesson : SecuredParam<Lesson> -> ServerResponse<unit>
+}

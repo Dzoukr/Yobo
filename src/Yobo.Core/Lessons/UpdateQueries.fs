@@ -106,3 +106,13 @@ let workshopDeleted (args:CmdArgs.DeleteWorkshop) (ctx:ReadDb.Db.dataContext) =
 let expirationExtended (args:CmdArgs.ExtendExpiration) (ctx:ReadDb.Db.dataContext) =
     let item = args.UserId |> getUserById ctx
     item.CreditsExpiration <- Some args.Expiration
+
+
+let lessonDeleted (args:CmdArgs.DeleteLesson) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+
+    args.Id
+    |> getReservationsById ctx
+    |> Seq.iter (fun x -> x.Delete())
+
+    item.Delete()

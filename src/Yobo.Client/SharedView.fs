@@ -6,12 +6,13 @@ open Fable.React.Props
 open Yobo.Shared
 open Thoth.Elmish
 open System
+open System.Globalization
 open Fulma
 
 let errorBox content =
     article [ ClassName "message is-danger has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fa fa-exclamation-circle"; Style [ PaddingRight 10 ] ] [] 
+            i [ ClassName "fa fa-exclamation-circle"; Style [ PaddingRight 10 ] ] []
             content
         ]
     ]
@@ -19,7 +20,7 @@ let errorBox content =
 let successBox content =
     article [ ClassName "message is-success has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fa fa-check-circle"; Style [ PaddingRight 10 ] ] [] 
+            i [ ClassName "fa fa-check-circle"; Style [ PaddingRight 10 ] ] []
             content
         ]
     ]
@@ -27,15 +28,15 @@ let successBox content =
 let inProgressBox content =
     article [ ClassName "message is-info has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fas fa-circle-notch fa-spin" ] [] 
+            i [ ClassName "fas fa-circle-notch fa-spin" ] []
             content
         ]
-    ]        
+    ]
 
 let infoBox content =
     article [ ClassName "message is-info has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fa fa-info-circle"; Style [ PaddingRight 10 ] ] [] 
+            i [ ClassName "fa fa-info-circle"; Style [ PaddingRight 10 ] ] []
             content
         ]
     ]
@@ -43,10 +44,10 @@ let infoBox content =
 let warningBox content =
     article [ ClassName "message is-warning has-text-centered" ] [
         div [ ClassName "message-body"][
-            i [ ClassName "fa fa-exclamation-triangle"; Style [ PaddingRight 10 ] ] [] 
+            i [ ClassName "fa fa-exclamation-triangle"; Style [ PaddingRight 10 ] ] []
             content
         ]
-    ]        
+    ]
 
 let serverErrorToView (serverError:ServerError) =
     serverError.Explain() |> str |> errorBox
@@ -68,7 +69,7 @@ let successToast msg =
 
 let resultToToast successMsg (res:Result<_,ServerError>) =
     match res with
-    | Ok _ -> successMsg |> successToast 
+    | Ok _ -> successMsg |> successToast
     | Error err -> err |> serverErrorToToast
 
 let resultToView successView (res:Result<_,ServerError>) =
@@ -89,6 +90,8 @@ let serverResultToViewIfAny successView (res:ServerResult<_> option) =
 
 let toCzDate (date:DateTimeOffset) = date.ToString("dd. MM. yyyy")
 let toCzTime (date:DateTimeOffset) = date.ToString("HH:mm")
+let toCzDateTime (date:DateTimeOffset) = date.ToString("dd. MM. yyyy HH:mm")
+
 let termsModal isActive closeDisplay =
     Modal.modal [ Modal.IsActive isActive ] [
         Modal.background [ Props [ OnClick closeDisplay ] ] [ ]
@@ -108,7 +111,7 @@ module Forms =
     let private errorAndColor (res:ValidationResult) name =
         let error = res |> Validation.tryGetFieldError name
         let clr = if error.IsSome then Input.Color IsDanger else Input.Option.Props []
-        let help = if error.IsSome then 
+        let help = if error.IsSome then
                     Help.help [ Help.Color IsDanger ]
                         [ str (error.Value.ErrorType.Explain()) ]
                    else span [] []

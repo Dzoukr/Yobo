@@ -11,5 +11,5 @@
   <ItemGroup>
         <ProjectReference Include="..\Yobo.FunctionApp\Yobo.FunctionApp.fsproj" />
     </ItemGroup>
-
+    <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

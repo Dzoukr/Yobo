@@ -40,16 +40,24 @@ module DbProjections =
         IsActivated = e.Activated.IsSome
     }
 
-    let private toUserReservation (e:Db.dataContext.``dbo.LessonReservationsEntity``) = {
-        UserId = e.UserId
-        CreditsExpiration = e.``dbo.Users by Id`` |> Seq.head |> (fun x -> x.CreditsExpiration)
-        Count = e.Count
-        UseCredits = e.UseCredits
-    }
+    let private toUserReservation (ctx:Db.dataContext) (e:Db.dataContext.``dbo.LessonReservationsEntity``) =
+        let user =
+            query {
+                for user in ctx.Dbo.Users do
+                where (user.Id = e.UserId)
+                select user
+            }
+            |> Seq.head
+        {
+            UserId = user.Id
+            CreditsExpiration = user.CreditsExpiration
+            Count = e.Count
+            UseCredits = e.UseCredits
+        }
 
-    let private toExistingLesson (e:Db.dataContext.``dbo.LessonsEntity``) = {
+    let private toExistingLesson ctx (e:Db.dataContext.``dbo.LessonsEntity``) = {
         Id = e.Id
-        Reservations = e.``dbo.LessonReservations by Id`` |> Seq.map toUserReservation |> Seq.toList
+        Reservations = e.``dbo.LessonReservations by Id`` |> Seq.map (toUserReservation ctx) |> Seq.toList
         StartDate = e.StartDate
         EndDate = e.EndDate
         IsCancelled = e.IsCancelled
@@ -74,7 +82,7 @@ module DbProjections =
             where (x.Id = i)
             select x
         }
-        |> Seq.map toExistingLesson
+        |> Seq.map (toExistingLesson ctx)
         |> Seq.tryHead
 
     let getWorkshopById (ctx:Db.dataContext) i =
@@ -91,7 +99,7 @@ module DbProjections =
             for x in ctx.Dbo.Lessons do
             select x
         }
-        |> Seq.map toExistingLesson
+        |> Seq.map (toExistingLesson ctx)
         |> Seq.toList
 
     let getAllWorkshops (ctx:Db.dataContext) () =

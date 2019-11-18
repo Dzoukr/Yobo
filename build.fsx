@@ -75,7 +75,7 @@ Target.create "Run" (fun _ ->
     let client = async {
         runTool yarnTool "webpack-dev-server" __SOURCE_DIRECTORY__
     }
-    
+
     [client;server]
     |> Async.Parallel
     |> Async.RunSynchronously
@@ -88,7 +88,7 @@ Target.create "RunDbMigrations" (fun _ ->
     runDotNet cmd migrationsDeployPath
 )
 
-Target.create "RefreshSchema" (fun _ -> 
+Target.create "RefreshSchema" (fun _ ->
     let srcFile = "..\Yobo.Private\ReadDb.fs"
     let original = functionAppCorePath + "\ReadDb.fs"
     let schemaFile = ".\database\yobo.schema"
@@ -122,8 +122,8 @@ Target.create "Publish" (fun _ ->
 
 open Fake.Core.TargetOperators
 
-"CleanClient" ==> "InstallClient" ==> "PublishClient"    
-"CleanFunctionApp" ==> "PublishDbMigrations" ==> "PublishFunctionApp"    
+"CleanClient" ==> "InstallClient" ==> "PublishClient"
+"CleanFunctionApp" ==> "PublishDbMigrations" ==> "PublishFunctionApp"
 "PublishDbMigrations" ==> "RunDbMigrations" ==> "RefreshSchema"
 
-Target.runOrDefaultWithArguments "Run" 
+Target.runOrDefaultWithArguments "Run"

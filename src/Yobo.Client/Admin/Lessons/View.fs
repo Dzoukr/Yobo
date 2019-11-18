@@ -24,7 +24,7 @@ module Calendar =
                         str "Smazat workshop"
                     ]
                 else "Workshop již proběhl" |> str |> SharedView.infoBox
-            
+
             div [ ClassName "popover is-popover-bottom" ][
                 div [ ClassName "popover-trigger lesson workshop" ] [
                     div [ ClassName "time" ] [
@@ -38,7 +38,7 @@ module Calendar =
                     deleteBtn
                 ]
             ]
-        
+
         let lessonDiv (lesson:Lesson) =
             let cap =
                 if lesson.IsCancelled then "Lekce je zrušena"
@@ -62,10 +62,32 @@ module Calendar =
                     "Lekce je zrušena" |> str |> SharedView.warningBox
                 else
                     if lesson.StartDate > DateTimeOffset.Now then
-                        Button.button [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> CancelLesson(lesson.Id) |> dispatch) ] ] [
+                        Button.button [ Button.Color IsWarning; Button.Props [ Style [ MarginLeft 5 ]; OnClick (fun _ -> CancelLesson(lesson.Id) |> dispatch) ] ] [
                             str "Zrušit lekci"
                         ]
                     else "Lekce již proběhla" |> str |> SharedView.infoBox
+
+            let deleteBtn =
+                if lesson.StartDate > DateTimeOffset.Now then
+                    Button.button [ Button.Color IsDanger; Button.Props [ Style [ MarginLeft 5 ]; OnClick (fun _ -> DeleteLesson(lesson.Id) |> dispatch) ] ] [
+                        str "Smazat lekci"
+                    ]
+                else str ""
+
+            let editBtn =
+                let lsn =
+                    {
+                        Id = lesson.Id
+                        StartDate = lesson.StartDate |> SharedView.toCzDateTime
+                        EndDate = lesson.EndDate |> SharedView.toCzDateTime
+                        Name = lesson.Name
+                        Description = lesson.Description
+                    } : UpdateLessonForm
+                if lesson.StartDate > DateTimeOffset.Now then
+                    Button.button [ Button.Color IsInfo; Button.Props [ OnClick (fun _ -> UpdateLessonChanged (Some lsn) |> dispatch) ] ] [
+                        str "Upravit lekci"
+                    ]
+                else str ""
 
             let cancelledClass = if lesson.IsCancelled then "cancelled" else ""
             div [ ClassName "popover is-popover-bottom" ][
@@ -82,11 +104,13 @@ module Calendar =
                     div [] (lesson.Reservations |> List.map res)
                 ]
                 div [ ClassName "popover-content" ] [
+                    editBtn
                     cancelBtn
+                    deleteBtn
                 ]
             ]
 
-            
+
         td [ ] [
             div [] (lessons |> List.map lessonDiv)
             div [] (workshops |> List.map workshopDiv)
@@ -95,7 +119,7 @@ module Calendar =
     let headerCol (state:State) (dispatch : Msg -> unit) (date:DateTimeOffset) =
         let isSelected = state.SelectedDates |> List.tryFind (fun y -> date = y) |> Option.isSome
         let checkBox =
-            let cmd = if isSelected then DateUnselected else DateSelected 
+            let cmd = if isSelected then DateUnselected else DateSelected
             if date >= DateTimeOffset.Now.StartOfTheDay() then
                 let i = date.Ticks.ToString()
                 div [] [
@@ -121,7 +145,7 @@ module Calendar =
             div [ ClassName "name" ] [ str n ]
             div [ ClassName "date" ] [ date.ToString("dd. MM. yyyy") |> str ]
         ]
-        
+
 
     let navigation (state:State) dispatch =
         let addBtn =
@@ -144,10 +168,124 @@ module Calendar =
                 addBtn
             ]
         ]
-        
+
+    let lessonUpdateForm (lesson:UpdateLessonForm option) dispatch =
+        match lesson with
+        | None -> str ""
+        | Some lsn ->
+            tr [ ] [
+                td [ ColSpan 7 ] [
+                    Field.div [] [
+                        Field.div [ Field.Option.IsHorizontal ] [
+                            Field.label [ Field.Label.CustomClass "is-normal" ] [
+                                Label.label [] [str "Začátek"]
+                            ]
+                            Field.body [] [
+                                Field.div [ ] [
+                                    div [ ClassName "control"] [
+                                        Input.text [
+                                            Input.Option.Placeholder "Čas začátku lekce, např. 19:00"
+                                            Input.Option.Value (lsn.StartDate)
+                                            Input.Option.OnChange (fun e ->
+                                                !!e.target?value
+                                                |> (fun v -> { lsn with StartDate = v })
+                                                |> Some
+                                                |> UpdateLessonChanged
+                                                |> dispatch
+                                            )
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                        Field.div [ Field.Option.IsHorizontal ] [
+                            Field.label [ Field.Label.CustomClass "is-normal" ] [
+                                Label.label [] [str "Konec"]
+                            ]
+                            Field.body [] [
+                                Field.div [ ] [
+                                    div [ ClassName "control"] [
+                                        Input.text [
+                                            Input.Option.Placeholder "Čas konce lekce, např. 20:10"
+                                            Input.Option.Value (lsn.EndDate)
+                                            Input.Option.OnChange (fun e ->
+                                                !!e.target?value
+                                                |> (fun v -> { lsn with EndDate = v })
+                                                |> Some
+                                                |> UpdateLessonChanged
+                                                |> dispatch
+                                            )
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                        Field.div [ Field.Option.IsHorizontal ] [
+                            Field.label [ Field.Label.CustomClass "is-normal" ] [
+                                Label.label [] [str "Název lekce"]
+                            ]
+                            Field.body [] [
+                                Field.div [ ] [
+                                    div [ ClassName "control"] [
+                                        Input.text [
+                                            Input.Option.Value lsn.Name
+                                            Input.Option.OnChange (fun e ->
+                                                !!e.target?value
+                                                |> (fun v -> { lsn with Name = v })
+                                                |> Some
+                                                |> UpdateLessonChanged
+                                                |> dispatch
+                                            )
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                        Field.div [ Field.Option.IsHorizontal ] [
+                            Field.label [ Field.Label.CustomClass "is-normal" ] [
+                                Label.label [] [str "Popis lekce"]
+                            ]
+                            Field.body [] [
+                                Field.div [ ] [
+                                    div [ ClassName "control"] [
+                                        Textarea.textarea [
+                                            Textarea.Option.Value lsn.Description
+                                            Textarea.Option.OnChange (fun e ->
+                                                !!e.target?value
+                                                |> (fun v -> { lsn with Description = v })
+                                                |> Some
+                                                |> UpdateLessonChanged
+                                                |> dispatch
+                                            )
+                                        ] [ ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                        Field.div [ Field.Option.IsHorizontal ] [
+                            Field.label [ Field.Label.CustomClass "is-normal" ] [
+                                Label.label [] []
+                            ]
+                            Field.body [] [
+                                Field.div [ ] [
+                                    div [ ClassName "control"] [
+                                        Button.button [
+                                            Button.Color IsPrimary
+                                            Button.Props [ OnClick (fun _ -> SubmitUpdateLessonForm |> dispatch) ]
+                                        ] [ "Upravit" |> str ]
+
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+
+
 
     let lessonsForm (state:State) dispatch =
-            
+
         let isSubmitable = Yobo.Client.Admin.Lessons.State.getValidLessonsToAdd state |> List.isEmpty |> not
 
         let dates =
@@ -158,7 +296,7 @@ module Calendar =
 
         div [] [
             Field.div [ Field.Option.IsHorizontal ] [
-                Field.label [ ] [ 
+                Field.label [ ] [
                     Label.label [] [str "Dny"]
                 ]
                 Field.body [] [
@@ -170,7 +308,7 @@ module Calendar =
                 ]
             ]
             Field.div [ Field.Option.IsHorizontal ] [
-                Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                Field.label [ Field.Label.CustomClass "is-normal" ] [
                     Label.label [] [str "Začátek"]
                 ]
                 Field.body [] [
@@ -186,7 +324,7 @@ module Calendar =
                 ]
             ]
             Field.div [ Field.Option.IsHorizontal ] [
-                Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                Field.label [ Field.Label.CustomClass "is-normal" ] [
                     Label.label [] [str "Konec"]
                 ]
                 Field.body [] [
@@ -202,7 +340,7 @@ module Calendar =
                 ]
             ]
             Field.div [ Field.Option.IsHorizontal ] [
-                Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                Field.label [ Field.Label.CustomClass "is-normal" ] [
                     Label.label [] [str "Název lekce"]
                 ]
                 Field.body [] [
@@ -217,7 +355,7 @@ module Calendar =
                 ]
             ]
             Field.div [ Field.Option.IsHorizontal ] [
-                Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                Field.label [ Field.Label.CustomClass "is-normal" ] [
                     Label.label [] [str "Popis lekce"]
                 ]
                 Field.body [] [
@@ -232,7 +370,7 @@ module Calendar =
                 ]
             ]
             Field.div [ Field.Option.IsHorizontal ] [
-                Field.label [ Field.Label.CustomClass "is-normal" ] [ 
+                Field.label [ Field.Label.CustomClass "is-normal" ] [
                     Label.label [] []
                 ]
                 Field.body [] [
@@ -290,6 +428,7 @@ module Calendar =
             |> tr [ ClassName "day" ]
 
         Table.table [ Table.CustomClass "is-fullwidth is-bordered table-calendar" ] [
+            yield lessonUpdateForm state.UpdateLessonForm dispatch
             yield lessonsForm state dispatch
             yield navigation state dispatch
             yield headerRow

@@ -78,6 +78,13 @@ let cancelLesson getProjection cmdHandler (i:Guid) =
         return ()
     }
 
+let deleteLesson getProjection cmdHandler (i:Guid) =
+    result {
+        let! proj = getProjection i |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
+        let! _ = ({ Id = i } : Lessons.CmdArgs.DeleteLesson) |> cmdHandler proj
+        return ()
+    }
+
 let deleteWorkshop getProjection cmdHandler (i:Guid) =
     result {
         let! proj = getProjection i |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)

@@ -19,6 +19,14 @@ with
         Description = ""
     }
 
+type UpdateLessonForm = {
+    Id : Guid
+    StartDate : string
+    EndDate : string
+    Name : string
+    Description : string
+}
+
 type State = {
     Lessons : Lesson list
     Workshops : Workshop list
@@ -26,6 +34,7 @@ type State = {
     SelectedDates : DateTimeOffset list
     FormOpened : bool
     AddLessonForm : AddLessonForm
+    UpdateLessonForm : UpdateLessonForm option
 }
 with
     static member Init = {
@@ -35,6 +44,7 @@ with
         SelectedDates = []
         FormOpened = false
         AddLessonForm = AddLessonForm.Init
+        UpdateLessonForm = None
     }
 
 type Msg =
@@ -52,6 +62,11 @@ type Msg =
     | SubmitAddWorkshopForm
     | AddLessonFormSubmitted of ServerResult<unit>
     | CancelLesson of Guid
+    | DeleteLesson of Guid
     | DeleteWorkshop of Guid
     | LessonCancelled of ServerResult<unit>
+    | LessonDeleted of ServerResult<unit>
     | WorkshopDeleted of ServerResult<unit>
+    | UpdateLessonChanged of UpdateLessonForm option
+    | SubmitUpdateLessonForm
+    | UpdateLessonFormSubmitted of ServerResult<unit>

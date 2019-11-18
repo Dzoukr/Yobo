@@ -62,6 +62,15 @@ let getValidWorkshopsToAdd (state:State) =
     |> Result.partition
     |> fst
 
+let getLessonToUpdate (state:State) =
+    {
+        Id = state.UpdateLessonForm.Value.Id
+        Start = state.UpdateLessonForm.Value.S
+        End : DateTimeOffset
+        Name : string
+        Description : string
+    } : Yobo.Shared.Admin.Domain.UpdateLesson
+
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
     | Init -> state, [ LoadLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
@@ -123,10 +132,30 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
         | Error e -> state, (e |> SharedView.serverErrorToToast)
     | CancelLesson id ->
         state, (id |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.CancelLesson LessonCancelled)
+    | DeleteLesson id ->
+        state, (id |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.DeleteLesson LessonDeleted)
     | DeleteWorkshop id ->
         state, (id |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.DeleteWorkshop WorkshopDeleted)
     | LessonCancelled res ->
         state, [ (res |> SharedView.resultToToast "Lekce byla úspěšně zrušena"); LoadLessons |> Cmd.ofMsg ] |> Cmd.batch
+    | LessonDeleted res ->
+        state, [ (res |> SharedView.resultToToast "Lekce byla úspěšně smazána"); LoadLessons |> Cmd.ofMsg ] |> Cmd.batch
     | WorkshopDeleted res ->
         state, [ (res |> SharedView.resultToToast "Workshop byla úspěšně smazán"); LoadWorkshops |> Cmd.ofMsg ] |> Cmd.batch
-                
+    | UpdateLessonChanged lsn ->
+        { state with UpdateLessonForm = lsn }, Cmd.none
+    | SubmitUpdateLessonForm ->
+        state,
+            (state
+            |> (fun x -> x. {})
+            |> SecuredParam.create
+            |> Cmd.ofAsyncResult adminAPI.UpdateLesson (UpdateLessonFormSubmitted))
+    | UpdateLessonFormSubmitted res ->
+        match res with
+        | Ok _ -> { State.Init with WeekOffset = state.WeekOffset },
+                    [
+                        SharedView.successToast "Lekce úspěšně upravena."
+                        Init |> Cmd.ofMsg
+                    ]
+                    |> Cmd.batch
+        | Error e -> state, (e |> SharedView.serverErrorToToast)

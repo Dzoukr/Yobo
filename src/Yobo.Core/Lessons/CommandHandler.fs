@@ -95,6 +95,32 @@ let cancelLesson (lesson:ExistingLesson) (args:CmdArgs.CancelLesson) =
         ]
     )
 
+let deleteLesson (lesson:ExistingLesson) (args:CmdArgs.DeleteLesson) =
+    lesson
+    |> onlyIfNotAlreadyStarted
+    <!> (fun lsn ->
+        let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
+        let refunds =
+            refund
+            |> List.map ((fun x -> { UserId = x.UserId; Amount = x.Count; LessonId = lsn.Id } : CmdArgs.RefundCredits ) >> CreditsRefunded)
+        let unblocks =
+            unblock
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
+        let extends =
+            refund
+            |> List.filter (fun x -> x.CreditsExpiration.IsSome)
+            |> List.map (fun x -> { UserId = x.UserId; Expiration = x.CreditsExpiration.Value.Add(TimeSpan.FromDays 7.) } : CmdArgs.ExtendExpiration)
+            |> List.map ExpirationExtended
+        [
+            yield! refunds
+            yield! unblocks
+            yield! extends
+            yield LessonDeleted args
+        ]
+    )
+
+
+
 let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:CmdArgs.AddReservation) =
     lesson
     |> onlyIfNotFull args.Count

@@ -73,6 +73,10 @@ module CmdArgs =
         Expiration : DateTimeOffset
     }
 
+    type DeleteLesson = {
+        Id : Guid
+    }
+
 type Event =
     | LessonCreated of CmdArgs.CreateLesson
     | ReservationAdded of CmdArgs.AddReservation
@@ -86,3 +90,4 @@ type Event =
     | WorkshopCreated of CmdArgs.CreateWorkshop
     | WorkshopDeleted of CmdArgs.DeleteWorkshop
     | ExpirationExtended of CmdArgs.ExtendExpiration
+    | LessonDeleted of CmdArgs.DeleteLesson

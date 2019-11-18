@@ -14,7 +14,7 @@ let private getUserById (userSvc:Yobo.FunctionApp.Services.AuthServices) i =
 module Security =
     open Yobo.Shared.Auth
     open Yobo.FunctionApp
-    
+
     let onlyForLogged (userSvc:Services.AuthServices) (sp:SecuredParam<_>) =
         match sp.Token |> userSvc.Authorizator.ValidateToken with
         | Some claims ->
@@ -31,11 +31,11 @@ module Security =
 
 module Auth =
     open Yobo.FunctionApp.Auth.Functions
-    open Yobo.Libraries.Security 
+    open Yobo.Libraries.Security
     open Yobo.FunctionApp
     open Yobo.Core.Auth
-    
-    let api dbCtx emailSettings (svc:Services.ApplicationServices) : Yobo.Shared.Auth.Communication.API = 
+
+    let api dbCtx emailSettings (svc:Services.ApplicationServices) : Yobo.Shared.Auth.Communication.API =
         let withHandlers cmdHandler =
             let innerHandle proj cmd =
                 cmd
@@ -43,7 +43,7 @@ module Auth =
                 |> Result.mapError ServerError.DomainError
                 <!> (fun evns ->
                     evns |> List.iter (Yobo.Libraries.Serialization.Serializer.serialize >> svc.Logger.Information)
-                    
+
                     evns |> List.map (fun e -> DbEventHandler.handle e dbCtx) |> ignore
                     dbCtx.SubmitUpdates()
 
@@ -62,7 +62,7 @@ module Auth =
             if email = userSvc.AdminUser.Email && pwd = userSvc.AdminUserPassword then Ok userSvc.AdminUser
             else
                 userSvc.Authenticator.Login email pwd
-        
+
         {
             GetToken = getToken (loginWithAdmin svc.Auth) (svc.Auth.Authorizator.CreateToken >> fun x -> x.AccessToken) >> Result.mapError AuthError >> toAsync
             RefreshToken = refreshToken svc.Auth.Authorizator.ValidateToken (svc.Auth.Authorizator.CreateToken >> fun x -> x.AccessToken) >> toAsync
@@ -79,7 +79,7 @@ module Admin =
     open Yobo.FunctionApp.Admin.Functions
     open Yobo.Core.Lessons
 
-    let api dbCtx (svc:Services.ApplicationServices) : Yobo.Shared.Admin.Communication.API = 
+    let api dbCtx (svc:Services.ApplicationServices) : Yobo.Shared.Admin.Communication.API =
 
         let withHandlers cmdHandler =
             let innerHandle proj cmd =
@@ -101,6 +101,7 @@ module Admin =
             AddLessons = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= addLessons (Projections.DbProjections.getAllLessons dbCtx) (withHandlers CommandHandler.createLesson) |> toAsync
             AddWorkshops = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= addWorkshops (Projections.DbProjections.getAllWorkshops dbCtx) (withHandlers CommandHandler.createWorkshop) |> toAsync
             CancelLesson = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= cancelLesson (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.cancelLesson) |> toAsync
+            DeleteLesson = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= deleteLesson (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.deleteLesson) |> toAsync
             DeleteWorkshop = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= deleteWorkshop (Projections.DbProjections.getWorkshopById dbCtx) (withHandlers CommandHandler.deleteWorkshop) |> toAsync
         }
 
@@ -135,25 +136,25 @@ module Calendar =
                 (fun x ->
                     x |> (Security.onlyForLogged svc.Auth)
                     <!> (fun (u,p) ->
-                        p 
+                        p
                         |> limit
                         |> svc.Lessons.ReadQueries.GetAllForDateRange |> List.map (Lesson.FromAdminLesson u.Id)
-                    ) 
+                    )
                     |> toAsync
                 )
-            CancelReservation = fun x -> x |> (Security.onlyForLogged svc.Auth) >>= cancelReservation (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.cancelReservation) |> toAsync 
+            CancelReservation = fun x -> x |> (Security.onlyForLogged svc.Auth) >>= cancelReservation (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.cancelReservation) |> toAsync
             AddReservation = fun x -> x |> (Security.onlyForLogged svc.Auth) >>= addReservation (Projections.DbProjections.getLessonById dbCtx) (Projections.DbProjections.getUserById dbCtx) (withHandlers CommandHandler.addReservation)  |> toAsync
         }
 
 module MyLessons =
-    let api dbCtx (svc:Services.ApplicationServices) : Yobo.Shared.MyLessons.Communication.API = 
+    let api dbCtx (svc:Services.ApplicationServices) : Yobo.Shared.MyLessons.Communication.API =
         {
-            GetMyLessons = 
-                (fun x -> 
+            GetMyLessons =
+                (fun x ->
                     x |> (Security.onlyForLogged svc.Auth)
-                    <!> (fun (u,_) -> 
+                    <!> (fun (u,_) ->
                         Yobo.Core.Lessons.ReadQueries.MyLessons.getMyLessons dbCtx u.Id
-                    ) 
+                    )
                     |> toAsync
-                ) 
+                )
         }

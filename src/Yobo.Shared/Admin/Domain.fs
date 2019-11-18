@@ -27,6 +27,14 @@ type AddLesson = {
     Description : string
 }
 
+type UpdateLesson = {
+    Id : Guid
+    Start : DateTimeOffset
+    End : DateTimeOffset
+    Name : string
+    Description : string
+}
+
 type AddWorkshop = {
     Start : DateTimeOffset
     End : DateTimeOffset

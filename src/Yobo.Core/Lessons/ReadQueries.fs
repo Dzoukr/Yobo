@@ -12,24 +12,32 @@ module Lessons =
         GetAllForDateRange : (DateTimeOffset * DateTimeOffset) -> Lesson list
     }
 
-    let private reservationFromDbEntity (r:ReadDb.Db.dataContext.``dbo.LessonReservationsEntity``) =
+    let private reservationFromDbEntity (ctx:ReadDb.Db.dataContext) (r:ReadDb.Db.dataContext.``dbo.LessonReservationsEntity``) =
         let res =
             match r.Count, r.UseCredits with
             | 2, _ -> ForTwo
             | 1, true -> ForOne(Credits)
             | 1, false -> ForOne(Cash)
             | _ -> failwith "Invalid value in DB for reservations"
-        let user = r.``dbo.Users by Id`` |> Seq.head |> Auth.ReadQueries.userFromDbEntity
+
+        let user =
+            query {
+                for user in ctx.Dbo.Users do
+                where (user.Id = r.UserId)
+                select user
+            }
+            |> Seq.head
+            |> Auth.ReadQueries.userFromDbEntity
         user, res
 
-    let internal lessonFromDbEntity (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) =
+    let internal lessonFromDbEntity ctx (u:ReadDb.Db.dataContext.``dbo.LessonsEntity``) =
         {
             Id = u.Id
             Name = u.Name
             Description = u.Description
             StartDate = u.StartDate.ToCzDateTimeOffset()
             EndDate = u.EndDate.ToCzDateTimeOffset()
-            Reservations = u.``dbo.LessonReservations by Id`` |> Seq.map reservationFromDbEntity |> Seq.toList
+            Reservations = u.``dbo.LessonReservations by Id`` |> Seq.map (reservationFromDbEntity ctx) |> Seq.toList
             IsCancelled = u.IsCancelled
         }
 
@@ -41,7 +49,7 @@ module Lessons =
             select x
         }
         |> Seq.toList
-        |> List.map lessonFromDbEntity
+        |> List.map (lessonFromDbEntity ctx)
 
     let createDefault (connString:string) =
         let ctx = ReadDb.Db.GetDataContext(connString)

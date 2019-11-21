@@ -19,12 +19,13 @@ type DomainError =
     | CashReservationIsBlocked
     | LessonIsAlreadyCancelled
     | WorkshopIsAlreadyDeleted
+    | LessonIsInPast
     with
         member x.Explain() =
             match x with
             | ItemAlreadyExists v -> v |> sprintf "Tento %s již v systému existuje."
-            | ItemDoesNotExist v -> v |> sprintf "Položka s touto hodnotou %s v systému neexistuje." 
-            | UserAlreadyActivated -> "Uživatelský účet je již zaktivován." 
+            | ItemDoesNotExist v -> v |> sprintf "Položka s touto hodnotou %s v systému neexistuje."
+            | UserAlreadyActivated -> "Uživatelský účet je již zaktivován."
             | UserNotActivated -> "Uživatelský účet není zaktivován."
             | ActivationKeyDoesNotMatch -> "Aktivační klíč nebyl nalezen."
             | PasswordResetKeyDoesNotMatch -> "Klíč pro reset hesla nebyl nalezen."
@@ -38,6 +39,7 @@ type DomainError =
             | CashReservationIsBlocked -> "Rezervaci v hotovosti nelze provést."
             | LessonIsAlreadyCancelled -> "Lekce je již zrušena."
             | WorkshopIsAlreadyDeleted -> "Workshop je již smazán."
+            | LessonIsInPast -> "Lekce nesmí být v minulosti."
 
 type User = {
     Id : Guid

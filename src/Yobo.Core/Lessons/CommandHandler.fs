@@ -24,6 +24,17 @@ let private onlyIfNotFull count lesson =
         DomainError.LessonIsFull |> Error
     else Ok lesson
 
+let private onlyIfLessonExists (allLessons:ExistingLesson list) id =
+    match tryFindById allLessons id with
+    | None -> DomainError.ItemDoesNotExist "Id" |> Error
+    | Some e -> e |> Ok
+
+let private onlyIfNotInPast (args:CmdArgs.UpdateLesson) =
+    let now = DateTimeOffset.UtcNow
+    if args.StartDate <= now || args.EndDate <= now then
+        DomainError.LessonIsInPast |> Error
+    else args |> Ok
+
 let private onlyIfUserNotAlreadyReserved userId lesson =
     lesson.Reservations
     |> List.tryFind (fun ({UserId = u}) -> u = userId)
@@ -70,6 +81,12 @@ let createLesson (allLessons:ExistingLesson list) (args:CmdArgs.CreateLesson) =
     match tryFindById allLessons args.Id with
     | Some e -> DomainError.ItemAlreadyExists "Id" |> Error
     | None -> [ LessonCreated args ] |> Ok
+
+let updateLesson (allLessons:ExistingLesson list) (args:CmdArgs.UpdateLesson) =
+    args.Id
+    |> onlyIfLessonExists allLessons
+    <!> (fun _ -> onlyIfNotInPast args)
+    <!> (fun _ -> [ LessonUpdated args ])
 
 let cancelLesson (lesson:ExistingLesson) (args:CmdArgs.CancelLesson) =
     lesson
@@ -118,8 +135,6 @@ let deleteLesson (lesson:ExistingLesson) (args:CmdArgs.DeleteLesson) =
             yield LessonDeleted args
         ]
     )
-
-
 
 let addReservation (lesson:ExistingLesson,user:Projections.ExistingUser) (args:CmdArgs.AddReservation) =
     lesson

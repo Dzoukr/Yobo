@@ -78,8 +78,8 @@ module Calendar =
                 let lsn =
                     {
                         Id = lesson.Id
-                        StartDate = lesson.StartDate |> SharedView.toCzDateTime
-                        EndDate = lesson.EndDate |> SharedView.toCzDateTime
+                        StartDate = lesson.StartDate.ToString("O")
+                        EndDate = lesson.EndDate.ToString("O")
                         Name = lesson.Name
                         Description = lesson.Description
                     } : UpdateLessonForm

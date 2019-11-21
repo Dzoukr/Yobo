@@ -34,6 +34,18 @@ module ArgsBuilder =
         ) Validation.validateAddLesson
         >> Result.mapError ServerError.ValidationError
 
+    let buildUpdateLesson =
+        ArgsBuilder.build (fun (x:UpdateLesson) ->
+            ({
+                Id = x.Id
+                StartDate = x.Start
+                EndDate = x.End
+                Name = x.Name
+                Description = x.Description
+            } : Lessons.CmdArgs.UpdateLesson)
+        ) Validation.validateUpdateLesson
+        >> Result.mapError ServerError.ValidationError
+
     let buildAddWorkshop =
         ArgsBuilder.build (fun (x:AddWorkshop) ->
             ({
@@ -89,5 +101,13 @@ let deleteWorkshop getProjection cmdHandler (i:Guid) =
     result {
         let! proj = getProjection i |> Result.ofOption (DomainError.ItemDoesNotExist "Id" |> ServerError.DomainError)
         let! _ = ({ Id = i } : Lessons.CmdArgs.DeleteWorkshop) |> cmdHandler proj
+        return ()
+    }
+
+let updateLesson getProjection cmdHandler (acc:UpdateLesson) =
+    result {
+        let proj = getProjection ()
+        let! args = acc |> ArgsBuilder.buildUpdateLesson
+        let! _ = args |> cmdHandler proj
         return ()
     }

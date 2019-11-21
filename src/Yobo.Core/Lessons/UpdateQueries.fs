@@ -107,7 +107,6 @@ let expirationExtended (args:CmdArgs.ExtendExpiration) (ctx:ReadDb.Db.dataContex
     let item = args.UserId |> getUserById ctx
     item.CreditsExpiration <- Some args.Expiration
 
-
 let lessonDeleted (args:CmdArgs.DeleteLesson) (ctx:ReadDb.Db.dataContext) =
     let item = args.Id |> getById ctx
 
@@ -116,3 +115,10 @@ let lessonDeleted (args:CmdArgs.DeleteLesson) (ctx:ReadDb.Db.dataContext) =
     |> Seq.iter (fun x -> x.Delete())
 
     item.Delete()
+
+let lessonUpdated (args:CmdArgs.UpdateLesson) (ctx:ReadDb.Db.dataContext) =
+    let item = args.Id |> getById ctx
+    item.Name <- args.Name
+    item.Description <- args.Description
+    item.StartDate <- args.StartDate
+    item.EndDate <- args.EndDate

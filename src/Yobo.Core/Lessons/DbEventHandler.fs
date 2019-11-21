@@ -14,3 +14,4 @@ let handle = function
     | WorkshopDeleted args -> UpdateQueries.workshopDeleted args
     | ExpirationExtended args -> UpdateQueries.expirationExtended args
     | LessonDeleted args -> UpdateQueries.lessonDeleted args
+    | LessonUpdated args -> UpdateQueries.lessonUpdated args

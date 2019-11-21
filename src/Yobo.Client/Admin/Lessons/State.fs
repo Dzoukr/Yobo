@@ -63,17 +63,21 @@ let getValidWorkshopsToAdd (state:State) =
     |> fst
 
 let getLessonToUpdate (state:State) =
-    {
-        Id = state.UpdateLessonForm.Value.Id
-        Start = state.UpdateLessonForm.Value.S
-        End : DateTimeOffset
-        Name : string
-        Description : string
-    } : Yobo.Shared.Admin.Domain.UpdateLesson
+    state.UpdateLessonForm
+    |> Option.get
+    |> (fun x ->
+        {
+            Id = x.Id
+            Start = x.StartDate |> DateTimeOffset.Parse
+            End = x.EndDate |> DateTimeOffset.Parse
+            Name = x.Name
+            Description = x.Description
+        } : Yobo.Shared.Admin.Domain.UpdateLesson
+    )
 
 let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     match msg with
-    | Init -> state, [ LoadLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
+    | Init -> { state with UpdateLessonForm = None }, [ LoadLessons; LoadWorkshops] |> List.map Cmd.ofMsg |> Cmd.batch
     | LoadLessons ->
         state,
             state.WeekOffset
@@ -147,7 +151,7 @@ let update (msg : Msg) (state : State) : State * Cmd<Msg> =
     | SubmitUpdateLessonForm ->
         state,
             (state
-            |> (fun x -> x. {})
+            |> getLessonToUpdate
             |> SecuredParam.create
             |> Cmd.ofAsyncResult adminAPI.UpdateLesson (UpdateLessonFormSubmitted))
     | UpdateLessonFormSubmitted res ->

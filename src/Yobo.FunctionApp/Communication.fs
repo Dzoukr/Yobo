@@ -103,6 +103,7 @@ module Admin =
             CancelLesson = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= cancelLesson (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.cancelLesson) |> toAsync
             DeleteLesson = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= deleteLesson (Projections.DbProjections.getLessonById dbCtx) (withHandlers CommandHandler.deleteLesson) |> toAsync
             DeleteWorkshop = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= deleteWorkshop (Projections.DbProjections.getWorkshopById dbCtx) (withHandlers CommandHandler.deleteWorkshop) |> toAsync
+            UpdateLesson = fun x -> x |> (Security.onlyForAdmin svc.Auth) <!> snd >>= updateLesson (Projections.DbProjections.getAllLessons dbCtx) (withHandlers CommandHandler.updateLesson) |> toAsync
         }
 
 module Calendar =

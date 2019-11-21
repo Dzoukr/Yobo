@@ -77,6 +77,14 @@ module CmdArgs =
         Id : Guid
     }
 
+    type UpdateLesson = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+    }
+
 type Event =
     | LessonCreated of CmdArgs.CreateLesson
     | ReservationAdded of CmdArgs.AddReservation
@@ -91,3 +99,4 @@ type Event =
     | WorkshopDeleted of CmdArgs.DeleteWorkshop
     | ExpirationExtended of CmdArgs.ExtendExpiration
     | LessonDeleted of CmdArgs.DeleteLesson
+    | LessonUpdated of CmdArgs.UpdateLesson

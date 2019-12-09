@@ -1,67 +1,27 @@
-version 5.215.0
+version 5.216.0
+
 source https://api.nuget.org/v3/index.json
-framework: netstandard2.0, netcoreapp2.2
 storage: none
 
-// shared
 nuget FSharp.Core
-github Dzoukr/FSharp.Rop FSharp.Rop.fs
-nuget TaskBuilder.fs
-nuget Newtonsoft.Json
-nuget Microsoft.FSharpLu.Json
 
-// server
-nuget Giraffe
-nuget Fable.Remoting.Giraffe
-nuget Microsoft.NET.Sdk.Functions
-nuget Microsoft.Azure.WebJobs.Extensions.Storage
-nuget Microsoft.Azure.WebJobs.Extensions.DurableTask
-nuget Microsoft.Extensions.Configuration
-nuget Microsoft.Extensions.Configuration.Json
-nuget Microsoft.Extensions.Configuration.EnvironmentVariables
-    
-// core
-nuget CosmoStore.TableStorage
-nuget SQLProvider
-nuget System.Data.SqlClient
-nuget Fue
-nuget MailChimp.Net.V3
-
-// libraries
-nuget WindowsAzure.Storage
-nuget Mailjet.Api
-nuget System.IdentityModel.Tokens.Jwt
-
-// client
-nuget Fable.Core ~> 3
-nuget Fable.Elmish ~> 3
-nuget Fable.Elmish.Debugger ~> 3
-nuget Fable.Elmish.HMR ~> 4
-nuget Fable.Elmish.React ~> 3
-nuget Fable.Elmish.Browser ~> 3
-nuget Fable.React ~> 5
-nuget Fable.Remoting.Client ~> 5
-nuget Fulma ~> 2
-nuget Fulma.Extensions.Wikiki.Quickview
-nuget Thoth.Elmish.Toast
-
-// logging
-nuget Serilog.Sinks.MSSqlServer
-
-// migrations
-nuget dbup-sqlserver
-
-group Tools
+group Client
     source https://api.nuget.org/v3/index.json
-    framework: netcoreapp2.2
-    nuget FSharp.Compiler.Tools
+    storage: none
+    nuget FSharp.Core
+    nuget Fable.Core
+    nuget Fable.Elmish.Debugger
+    nuget Fable.Elmish.React
+    nuget Fable.Elmish.HMR
+    nuget Feliz
+    nuget Feliz.Router
+    nuget Feliz.Bulma
 
 group Build
     source https://api.nuget.org/v3/index.json
-    framework: netstandard2.0
     storage: none
-
-    nuget FSharp.Core //4.3.4 // https://github.com/fsharp/FAKE/issues/2001
-    nuget Fake.Core.Target
+    nuget FSharp.Core
     nuget Fake.DotNet.Cli
+    nuget Fake.Core.Target
     nuget Fake.IO.FileSystem
+    

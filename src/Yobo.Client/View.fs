@@ -1,88 +1,14 @@
-module Yobo.Client.View
+﻿module Yobo.Client.View
 
-open Yobo.Client.Domain
-open Fulma
-open Fable.React
-open Fable.React.Props
-open Yobo.Shared.Domain
-open Router
-
-let private displayLoggedPage termsViewed (user:User option) (page:Page) content dispatch =
-    let item (pg:string) icon text =
-        let isActive = page.Path = pg
-        Navbar.Item.a [ Navbar.Item.IsActive isActive ; Navbar.Item.Option.Props [ Href pg; OnClick Router.goToUrl ] ] [
-            i [ ClassName icon; Style [ MarginRight 5] ] [ ]
-            str text
-        ]
-
-    let adminButtons =
-        match user with
-        | Some { IsAdmin = true } ->
-                [ item Router.Users.Path "fas fa-users" "Uživatelé"
-                  item Router.Lessons.Path "fas fa-calendar-alt" "Lekce" ]
-        | _ -> []
-
-    let userInfo =
-        match user with
-        | Some user ->
-            Navbar.Item.div [] [
-                Tag.tag [ Tag.Color IsInfo; Tag.Props [ Style [ MarginRight 10 ] ] ] [ sprintf "%i kreditů" user.Credits |> str ]
-                i [ ClassName "fas fa-user"; Style [ MarginRight 5 ] ] []
-                sprintf "%s %s" user.FirstName user.LastName |> str
-            ]
-        | None -> str ""
+open Domain
+open Feliz
+open Feliz.Bulma
+open Feliz.Router
     
-    div [] [
-        Navbar.navbar [ Navbar.Color IsLight; ] [
-            Container.container [] [
-                Navbar.Start.div [] [
-                    item Router.Calendar.Path "fas fa-calendar-alt" "Kalendář"
-                    item Router.MyLessons.Path "fas fa-user" "Můj účet"
-                ]
-                Navbar.End.div [] [
-                    yield! adminButtons
-                    yield userInfo
-                    yield Navbar.Item.div [] [
-                        div [ ClassName "buttons" ] [
-                            Button.a [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> LoggedOut |> dispatch) ] ] [
-                                str "Odhlásit"
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ]
-        main [ Style [ PaddingTop "2rem" ] ] [
-            Container.container [ ] [
-                content
-            ]
-            Container.container [ ] [
-                a [ ClassName "terms-link"; OnClick (fun _ -> ToggleTermsView |> dispatch) ] [str "Obchodní podmínky"]
-                SharedView.termsModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
-            ]
-        ]
+let view (model : Model) (dispatch : Msg -> unit) =
+    let render =
+        Html.div "AHOJ"
+    Router.router [
+        Router.onUrlChanged (Router.parseUrl >> UrlChanged >> dispatch)
+        Router.application render
     ]
-
-let render (state : State) (dispatch : Msg -> unit) =
-    let showInTemplate content =
-        displayLoggedPage state.TermsDisplayed state.LoggedUser state.Page content dispatch
-    match state.Page with
-    | AuthPage Login -> Auth.Login.View.render state.States.Login (LoginMsg >> AuthMsg >> dispatch)
-    | AuthPage Registration -> Auth.Registration.View.render state.States.Registration (RegistrationMsg >> AuthMsg >> dispatch)
-    | AuthPage (AccountActivation _) -> Auth.AccountActivation.View.render state.States.AccountActivation (AccountActivationMsg >> AuthMsg >> dispatch)
-    | AuthPage ForgottenPassword -> Auth.ForgottenPassword.View.render state.States.ForgottenPassword (ForgottenPasswordMsg >> AuthMsg >> dispatch)
-    | AuthPage (ResetPassword _) -> Auth.ResetPassword.View.render state.States.ResetPassword (ResetPasswordMsg >> AuthMsg >> dispatch)
-    | AdminPage pg ->
-        let content =
-            match pg with
-            | Users -> Admin.Users.View.render state.States.Users (UsersMsg >> AdminMsg >> dispatch)
-            | Lessons -> Admin.Lessons.View.render state.States.Lessons (LessonsMsg >> AdminMsg >> dispatch)
-        content |> showInTemplate
-    | Calendar ->
-        let content =
-            if state.LoggedUser.IsSome then
-                Calendar.View.render state.LoggedUser.Value state.States.Calendar (CalendarMsg >> dispatch)
-            else str ""
-        content |> showInTemplate
-    | MyLessons ->
-        MyLessons.View.render state.States.MyLessons (MyLessonsMsg >> dispatch) |> showInTemplate

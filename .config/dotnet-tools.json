@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "isRoot": true,
+  "tools": {
+    "paket": {
+      "version": "5.241.1",
+      "commands": [
+        "paket"
+      ]
+    },
+    "fake-cli": {
+      "version": "5.18.3",
+      "commands": [
+        "fake"
+      ]
+    },
+    "femto": {
+      "version": "0.8.3",
+      "commands": [
+        "femto"
+      ]
+    }
+  }
+}

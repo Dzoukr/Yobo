@@ -1,21 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28306.52
-MinimumVisualStudioVersion = 10.0.40219.1
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Yobo.FunctionApp", "src\Yobo.FunctionApp\Yobo.FunctionApp.fsproj", "{3F7483C1-E8B5-4E1F-BA88-021E07731371}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Yobo.Client", "src\Yobo.Client\Yobo.Client.fsproj", "{EDEC6AB2-402E-4340-AC9D-3325A59084D3}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Yobo.Core", "src\Yobo.Core\Yobo.Core.fsproj", "{D8675CD3-7306-4170-B964-6AB5CE7CCB67}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Yobo.Shared", "src\Yobo.Shared\Yobo.Shared.fsproj", "{D26B84AF-77DE-48EA-8AA6-728C5B809841}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "Yobo.Libraries", "src\Yobo.Libraries\Yobo.Libraries.fsproj", "{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{BA5BC24D-BD6B-48FB-85A6-89C73FBD84CB}"
-EndProject
-Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "DbMigrations", "tools\DbMigrations\DbMigrations.fsproj", "{5BB85E62-F44C-492D-AA64-BDF4B2723371}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Client", "src\Yobo.Client\Yobo.Client.fsproj", "{9136B583-FA72-4656-B7F4-659FD75B2A78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,38 +8,9 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{3F7483C1-E8B5-4E1F-BA88-021E07731371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3F7483C1-E8B5-4E1F-BA88-021E07731371}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3F7483C1-E8B5-4E1F-BA88-021E07731371}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3F7483C1-E8B5-4E1F-BA88-021E07731371}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EDEC6AB2-402E-4340-AC9D-3325A59084D3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EDEC6AB2-402E-4340-AC9D-3325A59084D3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EDEC6AB2-402E-4340-AC9D-3325A59084D3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EDEC6AB2-402E-4340-AC9D-3325A59084D3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D8675CD3-7306-4170-B964-6AB5CE7CCB67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8675CD3-7306-4170-B964-6AB5CE7CCB67}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8675CD3-7306-4170-B964-6AB5CE7CCB67}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8675CD3-7306-4170-B964-6AB5CE7CCB67}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D26B84AF-77DE-48EA-8AA6-728C5B809841}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D26B84AF-77DE-48EA-8AA6-728C5B809841}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D26B84AF-77DE-48EA-8AA6-728C5B809841}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D26B84AF-77DE-48EA-8AA6-728C5B809841}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B67F266C-36AF-4A55-BAEB-BFDF54060DCC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5BB85E62-F44C-492D-AA64-BDF4B2723371}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{5BB85E62-F44C-492D-AA64-BDF4B2723371} = {BA5BC24D-BD6B-48FB-85A6-89C73FBD84CB}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C7A73719-4B55-49BD-9A88-23D7388764FA}
+		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

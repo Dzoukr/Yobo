@@ -4,6 +4,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Client", "src\Yobo.Cli
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Shared", "src\Yobo.Shared\Yobo.Shared.fsproj", "{0A0C185F-F080-40A6-A94D-F94C11F6D755}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Server", "src\Yobo.Server\Yobo.Server.fsproj", "{1883BFF6-E5A3-4A11-9947-475016E88D4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

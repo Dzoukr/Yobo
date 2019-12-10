@@ -1,0 +1,6 @@
+group Server
+    Microsoft.NET.Sdk.Functions
+    Microsoft.Azure.Functions.Extensions
+    FSharp.Core
+    Giraffe
+    Fable.Remoting.Giraffe

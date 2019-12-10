@@ -17,6 +17,18 @@ group Client
     nuget Feliz.Router
     nuget Feliz.Bulma
     nuget Elmish.SweetAlert
+    nuget Elmish.Toastr
+    nuget Fable.Remoting.Client
+
+group Server
+    source https://api.nuget.org/v3/index.json
+    framework:netcoreapp3.1
+    storage:none
+    nuget FSharp.Core
+    nuget Microsoft.Azure.Functions.Extensions
+    nuget Microsoft.NET.Sdk.Functions
+    nuget Giraffe
+    nuget Fable.Remoting.Giraffe
 
 group Build
     source https://api.nuget.org/v3/index.json

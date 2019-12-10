@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Validation.fs" />
+        <Compile Include="Communication.fs" />
+        <Compile Include="Auth\Communication.fs" />
+        <Compile Include="Auth\Validation.fs" />
+    </ItemGroup>
+
+</Project>

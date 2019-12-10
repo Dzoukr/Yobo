@@ -1,16 +1,10 @@
 ﻿module Yobo.Client.Router
 
 open Feliz.Router
+open Domain
 
-type Page =
-    | Login
-
-let defaultPage = Login
-    
 let parseUrl = function
-    | [ "login" ] -> Login 
-    | _ -> defaultPage
-    
-let getHref = function
-    | Login -> Router.format("login")
+    | [ Paths.Login ] -> Auth(Auth.Domain.Login Auth.Login.Domain.Model.init)
+    | [ Paths.Calendar ] -> Calendar
+    | _ -> Model.init.CurrentPage
     

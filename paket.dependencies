@@ -16,6 +16,7 @@ group Client
     nuget Feliz
     nuget Feliz.Router
     nuget Feliz.Bulma
+    nuget Elmish.SweetAlert
 
 group Build
     source https://api.nuget.org/v3/index.json

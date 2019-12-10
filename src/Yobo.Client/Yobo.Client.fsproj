@@ -6,19 +6,21 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Router.fs" />
+        <Compile Include="Paths.fs" />
+        <Compile Include="Auth\Login\Domain.fs" />
+        <Compile Include="Auth\Login\State.fs" />
+        <Compile Include="Auth\Login\View.fs" />
+        <Compile Include="Auth\Domain.fs" />
+        <Compile Include="Auth\State.fs" />
+        <Compile Include="Auth\View.fs" />
         <Compile Include="Domain.fs" />
+        <Compile Include="Router.fs" />
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />
         <Compile Include="App.fs" />
     </ItemGroup>
-<!--    <ItemGroup>-->
-<!--        <ProjectReference Include="..\..\src\Feliz.Bulma\Feliz.Bulma.fsproj" />-->
-<!--        <ProjectReference Include="..\..\src\Feliz.Bulma.QuickView\Feliz.Bulma.QuickView.fsproj" />-->
-<!--        <ProjectReference Include="..\..\src\Feliz.Bulma.Calendar\Feliz.Bulma.Calendar.fsproj" />-->
-<!--        <ProjectReference Include="..\..\src\Feliz.Bulma.Tooltip\Feliz.Bulma.Tooltip.fsproj" />-->
-<!--        <ProjectReference Include="..\..\src\Feliz.Bulma.Checkradio\Feliz.Bulma.Checkradio.fsproj" />-->
-<!--        <ProjectReference Include="..\..\src\Feliz.Bulma.Popover\Feliz.Bulma.Popover.fsproj" />-->
-<!--    </ItemGroup>-->
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+    </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
-</Project>  
+</Project> 

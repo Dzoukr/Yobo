@@ -1,16 +1,22 @@
 ﻿module Yobo.Client.Domain
 
+type Page =
+    | Calendar
+    // auth
+    | Auth of Auth.Domain.Model
+
 type Model = {
-    CurrentPage : Router.Page
-    ShowQuickView : bool
+    CurrentPage : Page
 }
 
 module Model =
     let init = {
-        CurrentPage = Router.defaultPage
-        ShowQuickView = false
+        CurrentPage = Calendar
     }
 
 type Msg =
-    | UrlChanged of Router.Page
-    | ToggleQuickView
+    // navigation
+    | UrlChanged of Page
+    | Navigate of string
+    // auth
+    | AuthMsg of Auth.Domain.Msg

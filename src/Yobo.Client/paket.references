@@ -7,3 +7,4 @@ group Client
     Feliz
     Feliz.Router
     Feliz.Bulma
+    Elmish.SweetAlert

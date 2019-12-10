@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Client", "src\Yobo.Client\Yobo.Client.fsproj", "{9136B583-FA72-4656-B7F4-659FD75B2A78}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Shared", "src\Yobo.Shared\Yobo.Shared.fsproj", "{0A0C185F-F080-40A6-A94D-F94C11F6D755}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9136B583-FA72-4656-B7F4-659FD75B2A78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A0C185F-F080-40A6-A94D-F94C11F6D755}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

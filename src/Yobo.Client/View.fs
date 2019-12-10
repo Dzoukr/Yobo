@@ -1,14 +1,23 @@
 ﻿module Yobo.Client.View
 
 open Domain
+open Elmish
 open Feliz
 open Feliz.Bulma
-open Feliz.Router
+open Router
     
-let view (model : Model) (dispatch : Msg -> unit) =
+let view (model:Model) (dispatch:Msg -> unit) =
     let render =
-        Html.div "AHOJ"
+        match model.CurrentPage with
+        | Auth m -> Auth.View.view m (AuthMsg >> dispatch)
+        | Calendar ->
+            Html.a [
+                prop.text "Login"
+                prop.onClick (fun _ -> Navigate(Paths.Login) |> dispatch)
+            ]
+            
     Router.router [
         Router.onUrlChanged (Router.parseUrl >> UrlChanged >> dispatch)
+        Router.pathMode
         Router.application render
     ]

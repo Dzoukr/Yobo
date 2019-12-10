@@ -4,7 +4,12 @@ open Domain
 open Elmish
 open Feliz
 open Feliz.Bulma
-open Router
+open Feliz.Router
+
+let private parseUrl = function
+    | [ Paths.Login ] -> Auth(Auth.Domain.Login Auth.Login.Domain.Model.init)
+    | [ Paths.Calendar ] -> Calendar
+    | _ -> Model.init.CurrentPage
     
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
@@ -13,11 +18,12 @@ let view (model:Model) (dispatch:Msg -> unit) =
         | Calendar ->
             Html.a [
                 prop.text "Login"
-                prop.onClick (fun _ -> Navigate(Paths.Login) |> dispatch)
+                prop.href (Router.format Paths.Login)
+                prop.onClick Router.goToUrl
             ]
             
     Router.router [
-        Router.onUrlChanged (Router.parseUrl >> UrlChanged >> dispatch)
+        Router.onUrlChanged (parseUrl >> UrlChanged >> dispatch)
         Router.pathMode
         Router.application render
     ]

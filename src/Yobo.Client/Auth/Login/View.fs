@@ -4,6 +4,8 @@ open Domain
 open Feliz
 open Feliz.Bulma
 open Yobo.Client
+open Yobo.Client.SharedView
+open Feliz.Router
 
 let inTemplate (content:ReactElement) =
     Bulma.hero [
@@ -25,23 +27,22 @@ let view (model:Model) (dispatch:Msg -> unit) =
         Bulma.field [
             Bulma.fieldBody [
                 Bulma.textInput [
-                    input.isDanger
+                    ValidationViews.color model.FormValidationErrors (nameof(model.Form.Email))
                     prop.placeholder "Váš email"
                     prop.onTextChange (fun x -> { model.Form with Email = x } |> FormChanged |> dispatch)
                 ]
             ]
-            Html.p [
-                prop.className "help is-danger"
-                prop.text "Pole nesmi byt prazdne"
-            ]
+            ValidationViews.help model.FormValidationErrors (nameof(model.Form.Email))
         ]
         Bulma.field [
             Bulma.fieldBody [
                 Bulma.passwordInput [
+                    ValidationViews.color model.FormValidationErrors (nameof(model.Form.Password))
                     prop.placeholder "Vaše heslo"
                     prop.onTextChange (fun x -> { model.Form with Password = x } |> FormChanged |> dispatch)
                 ]
             ]
+            ValidationViews.help model.FormValidationErrors (nameof(model.Form.Password))
         ]
         Bulma.field [
             Bulma.fieldBody [
@@ -55,9 +56,9 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
         ]
         Html.div [
-            Html.a [ prop.text "Registrace"; prop.onClick (fun _ -> Navigate(Paths.Registration) |> dispatch) ]
+            Html.a [ prop.text "Registrace"; prop.href (Router.format Paths.Registration);  prop.onClick Router.goToUrl ]
             Html.span " · "
-            Html.a [ prop.text "Zapomněl(a) jsem heslo!"; prop.onClick (fun _ -> Navigate(Paths.ForgottenPassword) |> dispatch)  ]
+            Html.a [ prop.text "Zapomněl(a) jsem heslo!"; prop.href (Router.format Paths.ForgottenPassword);  prop.onClick Router.goToUrl  ]
         ]
     ]
     |> inTemplate

@@ -17,6 +17,5 @@ module Model =
 type Msg =
     // navigation
     | UrlChanged of Page
-    | Navigate of string
     // auth
     | AuthMsg of Auth.Domain.Msg

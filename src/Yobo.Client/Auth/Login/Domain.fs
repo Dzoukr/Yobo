@@ -6,6 +6,7 @@ open Yobo.Shared.Validation
 
 type Model = {
     IsLogging : bool
+    FormSent : bool
     Form : Request.Login
     FormValidationErrors : ValidationError list
 }
@@ -13,12 +14,12 @@ type Model = {
 module Model =
     let init = {
         IsLogging = false
+        FormSent = false
         Form = { Email = ""; Password = "" }
         FormValidationErrors = []
     }
 
 type Msg =
-    | Navigate of string
     | FormChanged of Request.Login
     | Login
     | LoggedIn of ServerResponse<string>

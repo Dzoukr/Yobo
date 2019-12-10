@@ -6,6 +6,11 @@ type ValidationErrorType =
     | IsEmpty
     | IsNotValidEmail
 
+module ValidationErrorType =
+    let explain = function
+        | IsEmpty -> "Prosím vyplňte hodnotu."
+        | IsNotValidEmail -> "Vyplňte správný formát pro emailovou adresu."
+
 type ValidationError = {
     Field : string
     Type : ValidationErrorType

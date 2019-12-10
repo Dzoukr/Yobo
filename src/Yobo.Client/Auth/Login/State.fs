@@ -3,15 +3,19 @@
 open Domain
 open Elmish
 open Elmish.SweetAlert
-open Feliz.Router
 open Yobo.Shared.Auth.Validation
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
-    | Navigate s -> model, Router.navigate(s) 
     | FormChanged f ->
-        { model with Form = f; FormValidationErrors = validateLogin(f) }, Cmd.none
-    | Login -> { model with IsLogging = true }, LoggedIn (async{ return Ok ""}) |> Cmd.ofMsg
+        let validation = if model.FormSent then validateLogin(f) else []
+        { model with Form = f; FormValidationErrors = validation }, Cmd.none
+    | Login ->
+        let validationErrors = validateLogin(model.Form)
+        let model = { model with FormSent = true; FormValidationErrors = validationErrors }
+        match validationErrors with
+        | [] -> { model with IsLogging = true }, LoggedIn (async{ return Ok ""}) |> Cmd.ofMsg
+        | _ -> model, Cmd.none
     | LoggedIn res ->
         let errorAlert =
             SimpleAlert("Zadali jste nesprávný email nebo heslo")

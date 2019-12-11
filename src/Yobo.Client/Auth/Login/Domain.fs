@@ -22,4 +22,4 @@ module Model =
 type Msg =
     | FormChanged of Request.Login
     | Login
-    | LoggedIn of ServerResponse<string>
+    | LoggedIn of ServerResult<string>

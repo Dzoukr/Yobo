@@ -10,6 +10,7 @@
         <Compile Include="Server.fs" />
         <Compile Include="Paths.fs" />
         <Compile Include="SharedView.fs" />
+        <Compile Include="StateHandlers.fs" />
         <Compile Include="Auth\Login\Domain.fs" />
         <Compile Include="Auth\Login\State.fs" />
         <Compile Include="Auth\Login\View.fs" />

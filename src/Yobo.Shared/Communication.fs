@@ -6,4 +6,5 @@ type ServerError =
     | Exception of string
     | Validation of ValidationError list
 
-type ServerResponse<'a> = Async<Result<'a, ServerError>>
+type ServerResult<'a> = Result<'a, ServerError>
+type ServerResponse<'a> = Async<ServerResult<'a>>

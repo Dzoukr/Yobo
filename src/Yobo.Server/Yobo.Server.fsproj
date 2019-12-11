@@ -6,6 +6,10 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\..\paket-files\server\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/FSharp.Rop.fs</Link>
+    </Compile>
     <None Include="host.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -15,11 +19,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+    <ProjectReference Include="..\Yobo.Shared\Yobo.Shared.fsproj" />
+    <ProjectReference Include="..\Yobo.Libraries\Yobo.Libraries.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

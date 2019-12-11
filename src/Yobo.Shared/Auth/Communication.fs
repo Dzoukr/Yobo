@@ -10,7 +10,7 @@ module Request =
     }
 
 type AuthService = {
-    Login : Request.Login -> ServerResponse<string>
+    GetToken : Request.Login -> ServerResponse<string>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/auth/%s" m

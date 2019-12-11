@@ -39,6 +39,7 @@ module Tools =
     let yarn = runTool (findTool "yarn" "yarn.cmd")             
 
 let clientSrcPath = "src" </> "Yobo.Client"
+let serverWatcherPath = "src" </> "Yobo.Server.Local"
 let clientDeployPath = "deploy" </> "client"
 
 // Targets
@@ -60,7 +61,18 @@ Target.create "PublishClient" (fun _ ->
     Shell.copyDir clientDeployPath clientDeployLocalPath FileFilter.allFiles
 )
 
-Target.create "Run" (fun _ -> Tools.yarn "webpack-dev-server" clientSrcPath)
+Target.create "Run" (fun _ ->
+    let server = async {
+        Tools.dotnet "watch run" serverWatcherPath
+    }
+    let client = async {
+        Tools.yarn "webpack-dev-server" clientSrcPath
+    }
+    [client;server]
+    |> Async.Parallel
+    |> Async.RunSynchronously
+    |> ignore
+)
 
 "InstallClient" ==> "Run"
 "InstallClient" ==> "PublishClient"

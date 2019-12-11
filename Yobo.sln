@@ -6,6 +6,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Shared", "src\Yobo.Sha
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Server", "src\Yobo.Server\Yobo.Server.fsproj", "{1883BFF6-E5A3-4A11-9947-475016E88D4E}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Server.Local", "src\Yobo.Server.Local\Yobo.Server.Local.fsproj", "{59E9C33A-20BB-4E9B-AB61-2D3491F43E63}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Libraries", "src\Yobo.Libraries\Yobo.Libraries.fsproj", "{022799B0-0DFC-44B7-B02D-C7A3F1482228}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1883BFF6-E5A3-4A11-9947-475016E88D4E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59E9C33A-20BB-4E9B-AB61-2D3491F43E63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59E9C33A-20BB-4E9B-AB61-2D3491F43E63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59E9C33A-20BB-4E9B-AB61-2D3491F43E63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59E9C33A-20BB-4E9B-AB61-2D3491F43E63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{022799B0-0DFC-44B7-B02D-C7A3F1482228}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{022799B0-0DFC-44B7-B02D-C7A3F1482228}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{022799B0-0DFC-44B7-B02D-C7A3F1482228}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{022799B0-0DFC-44B7-B02D-C7A3F1482228}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

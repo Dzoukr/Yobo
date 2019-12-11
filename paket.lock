@@ -1,7 +1,4 @@
 STORAGE: NONE
-NUGET
-  remote: https://api.nuget.org/v3/index.json
-    FSharp.Core (4.7)
 
 GROUP Build
 STORAGE: NONE
@@ -857,6 +854,40 @@ NUGET
       Fable.Core (>= 3.0) - restriction: >= netstandard2.0
       FSharp.Core (>= 4.6.2) - restriction: >= netstandard2.0
 
+GROUP Libraries
+STORAGE: NONE
+RESTRICTION: == netstandard2.0
+NUGET
+  remote: https://api.nuget.org/v3/index.json
+    FSharp.Core (4.7)
+    Mailjet.Api (1.2.2)
+      NETStandard.Library (>= 1.6.1)
+      Newtonsoft.Json (>= 9.0.1)
+    Microsoft.IdentityModel.JsonWebTokens (5.6)
+      Microsoft.IdentityModel.Tokens (>= 5.6)
+      Newtonsoft.Json (>= 10.0.1)
+    Microsoft.IdentityModel.Logging (5.6)
+    Microsoft.IdentityModel.Tokens (5.6)
+      Microsoft.IdentityModel.Logging (>= 5.6)
+      Newtonsoft.Json (>= 10.0.1)
+      System.Security.Cryptography.Cng (>= 4.5)
+    Microsoft.NETCore.Platforms (3.1)
+    NETStandard.Library (2.0.3)
+      Microsoft.NETCore.Platforms (>= 1.1)
+    Newtonsoft.Json (12.0.3)
+    System.IdentityModel.Tokens.Jwt (5.6)
+      Microsoft.IdentityModel.JsonWebTokens (>= 5.6)
+      Microsoft.IdentityModel.Tokens (>= 5.6)
+      Newtonsoft.Json (>= 10.0.1)
+    System.Security.Cryptography.Cng (4.7)
+    System.ValueTuple (4.5)
+    TaskBuilder.fs (2.1)
+      FSharp.Core (>= 4.1.17)
+      NETStandard.Library (>= 1.6.1)
+      System.ValueTuple (>= 4.4)
+GITHUB
+  remote: Dzoukr/FSharp.Rop
+    FSharp.Rop.fs (af9107befc246fcd86e67c9a42b80042289554b3)
 GROUP Server
 STORAGE: NONE
 RESTRICTION: == netcoreapp3.1
@@ -1307,3 +1338,6 @@ NUGET
     WindowsAzure.Storage (9.3.3)
       NETStandard.Library (>= 1.6.1)
       Newtonsoft.Json (>= 10.0.2)
+GITHUB
+  remote: Dzoukr/FSharp.Rop
+    FSharp.Rop.fs (af9107befc246fcd86e67c9a42b80042289554b3)

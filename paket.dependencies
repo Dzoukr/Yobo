@@ -3,8 +3,6 @@ version 5.216.0
 source https://api.nuget.org/v3/index.json
 storage: none
 
-nuget FSharp.Core
-
 group Client
     source https://api.nuget.org/v3/index.json
     storage: none
@@ -20,6 +18,15 @@ group Client
     nuget Elmish.Toastr
     nuget Fable.Remoting.Client
 
+group Libraries
+    source https://api.nuget.org/v3/index.json
+    framework:netstandard2.0
+    storage:none
+    nuget FSharp.Core
+    nuget TaskBuilder.fs
+    nuget Mailjet.Api
+    nuget System.IdentityModel.Tokens.Jwt
+
 group Server
     source https://api.nuget.org/v3/index.json
     framework:netcoreapp3.1
@@ -29,6 +36,7 @@ group Server
     nuget Microsoft.NET.Sdk.Functions
     nuget Giraffe
     nuget Fable.Remoting.Giraffe
+    github Dzoukr/FSharp.Rop FSharp.Rop.fs
 
 group Build
     source https://api.nuget.org/v3/index.json

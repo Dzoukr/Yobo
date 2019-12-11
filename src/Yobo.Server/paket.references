@@ -1,6 +1,7 @@
 group Server
+    FSharp.Core
     Microsoft.NET.Sdk.Functions
     Microsoft.Azure.Functions.Extensions
-    FSharp.Core
     Giraffe
     Fable.Remoting.Giraffe
+    File:FSharp.Rop.fs

@@ -18,7 +18,7 @@ open Yobo.Server.Configuration
 open FSharp.Rop
 open Yobo.Shared.Communication
 
-let userToClaims (u:AuthUserView) =
+let private userToClaims (u:AuthUserView) =
     seq [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)
@@ -38,9 +38,18 @@ let private login (connString:string) (jwt:JwtConfiguration) (l:Request.Login) =
             |> Option.map (fun x -> x.Token)
             |> Result.ofOption (AuthenticationError.InvalidLoginOrPassword |> ServerError.Authentication)
     }
+    
+let private refreshToken (jwt:JwtConfiguration) (token:string) =
+    let pars = Jwt.getParameters jwt.Audience jwt.Issuer jwt.Secret
+    token
+    |> Jwt.validateToken pars
+    |> Option.map (Jwt.createJwtToken jwt.Audience jwt.Issuer jwt.Secret jwt.TokenLifetime)
+    |> Option.map (fun x -> x.Token)
+    |> Result.ofOption (AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication)
 
 let private authService (connString:string) (jwt:JwtConfiguration) : AuthService = {
     GetToken = Flow.ofTaskResultValidated validateLogin (login connString jwt) >> Async.AwaitTask
+    RefreshToken = Flow.ofResult (refreshToken jwt) >> Async.AwaitTask
 }
 
 let authServiceHandler (cfg:Configuration) : HttpHandler =

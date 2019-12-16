@@ -5,7 +5,7 @@ open Feliz.Bulma
 open Yobo.Shared.Communication
 open Yobo.Shared.Validation
 
-module ErrorViews =
+module ServerResponseViews =
     open Elmish
     open Elmish.Toastr
     
@@ -28,8 +28,8 @@ module ErrorViews =
                 e
                 |> AuthenticationError.explain
                 |> Toastr.message
-                |> Toastr.timeout 10000
-                |> Toastr.extendedTimout 10000
+                |> Toastr.timeout 5000
+                |> Toastr.extendedTimout 2000
                 
         basicToaster
         |> Toastr.position ToastPosition.TopRight
@@ -37,6 +37,11 @@ module ErrorViews =
         |> Toastr.withProgressBar
         |> Toastr.showCloseButton
         |> Toastr.error
+    
+    let showSuccess msg : Cmd<_> =
+        Toastr.message msg
+        |> Toastr.position ToastPosition.TopRight
+        |> Toastr.success
     
 
 module ValidationViews =

@@ -30,6 +30,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                     ValidationViews.color model.FormValidationErrors (nameof(model.Form.Email))
                     prop.placeholder "Váš email"
                     prop.onTextChange (fun x -> { model.Form with Email = x } |> FormChanged |> dispatch)
+                    prop.valueOrDefault model.Form.Email
                 ]
             ]
             ValidationViews.help model.FormValidationErrors (nameof(model.Form.Email))
@@ -40,6 +41,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                     ValidationViews.color model.FormValidationErrors (nameof(model.Form.Password))
                     prop.placeholder "Vaše heslo"
                     prop.onTextChange (fun x -> { model.Form with Password = x } |> FormChanged |> dispatch)
+                    prop.valueOrDefault model.Form.Password
                 ]
             ]
             ValidationViews.help model.FormValidationErrors (nameof(model.Form.Password))

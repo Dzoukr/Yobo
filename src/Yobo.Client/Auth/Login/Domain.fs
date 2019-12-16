@@ -15,7 +15,7 @@ module Model =
     let init = {
         IsLogging = false
         FormSent = false
-        Form = { Email = ""; Password = "" }
+        Form = Request.Login.init
         FormValidationErrors = []
     }
 

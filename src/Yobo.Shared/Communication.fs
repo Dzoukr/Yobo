@@ -4,10 +4,12 @@ open Yobo.Shared.Validation
 
 type AuthenticationError =
     | InvalidLoginOrPassword
+    | InvalidOrExpiredToken
     
 module AuthenticationError =
     let explain = function
         | InvalidLoginOrPassword -> "Nesprávně vyplněný email nebo heslo."
+        | InvalidOrExpiredToken -> "Token není validní nebo již vypršela jeho platnost."
 
 type ServerError =
     | Exception of string

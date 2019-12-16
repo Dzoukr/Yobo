@@ -13,7 +13,7 @@ let handleValidated
         match res with
         | Ok v -> v |> onSuccess
         | Error error ->
-            let cmd = error |> ErrorViews.showError
+            let cmd = error |> ServerResponseViews.showError
             let model =
                 match error with
                 | Validation errs -> onValidationError onErrorModel errs

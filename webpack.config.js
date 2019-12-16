@@ -12,14 +12,16 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+var clientPath = './src/Yobo.Client';
+
 var CONFIG = {
     // The tags to include the generated JS and CSS will be automatically injected in the HTML template
     // See https://github.com/jantimon/html-webpack-plugin
-    indexHtmlTemplate: './public/index.html',
-    fsharpEntry: './Yobo.Client.fsproj',
-    cssEntry: './styles/style.scss',
-    outputDir: './deploy',
-    assetsDir: './public',
+    indexHtmlTemplate: clientPath +'/public/index.html',
+    fsharpEntry: clientPath + '/Yobo.Client.fsproj',
+    cssEntry: clientPath + '/styles/styles.scss',
+    outputDir: clientPath + '/deploy',
+    assetsDir: clientPath + '/public',
     devServerPort: 8080,
     // When using webpack-dev-server, you may need to redirect some calls
     // to a external API server. See https://webpack.js.org/configuration/dev-server/#devserver-proxy

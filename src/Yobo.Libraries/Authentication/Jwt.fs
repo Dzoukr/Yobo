@@ -11,7 +11,7 @@ let private isExpirationValid (expires:Nullable<DateTime>) =
 
 let getKey (secret:string) = SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(secret)) 
 
-let private createJwtToken audience issuer secret expiration claims =
+let createJwtToken audience issuer secret expiration claims =
     let credentials = SigningCredentials(getKey secret, SecurityAlgorithms.HmacSha256)
     let issuedOn = DateTime.UtcNow
     let expiresOn = issuedOn.Add(expiration)

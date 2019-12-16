@@ -1,8 +1,3 @@
-version 5.216.0
-
-source https://api.nuget.org/v3/index.json
-storage: none
-
 group Client
     source https://api.nuget.org/v3/index.json
     storage: none
@@ -37,6 +32,8 @@ group Server
     nuget Giraffe
     nuget Fable.Remoting.Giraffe
     github Dzoukr/FSharp.Rop FSharp.Rop.fs
+    nuget Dapper
+    nuget Microsoft.Data.SqlClient
 
 group Build
     source https://api.nuget.org/v3/index.json

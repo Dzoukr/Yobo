@@ -24,6 +24,12 @@ module ErrorViews =
                 |> Toastr.title "Data nejsou vyplněna správně"
                 |> Toastr.timeout 30000
                 |> Toastr.extendedTimout 10000
+            | Authentication e ->
+                e
+                |> AuthenticationError.explain
+                |> Toastr.message
+                |> Toastr.timeout 10000
+                |> Toastr.extendedTimout 10000
                 
         basicToaster
         |> Toastr.position ToastPosition.TopRight
@@ -32,12 +38,6 @@ module ErrorViews =
         |> Toastr.showCloseButton
         |> Toastr.error
     
-    let showResult (er:ServerResult<_>) =
-        match er with
-        | Error e -> showError e
-        | Ok _ -> Cmd.none
-        
-            
 
 module ValidationViews =
 

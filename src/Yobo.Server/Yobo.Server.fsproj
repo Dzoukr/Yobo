@@ -19,6 +19,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Flow.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="Auth\Database.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />

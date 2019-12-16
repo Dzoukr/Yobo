@@ -2,9 +2,17 @@
 
 open Yobo.Shared.Validation
 
+type AuthenticationError =
+    | InvalidLoginOrPassword
+    
+module AuthenticationError =
+    let explain = function
+        | InvalidLoginOrPassword -> "Nesprávně vyplněný email nebo heslo."
+
 type ServerError =
     | Exception of string
     | Validation of ValidationError list
+    | Authentication of AuthenticationError
 
 type ServerResult<'a> = Result<'a, ServerError>
 

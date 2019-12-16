@@ -6,7 +6,6 @@
         "@babel/polyfill": "^7.4.4",
         "@babel/preset-env": "^7.4.4",
         "@babel/runtime": "^7.4.4",
-        "@fortawesome/fontawesome-free": "^5.10.2",
         "babel-loader": "^8.0.5",
         "copy-webpack-plugin": "^5.0.5",
         "core-js": "^3.2.1",
@@ -16,7 +15,8 @@
         "file-loader": "^5.0.2",
         "html-webpack-plugin": "^3.2.0",
         "mini-css-extract-plugin": "^0.8.0",
-        "open-sans-fonts": "^1.5.1",
+        "react": "16.12.0",
+        "react-dom": "16.12.0",
         "remotedev": "^0.2.9",
         "sass": "^1.22.10",
         "sass-loader": "^8.0.0",
@@ -28,14 +28,13 @@
         "whatwg-fetch": "^3.0.0"
     },
     "dependencies": {
+        "@fortawesome/fontawesome-free": "^5.10.2",
         "bulma": "^0.8.0",
         "bulma-calendar": "^6.0.7",
         "bulma-checkradio": "^1.1.1",
         "bulma-popover": "^1.0.0",
         "bulma-quickview": "^2.0.0",
         "bulma-tooltip": "^3.0.2",
-        "react": "16.12.0",
-        "react-dom": "16.12.0",
         "sweetalert2": "^8.19.0",
         "toastr": "^2.1.4"
     }

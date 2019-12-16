@@ -5,3 +5,5 @@ group Server
     Giraffe
     Fable.Remoting.Giraffe
     File:FSharp.Rop.fs
+    Dapper
+    Microsoft.Data.SqlClient

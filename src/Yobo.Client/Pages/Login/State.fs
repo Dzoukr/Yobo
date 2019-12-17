@@ -1,0 +1,26 @@
+﻿module Yobo.Client.Pages.Login.State
+
+open Domain
+open Elmish
+open Yobo.Shared.Auth.Validation
+open Yobo.Client.Server
+open Yobo.Client.SharedView
+open Yobo.Client.StateHandlers
+open Yobo.Shared.Auth.Communication
+open Yobo.Client.Forms
+
+let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
+    match msg with
+    | FormChanged f ->
+        { model with Form = model.Form |> ValidatedForm.updateWith f |> ValidatedForm.validateConditionalWith model.FormSent validateLogin }, Cmd.none
+    | Login ->
+        let model = { model with FormSent = true; Form = model.Form |> ValidatedForm.validateWith validateLogin }
+        if model.Form |> ValidatedForm.isValid then
+            { model with IsLogging = true }, Cmd.OfAsync.eitherResult authService.GetToken model.Form.FormData LoggedIn
+        else model, Cmd.none
+    | LoggedIn res ->
+        let onSuccess token = { model with IsLogging = false; Form = Request.Login.init |> ValidatedForm.init }, ServerResponseViews.showSuccess "Byli jste úspěšně přihlášeni!"
+        let onError = { model with IsLogging = false }
+        let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 
+        res |> handleValidated onSuccess onError onValidationError
+        

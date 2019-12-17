@@ -5,11 +5,17 @@ open System
 type ValidationErrorType =
     | IsEmpty
     | IsNotValidEmail
+    | IsBelowMinimalLength of int
+    | PasswordsDontMatch
+    | TermsNotAgreed
 
 module ValidationErrorType =
     let explain = function
         | IsEmpty -> "Prosím vyplňte hodnotu."
         | IsNotValidEmail -> "Vyplňte správný formát pro emailovou adresu."
+        | IsBelowMinimalLength l -> sprintf "Hodnota musí být nejméně %i znaků." l
+        | PasswordsDontMatch -> "Hesla se neshodují."
+        | TermsNotAgreed -> "Potvrďte souhlas s obchodními podmínkami."
 
 type ValidationError = {
     Field : string
@@ -29,6 +35,15 @@ let private isValidEmail (value:string) =
 let validateEmail value =
     if isValidEmail value then None
     else IsNotValidEmail |> Some
+    
+let validateMinimumLength l (value:string) =
+    if value.Length <= l then IsBelowMinimalLength l |> Some else None
+    
+let validatePasswordsMatch val1 val2 =
+    if val1 <> val2 then PasswordsDontMatch |> Some else None
+
+let validateTermsAgreed value =
+    if value = false then TermsNotAgreed |> Some else None
     
 let validate conds =
     conds

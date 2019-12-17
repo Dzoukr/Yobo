@@ -1,15 +1,17 @@
-﻿module Yobo.Shared.Communication
+﻿module Yobo.Shared.Domain
 
 open Yobo.Shared.Validation
 
 type AuthenticationError =
     | InvalidLoginOrPassword
     | InvalidOrExpiredToken
+    | EmailAlreadyRegistered
     
 module AuthenticationError =
     let explain = function
         | InvalidLoginOrPassword -> "Nesprávně vyplněný email nebo heslo."
         | InvalidOrExpiredToken -> "Token není validní nebo již vypršela jeho platnost."
+        | EmailAlreadyRegistered -> "Tento email je již v systému registrován."
 
 type ServerError =
     | Exception of string

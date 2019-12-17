@@ -16,7 +16,8 @@ open Yobo.Server.Auth.Database.Queries
 open Yobo.Shared.Auth.Validation
 open Yobo.Server.Configuration
 open FSharp.Rop
-open Yobo.Shared.Communication
+open Yobo.Server.Auth.Events
+open Yobo.Shared.Domain
 
 let private userToClaims (u:AuthUserView) =
     seq [
@@ -47,9 +48,33 @@ let private refreshToken (jwt:JwtConfiguration) (token:string) =
     |> Option.map (fun x -> x.Token)
     |> Result.ofOption (AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication)
 
+let private register (connString:string) (r:Request.Register) =
+    task {
+        use conn = new SqlConnection(connString)
+        let args : CmdArgs.Register =
+            {
+                Id = Guid.NewGuid()
+                ActivationKey = Guid.NewGuid()
+                PasswordHash = Password.createHash r.Password
+                FirstName = r.FirstName
+                LastName = r.LastName
+                Email = r.Email.ToLower()
+                Newsletters = r.NewslettersButtonChecked
+            }
+        let! projections = Database.Projections.getAll conn
+        args
+        |> CommandHandler.register projections
+        |> Result.mapError Authentication
+        |> Result.map EventHandler.handle
+        // TODO HERE
+        
+        return (Guid.NewGuid() |> Ok)
+    }
+
 let private authService (connString:string) (jwt:JwtConfiguration) : AuthService = {
     GetToken = Flow.ofTaskResultValidated validateLogin (login connString jwt) >> Async.AwaitTask
     RefreshToken = Flow.ofResult (refreshToken jwt) >> Async.AwaitTask
+    Register = Flow.ofTaskResultValidated validateRegister (register connString) >> Async.AwaitTask
 }
 
 let authServiceHandler (cfg:Configuration) : HttpHandler =

@@ -1,12 +1,14 @@
-﻿module Yobo.Client.Auth.Login.Domain
+module Yobo.Client.Pages.Registration.Domain
 
+open Yobo.Client.Forms
 open Yobo.Shared.Auth.Communication
-open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 open Yobo.Shared.Validation
 
 type Model = {
     IsLogging : bool
     FormSent : bool
+    //Form : ValidatedForm
     Form : Request.Login
     FormValidationErrors : ValidationError list
 }

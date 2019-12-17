@@ -3,7 +3,7 @@ module Yobo.Client.Server
 open Fable.Core
 open Fable.Remoting.Client
 open Yobo.Shared.Auth.Communication
-open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 
 module Cmd =
     open Elmish

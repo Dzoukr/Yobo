@@ -9,21 +9,23 @@
         <Compile Include="Feliz.Router.Extensions.fs" />
         <Compile Include="Server.fs" />
         <Compile Include="Paths.fs" />
+        <Compile Include="Forms.fs" />
         <Compile Include="SharedView.fs" />
         <Compile Include="StateHandlers.fs" />
-        <Compile Include="Auth\Login\Domain.fs" />
-        <Compile Include="Auth\Login\State.fs" />
-        <Compile Include="Auth\Login\View.fs" />
-        <Compile Include="Auth\Domain.fs" />
-        <Compile Include="Auth\State.fs" />
-        <Compile Include="Auth\View.fs" />
+        <Compile Include="Pages\Login\Domain.fs" />
+        <Compile Include="Pages\Login\State.fs" />
+        <Compile Include="Pages\Login\View.fs" />
+        <Compile Include="Pages\Registration\Domain.fs" />
+        <Compile Include="Pages\Registration\State.fs" />
+        <Compile Include="Pages\Registration\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />
         <Compile Include="App.fs" />
+        <Folder Include="Pages" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
-</Project> 
+</Project>

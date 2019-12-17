@@ -3,7 +3,8 @@
 type Page =
     | Calendar
     // auth
-    | Auth of Auth.Domain.Model
+    | Login of Pages.Login.Domain.Model
+    | Registration of Pages.Registration.Domain.Model
 
 type Model = {
     CurrentPage : Page
@@ -18,4 +19,5 @@ type Msg =
     // navigation
     | UrlChanged of Page
     // auth
-    | AuthMsg of Auth.Domain.Msg
+    | LoginMsg of Pages.Login.Domain.Msg
+    | RegistrationMsg of Pages.Registration.Domain.Msg

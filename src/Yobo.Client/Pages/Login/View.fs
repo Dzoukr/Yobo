@@ -1,9 +1,10 @@
-﻿module Yobo.Client.Auth.Login.View
+﻿module Yobo.Client.Pages.Login.View
 
-open Domain
 open Feliz
 open Feliz.Bulma
 open Yobo.Client
+open Yobo.Client.Forms
+open Domain
 open Yobo.Client.SharedView
 open Feliz.Router
 
@@ -27,24 +28,24 @@ let view (model:Model) (dispatch:Msg -> unit) =
         Bulma.field [
             Bulma.fieldBody [
                 Bulma.textInput [
-                    ValidationViews.color model.FormValidationErrors (nameof(model.Form.Email))
+                    ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
                     prop.placeholder "Váš email"
-                    prop.onTextChange (fun x -> { model.Form with Email = x } |> FormChanged |> dispatch)
-                    prop.valueOrDefault model.Form.Email
+                    prop.onTextChange (fun x -> { model.Form.FormData with Email = x } |> FormChanged |> dispatch)
+                    prop.valueOrDefault model.Form.FormData.Email
                 ]
             ]
-            ValidationViews.help model.FormValidationErrors (nameof(model.Form.Email))
+            ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
         ]
         Bulma.field [
             Bulma.fieldBody [
                 Bulma.passwordInput [
-                    ValidationViews.color model.FormValidationErrors (nameof(model.Form.Password))
+                    ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
                     prop.placeholder "Vaše heslo"
-                    prop.onTextChange (fun x -> { model.Form with Password = x } |> FormChanged |> dispatch)
-                    prop.valueOrDefault model.Form.Password
+                    prop.onTextChange (fun x -> { model.Form.FormData with Password = x } |> FormChanged |> dispatch)
+                    prop.valueOrDefault (model.Form.FormData.Password)
                 ]
             ]
-            ValidationViews.help model.FormValidationErrors (nameof(model.Form.Password))
+            ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
         ]
         Bulma.field [
             Bulma.fieldBody [

@@ -7,14 +7,16 @@ open Feliz.Bulma
 open Feliz.Router
 
 let private parseUrl = function
-    | [ Paths.Login ] -> Auth(Auth.Domain.Login Auth.Login.Domain.Model.init)
+    | [ Paths.Login ] -> Login (Pages.Login.Domain.Model.init)
+    | [ Paths.Registration ] -> Registration Pages.Registration.Domain.Model.init
     | [ Paths.Calendar ] -> Calendar
     | _ -> Model.init.CurrentPage
     
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
         match model.CurrentPage with
-        | Auth m -> Auth.View.view m (AuthMsg >> dispatch)
+        | Login m -> Pages.Login.View.view m (LoginMsg >> dispatch)
+        | Registration m -> Pages.Registration.View.view m (RegistrationMsg >> dispatch)
         | Calendar ->
             Html.a [
                 prop.text "Login"

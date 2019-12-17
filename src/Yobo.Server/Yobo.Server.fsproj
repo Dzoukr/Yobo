@@ -21,7 +21,10 @@
   <ItemGroup>
     <Compile Include="Flow.fs" />
     <Compile Include="Configuration.fs" />
+    <Compile Include="Auth\Events.fs" />
+    <Compile Include="Auth\CommandHandler.fs" />
     <Compile Include="Auth\Database.fs" />
+    <Compile Include="Auth\EventHandler.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />

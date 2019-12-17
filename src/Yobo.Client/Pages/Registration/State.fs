@@ -1,4 +1,4 @@
-﻿module Yobo.Client.Auth.Login.State
+﻿module Yobo.Client.Pages.Registration.State
 
 open Domain
 open Elmish

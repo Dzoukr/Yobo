@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <Compile Include="Validation.fs" />
-        <Compile Include="Communication.fs" />
+        <Compile Include="Domain.fs" />
         <Compile Include="Auth\Communication.fs" />
         <Compile Include="Auth\Validation.fs" />
     </ItemGroup>

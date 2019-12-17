@@ -2,7 +2,7 @@ module Yobo.Client.SharedView
 
 open Feliz
 open Feliz.Bulma
-open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 open Yobo.Shared.Validation
 
 module ServerResponseViews =

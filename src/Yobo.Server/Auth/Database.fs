@@ -21,3 +21,11 @@ module Queries =
             let! res = conn.QueryAsync<AuthUserView>(query, {| Email = email |})
             return res |> Seq.tryHead
         }
+
+module Projections =
+    let getAll (conn:IDbConnection) =
+        task {
+            let query = "SELECT * FROM [Users]"
+            let! res = conn.QueryAsync<CommandHandler.Projections.ExistingUser>(query)
+            return res |> Seq.toList
+        }

@@ -2,7 +2,7 @@
 module Yobo.Server.Flow
 
 open System.Threading.Tasks
-open Yobo.Shared.Communication
+open Yobo.Shared.Domain
 open FSharp.Control.Tasks.V2
 
 let toError (ex:exn) = ex.Message |> ServerError.Exception |> Error

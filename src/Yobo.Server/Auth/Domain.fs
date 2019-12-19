@@ -1,6 +1,16 @@
-module Yobo.Server.Auth.Events
+module Yobo.Server.Auth.Domain
 
 open System
+
+module Queries =
+    [<CLIMutable>]
+    type AuthUserView = {
+        Id : Guid
+        Email : string
+        PasswordHash : string
+        FirstName : string
+        LastName : string
+    }
 
 module CmdArgs = 
     type Register = {
@@ -38,10 +48,11 @@ module CmdArgs =
         Id : Guid
     }
 
+    
 type Event = 
     | Registered of CmdArgs.Register
     | ActivationKeyRegenerated of CmdArgs.RegenerateActivationKey
     | Activated of CmdArgs.Activate
     | PasswordResetInitiated of CmdArgs.InitiatePasswordReset
     | PasswordResetComplete of CmdArgs.CompleteResetPassword
-    | SubscribedToNewsletters of CmdArgs.SubscribeToNewsletters
+    | SubscribedToNewsletters of CmdArgs.SubscribeToNewsletters    

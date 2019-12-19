@@ -1,6 +1,6 @@
 module Yobo.Server.Auth.EventHandler
 
-open Events
+open Domain
 
 let private handleDb (e:Event) =
     ()

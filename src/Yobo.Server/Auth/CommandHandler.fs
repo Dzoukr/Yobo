@@ -1,7 +1,7 @@
 module Yobo.Server.Auth.CommandHandler
 
 open System
-open Events
+open Domain
 open Yobo.Shared.Domain
 
 module Projections =

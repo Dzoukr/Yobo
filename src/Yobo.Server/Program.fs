@@ -6,15 +6,15 @@ open Microsoft.Azure.WebJobs.Extensions.Http
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 open Giraffe
-open Configuration
+open Yobo.Server.CompositionRoot
 
-let webApp (cfg:Configuration) = choose [
-    Auth.HttpHandlers.authServiceHandler cfg
-]
-
+let webApp (root:CompositionRoot) =
+    choose [
+        Auth.HttpHandlers.authServiceHandler root
+    ]
 
 [<FunctionName("Index")>]
 let run ([<HttpTrigger (AuthorizationLevel.Anonymous, Route = "{*any}")>] req : HttpRequest, context : ExecutionContext, log : ILogger) =
     let hostingEnvironment = req.HttpContext.GetHostingEnvironment()
     hostingEnvironment.ContentRootPath <- context.FunctionAppDirectory
-    webApp (req.HttpContext.GetService<Configuration>()) (Some >> Task.FromResult) req.HttpContext
+    webApp (req.HttpContext.GetService<CompositionRoot>()) (Some >> Task.FromResult) req.HttpContext

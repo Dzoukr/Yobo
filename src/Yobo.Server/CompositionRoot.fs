@@ -11,19 +11,9 @@ type AuthQueries = {
     TryGetUserByEmail : SqlConnection -> string -> Task<Auth.Domain.Queries.AuthUserView option>
 }
 
-module AuthQueries =
-    let compose = {
-        TryGetUserByEmail = Auth.Database.Queries.tryGetUserByEmail
-    }
-
 type AuthProjections = {
     GetAllUsers : SqlConnection -> Task<Auth.CommandHandler.Projections.ExistingUser list>
 }
-
-module AuthProjections =
-    let compose = {
-        GetAllUsers = Auth.Database.Projections.getAll
-    }
 
 type AuthRoot = {
     GetSqlConnection : unit -> SqlConnection
@@ -52,8 +42,12 @@ module AuthRoot =
             ValidateToken = Jwt.validateToken pars >> Option.map List.ofSeq
             VerifyPassword = Password.verifyPassword
             CreatePasswordHash = Password.createHash
-            Queries = AuthQueries.compose
-            Projections = AuthProjections.compose
+            Queries = {
+                TryGetUserByEmail = Auth.Database.Queries.tryGetUserByEmail
+            }
+            Projections = {
+                GetAllUsers = Auth.Database.Projections.getAll
+            }
         } : AuthRoot
     
 type CompositionRoot = {

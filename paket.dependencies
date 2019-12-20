@@ -31,7 +31,8 @@ group Server
     nuget Microsoft.NET.Sdk.Functions
     nuget Giraffe
     nuget Fable.Remoting.Giraffe
-    github Dzoukr/FSharp.Rop FSharp.Rop.fs
+    github Dzoukr/FSharp.Rop FSharp.Rop.Result.fs
+    github Dzoukr/FSharp.Rop FSharp.Rop.TaskResult.fs
     nuget Dapper
     nuget Microsoft.Data.SqlClient
 

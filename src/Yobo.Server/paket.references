@@ -4,6 +4,7 @@ group Server
     Microsoft.Azure.Functions.Extensions
     Giraffe
     Fable.Remoting.Giraffe
-    File:FSharp.Rop.fs
+    File:FSharp.Rop.Result.fs
+    File:FSharp.Rop.TaskResult.fs
     Dapper
     Microsoft.Data.SqlClient

@@ -1,4 +1,5 @@
-﻿open System
+﻿module Yobo.Server.Local.Program
+
 open System.Diagnostics
 open System.IO
 

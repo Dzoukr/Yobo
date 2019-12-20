@@ -2,6 +2,7 @@ module Yobo.Server.Auth.HttpHandlers
 
 open System
 open System.Security.Claims
+open System.Threading.Tasks
 open Fable.Remoting.Giraffe
 open Fable.Remoting.Server
 open Giraffe
@@ -10,7 +11,8 @@ open FSharp.Control.Tasks
 open Yobo.Server
 open Yobo.Server.Auth.Domain
 open Yobo.Shared.Auth.Validation
-open FSharp.Rop
+open FSharp.Rop.Result
+open FSharp.Rop.TaskResult
 open Yobo.Server.CompositionRoot
 open Yobo.Shared.Domain
 
@@ -54,15 +56,12 @@ let private register (authRoot:AuthRoot) (r:Request.Register) =
                 Newsletters = r.NewslettersButtonChecked
             }
         let! projections = authRoot.Projections.GetAllUsers conn
-        let events =
+        return!
             args
             |> CommandHandler.register projections
             |> Result.mapError Authentication
-        
-        //|> Result.map EventHandler.handle
-        // TODO HERE
-        
-        return (Guid.NewGuid() |> Ok)
+            |> TaskResult.ofTaskAndResult (authRoot.HandleEvents conn)
+            |> TaskResult.map (fun _ -> args.Id)
     }
 
 let private authService (root:CompositionRoot) : AuthService =

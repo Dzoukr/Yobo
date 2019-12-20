@@ -6,9 +6,13 @@
     <LangVersion>preview</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\server\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
+    <Compile Include="..\..\paket-files\server\Dzoukr\FSharp.Rop\FSharp.Rop.Result.fs">
       <Paket>True</Paket>
-      <Link>paket-files/FSharp.Rop.fs</Link>
+      <Link>paket-files/FSharp.Rop.Result.fs</Link>
+    </Compile>
+    <Compile Include="..\..\paket-files\server\Dzoukr\FSharp.Rop\FSharp.Rop.TaskResult.fs">
+      <Paket>True</Paket>
+      <Link>paket-files/FSharp.Rop.TaskResult.fs</Link>
     </Compile>
     <None Include="host.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

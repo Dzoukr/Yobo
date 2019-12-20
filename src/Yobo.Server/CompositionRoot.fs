@@ -23,6 +23,7 @@ type AuthRoot = {
     CreatePasswordHash : string -> string
     Queries : AuthQueries
     Projections : AuthProjections
+    HandleEvents : SqlConnection -> Auth.Domain.Event list -> Task<unit>
 }
 
 module AuthRoot =
@@ -48,6 +49,7 @@ module AuthRoot =
             Projections = {
                 GetAllUsers = Auth.Database.Projections.getAll
             }
+            HandleEvents = Auth.EventHandler.handle
         } : AuthRoot
     
 type CompositionRoot = {

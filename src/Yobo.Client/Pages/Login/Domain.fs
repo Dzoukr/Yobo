@@ -6,14 +6,14 @@ open Yobo.Shared.Validation
 open Yobo.Client.Forms
 
 type Model = {
-    IsLogging : bool
+    IsLoading : bool
     FormSent : bool
     Form : ValidatedForm<Request.Login>
 }
 
 module Model =
     let init = {
-        IsLogging = false
+        IsLoading = false
         FormSent = false
         Form = Request.Login.init |> ValidatedForm.init
     }

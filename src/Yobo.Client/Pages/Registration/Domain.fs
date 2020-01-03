@@ -1,27 +1,27 @@
 module Yobo.Client.Pages.Registration.Domain
 
+open System
 open Yobo.Client.Forms
 open Yobo.Shared.Auth.Communication
 open Yobo.Shared.Domain
-open Yobo.Shared.Validation
 
 type Model = {
-    IsLogging : bool
+    IsLoading : bool
     FormSent : bool
-    //Form : ValidatedForm
-    Form : Request.Login
-    FormValidationErrors : ValidationError list
+    ShowTerms : bool
+    Form : ValidatedForm<Request.Register>
 }
 
 module Model =
     let init = {
-        IsLogging = false
+        IsLoading = false
         FormSent = false
-        Form = Request.Login.init
-        FormValidationErrors = []
+        ShowTerms = false
+        Form = Request.Register.init |> ValidatedForm.init
     }
 
 type Msg =
-    | FormChanged of Request.Login
-    | Login
-    | LoggedIn of ServerResult<string>
+    | FormChanged of Request.Register
+    | Register
+    | Registered of ServerResult<Guid>
+    | ToggleTerms

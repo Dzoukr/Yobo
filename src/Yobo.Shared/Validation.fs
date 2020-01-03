@@ -37,7 +37,7 @@ let validateEmail value =
     else IsNotValidEmail |> Some
     
 let validateMinimumLength l (value:string) =
-    if value.Length <= l then IsBelowMinimalLength l |> Some else None
+    if value.Length < l then IsBelowMinimalLength l |> Some else None
     
 let validatePasswordsMatch val1 val2 =
     if val1 <> val2 then PasswordsDontMatch |> Some else None

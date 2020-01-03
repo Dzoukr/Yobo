@@ -7,6 +7,7 @@ group Client
     Feliz
     Feliz.Router
     Feliz.Bulma
+    Feliz.Bulma.Checkradio
     Elmish.SweetAlert
     Elmish.Toastr
     Fable.Remoting.Client

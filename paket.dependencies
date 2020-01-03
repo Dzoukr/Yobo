@@ -9,6 +9,7 @@ group Client
     nuget Feliz
     nuget Feliz.Router
     nuget Feliz.Bulma
+    nuget Feliz.Bulma.Checkradio
     nuget Elmish.SweetAlert
     nuget Elmish.Toastr
     nuget Fable.Remoting.Client

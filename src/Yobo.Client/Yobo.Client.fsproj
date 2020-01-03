@@ -10,6 +10,7 @@
         <Compile Include="Server.fs" />
         <Compile Include="Paths.fs" />
         <Compile Include="Forms.fs" />
+        <Compile Include="StaticText.fs" />
         <Compile Include="SharedView.fs" />
         <Compile Include="StateHandlers.fs" />
         <Compile Include="Pages\Login\Domain.fs" />
@@ -22,10 +23,12 @@
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />
         <Compile Include="App.fs" />
-        <Folder Include="Pages" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Pages\Registration\styles.scss" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

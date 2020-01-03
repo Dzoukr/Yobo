@@ -52,7 +52,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 Bulma.button [
                     yield button.isPrimary
                     yield button.isFullwidth
-                    if model.IsLogging then yield! [ button.isLoading; prop.disabled true ]
+                    if model.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Přihlásit se"
                     yield prop.onClick (fun _ -> Login |> dispatch)
                 ]

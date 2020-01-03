@@ -64,3 +64,22 @@ module ValidationViews =
         |> List.tryFind (fun x -> x.Field = name)
         |> Option.map (fun _ -> input.isDanger)
         |> Option.defaultValue (Interop.mkAttr "dummy" "")
+        
+module StaticTextViews =
+    
+    let termsModal isActive closeDisplay =
+        Bulma.modal [
+            if isActive then modal.isActive
+            prop.children [
+                Bulma.modalBackground [ prop.onClick closeDisplay ]
+                Bulma.modalCard [
+                    Bulma.modalCardHead [
+                        Bulma.modalCardTitle "Obchodní podmínky"
+                        Bulma.delete [ prop.onClick closeDisplay ]
+                    ]
+                    Bulma.modalCardBody [
+                        prop.dangerouslySetInnerHTML StaticText.terms
+                    ]
+                ]
+            ]
+        ]

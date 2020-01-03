@@ -1,11 +1,13 @@
 ﻿module Yobo.Client.Pages.Registration.View
 
-open Domain
 open Feliz
 open Feliz.Bulma
 open Yobo.Client
+open Yobo.Client.Forms
+open Domain
 open Yobo.Client.SharedView
 open Feliz.Router
+open Feliz.Bulma.Checkradio
 
 let inTemplate (content:ReactElement) =
     Bulma.hero [
@@ -22,46 +24,120 @@ let inTemplate (content:ReactElement) =
     ]
 
 let view (model:Model) (dispatch:Msg -> unit) =
-    Bulma.box [
-        Bulma.title "REGI"
-        Html.img [ prop.src "img/logo.png" ]
-        Bulma.field [
-            Bulma.fieldBody [
-                Bulma.textInput [
-                    ValidationViews.color model.FormValidationErrors (nameof(model.Form.Email))
-                    prop.placeholder "Váš email"
-                    prop.onTextChange (fun x -> { model.Form with Email = x } |> FormChanged |> dispatch)
-                    prop.valueOrDefault model.Form.Email
+    Html.div [
+        // terms modal
+        SharedView.StaticTextViews.termsModal model.ShowTerms (fun _ -> ToggleTerms |> dispatch)
+        // form
+        Bulma.box [
+            Bulma.title1 "Registrace"
+            
+            Bulma.field [
+                Bulma.label "Křestní jméno"
+                Bulma.fieldBody [
+                    Bulma.textInput [
+                        ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.FirstName))
+                        prop.onTextChange (fun x -> { model.Form.FormData with FirstName = x } |> FormChanged |> dispatch)
+                        prop.valueOrDefault model.Form.FormData.FirstName
+                    ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.FirstName))
+            ]
+            
+            Bulma.field [
+                Bulma.label "Příjmení"
+                Bulma.fieldBody [
+                    Bulma.textInput [
+                        ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.LastName))
+                        prop.onTextChange (fun x -> { model.Form.FormData with LastName = x } |> FormChanged |> dispatch)
+                        prop.valueOrDefault model.Form.FormData.LastName
+                    ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.LastName))
+            ]
+            
+            Bulma.field [
+                Bulma.label "Email"
+                Bulma.fieldBody [
+                    Bulma.textInput [
+                        ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
+                        prop.onTextChange (fun x -> { model.Form.FormData with Email = x } |> FormChanged |> dispatch)
+                        prop.valueOrDefault model.Form.FormData.Email
+                    ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
+            ]
+            
+            Bulma.field [
+                Bulma.label "Heslo"
+                Bulma.fieldBody [
+                    Bulma.passwordInput [
+                        ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
+                        prop.onTextChange (fun x -> { model.Form.FormData with Password = x } |> FormChanged |> dispatch)
+                        prop.valueOrDefault model.Form.FormData.Password
+                    ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
+            ]
+            
+            Bulma.field [
+                Bulma.label "Heslo (ještě jednou pro kontrolu)"
+                Bulma.fieldBody [
+                    Bulma.passwordInput [
+                        ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.SecondPassword))
+                        prop.onTextChange (fun x -> { model.Form.FormData with SecondPassword = x } |> FormChanged |> dispatch)
+                        prop.valueOrDefault model.Form.FormData.SecondPassword
+                    ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.SecondPassword))
+            ]
+            
+            Bulma.field [
+                Bulma.fieldBody [
+                    Checkradio.checkbox [
+                        prop.id "terms"
+                        color.isSuccess
+                        prop.onCheckedChange (fun chkd -> { model.Form.FormData with AgreeButtonChecked = chkd } |> FormChanged |> dispatch )
+                    ]
+                    Html.label [
+                        prop.htmlFor "terms"
+                        prop.text "Souhlasím s obchodními podmínkami"
+                    ]
+                ]
+                Html.div [
+                    Html.a [ prop.onClick (fun _ -> ToggleTerms |> dispatch); prop.text "Obchodní podmínky" ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.AgreeButtonChecked))
+            ]
+            
+            Bulma.field [
+                Bulma.fieldBody [
+                    Checkradio.checkbox [
+                        prop.id "newsletters"
+                        color.isSuccess
+                        prop.onCheckedChange (fun chkd -> { model.Form.FormData with NewslettersButtonChecked = chkd } |> FormChanged |> dispatch )
+                    ]
+                    Html.label [
+                        prop.htmlFor "newsletters"
+                        prop.text "Souhlasím se zasíláním informačních emailů (newsletterů)"
+                    ]
+                ]
+                ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.NewslettersButtonChecked))
+            ]
+            
+            Bulma.field [
+                Bulma.fieldBody [
+                    Bulma.button [
+                        yield button.isPrimary
+                        yield button.isFullwidth
+                        if model.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                        yield prop.text "Registrovat"
+                        yield prop.onClick (fun _ -> Register |> dispatch)
+                    ]
                 ]
             ]
-            ValidationViews.help model.FormValidationErrors (nameof(model.Form.Email))
-        ]
-        Bulma.field [
-            Bulma.fieldBody [
-                Bulma.passwordInput [
-                    ValidationViews.color model.FormValidationErrors (nameof(model.Form.Password))
-                    prop.placeholder "Vaše heslo"
-                    prop.onTextChange (fun x -> { model.Form with Password = x } |> FormChanged |> dispatch)
-                    prop.valueOrDefault model.Form.Password
-                ]
+            Html.div [
+                Html.a [ prop.text "Zpět na přihlášení"; prop.href (Router.format Paths.Login);  prop.onClick Router.goToUrl  ]
             ]
-            ValidationViews.help model.FormValidationErrors (nameof(model.Form.Password))
-        ]
-        Bulma.field [
-            Bulma.fieldBody [
-                Bulma.button [
-                    yield button.isPrimary
-                    yield button.isFullwidth
-                    if model.IsLogging then yield! [ button.isLoading; prop.disabled true ]
-                    yield prop.text "Přihlásit se"
-                    yield prop.onClick (fun _ -> Login |> dispatch)
-                ]
-            ]
-        ]
-        Html.div [
-            Html.a [ prop.text "Registrace"; prop.href (Router.format Paths.Registration);  prop.onClick Router.goToUrl ]
-            Html.span " · "
-            Html.a [ prop.text "Zapomněl(a) jsem heslo!"; prop.href (Router.format Paths.ForgottenPassword);  prop.onClick Router.goToUrl  ]
         ]
     ]
     |> inTemplate

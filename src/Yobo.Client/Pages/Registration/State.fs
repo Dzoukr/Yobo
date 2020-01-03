@@ -7,21 +7,21 @@ open Yobo.Client.Server
 open Yobo.Client.SharedView
 open Yobo.Client.StateHandlers
 open Yobo.Shared.Auth.Communication
+open Yobo.Client.Forms
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
     | FormChanged f ->
-        let validation = if model.FormSent then validateLogin(f) else []
-        { model with Form = f; FormValidationErrors = validation }, Cmd.none
-    | Login ->
-        let validationErrors = validateLogin(model.Form)
-        let model = { model with FormSent = true; FormValidationErrors = validationErrors }
-        match validationErrors with
-        | [] -> { model with IsLogging = true }, Cmd.OfAsync.eitherResult authService.GetToken model.Form LoggedIn
-        | _ -> model, Cmd.none
-    | LoggedIn res ->
-        let onSuccess token = { model with IsLogging = false; Form = Request.Login.init }, ServerResponseViews.showSuccess "Byli jste úspěšně přihlášeni!"
-        let onError = { model with IsLogging = false }
-        let onValidationError m e = { m with FormValidationErrors = e } 
+        { model with Form = model.Form |> ValidatedForm.updateWith f |> ValidatedForm.validateConditionalWith model.FormSent validateRegister }, Cmd.none
+    | Register ->
+        let model = { model with FormSent = true; Form = model.Form |> ValidatedForm.validateWith validateRegister }
+        if model.Form |> ValidatedForm.isValid then
+            { model with IsLoading = true }, Cmd.OfAsync.eitherResult authService.Register model.Form.FormData Registered
+        else model, Cmd.none
+    | Registered res ->
+        let onSuccess _ = { model with IsLoading = false; Form = Request.Register.init |> ValidatedForm.init }, ServerResponseViews.showSuccess "REG SUCCESS"
+        let onError = { model with IsLoading = false }
+        let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 
         res |> handleValidated onSuccess onError onValidationError
+    | ToggleTerms -> { model with ShowTerms = not model.ShowTerms }, Cmd.none        
         

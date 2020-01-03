@@ -1,6 +1,5 @@
 module Yobo.Libraries.SimpleDapper
 
-open System
 open System.Text
 
 type OrderDirection =
@@ -53,6 +52,11 @@ type InsertQuery<'a> = {
 type UpdateQuery<'a> = {
     Table : string
     Value : 'a
+    Where : Where
+}
+
+type DeleteQuery = {
+    Table : string
     Where : Where
 }
 
@@ -154,6 +158,14 @@ let private evalUpdateQuery fields meta (q:UpdateQuery<_>) =
     let where = evalWhere meta q.Where
     if where.Length > 0 then sb.Append (sprintf " WHERE %s" where) |> ignore
     sb.ToString()
+
+let private evalDeleteQuery meta (q:DeleteQuery) =
+    // basic query
+    let sb = StringBuilder(sprintf "DELETE FROM %s" q.Table)
+    // where
+    let where = evalWhere meta q.Where
+    if where.Length > 0 then sb.Append (sprintf " WHERE %s" where) |> ignore
+    sb.ToString()
     
 let select<'a> tableName =
     {
@@ -177,7 +189,13 @@ let update<'a> tableName value where =
         Value = value
         Where = where
     } : UpdateQuery<'a>
+let delete tableName where =
+    {
+        Table = tableName
+        Where = where
+    } : DeleteQuery
 
+open System
 open Dapper
 
 type System.Data.IDbConnection with
@@ -201,6 +219,40 @@ type System.Data.IDbConnection with
         let meta = getWhereMetadata [] q.Where
         let pars = (extractWhereParams meta) @ (List.zip fields values) |> Map.ofList
         let query = evalUpdateQuery fields meta q
-        this.ExecuteAsync(query, pars)        
-        
-        
+        this.ExecuteAsync(query, pars)
+    
+    member this.DeleteAsync<'a> (q:DeleteQuery) =
+        // extract metadata
+        let meta = getWhereMetadata [] q.Where
+        let pars = (extractWhereParams meta) |> Map.ofList
+        let query = evalDeleteQuery meta q
+        this.ExecuteAsync(query, pars)
+
+module FSharp =
+    
+    type OptionHandler<'T>() =
+        inherit SqlMapper.TypeHandler<option<'T>>()
+
+        override __.SetValue(param, value) = 
+            let valueOrNull = 
+                match value with
+                | Some x -> box x
+                | None -> null
+
+            param.Value <- valueOrNull    
+
+        override __.Parse value =
+            if isNull value || value = box DBNull.Value 
+            then None
+            else Some (value :?> 'T)
+            
+    let registerOptionTypes() =
+        SqlMapper.AddTypeHandler (OptionHandler<Guid>())
+        SqlMapper.AddTypeHandler (OptionHandler<int64>())
+        SqlMapper.AddTypeHandler (OptionHandler<int>())
+        SqlMapper.AddTypeHandler (OptionHandler<int16>())
+        SqlMapper.AddTypeHandler (OptionHandler<string>())
+        SqlMapper.AddTypeHandler (OptionHandler<char>())
+        SqlMapper.AddTypeHandler (OptionHandler<DateTime>())
+        SqlMapper.AddTypeHandler (OptionHandler<DateTimeOffset>())
+        SqlMapper.AddTypeHandler (OptionHandler<bool>())

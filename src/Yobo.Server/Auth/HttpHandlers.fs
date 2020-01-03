@@ -39,15 +39,26 @@ let private login (authRoot:AuthRoot) (l:Request.Login) =
     task {
         use conn = authRoot.GetSqlConnection()
         
-//        let values =
-//            [0..3]
-//            |> List.map (fun x ->
-//                { Id = Guid.NewGuid(); Name = sprintf "WS%i" x; Description = "BLA"; StartDate = DateTimeOffset.UtcNow; EndDate = DateTimeOffset.UtcNow; Created = DateTimeOffset.UtcNow }    
-//            )
+        let values =
+            [0..3]
+            |> List.map (fun x ->
+                { Id = Guid.NewGuid(); Name = sprintf "WS%i" x; Description = "BLA"; StartDate = DateTimeOffset.UtcNow; EndDate = DateTimeOffset.UtcNow; Created = DateTimeOffset.UtcNow }    
+            )
         
-//        let! _ =
-//            insert<Workshop> "Workshops" values
-//            |> conn.InsertAsync
+        let updated =
+            values
+            |> List.rev
+            |> List.head
+            |> fun x -> { x with Name = "UPDATED" }
+        
+        let! _ =
+            insert<Workshop> "Workshops" values
+            |> conn.InsertAsync
+        
+        let! _ =
+            update<Workshop> "Workshops" updated (Field("Id", Eq(updated.Id)))
+            |> conn.UpdateAsync
+                    
         
         let! user = authRoot.Queries.TryGetUserByEmail conn l.Email
         return

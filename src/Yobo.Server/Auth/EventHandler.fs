@@ -4,7 +4,7 @@ open Domain
 open Microsoft.Data.SqlClient
 open FSharp.Control.Tasks
 
-let private handleDb (e:Event) =
+let private handleDb (conn:SqlConnection) (e:Event) =
     task {
         return ()
     }
@@ -12,6 +12,6 @@ let private handleDb (e:Event) =
 let handle (conn:SqlConnection) (evns:Event list) =
     task {
         for evn in evns do
-            do! handleDb evn
+            do! handleDb conn evn
     }
     

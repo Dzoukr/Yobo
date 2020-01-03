@@ -68,7 +68,7 @@ Target.create "Run" (fun _ ->
     let client = async {
         Tools.yarn "webpack-dev-server" clientSrcPath
     }
-    [client;server]
+    [server;client]
     |> Async.Parallel
     |> Async.RunSynchronously
     |> ignore

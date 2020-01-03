@@ -6,6 +6,7 @@
   <ItemGroup>
     <Compile Include="Authentication\Jwt.fs" />
     <Compile Include="Authentication\Password.fs" />
+    <Compile Include="SimpleDapper.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

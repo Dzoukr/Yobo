@@ -21,6 +21,7 @@ group Libraries
     nuget TaskBuilder.fs
     nuget Mailjet.Api
     nuget System.IdentityModel.Tokens.Jwt
+    nuget Dapper
 
 group Server
     source https://api.nuget.org/v3/index.json

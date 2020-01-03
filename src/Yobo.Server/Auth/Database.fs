@@ -1,23 +1,23 @@
 module Yobo.Server.Auth.Database
 
-open System
 open System.Data
-open Dapper
 open FSharp.Control.Tasks.V2
 open Domain
+open Yobo.Libraries.SimpleDapper
 
 module Queries =
     let tryGetUserByEmail (conn:IDbConnection) email =
         task {
-            let query = "SELECT * FROM [Users] WHERE Email = @Email"
-            let! res = conn.QueryAsync<Queries.AuthUserView>(query, {| Email = email |})
+            let! res =
+                select<Queries.AuthUserView> "Users"
+                |> where (Field ("Email", Eq(email)))
+                |> conn.SelectAsync
             return res |> Seq.tryHead
         }
 
 module Projections =
     let getAll (conn:IDbConnection) =
         task {
-            let query = "SELECT * FROM [Users]"
-            let! res = conn.QueryAsync<CommandHandler.Projections.ExistingUser>(query)
+            let! res = select<CommandHandler.Projections.ExistingUser> "Users" |> conn.SelectAsync
             return res |> Seq.toList
         }

@@ -24,9 +24,31 @@ let private userToClaims (u:Queries.AuthUserView) =
         Claim("LastName", u.LastName)
     ]
 
+open Yobo.Libraries.SimpleDapper
+
+type Workshop = {
+    Id : Guid
+    Name : string
+    Description : string
+    StartDate : DateTimeOffset
+    EndDate : DateTimeOffset
+    Created : DateTimeOffset
+}
+
 let private login (authRoot:AuthRoot) (l:Request.Login) =
     task {
         use conn = authRoot.GetSqlConnection()
+        
+//        let values =
+//            [0..3]
+//            |> List.map (fun x ->
+//                { Id = Guid.NewGuid(); Name = sprintf "WS%i" x; Description = "BLA"; StartDate = DateTimeOffset.UtcNow; EndDate = DateTimeOffset.UtcNow; Created = DateTimeOffset.UtcNow }    
+//            )
+        
+//        let! _ =
+//            insert<Workshop> "Workshops" values
+//            |> conn.InsertAsync
+        
         let! user = authRoot.Queries.TryGetUserByEmail conn l.Email
         return
             user

@@ -3,3 +3,4 @@ group Libraries
     TaskBuilder.fs
     Mailjet.Api
     System.IdentityModel.Tokens.Jwt
+    Dapper

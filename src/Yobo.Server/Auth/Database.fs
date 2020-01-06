@@ -10,7 +10,7 @@ module Queries =
         task {
             let! res =
                 select<Queries.AuthUserView> "Users"
-                |> where (Field ("Email", Eq(email)))
+                |> where (Column ("Email", Eq(email)))
                 |> conn.SelectAsync
             return res |> Seq.tryHead
         }

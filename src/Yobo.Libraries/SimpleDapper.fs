@@ -37,21 +37,22 @@ type Pagination =
 
 let column name whereComp = Where.Column(name, whereComp)
 
-type SelectQuery<'a> = {
+type SelectQuery = {
     Table : string
     Where : Where
     OrderBy : OrderBy list
     Pagination : Pagination
+    IgnoredColumns : string list
 }
 
-type InsertQuery<'a> = {
+type InsertQuery = {
     Table : string
-    Values : 'a list
+    Values : obj list
 }
 
-type UpdateQuery<'a> = {
+type UpdateQuery = {
     Table : string
-    Value : 'a
+    Value : obj
     Where : Where
 }
 
@@ -91,7 +92,9 @@ module private WhereAnalyzer =
         | Binary(w1, _, w2) -> [w1;w2] |> List.fold getWhereMetadata meta      
     
 module private Evaluators =
-
+    
+    open System.Linq
+    
     let evalCombination = function
         | And -> "AND"
         | Or -> "OR"
@@ -133,8 +136,8 @@ module private Evaluators =
         | Skip o -> sprintf "OFFSET %i ROWS" o
         | SkipTake(o,f) -> sprintf "OFFSET %i ROWS FETCH NEXT %i ROWS ONLY" o f
     
-    let evalSelectQuery fields meta (q:SelectQuery<_>) =
-        let fieldNames = fields |> String.concat ", "
+    let evalSelectQuery fields meta (q:SelectQuery) =
+        let fieldNames = fields |> List.filter (fun x -> not <| q.IgnoredColumns.Contains(x)) |> String.concat ", "
         // basic query
         let sb = StringBuilder(sprintf "SELECT %s FROM %s" fieldNames q.Table)
         // where
@@ -148,12 +151,12 @@ module private Evaluators =
         if pagination.Length > 0 then sb.Append (sprintf " %s" pagination) |> ignore    
         sb.ToString()
             
-    let evalInsertQuery fields (q:InsertQuery<_>) =
+    let evalInsertQuery fields (q:InsertQuery) =
         let fieldNames = fields |> String.concat ", " |> sprintf "(%s)"
         let values = fields |> List.map (sprintf "@%s") |> String.concat ", " |> sprintf "(%s)" 
         sprintf "INSERT INTO %s %s VALUES %s" q.Table fieldNames values        
 
-    let evalUpdateQuery fields meta (q:UpdateQuery<_>) =
+    let evalUpdateQuery fields meta (q:UpdateQuery) =
         // basic query
         let pairs = fields |> List.map (fun x -> sprintf "%s=@%s" x x) |> String.concat ", "
         let sb = StringBuilder(sprintf "UPDATE %s SET %s" q.Table pairs)
@@ -183,7 +186,7 @@ module private Reflection =
         
 module private Preparators =
     
-    let prepareSelect<'a> (q:SelectQuery<'a>) =
+    let prepareSelect<'a> (q:SelectQuery) =
         let fields = Reflection.getFields<'a>()
         // extract metadata
         let meta = WhereAnalyzer.getWhereMetadata [] q.Where
@@ -191,12 +194,12 @@ module private Preparators =
         let pars = WhereAnalyzer.extractWhereParams meta |> Map.ofList
         query, pars
         
-    let prepareInsert<'a> (q:InsertQuery<'a>) =
+    let prepareInsert<'a> (q:InsertQuery) =
         let fields = Reflection.getFields<'a>()
         let query = Evaluators.evalInsertQuery fields q
         query, q.Values
     
-    let prepareUpdate<'a> (q:UpdateQuery<'a>) =
+    let prepareUpdate<'a> (q:UpdateQuery) =
         let fields = Reflection.getFields<'a>()
         let values = Reflection.getValues q.Value
         // extract metadata
@@ -213,24 +216,24 @@ module private Preparators =
 
 module Builders =
         
-    type InsertBuilder<'a>() =
+    type InsertBuilder() =
         member __.Yield _ =
             {
                 Table = ""
                 Values = []
-            } : InsertQuery<'a>
+            } : InsertQuery
         
         /// Sets the TABLE name for query            
         [<CustomOperation "table">]
-        member __.Table (state:InsertQuery<_>, name) = { state with Table = name }        
+        member __.Table (state:InsertQuery, name) = { state with Table = name }        
         
         /// Sets the list of values for INSERT
         [<CustomOperation "values">]
-        member __.Values (state:InsertQuery<_>, values:'a list) = { state with Values = values }        
+        member __.Values (state:InsertQuery, values:'a list) = { state with Values = values }        
         
         /// Sets the single value for INSERT
         [<CustomOperation "value">]
-        member __.Value (state:InsertQuery<_>, value:'a) = { state with Values = [value] }        
+        member __.Value (state:InsertQuery, value:'a) = { state with Values = [value] }        
         
     type DeleteBuilder() =
         member __.Yield _ =
@@ -247,81 +250,92 @@ module Builders =
         [<CustomOperation "where">]
         member __.Where (state:DeleteQuery, where:Where) = { state with Where = where }
     
-    type UpdateBuilder<'a>() =
+    type UpdateBuilder() =
         member __.Yield _ =
             {
                 Table = ""
-                Value = Unchecked.defaultof<'a>
+                Value = null
                 Where = Where.Empty
-            } : UpdateQuery<'a>
+            } : UpdateQuery
                     
         /// Sets the TABLE name for query
         [<CustomOperation "table">]
-        member __.Table (state:UpdateQuery<_>, name) = { state with Table = name }        
+        member __.Table (state:UpdateQuery, name) = { state with Table = name }        
         
         /// Sets the SET of value to UPDATE
         [<CustomOperation "set">]
-        member __.Set (state:UpdateQuery<_>, value:'a) = { state with Value = value }
+        member __.Set (state:UpdateQuery, value:'a) = { state with Value = value }
         
         /// Sets the WHERE condition
         [<CustomOperation "where">]
-        member __.Where (state:UpdateQuery<_>, where:Where) = { state with Where = where }        
+        member __.Where (state:UpdateQuery, where:Where) = { state with Where = where }        
     
-    type SelectBuilder<'a>() =
+    type SelectBuilder() =
         member __.Yield _ =
             {
                 Table = ""
                 Where = Where.Empty
                 OrderBy = []
                 Pagination = Skip 0
-            } : SelectQuery<'a>
+                IgnoredColumns = []
+            } : SelectQuery
         
         /// Sets the TABLE name for query
         [<CustomOperation "table">]
-        member __.Table (state:SelectQuery<_>, name) = { state with Table = name }
+        member __.Table (state:SelectQuery, name) = { state with Table = name }
         
         /// Sets the WHERE condition
         [<CustomOperation "where">]
-        member __.Where (state:SelectQuery<_>, where:Where) = { state with Where = where }        
+        member __.Where (state:SelectQuery, where:Where) = { state with Where = where }        
         
         /// Sets the ORDER BY for multiple columns
         [<CustomOperation "orderByMany">]
-        member __.OrderByMany (state:SelectQuery<_>, values) = { state with OrderBy = values }        
+        member __.OrderByMany (state:SelectQuery, values) = { state with OrderBy = values }        
         
         /// Sets the ORDER BY for single column
         [<CustomOperation "orderBy">]
-        member __.OrderBy (state:SelectQuery<_>, colName, direction) = { state with OrderBy = [(colName, direction)] }        
+        member __.OrderBy (state:SelectQuery, colName, direction) = { state with OrderBy = [(colName, direction)] }        
         
-        /// Sets the OFFSET value for query
+        /// Sets the SKIP value for query
         [<CustomOperation "skip">]
-        member __.Skip (state:SelectQuery<_>, skip) = { state with Pagination = Pagination.Skip skip }        
+        member __.Skip (state:SelectQuery, skip) = { state with Pagination = Pagination.Skip skip }        
         
-        /// Sets the OFFSET and FETCH value for query
+        /// Sets the SKIP and TAKE value for query
         [<CustomOperation "skipTake">]
-        member __.SkipTake (state:SelectQuery<_>, skip, take) = { state with Pagination = Pagination.SkipTake(skip, take) }        
+        member __.SkipTake (state:SelectQuery, skip, take) = { state with Pagination = Pagination.SkipTake(skip, take) }
         
-let insert<'a> = Builders.InsertBuilder<'a>()
+        /// Ignore column for mapping
+        [<CustomOperation "ignore">]
+        member __.Ignore (state:SelectQuery, name) = { state with IgnoredColumns = [name] }        
+        
+        /// Ignore more columns for mapping
+        [<CustomOperation "ignoreMany">]
+        member __.IgnoreMany (state:SelectQuery, names) = { state with IgnoredColumns = names }        
+
+        
+let insert = Builders.InsertBuilder()
 let delete = Builders.DeleteBuilder()
-let update<'a> = Builders.UpdateBuilder<'a>()
-let select<'a> = Builders.SelectBuilder<'a>()  
+let update = Builders.UpdateBuilder()
+let select = Builders.SelectBuilder()  
 
 open System
 open Dapper
 
 type System.Data.IDbConnection with
-    member this.SelectAsync<'a> (q:SelectQuery<'a>) =
-        let query, pars = q |> Preparators.prepareSelect
+    member this.SelectAsync<'a> (q:SelectQuery) =
+        let query, pars = q |> Preparators.prepareSelect<'a>
+        printfn "%s" query
         this.QueryAsync<'a>(query, pars)
         
-    member this.InsertAsync<'a> (q:InsertQuery<'a>) =
-        let query, values = q |> Preparators.prepareInsert
+    member this.InsertAsync<'a> (q:InsertQuery) =
+        let query, values = q |> Preparators.prepareInsert<'a>
         this.ExecuteAsync(query, values)
         
-    member this.UpdateAsync<'a> (q:UpdateQuery<'a>) =
-        let query, pars = q |> Preparators.prepareUpdate
+    member this.UpdateAsync<'a> (q:UpdateQuery) =
+        let query, pars = q |> Preparators.prepareUpdate<'a>
         this.ExecuteAsync(query, pars)
     
-    member this.DeleteAsync<'a> (q:DeleteQuery) =
+    member this.DeleteAsync (q:DeleteQuery) =
         let query, pars = q |> Preparators.prepareDelete
         this.ExecuteAsync(query, pars)
 
@@ -348,6 +362,8 @@ module FSharp =
         SqlMapper.AddTypeHandler (OptionHandler<int64>())
         SqlMapper.AddTypeHandler (OptionHandler<int>())
         SqlMapper.AddTypeHandler (OptionHandler<int16>())
+        SqlMapper.AddTypeHandler (OptionHandler<float>())
+        SqlMapper.AddTypeHandler (OptionHandler<decimal>())
         SqlMapper.AddTypeHandler (OptionHandler<string>())
         SqlMapper.AddTypeHandler (OptionHandler<char>())
         SqlMapper.AddTypeHandler (OptionHandler<DateTime>())

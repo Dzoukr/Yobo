@@ -3,7 +3,6 @@ module Yobo.Server.Auth.Domain
 open System
 
 module Queries =
-    [<CLIMutable>]
     type AuthUserView = {
         Id : Guid
         Email : string

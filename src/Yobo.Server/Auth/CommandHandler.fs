@@ -5,7 +5,6 @@ open Domain
 open Yobo.Shared.Domain
 
 module Projections =
-    [<CLIMutable>]
     type ExistingUser = {
         Id : Guid
         Email : string

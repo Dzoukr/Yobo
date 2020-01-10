@@ -2,13 +2,11 @@ module Yobo.Server.Auth.HttpHandlers
 
 open System
 open System.Security.Claims
-open System.Threading.Tasks
 open Fable.Remoting.Giraffe
 open Fable.Remoting.Server
 open Giraffe
 open Yobo.Shared.Auth.Communication
 open FSharp.Control.Tasks
-open Yobo.Server
 open Yobo.Server.Auth.Domain
 open Yobo.Shared.Auth.Validation
 open FSharp.Rop.Result
@@ -23,17 +21,6 @@ let private userToClaims (u:Queries.AuthUserView) =
         Claim("FirstName", u.FirstName)
         Claim("LastName", u.LastName)
     ]
-
-open Yobo.Libraries.SimpleDapper
-
-type Workshop = {
-    Id : Guid
-    Name : string
-    Description : string
-    StartDate : DateTimeOffset
-    EndDate : DateTimeOffset
-    Created : DateTimeOffset
-}
 
 let private login (authRoot:AuthRoot) (l:Request.Login) =
     task {
@@ -66,20 +53,25 @@ let private register (authRoot:AuthRoot) (r:Request.Register) =
                 Email = r.Email.ToLower()
                 Newsletters = r.NewslettersButtonChecked
             }
-        let! projections = authRoot.Projections.GetAllUsers conn
-        return!
-            args
-            |> CommandHandler.register projections
-            |> Result.mapError Authentication
-            |> TaskResult.ofTaskAndResult (authRoot.HandleEvents conn)
-            |> TaskResult.map (fun _ -> args.Id)
+        return! (authRoot.CommandHandler.Register conn args)            
     }
 
 let private authService (root:CompositionRoot) : AuthService =
     {
-        GetToken = Flow.ofTaskResultValidated validateLogin (login root.Auth) >> Async.AwaitTask
-        RefreshToken = Flow.ofResult (refreshToken root.Auth) >> Async.AwaitTask
-        Register = Flow.ofTaskResultValidated validateRegister (register root.Auth) >> Async.AwaitTask
+        GetToken =
+            ServerResult.ofValidation validateLogin
+            >> TaskResult.ofResult
+            >> TaskResult.bind (login root.Auth)
+            >> Async.AwaitTask
+        RefreshToken =
+            (refreshToken root.Auth)
+            >> TaskResult.ofResult
+            >> Async.AwaitTask
+        Register =
+            ServerResult.ofValidation validateRegister
+            >> TaskResult.ofResult
+            >> TaskResult.bind (register root.Auth)
+            >> Async.AwaitTask
     }
 
 let authServiceHandler (root:CompositionRoot) : HttpHandler =

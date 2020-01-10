@@ -22,7 +22,6 @@ group Libraries
     nuget TaskBuilder.fs
     nuget Mailjet.Api
     nuget System.IdentityModel.Tokens.Jwt
-    nuget Dapper
 
 group Server
     source https://api.nuget.org/v3/index.json
@@ -35,7 +34,7 @@ group Server
     nuget Fable.Remoting.Giraffe
     github Dzoukr/FSharp.Rop FSharp.Rop.Result.fs
     github Dzoukr/FSharp.Rop FSharp.Rop.TaskResult.fs
-    nuget Dapper
+    nuget Dapper.FSharp
     nuget Microsoft.Data.SqlClient
 
 group Build

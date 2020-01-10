@@ -6,5 +6,5 @@ group Server
     Fable.Remoting.Giraffe
     File:FSharp.Rop.Result.fs
     File:FSharp.Rop.TaskResult.fs
-    Dapper
+    Dapper.FSharp
     Microsoft.Data.SqlClient

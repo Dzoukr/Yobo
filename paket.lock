@@ -878,8 +878,6 @@ STORAGE: NONE
 RESTRICTION: == netstandard2.0
 NUGET
   remote: https://api.nuget.org/v3/index.json
-    Dapper (2.0.30)
-      System.Reflection.Emit.Lightweight (>= 4.6)
     FSharp.Core (4.7)
     Mailjet.Api (1.2.2)
       NETStandard.Library (>= 1.6.1)
@@ -900,9 +898,6 @@ NUGET
       Microsoft.IdentityModel.JsonWebTokens (>= 5.6)
       Microsoft.IdentityModel.Tokens (>= 5.6)
       Newtonsoft.Json (>= 10.0.1)
-    System.Reflection.Emit.ILGeneration (4.7)
-    System.Reflection.Emit.Lightweight (4.7)
-      System.Reflection.Emit.ILGeneration (>= 4.7)
     System.Security.Cryptography.Cng (4.7)
     System.ValueTuple (4.5)
     TaskBuilder.fs (2.1)
@@ -917,6 +912,9 @@ NUGET
   remote: https://api.nuget.org/v3/index.json
     Dapper (2.0.30)
       System.Reflection.Emit.Lightweight (>= 4.6)
+    Dapper.FSharp (1.2)
+      Dapper (>= 2.0.30)
+      FSharp.Core (>= 4.7)
     Fable.Remoting.Giraffe (3.11.2)
       Fable.Remoting.Json (>= 2.6)
       Fable.Remoting.Server (>= 4.10.2)

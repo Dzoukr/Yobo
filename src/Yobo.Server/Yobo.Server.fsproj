@@ -23,7 +23,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Flow.fs" />
     <Compile Include="Auth\Domain.fs" />
     <Compile Include="Auth\CommandHandler.fs" />
     <Compile Include="Auth\EventHandler.fs" />

@@ -10,6 +10,7 @@ type Model = {
     FormSent : bool
     ShowTerms : bool
     Form : ValidatedForm<Request.Register>
+    ShowThankYou : bool
 }
 
 module Model =
@@ -18,6 +19,7 @@ module Model =
         FormSent = false
         ShowTerms = false
         Form = Request.Register.init |> ValidatedForm.init
+        ShowThankYou = false
     }
 
 type Msg =

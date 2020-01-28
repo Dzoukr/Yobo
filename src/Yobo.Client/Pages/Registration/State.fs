@@ -19,7 +19,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
             { model with IsLoading = true }, Cmd.OfAsync.eitherResult authService.Register model.Form.FormData Registered
         else model, Cmd.none
     | Registered res ->
-        let onSuccess _ = { model with IsLoading = false; Form = Request.Register.init |> ValidatedForm.init }, ServerResponseViews.showSuccess "REG SUCCESS"
+        let onSuccess _ = { model with IsLoading = false; Form = Request.Register.init |> ValidatedForm.init; ShowThankYou = true }, Cmd.none
         let onError = { model with IsLoading = false }
         let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 
         res |> handleValidated onSuccess onError onValidationError

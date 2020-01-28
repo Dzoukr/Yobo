@@ -23,12 +23,37 @@ module Tables =
         PasswordResetKey : Guid option
         Newsletters : bool
     }
+    
+module Updates =
+    let registered (conn:IDbConnection) (args:CmdArgs.Register) =
+        task {
+            let! _ =
+                insert {
+                    table "Users"
+                    value ({
+                        Id = args.Id
+                        Email = args.Email
+                        FirstName = args.FirstName
+                        LastName = args.FirstName
+                        PasswordHash = args.PasswordHash
+                        ActivationKey = args.ActivationKey
+                        Registered = DateTimeOffset.UtcNow
+                        Activated = None
+                        Credits = 0
+                        CreditsExpiration = None
+                        CashReservationBlockedUntil = None
+                        PasswordResetKey = None
+                        Newsletters = args.Newsletters
+                    } : Tables.Users)
+                } |> conn.InsertAsync
+            return ()
+        }
 
 module Queries =
     let tryGetUserByEmail (conn:IDbConnection) email =
         task {
             let! res =
-                select  {
+                select {
                     table "Users"
                     where (eq "Email" email)
                 }

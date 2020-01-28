@@ -23,10 +23,12 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="EmailTemplates.fs" />
     <Compile Include="Auth\Domain.fs" />
     <Compile Include="Auth\CommandHandler.fs" />
-    <Compile Include="Auth\EventHandler.fs" />
     <Compile Include="Auth\Database.fs" />
+    <Compile Include="Auth\EmailEventHandler.fs" />
+    <Compile Include="Auth\DbEventHandler.fs" />
     <Compile Include="CompositionRoot.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />

@@ -5,6 +5,8 @@ open Feliz.Bulma
 open Yobo.Shared.Domain
 open Yobo.Shared.Validation
 
+
+
 module ServerResponseViews =
     open Elmish
     open Elmish.Toastr
@@ -43,10 +45,20 @@ module ServerResponseViews =
         |> Toastr.position ToastPosition.TopRight
         |> Toastr.success
     
+module BoxedViews =
+    
+    let showSuccess (msg:string) =
+        Bulma.message [
+            message.isSuccess
+            prop.children [
+                Bulma.messageBody [
+                    Html.i [ prop.className "fas fa-check-circle"; prop.style [ style.paddingRight 10 ] ]
+                    Html.text msg
+                ]
+            ]
+        ]
 
 module ValidationViews =
-
-    open Yobo.Shared.Validation
 
     let help errors name =
         errors
@@ -64,6 +76,8 @@ module ValidationViews =
         |> List.tryFind (fun x -> x.Field = name)
         |> Option.map (fun _ -> input.isDanger)
         |> Option.defaultValue (Interop.mkAttr "dummy" "")
+
+
         
 module StaticTextViews =
     

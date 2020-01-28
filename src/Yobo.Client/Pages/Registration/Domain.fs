@@ -25,5 +25,5 @@ module Model =
 type Msg =
     | FormChanged of Request.Register
     | Register
-    | Registered of ServerResult<Guid>
+    | Registered of ServerResult<unit>
     | ToggleTerms

@@ -53,29 +53,40 @@ let private register (authRoot:AuthRoot) (r:Request.Register) =
                 Email = r.Email.ToLower()
                 Newsletters = r.NewslettersButtonChecked
             }
-        return! (authRoot.CommandHandler.Register conn args)            
+        return! authRoot.CommandHandler.Register conn args            
     }
 
-let private authService (root:CompositionRoot) : AuthService =
+let private activateAccount (authRoot:AuthRoot) (key:Guid) =
+    task {
+        use conn = authRoot.GetSqlConnection()
+        let args = { ActivationKey = key } : CmdArgs.Activate
+        return! authRoot.CommandHandler.ActivateAccount conn args
+    }
+
+let private authService (root:AuthRoot) : AuthService =
     {
         GetToken =
             ServerResult.ofValidation validateLogin
             >> TaskResult.ofResult
-            >> TaskResult.bind (login root.Auth)
+            >> TaskResult.bind (login root)
             >> Async.AwaitTask
         RefreshToken =
-            (refreshToken root.Auth)
+            (refreshToken root)
             >> TaskResult.ofResult
             >> Async.AwaitTask
         Register =
             ServerResult.ofValidation validateRegister
             >> TaskResult.ofResult
-            >> TaskResult.bind (register root.Auth)
+            >> TaskResult.bind (register root)
             >> Async.AwaitTask
+        ActivateAccount =
+            (activateAccount root)
+            >> Async.AwaitTask
+            
     }
 
 let authServiceHandler (root:CompositionRoot) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder AuthService.RouteBuilder
-    |> Remoting.fromValue (authService root)
+    |> Remoting.fromValue (authService root.Auth)
     |> Remoting.buildHttpHandler

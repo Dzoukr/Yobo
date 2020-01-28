@@ -14,6 +14,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | _, UrlChanged p -> { model with CurrentPage = p }, Cmd.none
     // auth
     | Login m, LoginMsg subMsg -> Pages.Login.State.update subMsg m |> upTo model Login LoginMsg 
-    | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg 
+    | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg
+    | AccountActivation m, AccountActivationMsg subMsg -> Pages.AccountActivation.State.update subMsg m |> upTo model AccountActivation AccountActivationMsg
         
     

@@ -9,4 +9,5 @@ let handle (conn:SqlConnection) (e:Event) =
     task {
         match e with
         | Registered args -> do! args |> Database.Updates.registered conn
+        | Activated args -> do! args |> Database.Updates.activated conn
     }

@@ -37,7 +37,8 @@ module Request =
 type AuthService = {
     GetToken : Request.Login -> ServerResponse<string>
     RefreshToken : string -> ServerResponse<string>
-    Register : Request.Register -> ServerResponse<Guid>
+    Register : Request.Register -> ServerResponse<unit>
+    ActivateAccount : Guid -> ServerResponse<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/auth/%s" m

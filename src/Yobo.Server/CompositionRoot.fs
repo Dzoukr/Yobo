@@ -19,7 +19,8 @@ type AuthProjections = {
 }
 
 type AuthCommandHandler = {
-    Register : SqlConnection -> Domain.CmdArgs.Register -> Task<Result<Guid,ServerError>>
+    Register : SqlConnection -> Domain.CmdArgs.Register -> Task<Result<unit,ServerError>>
+    ActivateAccount : SqlConnection -> Domain.CmdArgs.Activate -> Task<Result<unit,ServerError>>
 }
 
 type AuthRoot = {
@@ -69,7 +70,14 @@ module AuthRoot =
                         |> CommandHandler.register projections
                         |> Result.mapError Authentication
                         |> TaskResult.ofTaskAndResult (eventHandler conn)
-                        |> TaskResult.map (fun _ -> args.Id)
+                }
+                ActivateAccount = fun conn args -> task {
+                    let! projections = Auth.Database.Projections.getAll conn
+                    return!
+                        args
+                        |> CommandHandler.activate projections
+                        |> Result.mapError Authentication
+                        |> TaskResult.ofTaskAndResult (eventHandler conn)
                 }
             }
         } : AuthRoot

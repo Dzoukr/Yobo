@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="ClientPaths.fs" />
         <Compile Include="Validation.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="Auth\Communication.fs" />

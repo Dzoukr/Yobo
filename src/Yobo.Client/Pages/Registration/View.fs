@@ -141,11 +141,11 @@ let registerForm model dispatch =
 let view (model:Model) (dispatch:Msg -> unit) =
     Html.div [
         // terms modal
-        SharedView.StaticTextViews.termsModal model.ShowTerms (fun _ -> ToggleTerms |> dispatch)
+        SharedView.StaticTextViews.showTermsModal model.ShowTerms (fun _ -> ToggleTerms |> dispatch)
         
         // form
         if model.ShowThankYou then
-            SharedView.BoxedViews.showSuccess "Registrace proběhla úspěšně! Pro aktivaci účtu klikněte na odkaz v registračním emailu."
+            SharedView.BoxedViews.showSuccessMessage "Registrace proběhla úspěšně! Pro aktivaci účtu klikněte na odkaz v registračním emailu."
         else            
             registerForm model dispatch            
     ]

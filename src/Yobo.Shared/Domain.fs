@@ -6,17 +6,28 @@ type AuthenticationError =
     | InvalidLoginOrPassword
     | InvalidOrExpiredToken
     | EmailAlreadyRegistered
+    | AccountAlreadyActivatedOrNotFound
     
 module AuthenticationError =
     let explain = function
         | InvalidLoginOrPassword -> "Nesprávně vyplněný email nebo heslo."
         | InvalidOrExpiredToken -> "Token není validní nebo již vypršela jeho platnost."
         | EmailAlreadyRegistered -> "Tento email je již v systému registrován."
+        | AccountAlreadyActivatedOrNotFound -> "Tento účet je již zaktivován nebo byl zadán neplatný aktivační klíč."
 
 type ServerError =
     | Exception of string
     | Validation of ValidationError list
     | Authentication of AuthenticationError
+
+module ServerError =
+    let explain = function
+        | Exception e -> e
+        | Validation errs ->
+            errs
+            |> List.map ValidationError.explain
+            |> String.concat ", "
+        | Authentication e -> e |> AuthenticationError.explain
 
 type ServerResult<'a> = Result<'a, ServerError>
 

@@ -13,11 +13,11 @@ let handleValidated
         match res with
         | Ok v -> v |> onSuccess
         | Error error ->
-            let cmd = error |> ServerResponseViews.showError
+            let cmd = error |> ServerResponseViews.showErrorToast
             let model =
                 match error with
                 | Validation errs -> onValidationError onErrorModel errs
                 | _ -> onErrorModel
             model, cmd
             
-let handle onSuccess onErrorModel res = handleValidated onSuccess onErrorModel (fun x y -> x) res  
+let handle onSuccess onErrorModel res = handleValidated onSuccess onErrorModel (fun x _ -> x) res  

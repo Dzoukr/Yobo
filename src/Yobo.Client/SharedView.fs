@@ -11,7 +11,7 @@ module ServerResponseViews =
     open Elmish
     open Elmish.Toastr
     
-    let showError (e:ServerError) : Cmd<_> =
+    let showErrorToast (e:ServerError) : Cmd<_> =
         let basicToaster =
             match e with
             | Exception msg ->
@@ -40,23 +40,52 @@ module ServerResponseViews =
         |> Toastr.showCloseButton
         |> Toastr.error
     
-    let showSuccess msg : Cmd<_> =
+    let showSuccessToast msg : Cmd<_> =
         Toastr.message msg
         |> Toastr.position ToastPosition.TopRight
         |> Toastr.success
     
 module BoxedViews =
     
-    let showSuccess (msg:string) =
+    let showSuccess elm =
         Bulma.message [
             message.isSuccess
             prop.children [
                 Bulma.messageBody [
                     Html.i [ prop.className "fas fa-check-circle"; prop.style [ style.paddingRight 10 ] ]
-                    Html.text msg
+                    elm
                 ]
             ]
         ]
+    
+    let showError elm =
+        Bulma.message [
+            message.isDanger
+            prop.children [
+                Bulma.messageBody [
+                    Html.i [ prop.className "fas fa-exclamation-circle"; prop.style [ style.paddingRight 10 ] ]
+                    elm
+                ]
+            ]
+        ]
+    
+    let showInProgress elm =
+        Bulma.message [
+            message.isInfo
+            prop.children [
+                Bulma.messageBody [
+                    Html.i [ prop.className "fas fa-circle-notch fa-spin" ]
+                    Html.span [
+                        prop.style [ style.paddingLeft 10 ]
+                        prop.children [elm]
+                    ]
+                ]
+            ]
+        ]
+            
+    let showSuccessMessage (msg:string) = msg |> Html.text |> showSuccess
+    let showErrorMessage (msg:string) = msg |> Html.text |> showError
+    let showInProgressMessage (msg:string) = msg |> Html.text |> showInProgress
 
 module ValidationViews =
 
@@ -81,7 +110,7 @@ module ValidationViews =
         
 module StaticTextViews =
     
-    let termsModal isActive closeDisplay =
+    let showTermsModal isActive closeDisplay =
         Bulma.modal [
             if isActive then modal.isActive
             prop.children [

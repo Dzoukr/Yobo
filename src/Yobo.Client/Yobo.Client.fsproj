@@ -19,6 +19,9 @@
         <Compile Include="Pages\Registration\Domain.fs" />
         <Compile Include="Pages\Registration\State.fs" />
         <Compile Include="Pages\Registration\View.fs" />
+        <Compile Include="Pages\AccountActivation\Domain.fs" />
+        <Compile Include="Pages\AccountActivation\State.fs" />
+        <Compile Include="Pages\AccountActivation\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />

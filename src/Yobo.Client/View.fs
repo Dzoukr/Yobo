@@ -10,7 +10,20 @@ let private parseUrl = function
     | [ Paths.Login ] -> Login (Pages.Login.Domain.Model.init)
     | [ Paths.Registration ] -> Registration Pages.Registration.Domain.Model.init
     | [ Paths.Calendar ] -> Calendar
+    | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> AccountActivation (Pages.AccountActivation.Domain.Model.init id)
     | _ -> Model.init.CurrentPage
+    
+let private getPageMessages = function
+    | Page.AccountActivation _ ->
+        Pages.AccountActivation.Domain.Msg.Activate
+        |> AccountActivationMsg
+        |> List.singleton
+    | _ -> []
+
+let private withPageMessages (dispatch:Msg -> unit) p =
+    match getPageMessages p with
+    | [] -> p |> UrlChanged |> dispatch
+    | msgs -> (UrlChanged p :: msgs) |> List.iter dispatch
     
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
@@ -23,9 +36,10 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 prop.href (Router.format Paths.Login)
                 prop.onClick Router.goToUrl
             ]
+        | AccountActivation m -> Pages.AccountActivation.View.view m (AccountActivationMsg >> dispatch)
             
     Router.router [
-        Router.onUrlChanged (parseUrl >> UrlChanged >> dispatch)
+        Router.onUrlChanged (parseUrl >> withPageMessages dispatch)
         Router.pathMode
         Router.application render
     ]

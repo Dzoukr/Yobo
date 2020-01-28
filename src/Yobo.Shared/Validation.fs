@@ -22,6 +22,10 @@ type ValidationError = {
     Type : ValidationErrorType
 }
 
+module ValidationError =
+    let explain err =
+        sprintf "Pole \"%s\" obsahuje chybu: \"%s\"" err.Field (err.Type |> ValidationErrorType.explain)
+
 let validateNotEmpty value = 
     if String.IsNullOrWhiteSpace(value) then IsEmpty |> Some else None
     

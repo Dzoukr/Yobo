@@ -48,6 +48,17 @@ module Updates =
                 } |> conn.InsertAsync
             return ()
         }
+    
+    let activated (conn:IDbConnection) (args:CmdArgs.Activate) =
+        task {
+            let! _ =
+                update {
+                    table "Users"
+                    set {| Activated = DateTimeOffset.UtcNow |}
+                    where (eq "ActivationKey" args.ActivationKey)
+                } |> conn.UpdateAsync
+            return ()
+        }
 
 module Queries =
     let tryGetUserByEmail (conn:IDbConnection) email =

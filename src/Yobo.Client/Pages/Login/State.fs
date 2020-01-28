@@ -19,7 +19,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
             { model with IsLoading = true }, Cmd.OfAsync.eitherResult authService.GetToken model.Form.FormData LoggedIn
         else model, Cmd.none
     | LoggedIn res ->
-        let onSuccess token = { model with IsLoading = false; Form = Request.Login.init |> ValidatedForm.init }, ServerResponseViews.showSuccess "Byli jste úspěšně přihlášeni!"
+        let onSuccess token = { model with IsLoading = false; Form = Request.Login.init |> ValidatedForm.init }, ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"
         let onError = { model with IsLoading = false }
         let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 
         res |> handleValidated onSuccess onError onValidationError

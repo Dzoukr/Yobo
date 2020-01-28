@@ -23,7 +23,6 @@ module CmdArgs =
     }
 
     type Activate = {
-        Id : Guid
         ActivationKey : Guid
     }
 
@@ -47,6 +46,16 @@ module CmdArgs =
         Id : Guid
     }
 
+module EventArgs =
+    type Registered = {
+        Id : Guid
+        ActivationKey : Guid
+        PasswordHash : string
+        FirstName : string
+        LastName : string
+        Email : string
+        Newsletters : bool
+    }
     
 type Event = 
     | Registered of CmdArgs.Register

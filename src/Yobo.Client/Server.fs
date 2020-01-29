@@ -3,6 +3,7 @@ module Yobo.Client.Server
 open Fable.Core
 open Fable.Remoting.Client
 open Yobo.Shared.Auth.Communication
+open Yobo.Shared.UserAccount.Communication
 open Yobo.Shared.Domain
 
 module Cmd =
@@ -22,3 +23,9 @@ let authService =
     |> Remoting.withRouteBuilder AuthService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
     |> Remoting.buildProxy<AuthService>
+
+let userAccountService =
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder UserAccountService.RouteBuilder
+    |> Remoting.withBaseUrl baseUrl
+    |> Remoting.buildProxy<UserAccountService>

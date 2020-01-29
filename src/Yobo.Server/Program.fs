@@ -11,6 +11,7 @@ open Yobo.Server.CompositionRoot
 let webApp (root:CompositionRoot) =
     choose [
         Auth.HttpHandlers.authServiceHandler root
+        UserAccount.HttpHandlers.userAccountServiceHandler root
     ]
 
 [<FunctionName("Index")>]

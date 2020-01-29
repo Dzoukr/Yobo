@@ -15,18 +15,6 @@ let private parseUrl = function
     | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> ResetPassword (Pages.ResetPassword.Domain.Model.init id)
     | _ -> Model.init.CurrentPage
     
-let private getPageMessages = function
-    | Page.AccountActivation _ ->
-        Pages.AccountActivation.Domain.Msg.Activate
-        |> AccountActivationMsg
-        |> List.singleton
-    | _ -> []
-
-let private withPageMessages (dispatch:Msg -> unit) p =
-    match getPageMessages p with
-    | [] -> p |> UrlChanged |> dispatch
-    | msgs -> (UrlChanged p :: msgs) |> List.iter dispatch
-    
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
         match model.CurrentPage with
@@ -43,7 +31,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         | ResetPassword m -> Pages.ResetPassword.View.view m (ResetPasswordMsg >> dispatch)
             
     Router.router [
-        Router.onUrlChanged (parseUrl >> withPageMessages dispatch)
+        Router.onUrlChanged (parseUrl >> UrlChanged >> dispatch)
         Router.pathMode
         Router.application render
     ]

@@ -31,6 +31,7 @@
     <Compile Include="Auth\DbEventHandler.fs" />
     <Compile Include="CompositionRoot.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
+    <Compile Include="UserAccount\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

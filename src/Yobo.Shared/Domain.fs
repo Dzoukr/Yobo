@@ -41,3 +41,7 @@ module ServerResult =
         | errs -> errs |> Validation |> Error
 
 type ServerResponse<'a> = Async<ServerResult<'a>>
+type SecuredParam<'a> = {
+    Token : string
+    Parameter : 'a
+}

@@ -11,14 +11,20 @@ type Page =
 
 type Model = {
     CurrentPage : Page
+    LoggedUser : string option
+    IsCheckingUser : bool
 }
 
 module Model =
     let init = {
         CurrentPage = Calendar
+        LoggedUser = None
+        IsCheckingUser = false
     }
 
 type Msg =
+    | RetrieveLoggedUserAndRedirect of Page
+    | LoggedUserRetrieved of string * Page
     // navigation
     | UrlChanged of Page
     // auth

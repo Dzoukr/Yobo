@@ -62,6 +62,9 @@ module AuthRoot =
                 do! Auth.EmailEventHandler.handle sendEmail emailBuilder (queries.TryGetUserById conn) e
         }
         
+        let handle conn = Result.mapError Authentication >> TaskResult.ofTaskAndResult (eventHandler conn)
+            
+        
         {
             GetSqlConnection = getSqlConnection
             CreateToken = Jwt.createJwtToken audience issuer secret tokenLifetime >> fun x -> x.Token
@@ -72,27 +75,15 @@ module AuthRoot =
             CommandHandler = {
                 Register = fun conn args -> task {
                     let! projections = Auth.Database.Projections.getAll conn
-                    return!
-                        args
-                        |> CommandHandler.register projections
-                        |> Result.mapError Authentication
-                        |> TaskResult.ofTaskAndResult (eventHandler conn)
+                    return! args |> CommandHandler.register projections |> handle conn
                 }
                 ActivateAccount = fun conn args -> task {
                     let! projections = Auth.Database.Projections.getAll conn
-                    return!
-                        args
-                        |> CommandHandler.activate projections
-                        |> Result.mapError Authentication
-                        |> TaskResult.ofTaskAndResult (eventHandler conn)
+                    return! args |> CommandHandler.activate projections |> handle conn
                 }
                 ForgottenPassword = fun conn args -> task {
                     let! projections = Auth.Database.Projections.getAll conn
-                    return!
-                        args
-                        |> CommandHandler.initiatePasswordReset projections
-                        |> Result.mapError Authentication
-                        |> TaskResult.ofTaskAndResult (eventHandler conn)
+                    return! args |> CommandHandler.initiatePasswordReset projections |> handle conn
                 }
                 ResetPassword = fun conn args -> task {
                     let! projections = Auth.Database.Projections.getAll conn

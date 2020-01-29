@@ -9,9 +9,11 @@ open Yobo.Libraries.Authentication
 open Yobo.Server.Auth
 open Yobo.Shared.Domain
 open FSharp.Control.Tasks.V2
+open FSharp.Rop.TaskResult
 
 type AuthQueries = {
-    TryGetUserByEmail : SqlConnection -> string -> Task<Auth.Domain.Queries.AuthUserView option>
+    TryGetUserByEmail : SqlConnection -> string -> Task<Auth.Database.Queries.AuthUserView option>
+    TryGetUserById : SqlConnection -> Guid -> Task<Auth.Database.Queries.BasicUserView option>
 }
 
 type AuthProjections = {
@@ -19,8 +21,10 @@ type AuthProjections = {
 }
 
 type AuthCommandHandler = {
-    Register : SqlConnection -> Domain.CmdArgs.Register -> Task<Result<unit,ServerError>>
-    ActivateAccount : SqlConnection -> Domain.CmdArgs.Activate -> Task<Result<unit,ServerError>>
+    Register : SqlConnection -> Domain.CmdArgs.Register -> Task<ServerResult<unit>>
+    ActivateAccount : SqlConnection -> Domain.CmdArgs.Activate -> Task<ServerResult<unit>>
+    ForgottenPassword : SqlConnection -> Domain.CmdArgs.InitiatePasswordReset -> Task<ServerResult<unit>>
+    ResetPassword : SqlConnection -> Domain.CmdArgs.CompleteResetPassword -> Task<ServerResult<unit>>
 }
 
 type AuthRoot = {
@@ -44,13 +48,18 @@ module AuthRoot =
         let audience = cfg.["AuthAudience"]
         let secret = cfg.["AuthSecret"]
         let tokenLifetime = cfg.["AuthTokenLifetime"] |> TimeSpan.Parse
-        
         let pars = Jwt.getParameters audience issuer secret
+        
+        
+        let queries = {
+            TryGetUserByEmail = Auth.Database.Queries.tryGetUserByEmail
+            TryGetUserById = Auth.Database.Queries.tryGetUserById
+        }
         
         let eventHandler conn evns = task {
             for e in evns do
                 do! Auth.DbEventHandler.handle conn e
-                do! Auth.EmailEventHandler.handle sendEmail emailBuilder e
+                do! Auth.EmailEventHandler.handle sendEmail emailBuilder (queries.TryGetUserById conn) e
         }
         
         {
@@ -59,9 +68,7 @@ module AuthRoot =
             ValidateToken = Jwt.validateToken pars >> Option.map List.ofSeq
             VerifyPassword = Password.verifyPassword
             CreatePasswordHash = Password.createHash
-            Queries = {
-                TryGetUserByEmail = Auth.Database.Queries.tryGetUserByEmail
-            }
+            Queries = queries
             CommandHandler = {
                 Register = fun conn args -> task {
                     let! projections = Auth.Database.Projections.getAll conn
@@ -76,6 +83,22 @@ module AuthRoot =
                     return!
                         args
                         |> CommandHandler.activate projections
+                        |> Result.mapError Authentication
+                        |> TaskResult.ofTaskAndResult (eventHandler conn)
+                }
+                ForgottenPassword = fun conn args -> task {
+                    let! projections = Auth.Database.Projections.getAll conn
+                    return!
+                        args
+                        |> CommandHandler.initiatePasswordReset projections
+                        |> Result.mapError Authentication
+                        |> TaskResult.ofTaskAndResult (eventHandler conn)
+                }
+                ResetPassword = fun conn args -> task {
+                    let! projections = Auth.Database.Projections.getAll conn
+                    return!
+                        args
+                        |> CommandHandler.completePasswordReset projections
                         |> Result.mapError Authentication
                         |> TaskResult.ofTaskAndResult (eventHandler conn)
                 }

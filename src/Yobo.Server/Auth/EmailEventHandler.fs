@@ -1,12 +1,17 @@
 module Yobo.Server.Auth.EmailEventHandler
 
+open System
 open System.Threading.Tasks
 open Domain
 open FSharp.Control.Tasks
 open Yobo.Libraries.Emails
 open Yobo.Server.EmailTemplates
     
-let handle (sendEmail:{| To:Address; Subject:string; Message:string |} -> Task<unit>) (templateBuilder:EmailTemplateBuilder) (e:Event) =
+let handle
+    (sendEmail:{| To:Address; Subject:string; Message:string |} -> Task<unit>)
+    (templateBuilder:EmailTemplateBuilder)
+    (tryGetUserById:Guid -> Task<Database.Queries.BasicUserView option>)
+    (e:Event) =
     task {
         match e with
         | Registered args ->
@@ -16,5 +21,15 @@ let handle (sendEmail:{| To:Address; Subject:string; Message:string |} -> Task<u
             let message = args.ActivationKey |> templateBuilder.RegisterEmailMessage
             do! {| To = tos; Subject = subject; Message = message |} |> sendEmail
             return ()
+        | PasswordResetInitiated args ->
+            match! args.Id |> tryGetUserById with
+            | Some (user:Database.Queries.BasicUserView) ->
+                let name = sprintf "%s %s" user.FirstName user.LastName
+                let tos = { Email = user.Email; Name = name }
+                let subject = "Požadavek na změnu hesla"
+                let message = args.PasswordResetKey |> templateBuilder.PasswordResetEmailMessage
+                do! {| To = tos; Subject = subject; Message = message |} |> sendEmail
+                return ()
+            | None -> return ()
         | _ -> return ()
     }

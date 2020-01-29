@@ -14,7 +14,7 @@ open FSharp.Rop.TaskResult
 open Yobo.Server.CompositionRoot
 open Yobo.Shared.Domain
 
-let private userToClaims (u:Queries.AuthUserView) =
+let private userToClaims (u:Database.Queries.AuthUserView) =
     [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)
@@ -62,6 +62,28 @@ let private activateAccount (authRoot:AuthRoot) (key:Guid) =
         let args = { ActivationKey = key } : CmdArgs.Activate
         return! authRoot.CommandHandler.ActivateAccount conn args
     }
+    
+let private forgottenPassword (authRoot:AuthRoot) (r:Request.ForgottenPassword) =
+    task {
+        use conn = authRoot.GetSqlConnection()
+        let args : CmdArgs.InitiatePasswordReset =
+            {
+                Email = r.Email
+                PasswordResetKey = Guid.NewGuid()
+            }
+        return! authRoot.CommandHandler.ForgottenPassword conn args            
+    }
+
+let private resetPassword (authRoot:AuthRoot) (r:Request.ResetPassword) =
+    task {
+        use conn = authRoot.GetSqlConnection()
+        let args : CmdArgs.CompleteResetPassword =
+            {
+                PasswordResetKey = r.PasswordResetKey
+                PasswordHash = authRoot.CreatePasswordHash r.Password
+            }
+        return! authRoot.CommandHandler.ResetPassword conn args            
+    }
 
 let private authService (root:AuthRoot) : AuthService =
     {
@@ -82,7 +104,16 @@ let private authService (root:AuthRoot) : AuthService =
         ActivateAccount =
             (activateAccount root)
             >> Async.AwaitTask
-            
+        ForgottenPassword =
+            ServerResult.ofValidation validateForgottenPassword
+            >> TaskResult.ofResult
+            >> TaskResult.bind (forgottenPassword root)
+            >> Async.AwaitTask
+        ResetPassword =
+            ServerResult.ofValidation validateResetPassword
+            >> TaskResult.ofResult
+            >> TaskResult.bind (resetPassword root)
+            >> Async.AwaitTask
     }
 
 let authServiceHandler (root:CompositionRoot) : HttpHandler =

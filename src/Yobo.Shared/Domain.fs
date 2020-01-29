@@ -7,6 +7,7 @@ type AuthenticationError =
     | InvalidOrExpiredToken
     | EmailAlreadyRegistered
     | AccountAlreadyActivatedOrNotFound
+    | InvalidPasswordResetKey
     
 module AuthenticationError =
     let explain = function
@@ -14,6 +15,8 @@ module AuthenticationError =
         | InvalidOrExpiredToken -> "Token není validní nebo již vypršela jeho platnost."
         | EmailAlreadyRegistered -> "Tento email je již v systému registrován."
         | AccountAlreadyActivatedOrNotFound -> "Tento účet je již zaktivován nebo byl zadán neplatný aktivační klíč."
+        | InvalidPasswordResetKey -> "Kód pro nastavení nového hesla je nesprávný, nebo byl již použit."
+
 
 type ServerError =
     | Exception of string

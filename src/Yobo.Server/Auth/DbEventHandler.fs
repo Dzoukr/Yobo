@@ -10,4 +10,6 @@ let handle (conn:SqlConnection) (e:Event) =
         match e with
         | Registered args -> do! args |> Database.Updates.registered conn
         | Activated args -> do! args |> Database.Updates.activated conn
+        | PasswordResetInitiated args -> do! args |> Database.Updates.passwordResetInitiated conn
+        | PasswordResetComplete args -> do! args |> Database.Updates.passwordResetComplete conn
     }

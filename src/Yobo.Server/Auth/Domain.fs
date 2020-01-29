@@ -2,15 +2,6 @@ module Yobo.Server.Auth.Domain
 
 open System
 
-module Queries =
-    type AuthUserView = {
-        Id : Guid
-        Email : string
-        PasswordHash : string
-        FirstName : string
-        LastName : string
-    }
-
 module CmdArgs = 
     type Register = {
         Id : Guid
@@ -32,12 +23,11 @@ module CmdArgs =
     }
 
     type InitiatePasswordReset = {
-        Id : Guid
+        Email : string
         PasswordResetKey : Guid
     }
 
     type CompleteResetPassword = {
-        Id : Guid
         PasswordResetKey : Guid
         PasswordHash : string
     }
@@ -47,20 +37,23 @@ module CmdArgs =
     }
 
 module EventArgs =
-    type Registered = {
+    type Activated = {
         Id : Guid
-        ActivationKey : Guid
+    }
+    type PasswordResetInitiated = {
+        Id : Guid
+        PasswordResetKey : Guid
+    }
+    type PasswordResetComplete = {
+        Id : Guid
+        PasswordResetKey : Guid
         PasswordHash : string
-        FirstName : string
-        LastName : string
-        Email : string
-        Newsletters : bool
     }
     
 type Event = 
     | Registered of CmdArgs.Register
     | ActivationKeyRegenerated of CmdArgs.RegenerateActivationKey
-    | Activated of CmdArgs.Activate
-    | PasswordResetInitiated of CmdArgs.InitiatePasswordReset
-    | PasswordResetComplete of CmdArgs.CompleteResetPassword
+    | Activated of EventArgs.Activated
+    | PasswordResetInitiated of EventArgs.PasswordResetInitiated
+    | PasswordResetComplete of EventArgs.PasswordResetComplete
     | SubscribedToNewsletters of CmdArgs.SubscribeToNewsletters    

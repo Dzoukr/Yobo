@@ -11,6 +11,8 @@ let private parseUrl = function
     | [ Paths.Registration ] -> Registration Pages.Registration.Domain.Model.init
     | [ Paths.Calendar ] -> Calendar
     | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> AccountActivation (Pages.AccountActivation.Domain.Model.init id)
+    | [ Paths.ForgottenPassword ] -> ForgottenPassword (Pages.ForgottenPassword.Domain.Model.init)
+    | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> ResetPassword (Pages.ResetPassword.Domain.Model.init id)
     | _ -> Model.init.CurrentPage
     
 let private getPageMessages = function
@@ -37,6 +39,8 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 prop.onClick Router.goToUrl
             ]
         | AccountActivation m -> Pages.AccountActivation.View.view m (AccountActivationMsg >> dispatch)
+        | ForgottenPassword m -> Pages.ForgottenPassword.View.view m (ForgottenPasswordMsg >> dispatch)
+        | ResetPassword m -> Pages.ResetPassword.View.view m (ResetPasswordMsg >> dispatch)
             
     Router.router [
         Router.onUrlChanged (parseUrl >> withPageMessages dispatch)

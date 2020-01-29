@@ -33,12 +33,30 @@ module Request =
             AgreeButtonChecked = false
             NewslettersButtonChecked = false
         }
-
+        
+    type ForgottenPassword = {
+        Email : string
+    }
+    
+    module ForgottenPassword =
+        let init = { Email = "" }
+    
+    type ResetPassword = {
+        PasswordResetKey : Guid
+        Password: string
+        SecondPassword: string
+    }
+    
+    module ResetPassword =
+        let init = { Password = ""; SecondPassword = ""; PasswordResetKey = Guid.Empty }
+    
 type AuthService = {
     GetToken : Request.Login -> ServerResponse<string>
     RefreshToken : string -> ServerResponse<string>
     Register : Request.Register -> ServerResponse<unit>
     ActivateAccount : Guid -> ServerResponse<unit>
+    ForgottenPassword : Request.ForgottenPassword -> ServerResponse<unit>
+    ResetPassword : Request.ResetPassword -> ServerResponse<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/auth/%s" m

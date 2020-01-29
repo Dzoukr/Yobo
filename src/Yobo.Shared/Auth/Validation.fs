@@ -20,3 +20,14 @@ let validateRegister (r:Request.Register) =
         nameof(r.AgreeButtonChecked), validateTermsAgreed r.AgreeButtonChecked
     ] |> validate
     
+let validateForgottenPassword (l:Request.ForgottenPassword) =
+    [
+        nameof(l.Email), validateEmail l.Email
+    ] |> validate    
+
+let validateResetPassword (r:Request.ResetPassword) =
+    [
+        nameof(r.Password), validateMinimumLength 6 r.Password
+        nameof(r.SecondPassword), validateMinimumLength 6 r.SecondPassword
+        nameof(r.SecondPassword), validatePasswordsMatch r.Password r.SecondPassword
+    ] |> validate

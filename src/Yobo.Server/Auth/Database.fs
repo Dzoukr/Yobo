@@ -32,7 +32,7 @@ module Updates =
                     table "Users"
                     value ({
                         Id = args.Id
-                        Email = args.Email
+                        Email = args.Email.ToLowerInvariant()
                         FirstName = args.FirstName
                         LastName = args.FirstName
                         PasswordHash = args.PasswordHash
@@ -49,24 +49,54 @@ module Updates =
             return ()
         }
     
-    let activated (conn:IDbConnection) (args:CmdArgs.Activate) =
+    let activated (conn:IDbConnection) (args:EventArgs.Activated) =
         task {
             let! _ =
                 update {
                     table "Users"
                     set {| Activated = DateTimeOffset.UtcNow |}
-                    where (eq "ActivationKey" args.ActivationKey)
+                    where (eq "Id" args.Id)
+                } |> conn.UpdateAsync
+            return ()
+        }
+    
+    let passwordResetInitiated (conn:IDbConnection) (args:EventArgs.PasswordResetInitiated) =
+        task {
+            let! _ =
+                update {
+                    table "Users"
+                    set {| PasswordResetKey = args.PasswordResetKey |}
+                    where (eq "Id" args.Id)
+                } |> conn.UpdateAsync
+            return ()
+        }
+    
+    let passwordResetComplete (conn:IDbConnection) (args:EventArgs.PasswordResetComplete) =
+        task {
+            let! _ =
+                update {
+                    table "Users"
+                    set {| PasswordResetKey = None; PasswordHash = args.PasswordHash |}
+                    where (eq "Id" args.Id)
                 } |> conn.UpdateAsync
             return ()
         }
 
 module Queries =
-    let tryGetUserByEmail (conn:IDbConnection) email =
+    type AuthUserView = {
+        Id : Guid
+        Email : string
+        PasswordHash : string
+        FirstName : string
+        LastName : string
+    }
+    
+    let tryGetUserByEmail (conn:IDbConnection) (email:string) =
         task {
             let! res =
                 select {
                     table "Users"
-                    where (eq "Email" email)
+                    where (eq "Email" (email.ToLowerInvariant()))
                 }
                 |> conn.SelectAsync<Tables.Users>
             return
@@ -79,9 +109,38 @@ module Queries =
                         PasswordHash = x.PasswordHash
                         FirstName = x.FirstName
                         LastName = x.LastName
-                    } : Queries.AuthUserView
+                    } : AuthUserView
                 )
         }
+    
+    type BasicUserView = {
+        Id : Guid
+        Email : string
+        FirstName : string
+        LastName : string
+    }
+    
+    let tryGetUserById (conn:IDbConnection) (id:Guid) =
+        task {
+            let! res =
+                select {
+                    table "Users"
+                    where (eq "Id" id)
+                }
+                |> conn.SelectAsync<Tables.Users>
+            return
+                res
+                |> Seq.tryHead
+                |> Option.map (fun x ->
+                    {
+                        Id = x.Id
+                        Email = x.Email
+                        FirstName = x.FirstName
+                        LastName = x.LastName
+                    } : BasicUserView
+                )
+        }        
+        
 
 module Projections =
     let getAll (conn:IDbConnection) =

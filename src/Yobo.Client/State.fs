@@ -16,5 +16,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | Login m, LoginMsg subMsg -> Pages.Login.State.update subMsg m |> upTo model Login LoginMsg 
     | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg
     | AccountActivation m, AccountActivationMsg subMsg -> Pages.AccountActivation.State.update subMsg m |> upTo model AccountActivation AccountActivationMsg
+    | ForgottenPassword m, ForgottenPasswordMsg subMsg -> Pages.ForgottenPassword.State.update subMsg m |> upTo model ForgottenPassword ForgottenPasswordMsg
+    | ResetPassword m, ResetPasswordMsg subMsg -> Pages.ResetPassword.State.update subMsg m |> upTo model ResetPassword ResetPasswordMsg
         
     

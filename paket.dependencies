@@ -1,41 +1,37 @@
-group Client
-    source https://api.nuget.org/v3/index.json
-    storage: none
-    nuget FSharp.Core
-    nuget Fable.Core
-    nuget Fable.Elmish.Debugger
-    nuget Fable.Elmish.React
-    nuget Fable.Elmish.HMR
-    nuget Feliz
-    nuget Feliz.Router
-    nuget Feliz.Bulma
-    nuget Feliz.Bulma.Checkradio
-    nuget Elmish.SweetAlert
-    nuget Elmish.Toastr
-    nuget Fable.Remoting.Client
+source https://api.nuget.org/v3/index.json
+storage: none
+framework: auto-detect
 
-group Libraries
-    source https://api.nuget.org/v3/index.json
-    framework:netstandard2.0
-    storage:none
-    nuget FSharp.Core
-    nuget TaskBuilder.fs
-    nuget Mailjet.Api
-    nuget System.IdentityModel.Tokens.Jwt
+// shared    
+nuget FSharp.Core
 
-group Server
-    source https://api.nuget.org/v3/index.json
-    framework:netcoreapp3.1
-    storage:none
-    nuget FSharp.Core
-    nuget Microsoft.Azure.Functions.Extensions
-    nuget Microsoft.NET.Sdk.Functions
-    nuget Giraffe
-    nuget Fable.Remoting.Giraffe
-    github Dzoukr/FSharp.Rop FSharp.Rop.Result.fs
-    github Dzoukr/FSharp.Rop FSharp.Rop.TaskResult.fs
-    nuget Dapper.FSharp
-    nuget Microsoft.Data.SqlClient
+// client
+nuget Fable.Core
+nuget Fable.Elmish.Debugger
+nuget Fable.Elmish.React
+nuget Fable.Elmish.HMR
+nuget Feliz
+nuget Feliz.Router
+nuget Feliz.Bulma
+nuget Feliz.Bulma.Checkradio
+nuget Elmish.SweetAlert
+nuget Elmish.Toastr
+nuget Fable.Remoting.Client
+
+// libraries
+nuget TaskBuilder.fs
+nuget Mailjet.Api
+nuget System.IdentityModel.Tokens.Jwt
+
+// server
+nuget Microsoft.Azure.Functions.Extensions
+nuget Microsoft.NET.Sdk.Functions
+nuget Giraffe
+nuget Fable.Remoting.Giraffe
+github Dzoukr/FSharp.Rop FSharp.Rop.Result.fs
+github Dzoukr/FSharp.Rop FSharp.Rop.TaskResult.fs
+nuget Dapper.FSharp
+nuget Microsoft.Data.SqlClient
 
 group Build
     source https://api.nuget.org/v3/index.json

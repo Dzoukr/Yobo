@@ -2,11 +2,11 @@
 
 open System.Threading.Tasks
 open Microsoft.Azure.WebJobs
-open Microsoft.Azure.WebJobs.Extensions.Http
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Logging
 open Giraffe
-open Yobo.Server.CompositionRoot
+open Attributes
+open Microsoft.Azure.WebJobs.Extensions.Http
 
 let webApp (root:CompositionRoot) =
     choose [
@@ -15,7 +15,7 @@ let webApp (root:CompositionRoot) =
     ]
 
 [<FunctionName("Index")>]
-let run ([<HttpTrigger (AuthorizationLevel.Anonymous, Route = "{*any}")>] req : HttpRequest, context : ExecutionContext, log : ILogger) =
+let run ([<HttpTrigger (AuthorizationLevel.Anonymous, Route = "{*any}")>] req : HttpRequest, context : ExecutionContext, log : ILogger, [<CompositionRoot>]root: CompositionRoot) =
     let hostingEnvironment = req.HttpContext.GetHostingEnvironment()
     hostingEnvironment.ContentRootPath <- context.FunctionAppDirectory
-    webApp (req.HttpContext.GetService<CompositionRoot>()) (Some >> Task.FromResult) req.HttpContext
+    webApp root (Some >> Task.FromResult) req.HttpContext

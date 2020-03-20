@@ -11,10 +11,10 @@ open Yobo.Server.Auth.Domain
 open Yobo.Shared.Auth.Validation
 open FSharp.Rop.Result
 open FSharp.Rop.TaskResult
-open Yobo.Server.CompositionRoot
+open Yobo.Server
 open Yobo.Shared.Domain
 
-let private userToClaims (u:Database.Queries.AuthUserView) =
+let private userToClaims (u:Domain.Queries.AuthUserView) =
     [
         Claim("Id", u.Id.ToString())
         Claim("Email", u.Email)
@@ -24,8 +24,7 @@ let private userToClaims (u:Database.Queries.AuthUserView) =
 
 let private login (authRoot:AuthRoot) (l:Request.Login) =
     task {
-        use conn = authRoot.GetSqlConnection()
-        let! user = authRoot.Queries.TryGetUserByEmail conn l.Email
+        let! user = authRoot.Queries.TryGetUserByEmail l.Email
         return
             user
             |> Option.map (fun x -> x, authRoot.VerifyPassword l.Password x.PasswordHash)
@@ -42,7 +41,6 @@ let private refreshToken (authRoot:AuthRoot) (token:string) =
 
 let private register (authRoot:AuthRoot) (r:Request.Register) =
     task {
-        use conn = authRoot.GetSqlConnection()
         let args : CmdArgs.Register =
             {
                 Id = Guid.NewGuid()
@@ -53,36 +51,33 @@ let private register (authRoot:AuthRoot) (r:Request.Register) =
                 Email = r.Email.ToLower()
                 Newsletters = r.NewslettersButtonChecked
             }
-        return! authRoot.CommandHandler.Register conn args            
+        return! authRoot.CommandHandler.Register args            
     }
 
 let private activateAccount (authRoot:AuthRoot) (key:Guid) =
     task {
-        use conn = authRoot.GetSqlConnection()
         let args = { ActivationKey = key } : CmdArgs.Activate
-        return! authRoot.CommandHandler.ActivateAccount conn args
+        return! authRoot.CommandHandler.ActivateAccount args
     }
     
 let private forgottenPassword (authRoot:AuthRoot) (r:Request.ForgottenPassword) =
     task {
-        use conn = authRoot.GetSqlConnection()
         let args : CmdArgs.InitiatePasswordReset =
             {
                 Email = r.Email
                 PasswordResetKey = Guid.NewGuid()
             }
-        return! authRoot.CommandHandler.ForgottenPassword conn args            
+        return! authRoot.CommandHandler.ForgottenPassword args            
     }
 
 let private resetPassword (authRoot:AuthRoot) (r:Request.ResetPassword) =
     task {
-        use conn = authRoot.GetSqlConnection()
         let args : CmdArgs.CompleteResetPassword =
             {
                 PasswordResetKey = r.PasswordResetKey
                 PasswordHash = authRoot.CreatePasswordHash r.Password
             }
-        return! authRoot.CommandHandler.ResetPassword conn args            
+        return! authRoot.CommandHandler.ResetPassword args            
     }
 
 let private authService (root:AuthRoot) : AuthService =

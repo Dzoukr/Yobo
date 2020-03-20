@@ -3,6 +3,7 @@
 open Domain
 open Elmish
 open Feliz.Router
+open Server
 
 let init () = Model.init, Cmd.none
 
@@ -31,7 +32,13 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         else            
             { model with CurrentPage = p }, getPageInitCommands p
     | _, RetrieveLoggedUserAndRedirect p ->                
-        { model with IsCheckingUser = true }, Cmd.none                    
+        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherResult userAccountService.GetUserInfo (Server.SecuredParam.create ()) (fun u -> LoggedUserRetrieved(u, p))
+    | _, LoggedUserRetrieved(u, p) ->
+        match u with
+        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
+        | Error e ->
+            { model with IsCheckingUser = false },
+                [ SharedView.ServerResponseViews.showErrorToast e; Router.navigate Paths.Login ] |> Cmd.batch 
     // auth
     | Login m, LoginMsg subMsg -> Pages.Login.State.update subMsg m |> upTo model Login LoginMsg 
     | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg

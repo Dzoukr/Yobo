@@ -10,7 +10,7 @@ open Yobo.Server.EmailTemplates
 let handle
     (sendEmail:{| To:Address; Subject:string; Message:string |} -> Task<unit>)
     (templateBuilder:EmailTemplateBuilder)
-    (tryGetUserById:Guid -> Task<Database.Queries.BasicUserView option>)
+    (tryGetUserById:Guid -> Task<Domain.Queries.BasicUserView option>)
     (e:Event) =
     task {
         match e with
@@ -23,7 +23,7 @@ let handle
             return ()
         | PasswordResetInitiated args ->
             match! args.Id |> tryGetUserById with
-            | Some (user:Database.Queries.BasicUserView) ->
+            | Some user ->
                 let name = sprintf "%s %s" user.FirstName user.LastName
                 let tos = { Email = user.Email; Name = name }
                 let subject = "Požadavek na změnu hesla"

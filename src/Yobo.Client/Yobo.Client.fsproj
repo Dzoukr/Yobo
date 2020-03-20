@@ -6,6 +6,7 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="TokenStorage.fs" />
         <Compile Include="Feliz.Router.Extensions.fs" />
         <Compile Include="Server.fs" />
         <Compile Include="Paths.fs" />
@@ -35,9 +36,6 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="Pages\Registration\styles.scss" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

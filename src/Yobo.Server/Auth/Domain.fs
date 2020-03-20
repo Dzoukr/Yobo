@@ -2,6 +2,22 @@ module Yobo.Server.Auth.Domain
 
 open System
 
+module Queries =
+    type AuthUserView = {
+        Id : Guid
+        Email : string
+        PasswordHash : string
+        FirstName : string
+        LastName : string
+    }
+    
+    type BasicUserView = {
+        Id : Guid
+        Email : string
+        FirstName : string
+        LastName : string
+    }
+
 module CmdArgs = 
     type Register = {
         Id : Guid

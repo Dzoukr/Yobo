@@ -1,16 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
-    <LangVersion>preview</LangVersion>
+<!--    <LangVersion>preview</LangVersion>-->
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\..\paket-files\server\Dzoukr\FSharp.Rop\FSharp.Rop.Result.fs">
+    <Compile Include="..\..\paket-files\Dzoukr\FSharp.Rop\FSharp.Rop.Result.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.Result.fs</Link>
     </Compile>
-    <Compile Include="..\..\paket-files\server\Dzoukr\FSharp.Rop\FSharp.Rop.TaskResult.fs">
+    <Compile Include="..\..\paket-files\Dzoukr\FSharp.Rop\FSharp.Rop.TaskResult.fs">
       <Paket>True</Paket>
       <Link>paket-files/FSharp.Rop.TaskResult.fs</Link>
     </Compile>
@@ -29,6 +28,7 @@
     <Compile Include="Auth\Database.fs" />
     <Compile Include="Auth\EmailEventHandler.fs" />
     <Compile Include="Auth\DbEventHandler.fs" />
+    <Compile Include="UserAccount\Domain.fs" />
     <Compile Include="CompositionRoot.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="UserAccount\HttpHandlers.fs" />
@@ -36,8 +36,8 @@
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Yobo.Shared\Yobo.Shared.fsproj" />
     <ProjectReference Include="..\Yobo.Libraries\Yobo.Libraries.fsproj" />
+    <ProjectReference Include="..\Yobo.Shared\Yobo.Shared.fsproj" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

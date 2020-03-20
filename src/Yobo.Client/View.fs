@@ -21,11 +21,15 @@ let view (model:Model) (dispatch:Msg -> unit) =
         | Login m -> Pages.Login.View.view m (LoginMsg >> dispatch)
         | Registration m -> Pages.Registration.View.view m (RegistrationMsg >> dispatch)
         | Calendar ->
-            Html.a [
-                prop.text "Login"
-                prop.href (Router.format Paths.Login)
-                prop.onClick Router.goToUrl
+            Html.div [
+                Html.text (sprintf "%A" model.LoggedUser)
+                Html.a [
+                    prop.text "Login"
+                    prop.href (Router.format Paths.Login)
+                    prop.onClick Router.goToUrl
+                ]
             ]
+            
         | AccountActivation m -> Pages.AccountActivation.View.view m (AccountActivationMsg >> dispatch)
         | ForgottenPassword m -> Pages.ForgottenPassword.View.view m (ForgottenPasswordMsg >> dispatch)
         | ResetPassword m -> Pages.ResetPassword.View.view m (ResetPasswordMsg >> dispatch)

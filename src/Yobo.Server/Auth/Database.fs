@@ -83,13 +83,6 @@ module Updates =
         }
 
 module Queries =
-    type AuthUserView = {
-        Id : Guid
-        Email : string
-        PasswordHash : string
-        FirstName : string
-        LastName : string
-    }
     
     let tryGetUserByEmail (conn:IDbConnection) (email:string) =
         task {
@@ -109,17 +102,10 @@ module Queries =
                         PasswordHash = x.PasswordHash
                         FirstName = x.FirstName
                         LastName = x.LastName
-                    } : AuthUserView
+                    } : Queries.AuthUserView
                 )
         }
-    
-    type BasicUserView = {
-        Id : Guid
-        Email : string
-        FirstName : string
-        LastName : string
-    }
-    
+           
     let tryGetUserById (conn:IDbConnection) (id:Guid) =
         task {
             let! res =
@@ -137,7 +123,7 @@ module Queries =
                         Email = x.Email
                         FirstName = x.FirstName
                         LastName = x.LastName
-                    } : BasicUserView
+                    } : Queries.BasicUserView
                 )
         }        
         

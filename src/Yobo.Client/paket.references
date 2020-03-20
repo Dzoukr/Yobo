@@ -1,13 +1,12 @@
-group Client
-    FSharp.Core
-    Fable.Core
-    Fable.Elmish.Debugger
-    Fable.Elmish.React
-    Fable.Elmish.HMR
-    Feliz
-    Feliz.Router
-    Feliz.Bulma
-    Feliz.Bulma.Checkradio
-    Elmish.SweetAlert
-    Elmish.Toastr
-    Fable.Remoting.Client
+FSharp.Core
+Fable.Core
+Fable.Elmish.Debugger
+Fable.Elmish.React
+Fable.Elmish.HMR
+Feliz
+Feliz.Router
+Feliz.Bulma
+Feliz.Bulma.Checkradio
+Elmish.SweetAlert
+Elmish.Toastr
+Fable.Remoting.Client

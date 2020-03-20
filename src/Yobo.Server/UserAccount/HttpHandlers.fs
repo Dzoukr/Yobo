@@ -11,7 +11,9 @@ open Yobo.Shared.Auth.Validation
 open FSharp.Rop.Result
 open FSharp.Rop.TaskResult
 open Microsoft.AspNetCore.Http
-open Yobo.Server.CompositionRoot
+open Yobo.Server.Auth
+open Domain
+open Yobo.Server
 open Yobo.Shared.Domain
 open Yobo.Shared.UserAccount.Communication
 
@@ -20,7 +22,7 @@ let private userAccountService validator (root:CompositionRoot) : UserAccountSer
         GetUserInfo =
             validator
             >> TaskResult.ofResult
-            >> TaskResult.map (sprintf "%A")
+            >> TaskResult.map (fun (i,p) -> { Id = i; FirstName = "AAA"; LastName = "BBB" } : Yobo.Shared.UserAccount.Communication.Response.UserInfo)
             >> Async.AwaitTask
     }
 
@@ -29,7 +31,11 @@ let userAccountServiceHandler (root:CompositionRoot) : HttpHandler =
     let validator (sp:SecuredParam<_>) =
         match root.Auth.ValidateToken sp.Token with
         | Some claims ->
-            let userId = claims |> Seq.find (fun x -> x.Type = "Id")
+            let userId =
+                claims
+                |> Seq.find (fun x -> x.Type = "Id")
+                |> fun x -> x.Value
+                |> Guid
             Ok (userId, sp.Parameter)
         | None -> InvalidOrExpiredToken |> Authentication |> Error
     

@@ -14,6 +14,12 @@ module Cmd =
             let onError (ex:exn) = ex.Message |> ServerError.Exception |> Error |> resultMsg 
             Cmd.OfAsync.either f args resultMsg onError
 
+module SecuredParam =
+    let create p =
+        {
+            Token = TokenStorage.tryGetToken() |> Option.defaultValue ""
+            Parameter = p
+        }
 
 [<Emit("config.baseUrl")>]
 let baseUrl : string = jsNative

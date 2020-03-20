@@ -1,5 +1,7 @@
 ﻿module Yobo.Client.Domain
 
+open Yobo.Shared.Domain
+
 type Page =
     | Calendar
     // auth
@@ -11,7 +13,7 @@ type Page =
 
 type Model = {
     CurrentPage : Page
-    LoggedUser : string option
+    LoggedUser : Yobo.Shared.UserAccount.Communication.Response.UserInfo option
     IsCheckingUser : bool
 }
 
@@ -24,7 +26,7 @@ module Model =
 
 type Msg =
     | RetrieveLoggedUserAndRedirect of Page
-    | LoggedUserRetrieved of string * Page
+    | LoggedUserRetrieved of ServerResult<Yobo.Shared.UserAccount.Communication.Response.UserInfo> * Page
     // navigation
     | UrlChanged of Page
     // auth

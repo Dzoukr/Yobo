@@ -1,10 +1,10 @@
-group Server
-    FSharp.Core
-    Microsoft.NET.Sdk.Functions
-    Microsoft.Azure.Functions.Extensions
-    Giraffe
-    Fable.Remoting.Giraffe
-    File:FSharp.Rop.Result.fs
-    File:FSharp.Rop.TaskResult.fs
-    Dapper.FSharp
-    Microsoft.Data.SqlClient
+FSharp.Core
+Microsoft.NET.Sdk.Functions
+Microsoft.Azure.Functions.Extensions
+Giraffe
+Fable.Remoting.Giraffe
+File:FSharp.Rop.Result.fs
+File:FSharp.Rop.TaskResult.fs
+Dapper.FSharp
+Microsoft.Data.SqlClient
+Microsoft.IdentityModel.Tokens

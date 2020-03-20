@@ -7,3 +7,4 @@ File:FSharp.Rop.Result.fs
 File:FSharp.Rop.TaskResult.fs
 Dapper.FSharp
 Microsoft.Data.SqlClient
+    

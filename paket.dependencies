@@ -1,8 +1,7 @@
 source https://api.nuget.org/v3/index.json
 storage: none
-framework: auto-detect
+framework: netcoreapp3.1, netstandard2.0
 
-// shared    
 nuget FSharp.Core
 
 // client
@@ -25,7 +24,7 @@ nuget System.IdentityModel.Tokens.Jwt
 
 // server
 nuget Microsoft.Azure.Functions.Extensions
-nuget Microsoft.NET.Sdk.Functions
+nuget Microsoft.NET.Sdk.Functions = 3.0.3
 nuget Giraffe
 nuget Fable.Remoting.Giraffe
 github Dzoukr/FSharp.Rop FSharp.Rop.Result.fs
@@ -40,4 +39,3 @@ group Build
     nuget Fake.DotNet.Cli
     nuget Fake.Core.Target
     nuget Fake.IO.FileSystem
-    

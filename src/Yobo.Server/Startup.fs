@@ -36,12 +36,13 @@ module private Configuration =
             .AddJsonFile("local.settings.json", true)
             .AddEnvironmentVariables().Build()
 
-let private withSqlConnection builder fn =
-    let conn = builder()
-    fn conn
+
 
 module AuthRoot =
-    
+    let private withSqlConnection builder fn =
+        let conn = builder()
+        fn conn
+        
     let compose sqlConnectionBuilder sendEmail emailBuilder (cfg:IConfigurationRoot) =
         
         let sql fn = withSqlConnection sqlConnectionBuilder fn

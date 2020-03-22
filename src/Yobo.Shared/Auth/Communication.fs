@@ -51,12 +51,12 @@ module Request =
         let init = { Password = ""; SecondPassword = ""; PasswordResetKey = Guid.Empty }
     
 type AuthService = {
-    GetToken : Request.Login -> ServerResponse<string>
-    RefreshToken : string -> ServerResponse<string>
-    Register : Request.Register -> ServerResponse<unit>
-    ActivateAccount : Guid -> ServerResponse<unit>
-    ForgottenPassword : Request.ForgottenPassword -> ServerResponse<unit>
-    ResetPassword : Request.ResetPassword -> ServerResponse<unit>
+    GetToken : Request.Login -> Async<string>
+    RefreshToken : string -> Async<string>
+    Register : Request.Register -> Async<unit>
+    ActivateAccount : Guid -> Async<unit>
+    ForgottenPassword : Request.ForgottenPassword -> Async<unit>
+    ResetPassword : Request.ResetPassword -> Async<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/auth/%s" m

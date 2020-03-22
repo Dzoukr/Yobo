@@ -36,13 +36,12 @@ module private Configuration =
             .AddJsonFile("local.settings.json", true)
             .AddEnvironmentVariables().Build()
 
-
+let private withSqlConnection builder fn =
+    let conn = builder()
+    fn conn
 
 module AuthRoot =
-    let private withSqlConnection builder fn =
-        let conn = builder()
-        fn conn
-        
+    
     let compose sqlConnectionBuilder sendEmail emailBuilder (cfg:IConfigurationRoot) =
         
         let sql fn = withSqlConnection sqlConnectionBuilder fn
@@ -59,13 +58,13 @@ module AuthRoot =
             TryGetUserById = sql Auth.Database.Queries.tryGetUserById
         }
         
-        let eventHandler conn evns = task {
+        let handleEvents conn evns = task {
             for e in evns do
                 do! Auth.DbEventHandler.handle conn e
                 do! Auth.EmailEventHandler.handle sendEmail emailBuilder queries.TryGetUserById e
         }
         
-        let handle conn = Result.mapError ServerError.Authentication >> TaskResult.ofTaskAndResult (eventHandler conn)
+        let toExn = Result.mapError ServerError.Authentication >> ServerError.ofResult
         
         {
             CreateToken = Jwt.createJwtToken audience issuer secret tokenLifetime >> fun x -> x.Token
@@ -76,23 +75,23 @@ module AuthRoot =
             CommandHandler = {
                 Register = fun args -> task {
                     let! projections = sql Auth.Database.Projections.getAll
-                    return! args |> CommandHandler.register projections |> sql handle
+                    return! args |> CommandHandler.register projections |> toExn |> sql handleEvents
                 }
                 ActivateAccount = fun args -> task {
                     let! projections = sql Auth.Database.Projections.getAll
-                    return! args |> CommandHandler.activate projections |> sql handle
+                    return! args |> CommandHandler.activate projections |> toExn |> sql handleEvents
                 }
                 ForgottenPassword = fun args -> task {
                     let! projections = sql Auth.Database.Projections.getAll
-                    return! args |> CommandHandler.initiatePasswordReset projections |> sql handle
+                    return! args |> CommandHandler.initiatePasswordReset projections |> toExn |> sql handleEvents
                 }
                 ResetPassword = fun args -> task {
                     let! projections = sql Auth.Database.Projections.getAll
                     return!
                         args
                         |> CommandHandler.completePasswordReset projections
-                        |> Result.mapError Authentication
-                        |> TaskResult.ofTaskAndResult (sql eventHandler)
+                        |> toExn
+                        |> sql handleEvents
                 }
             }
         } : AuthRoot

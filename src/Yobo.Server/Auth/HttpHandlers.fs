@@ -1,6 +1,7 @@
 module Yobo.Server.Auth.HttpHandlers
 
 open System
+open System.Net
 open System.Security.Claims
 open Fable.Remoting.Giraffe
 open Fable.Remoting.Server
@@ -11,6 +12,8 @@ open Yobo.Server.Auth.Domain
 open Yobo.Shared.Auth.Validation
 open FSharp.Rop.Result
 open FSharp.Rop.TaskResult
+open Microsoft.AspNetCore.Http
+open Microsoft.AspNetCore.Identity
 open Yobo.Server
 open Yobo.Shared.Domain
 
@@ -30,14 +33,14 @@ let private login (authRoot:AuthRoot) (l:Request.Login) =
             |> Option.map (fun x -> x, authRoot.VerifyPassword l.Password x.PasswordHash)
             |> Option.bind (fun (user,isVerified) -> if isVerified then Some user else None)
             |> Option.map (userToClaims >> authRoot.CreateToken)
-            |> Result.ofOption (AuthenticationError.InvalidLoginOrPassword |> ServerError.Authentication)
+            |> ServerError.ofOption (AuthenticationError.InvalidLoginOrPassword |> ServerError.Authentication)
     }
     
 let private refreshToken (authRoot:AuthRoot) (token:string) =
     token
     |> authRoot.ValidateToken
     |> Option.map (authRoot.CreateToken)
-    |> Result.ofOption (AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication)
+    |> ServerError.ofOption (AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication)
 
 let private register (authRoot:AuthRoot) (r:Request.Register) =
     task {
@@ -80,39 +83,53 @@ let private resetPassword (authRoot:AuthRoot) (r:Request.ResetPassword) =
         return! authRoot.CommandHandler.ResetPassword args            
     }
 
+open FSharp.Control.Tasks
+
+
+
+
 let private authService (root:AuthRoot) : AuthService =
     {
-        GetToken =
-            ServerResult.ofValidation validateLogin
-            >> TaskResult.ofResult
-            >> TaskResult.bind (login root)
-            >> Async.AwaitTask
-        RefreshToken =
-            (refreshToken root)
-            >> TaskResult.ofResult
-            >> Async.AwaitTask
-        Register =
-            ServerResult.ofValidation validateRegister
-            >> TaskResult.ofResult
-            >> TaskResult.bind (register root)
-            >> Async.AwaitTask
-        ActivateAccount =
-            (activateAccount root)
-            >> Async.AwaitTask
-        ForgottenPassword =
-            ServerResult.ofValidation validateForgottenPassword
-            >> TaskResult.ofResult
-            >> TaskResult.bind (forgottenPassword root)
-            >> Async.AwaitTask
-        ResetPassword =
-            ServerResult.ofValidation validateResetPassword
-            >> TaskResult.ofResult
-            >> TaskResult.bind (resetPassword root)
-            >> Async.AwaitTask
+        GetToken = ServerError.validate validateLogin >> (login root) >> Async.AwaitTask
+        RefreshToken = (refreshToken root) >> async.Return
+        Register = ServerError.validate validateRegister >> (register root) >> Async.AwaitTask
+        ActivateAccount = (activateAccount root) >> Async.AwaitTask
+        ForgottenPassword = ServerError.validate validateForgottenPassword >> (forgottenPassword root) >> Async.AwaitTask
+        ResetPassword = ServerError.validate validateResetPassword >> (resetPassword root) >> Async.AwaitTask
     }
 
 let authServiceHandler (root:CompositionRoot) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder AuthService.RouteBuilder
     |> Remoting.fromValue (authService root.Auth)
+    |> Remoting.withErrorHandler Remoting.errorHandler
     |> Remoting.buildHttpHandler
+    
+module private Bearer =
+    open Microsoft.Extensions.Primitives
+
+    let private (|BearerToken|_|) (d:IHeaderDictionary) =
+        match d.["authorization"] with
+        | x when x = StringValues.Empty -> None
+        | x ->
+            if x.[0].StartsWith("Bearer ") then x.[0].Replace("Bearer ","") |> Some
+            else None
+
+    let tryGetToken (ctx:HttpContext) =
+        match ctx.Request.Headers with
+        | BearerToken token -> Some token
+        | _ -> None
+
+let onlyForLoggedUser (authRoot:AuthRoot) next (ctx:HttpContext) =
+    let claims =
+        ctx
+        |> Bearer.tryGetToken
+        |> Option.bind (authRoot.ValidateToken)
+    match claims with
+    | Some c ->
+        ctx.User <- ClaimsPrincipal(ClaimsIdentity(c))
+        next ctx
+    | None ->
+        RequestErrors.UNAUTHORIZED "Bearer" "Yobo" "Unauthorized" next ctx
+    
+     

@@ -13,33 +13,29 @@ open FSharp.Rop.TaskResult
 open Microsoft.AspNetCore.Http
 open Yobo.Server.Auth
 open Domain
+open Microsoft.AspNetCore.Http
 open Yobo.Server
 open Yobo.Shared.Domain
 open Yobo.Shared.UserAccount.Communication
+open FSharp.Control.Tasks
 
-let private userAccountService validator (root:CompositionRoot) : UserAccountService =
+let private userAccountService (root:CompositionRoot) userId  : UserAccountService =
     {
         GetUserInfo =
-            validator
-            >> TaskResult.ofResult
-            >> TaskResult.map (fun (i,p) -> { Id = i; FirstName = "AAA"; LastName = "BBB" } : Yobo.Shared.UserAccount.Communication.Response.UserInfo)
+            (fun _ -> task { return ({ Id = userId; FirstName = "AAA"; LastName = "BBB" } : Yobo.Shared.UserAccount.Communication.Response.UserInfo) }) 
             >> Async.AwaitTask
     }
 
+let private withUser (proxyBuilder:Guid -> 'proxy) (ctx:HttpContext) =
+    let userId =
+        ctx.User.Claims
+        |> Seq.find (fun x -> x.Type = "Id")
+        |> fun x -> x.Value
+        |> Guid
+    userId |> proxyBuilder
+
 let userAccountServiceHandler (root:CompositionRoot) : HttpHandler =
-    
-    let validator (sp:SecuredParam<_>) =
-        match root.Auth.ValidateToken sp.Token with
-        | Some claims ->
-            let userId =
-                claims
-                |> Seq.find (fun x -> x.Type = "Id")
-                |> fun x -> x.Value
-                |> Guid
-            Ok (userId, sp.Parameter)
-        | None -> InvalidOrExpiredToken |> Authentication |> Error
-    
     Remoting.createApi()
     |> Remoting.withRouteBuilder UserAccountService.RouteBuilder
-    |> Remoting.fromValue (userAccountService validator root)
+    |> Remoting.fromContext (withUser (userAccountService root))
     |> Remoting.buildHttpHandler

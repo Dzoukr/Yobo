@@ -10,8 +10,13 @@ open Microsoft.Azure.WebJobs.Extensions.Http
 
 let webApp (root:CompositionRoot) =
     choose [
+        // anonymous handlers
         Auth.HttpHandlers.authServiceHandler root
-        UserAccount.HttpHandlers.userAccountServiceHandler root
+        
+        // authenticated handlers
+        Auth.HttpHandlers.onlyForLoggedUser root.Auth >=> choose [
+            UserAccount.HttpHandlers.userAccountServiceHandler root
+        ]
     ]
 
 [<FunctionName("Index")>]

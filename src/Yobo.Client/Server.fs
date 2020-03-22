@@ -1,10 +1,24 @@
 module Yobo.Client.Server
 
+open System
 open Fable.Core
+open Fable.Core
+open Fable.Core.JsInterop
 open Fable.Remoting.Client
+open Fable.SimpleJson
+open Fable.SimpleJson
+open Fable.SimpleJson
 open Yobo.Shared.Auth.Communication
 open Yobo.Shared.UserAccount.Communication
 open Yobo.Shared.Domain
+
+let exnToError (e:exn) : ServerError =
+    match e with  
+    | :? Fable.Remoting.Client.ProxyRequestException as ex -> 
+        let body : obj = JS.JSON.parse ex.Response.ResponseBody
+        let errorString : string = JS.JSON.stringify body?error
+        Json.parseAs<ServerError>(errorString)
+    | _ -> (ServerError.Exception(e.Message))
 
 module Cmd =
     open Elmish
@@ -30,8 +44,12 @@ let authService =
     |> Remoting.withBaseUrl baseUrl
     |> Remoting.buildProxy<AuthService>
 
-let userAccountService =
+let onUserAccountService (fn:UserAccountService -> 'a) =
+    let token = TokenStorage.tryGetToken() |> Option.defaultValue ""
     Remoting.createApi()
     |> Remoting.withRouteBuilder UserAccountService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
+    |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
     |> Remoting.buildProxy<UserAccountService>
+    |> fn
+    

@@ -12,7 +12,7 @@ module Response =
     }
 
 type UserAccountService = {
-    GetUserInfo : SecuredParam<unit> -> ServerResponse<Response.UserInfo>
+    GetUserInfo : unit -> Async<Response.UserInfo>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/useraccount/%s" m

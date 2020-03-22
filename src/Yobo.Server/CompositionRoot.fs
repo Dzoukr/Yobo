@@ -14,10 +14,10 @@ type AuthQueries = {
 }
 
 type AuthCommandHandler = {
-    Register : Domain.CmdArgs.Register -> Task<ServerResult<unit>>
-    ActivateAccount : Domain.CmdArgs.Activate -> Task<ServerResult<unit>>
-    ForgottenPassword : Domain.CmdArgs.InitiatePasswordReset -> Task<ServerResult<unit>>
-    ResetPassword : Domain.CmdArgs.CompleteResetPassword -> Task<ServerResult<unit>>
+    Register : Domain.CmdArgs.Register -> Task<unit>
+    ActivateAccount : Domain.CmdArgs.Activate -> Task<unit>
+    ForgottenPassword : Domain.CmdArgs.InitiatePasswordReset -> Task<unit>
+    ResetPassword : Domain.CmdArgs.CompleteResetPassword -> Task<unit>
 }
 
 type AuthRoot = {

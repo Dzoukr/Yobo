@@ -23,6 +23,8 @@ type ServerError =
     | Validation of ValidationError list
     | Authentication of AuthenticationError
 
+exception ServerException of ServerError
+
 module ServerError =
     let explain = function
         | Exception e -> e
@@ -31,6 +33,23 @@ module ServerError =
             |> List.map ValidationError.explain
             |> String.concat ", "
         | Authentication e -> e |> AuthenticationError.explain
+        
+    let failwith (er:ServerError) = raise (ServerException er)
+    
+    let ofOption err (v:Option<_>) =
+        v
+        |> Option.defaultWith (fun _ -> err |> failwith)
+    
+    let ofResult<'a> (v:Result<'a,ServerError>) =
+        match v with
+        | Ok v -> v
+        | Error e -> e |> failwith
+
+    let validate (validationFn:'a -> ValidationError list) (value:'a) =
+        match value |> validationFn with
+        | [] -> value
+        | errs -> errs |> Validation |> failwith
+
 
 type ServerResult<'a> = Result<'a, ServerError>
 

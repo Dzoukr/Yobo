@@ -7,6 +7,7 @@ nuget FSharp.Core
 // client
 nuget Fable.Core
 nuget Fable.Elmish.Debugger
+nuget Thoth.Json = 3.5.0
 nuget Fable.Elmish.React
 nuget Fable.Elmish.HMR
 nuget Feliz

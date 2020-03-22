@@ -4,7 +4,11 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Server", "src\Yobo.Ser
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Libraries", "src\Yobo.Libraries\Yobo.Libraries.fsproj", "{FBF81E29-BDB5-4306-8FEE-DB5FA610F9EA}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Shared", "src\Yobo.Shared\Yobo.Shared.fsproj", "{BD07E43E-AFF9-402B-B896-17A7CCBF8520}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Client", "src\Yobo.Client\Yobo.Client.fsproj", "{968A2BC6-CAC1-4BC1-BDF9-2DC5F410C89D}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Shared", "src\Yobo.Shared\Yobo.Shared.fsproj", "{B6D5CA23-B66A-4015-A6EB-501F046A111F}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Server.Local", "src\Yobo.Server.Local\Yobo.Server.Local.fsproj", "{71775CD2-A079-4981-9F18-E11B03519398}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,9 +24,17 @@ Global
 		{FBF81E29-BDB5-4306-8FEE-DB5FA610F9EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FBF81E29-BDB5-4306-8FEE-DB5FA610F9EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FBF81E29-BDB5-4306-8FEE-DB5FA610F9EA}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BD07E43E-AFF9-402B-B896-17A7CCBF8520}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BD07E43E-AFF9-402B-B896-17A7CCBF8520}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BD07E43E-AFF9-402B-B896-17A7CCBF8520}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BD07E43E-AFF9-402B-B896-17A7CCBF8520}.Release|Any CPU.Build.0 = Release|Any CPU
+		{968A2BC6-CAC1-4BC1-BDF9-2DC5F410C89D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{968A2BC6-CAC1-4BC1-BDF9-2DC5F410C89D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{968A2BC6-CAC1-4BC1-BDF9-2DC5F410C89D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{968A2BC6-CAC1-4BC1-BDF9-2DC5F410C89D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D5CA23-B66A-4015-A6EB-501F046A111F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D5CA23-B66A-4015-A6EB-501F046A111F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D5CA23-B66A-4015-A6EB-501F046A111F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D5CA23-B66A-4015-A6EB-501F046A111F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71775CD2-A079-4981-9F18-E11B03519398}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71775CD2-A079-4981-9F18-E11B03519398}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71775CD2-A079-4981-9F18-E11B03519398}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71775CD2-A079-4981-9F18-E11B03519398}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

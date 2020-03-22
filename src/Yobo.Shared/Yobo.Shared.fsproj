@@ -12,7 +12,6 @@
         <Compile Include="Auth\Communication.fs" />
         <Compile Include="Auth\Validation.fs" />
         <Compile Include="UserAccount\Communication.fs" />
-        <Content Include="paket.references" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

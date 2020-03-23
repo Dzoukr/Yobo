@@ -13,16 +13,18 @@ open Yobo.Client.Forms
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
-    | ErrorOccured e ->
-        { model with IsLoading = false }, e |> ServerResponseViews.showErrorToast
     | FormChanged f ->
         { model with Form = model.Form |> ValidatedForm.updateWith f |> ValidatedForm.validateConditionalWith model.FormSent validateLogin }, Cmd.none
     | Login ->
         let model = { model with FormSent = true; Form = model.Form |> ValidatedForm.validateWith validateLogin }
         if model.Form |> ValidatedForm.isValid then
-            { model with IsLoading = true }, Cmd.OfAsync.either authService.GetToken model.Form.FormData LoggedIn (exnToError >> Msg.ErrorOccured)
+            { model with IsLoading = true }, Cmd.OfAsync.eitherAsResult authService.GetToken model.Form.FormData LoggedIn
         else model, Cmd.none
-    | LoggedIn token ->
-        TokenStorage.setToken token
-        { model with IsLoading = false; Form = Request.Login.init |> ValidatedForm.init },
-            Cmd.batch [ ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"; Router.navigate Paths.Calendar ]
+    | LoggedIn res ->
+        match res with
+        | Ok token ->
+            TokenStorage.setToken token
+            { model with IsLoading = false; Form = Request.Login.init |> ValidatedForm.init },
+                Cmd.batch [ ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"; Router.navigate Paths.Calendar ]
+        | Error e ->
+            { model with IsLoading = false }, e |> ServerResponseViews.showErrorToast

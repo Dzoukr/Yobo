@@ -84,6 +84,7 @@ let private resetPassword (authRoot:AuthRoot) (r:Request.ResetPassword) =
     }
 
 open FSharp.Control.Tasks
+open Newtonsoft.Json
 
 
 
@@ -129,7 +130,6 @@ let onlyForLoggedUser (authRoot:AuthRoot) next (ctx:HttpContext) =
     | Some c ->
         ctx.User <- ClaimsPrincipal(ClaimsIdentity(c))
         next ctx
-    | None ->
-        RequestErrors.UNAUTHORIZED "Bearer" "Yobo" "Unauthorized" next ctx
+    | None -> RequestErrors.UNAUTHORIZED "Bearer" "Yobo" "Unauthorized" next ctx
     
      

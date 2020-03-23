@@ -13,27 +13,24 @@ open Yobo.Shared.UserAccount.Communication
 open Yobo.Shared.Domain
 
 let exnToError (e:exn) : ServerError =
-    match e with  
+    match e with
     | :? Fable.Remoting.Client.ProxyRequestException as ex -> 
-        let body : obj = JS.JSON.parse ex.Response.ResponseBody
-        let errorString : string = JS.JSON.stringify body?error
-        Json.parseAs<ServerError>(errorString)
-    | _ -> (ServerError.Exception(e.Message))
+        if ex.StatusCode = 401 then
+            AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication
+        else
+            let body : obj = JS.JSON.parse ex.Response.ResponseBody
+            let errorString : string = JS.JSON.stringify body?error
+            Json.parseAs<ServerError>(errorString)
+    | _ ->
+        (ServerError.Exception(e.Message))
 
 module Cmd =
     open Elmish
     
     module OfAsync =
-        let eitherResult f args resultMsg =
-            let onError (ex:exn) = ex.Message |> ServerError.Exception |> Error |> resultMsg 
-            Cmd.OfAsync.either f args resultMsg onError
+        let eitherAsResult f args resultMsg =
+            Cmd.OfAsync.either f args (Ok >> resultMsg) (exnToError >> Error >> resultMsg)
 
-module SecuredParam =
-    let create p =
-        {
-            Token = TokenStorage.tryGetToken() |> Option.defaultValue ""
-            Parameter = p
-        }
 
 [<Emit("config.baseUrl")>]
 let baseUrl : string = jsNative

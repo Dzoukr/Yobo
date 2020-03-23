@@ -23,6 +23,8 @@ type ServerError =
     | Validation of ValidationError list
     | Authentication of AuthenticationError
 
+type ServerResult<'a> = Result<'a, ServerError>
+
 exception ServerException of ServerError
 
 module ServerError =
@@ -49,18 +51,3 @@ module ServerError =
         match value |> validationFn with
         | [] -> value
         | errs -> errs |> Validation |> failwith
-
-
-type ServerResult<'a> = Result<'a, ServerError>
-
-module ServerResult =
-    let ofValidation (validationFn:'a -> ValidationError list) (value:'a) : ServerResult<'a> =
-        match value |> validationFn with
-        | [] -> Ok value
-        | errs -> errs |> Validation |> Error
-
-type ServerResponse<'a> = Async<ServerResult<'a>>
-type SecuredParam<'a> = {
-    Token : string
-    Parameter : 'a
-}

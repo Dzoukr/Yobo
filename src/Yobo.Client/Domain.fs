@@ -26,7 +26,7 @@ module Model =
 
 type Msg =
     | RetrieveLoggedUserAndRedirect of Page
-    | LoggedUserRetrieved of Yobo.Shared.UserAccount.Communication.Response.UserInfo * Page
+    | LoggedUserRetrieved of ServerResult<Yobo.Shared.UserAccount.Communication.Response.UserInfo> * Page
     // navigation
     | UrlChanged of Page
     // auth

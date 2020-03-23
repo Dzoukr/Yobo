@@ -38,4 +38,5 @@ let userAccountServiceHandler (root:CompositionRoot) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder UserAccountService.RouteBuilder
     |> Remoting.fromContext (withUser (userAccountService root))
+    |> Remoting.withErrorHandler Remoting.errorHandler
     |> Remoting.buildHttpHandler

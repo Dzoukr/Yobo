@@ -11,6 +11,6 @@ open Yobo.Client.Forms
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
-    | Activate -> model, Cmd.OfAsync.eitherResult authService.ActivateAccount model.ActivationId Activated
+    | Activate -> model, Cmd.OfAsync.eitherAsResult authService.ActivateAccount model.ActivationId Activated
     | Activated res -> { model with ActivationResult = Some res }, Cmd.none
         

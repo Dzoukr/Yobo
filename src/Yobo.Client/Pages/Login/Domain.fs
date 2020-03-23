@@ -19,7 +19,6 @@ module Model =
     }
 
 type Msg =
-    | ErrorOccured of ServerError
     | FormChanged of Request.Login
     | Login
-    | LoggedIn of string
+    | LoggedIn of ServerResult<string>

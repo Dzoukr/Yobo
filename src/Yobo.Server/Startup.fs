@@ -141,10 +141,6 @@ type private InjectCompositionRoot(root) =
                 .BindToInput<CompositionRoot>(fun x -> root)
             |> ignore
 
-type FuncStartup() =
-    inherit FunctionsStartup()
-    override this.Configure (s:IFunctionsHostBuilder) = 
-        ()
         
 type WebJobsStartup() =
     interface IWebJobsStartup with
@@ -154,7 +150,7 @@ type WebJobsStartup() =
             root
             |> builder.Services.AddSingleton<CompositionRoot>
             |> ignore
+            builder.Services.AddGiraffe() |> ignore
             builder.AddExtension(InjectCompositionRoot(root)) |> ignore
     
 [<assembly: WebJobsStartup(typeof<WebJobsStartup>)>] do ()        
-[<assembly: FunctionsStartup(typeof<FuncStartup>)>] do ()  

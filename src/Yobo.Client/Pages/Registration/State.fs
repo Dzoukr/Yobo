@@ -16,7 +16,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | Register ->
         let model = { model with FormSent = true; Form = model.Form |> ValidatedForm.validateWith validateRegister }
         if model.Form |> ValidatedForm.isValid then
-            { model with IsLoading = true }, Cmd.OfAsync.eitherResult authService.Register model.Form.FormData Registered
+            { model with IsLoading = true }, Cmd.OfAsync.eitherAsResult authService.Register model.Form.FormData Registered
         else model, Cmd.none
     | Registered res ->
         let onSuccess _ = { model with IsLoading = false; Form = Request.Register.init |> ValidatedForm.init; ShowThankYou = true }, Cmd.none

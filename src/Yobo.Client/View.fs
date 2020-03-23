@@ -35,7 +35,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         | ResetPassword m -> Pages.ResetPassword.View.view m (ResetPasswordMsg >> dispatch)
             
     Router.router [
-        Router.onUrlChanged (parseUrl >> UrlChanged >> dispatch)
         Router.pathMode
+        Router.onUrlChanged (parseUrl >> UrlChanged >> dispatch)
         Router.application render
     ]

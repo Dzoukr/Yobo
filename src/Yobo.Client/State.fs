@@ -33,14 +33,14 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
             { model with CurrentPage = p }, getPageInitCommands p
     | _, RetrieveLoggedUserAndRedirect p ->                
         let x = (onUserAccountService (fun x -> x.GetUserInfo))
-        { model with IsCheckingUser = true }, Cmd.OfAsync.perform x () (fun u -> LoggedUserRetrieved(u, p)) // eitherResult userAccountService.GetUserInfo (Server.SecuredParam.create ()) (fun u -> LoggedUserRetrieved(u, p))
-    | _, LoggedUserRetrieved(usr, p) ->
-        { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
-//        match u with
-//        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
-//        | Error e ->
-//            { model with IsCheckingUser = false },
-//                [ SharedView.ServerResponseViews.showErrorToast e; Router.navigate Paths.Login ] |> Cmd.batch 
+        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult x () (fun u -> LoggedUserRetrieved(u, p))
+    | _, LoggedUserRetrieved(u, p) ->
+        Fable.Core.JS.console.log u
+        match u with
+        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
+        | Error e ->
+            { model with IsCheckingUser = false },
+                [ SharedView.ServerResponseViews.showErrorToast e; Router.navigate Paths.Login ] |> Cmd.batch 
     // auth
     | Login m, LoginMsg subMsg -> Pages.Login.State.update subMsg m |> upTo model Login LoginMsg 
     | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg

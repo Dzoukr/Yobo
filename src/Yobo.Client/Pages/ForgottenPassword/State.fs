@@ -18,7 +18,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | InitiateReset ->
         let model = { model with FormSent = true; Form = model.Form |> ValidatedForm.validateWith validateForgottenPassword }
         if model.Form |> ValidatedForm.isValid then
-            { model with IsLoading = true }, Cmd.OfAsync.eitherResult authService.ForgottenPassword model.Form.FormData ResetInitiated
+            { model with IsLoading = true }, Cmd.OfAsync.eitherAsResult authService.ForgottenPassword model.Form.FormData ResetInitiated
         else model, Cmd.none
     | ResetInitiated res ->
         let onSuccess _ =

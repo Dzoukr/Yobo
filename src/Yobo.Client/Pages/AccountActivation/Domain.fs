@@ -15,6 +15,5 @@ module Model =
     }
 
 type Msg =
-    | ErrorOccured of ServerError
     | Activate
-    | Activated
+    | Activated of ServerResult<unit>

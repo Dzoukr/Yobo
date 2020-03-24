@@ -19,9 +19,8 @@ let exnToError (e:exn) : ServerError =
             AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication
         else
             try
-                let body : obj = JS.JSON.parse ex.Response.ResponseBody
-                let errorString : string = JS.JSON.stringify body?error
-                Json.parseAs<ServerError>(errorString)
+                let serverError = Json.parseAs<{| error: ServerError |}>(ex.Response.ResponseBody)
+                serverError.error
             with _ -> (ServerError.Exception(e.Message)) 
     | _ -> (ServerError.Exception(e.Message))
 

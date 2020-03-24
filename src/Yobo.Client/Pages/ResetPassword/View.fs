@@ -61,7 +61,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
         
         Html.div [
-            Html.a [ prop.text "Zpět na přihlášení"; prop.href (Router.format Paths.Login);  prop.onClick Router.goToUrl  ]
+            Html.a [ prop.text "Zpět na přihlášení"; prop.href (Router.formatPath Paths.Login);  prop.onClick Router.goToUrl  ]
         ]
     ]
     |> inTemplate

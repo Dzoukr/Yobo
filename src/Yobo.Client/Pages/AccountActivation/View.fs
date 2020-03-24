@@ -13,7 +13,7 @@ let view (state:Model) (dispatch : Msg -> unit) =
         Html.span [
             Html.text msg
             Html.div [
-                Html.a [ prop.text "Zpátky na přihlášení"; prop.href (Router.format Paths.Login); prop.onClick Router.goToUrl ]
+                Html.a [ prop.text "Zpátky na přihlášení"; prop.href (Router.formatPath Paths.Login); prop.onClick Router.goToUrl ]
             ]
         ]
     

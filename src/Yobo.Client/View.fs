@@ -6,14 +6,14 @@ open Feliz
 open Feliz.Bulma
 open Feliz.Router
 
-let private parseUrl = function
+let parseUrl = function
     | [ Paths.Login ] -> Login (Pages.Login.Domain.Model.init)
     | [ Paths.Registration ] -> Registration Pages.Registration.Domain.Model.init
     | [ Paths.Calendar ] -> Calendar
     | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> AccountActivation (Pages.AccountActivation.Domain.Model.init id)
     | [ Paths.ForgottenPassword ] -> ForgottenPassword (Pages.ForgottenPassword.Domain.Model.init)
     | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> ResetPassword (Pages.ResetPassword.Domain.Model.init id)
-    | _ -> Model.init.CurrentPage
+    | _ -> Calendar
     
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
@@ -25,7 +25,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 Html.text (sprintf "%A" model.LoggedUser)
                 Html.a [
                     prop.text "Login"
-                    prop.href (Router.format Paths.Login)
+                    prop.href (Router.formatPath Paths.Login)
                     prop.onClick Router.goToUrl
                 ]
             ]

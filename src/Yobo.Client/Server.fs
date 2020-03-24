@@ -18,11 +18,12 @@ let exnToError (e:exn) : ServerError =
         if ex.StatusCode = 401 then
             AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication
         else
-            let body : obj = JS.JSON.parse ex.Response.ResponseBody
-            let errorString : string = JS.JSON.stringify body?error
-            Json.parseAs<ServerError>(errorString)
-    | _ ->
-        (ServerError.Exception(e.Message))
+            try
+                let body : obj = JS.JSON.parse ex.Response.ResponseBody
+                let errorString : string = JS.JSON.stringify body?error
+                Json.parseAs<ServerError>(errorString)
+            with _ -> (ServerError.Exception(e.Message)) 
+    | _ -> (ServerError.Exception(e.Message))
 
 module Cmd =
     open Elmish

@@ -11,7 +11,7 @@ nuget Thoth.Json = 3.5.0
 nuget Fable.Elmish.React
 nuget Fable.Elmish.HMR
 nuget Feliz
-nuget Feliz.Router = 1.8.0
+nuget Feliz.Router
 nuget Feliz.Bulma
 nuget Feliz.Bulma.Checkradio
 nuget Elmish.SweetAlert

@@ -18,8 +18,8 @@ type Model = {
 }
 
 module Model =
-    let init = {
-        CurrentPage = Calendar
+    let init page = {
+        CurrentPage = page
         LoggedUser = None
         IsCheckingUser = false
     }

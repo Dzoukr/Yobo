@@ -59,9 +59,9 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
         ]
         Html.div [
-            Html.a [ prop.text "Registrace"; prop.href (Router.format Paths.Registration); prop.onClick Router.goToUrl ]
+            Html.a [ prop.text "Registrace"; prop.href (Router.formatPath Paths.Registration); prop.onClick Router.goToUrl ]
             Html.span " · "
-            Html.a [ prop.text "Zapomněl(a) jsem heslo!"; prop.href (Router.format Paths.ForgottenPassword); prop.onClick Router.goToUrl  ]
+            Html.a [ prop.text "Zapomněl(a) jsem heslo!"; prop.href (Router.formatPath Paths.ForgottenPassword); prop.onClick Router.goToUrl  ]
         ]
     ]
     |> inTemplate

@@ -25,7 +25,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
             { model with IsLoading = false; Form = Request.ResetPassword.init |> ValidatedForm.init },
             [
                 ServerResponseViews.showSuccessToast "Vaše heslo bylo úspěšně nastaveno. Nyní se můžete přihlásit."
-                (Router.navigate Paths.Login)
+                (Router.navigatePath Paths.Login)
             ] |> Cmd.batch
         let onError = { model with IsLoading = false }
         let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 

@@ -5,7 +5,8 @@ open Elmish
 open Feliz.Router
 open Server
 
-let init () = Model.init, Cmd.none
+let init () =
+    Model.init (Router.currentPath() |> View.parseUrl), Cmd.none
 
 let private upTo model toState toMsg (m,cmd) =
     { model with CurrentPage = toState(m) }, Cmd.map(toMsg) cmd
@@ -40,7 +41,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
         | Error e ->
             { model with IsCheckingUser = false },
-                [ SharedView.ServerResponseViews.showErrorToast e; Router.navigate Paths.Login ] |> Cmd.batch 
+                [ SharedView.ServerResponseViews.showErrorToast e; Router.navigatePath Paths.Login ] |> Cmd.batch 
     // auth
     | Login m, LoginMsg subMsg -> Pages.Login.State.update subMsg m |> upTo model Login LoginMsg 
     | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg

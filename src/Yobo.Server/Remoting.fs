@@ -7,8 +7,7 @@ open Yobo.Shared.Domain
 
 let private statusCode = function
     | Exception _ -> 500
-    | Validation _ -> 400
-    | Authentication _ -> 400
+    | _ -> 400
 
 let rec errorHandler (ex: Exception) (routeInfo: RouteInfo<HttpContext>) = 
     match ex with

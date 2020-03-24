@@ -14,9 +14,6 @@ module ServerResponseViews =
     let showErrorToast (e:ServerError) : Cmd<_> =
         let basicToaster =
             match e with
-            | Exception msg ->
-                Toastr.message msg
-                |> Toastr.title "Došlo k chybě"
             | Validation v ->
                 v
                 |> List.map (fun x -> x.Field, ValidationErrorType.explain x.Type)
@@ -32,6 +29,11 @@ module ServerResponseViews =
                 |> Toastr.message
                 |> Toastr.timeout 5000
                 |> Toastr.extendedTimout 2000
+            | error ->
+                error
+                |> ServerError.explain
+                |> Toastr.message
+                |> Toastr.title "Došlo k chybě"
                 
         basicToaster
         |> Toastr.position ToastPosition.TopRight

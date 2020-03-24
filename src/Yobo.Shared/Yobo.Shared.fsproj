@@ -11,6 +11,7 @@
         <Compile Include="Domain.fs" />
         <Compile Include="Auth\Communication.fs" />
         <Compile Include="Auth\Validation.fs" />
+        <Compile Include="UserAccount\Domain.fs" />
         <Compile Include="UserAccount\Communication.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />

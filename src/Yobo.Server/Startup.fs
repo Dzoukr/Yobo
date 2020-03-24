@@ -96,15 +96,15 @@ module AuthRoot =
             }
         } : AuthRoot
 
-//module UserAccountRoot =
-//    let compose getSqlConnection (cfg:IConfigurationRoot) =
-//        let sql fn = withSqlConnection getSqlConnection fn
-//        
-//        {
-//            Queries = {
-//                GetUserInfo = sql UserAccount.
-//            }    
-//        }
+module UserAccountRoot =
+    let compose sqlConnectionBuilder (cfg:IConfigurationRoot) =
+        let sql fn = withSqlConnection sqlConnectionBuilder fn
+        
+        {
+            Queries = {
+                TryGetUserInfo = sql UserAccount.Database.Queries.tryGetUserById
+            }    
+        }
 
 
 
@@ -128,7 +128,7 @@ module CompositionRoot =
         
         {
             Auth = AuthRoot.compose sqlConnectionBuilder sendEmail emailBuilder cfg
-            //UserAccount = UserAccountRoot.compose 
+            UserAccount = UserAccountRoot.compose sqlConnectionBuilder cfg
         } : CompositionRoot
 
 

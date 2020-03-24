@@ -30,7 +30,7 @@ type AuthRoot = {
 }
 
 type UserAccountQueries = {
-    GetUserInfo : Guid -> Task<ServerResult<UserAccount.Domain.Queries.UserAccount>>
+    TryGetUserInfo : Guid -> Task<Yobo.Shared.UserAccount.Domain.Queries.UserAccount option>
 }
 
 type UserAccountRoot = {
@@ -38,7 +38,7 @@ type UserAccountRoot = {
 }
 type CompositionRoot = {
     Auth : AuthRoot
-    //UserAccount : UserAccountRoot
+    UserAccount : UserAccountRoot
 }    
 
 module Attributes =

@@ -24,12 +24,16 @@ module Tables =
         Newsletters : bool
     }
     
+    [<RequireQualifiedAccess>]
+    module Users =
+        let name = "Users"
+    
 module Updates =
     let registered (conn:IDbConnection) (args:CmdArgs.Register) =
         task {
             let! _ =
                 insert {
-                    table "Users"
+                    table Tables.Users.name
                     value ({
                         Id = args.Id
                         Email = args.Email.ToLowerInvariant()
@@ -53,7 +57,7 @@ module Updates =
         task {
             let! _ =
                 update {
-                    table "Users"
+                    table Tables.Users.name
                     set {| Activated = DateTimeOffset.UtcNow |}
                     where (eq "Id" args.Id)
                 } |> conn.UpdateAsync
@@ -64,7 +68,7 @@ module Updates =
         task {
             let! _ =
                 update {
-                    table "Users"
+                    table Tables.Users.name
                     set {| PasswordResetKey = args.PasswordResetKey |}
                     where (eq "Id" args.Id)
                 } |> conn.UpdateAsync
@@ -75,7 +79,7 @@ module Updates =
         task {
             let! _ =
                 update {
-                    table "Users"
+                    table Tables.Users.name
                     set {| PasswordResetKey = None; PasswordHash = args.PasswordHash |}
                     where (eq "Id" args.Id)
                 } |> conn.UpdateAsync
@@ -88,7 +92,7 @@ module Queries =
         task {
             let! res =
                 select {
-                    table "Users"
+                    table Tables.Users.name
                     where (eq "Email" (email.ToLowerInvariant()))
                 }
                 |> conn.SelectAsync<Tables.Users>

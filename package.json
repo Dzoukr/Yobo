@@ -35,6 +35,7 @@
         "bulma-popover": "^1.0.0",
         "bulma-quickview": "^2.0.0",
         "bulma-tooltip": "^3.0.2",
+        "bulma-pageloader": "^0.3.0",
         "sweetalert2": "^8.19.0",
         "toastr": "^2.1.4"
     }

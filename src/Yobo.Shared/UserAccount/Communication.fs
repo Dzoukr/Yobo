@@ -2,17 +2,10 @@ module Yobo.Shared.UserAccount.Communication
 
 open System
 open Yobo.Shared.Domain
-
-[<RequireQualifiedAccess>]
-module Response =
-    type UserInfo = {
-        Id : Guid
-        FirstName : string
-        LastName : string
-    }
+open Domain
 
 type UserAccountService = {
-    GetUserInfo : unit -> Async<Response.UserInfo>
+    GetUserInfo : unit -> Async<Queries.UserAccount>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/useraccount/%s" m

@@ -14,6 +14,7 @@ nuget Feliz
 nuget Feliz.Router
 nuget Feliz.Bulma
 nuget Feliz.Bulma.Checkradio
+nuget Feliz.Bulma.PageLoader
 nuget Elmish.SweetAlert
 nuget Elmish.Toastr
 nuget Fable.Remoting.Client

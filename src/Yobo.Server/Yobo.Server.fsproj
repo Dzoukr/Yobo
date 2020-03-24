@@ -31,6 +31,7 @@
     <Compile Include="Auth\EmailEventHandler.fs" />
     <Compile Include="Auth\DbEventHandler.fs" />
     <Compile Include="UserAccount\Domain.fs" />
+    <Compile Include="UserAccount\Database.fs" />
     <Compile Include="CompositionRoot.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="UserAccount\HttpHandlers.fs" />

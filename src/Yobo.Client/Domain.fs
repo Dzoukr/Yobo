@@ -11,9 +11,26 @@ type Page =
     | ForgottenPassword of Pages.ForgottenPassword.Domain.Model
     | ResetPassword of Pages.ResetPassword.Domain.Model
 
+[<RequireQualifiedAccess>]    
+module Page =
+    open Feliz.Router
+    
+    let parseFromUrlSegments = function
+        | [ Paths.Login ] -> Login (Pages.Login.Domain.Model.init)
+        | [ Paths.Registration ] -> Registration Pages.Registration.Domain.Model.init
+        | [ Paths.Calendar ] -> Calendar
+        | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> AccountActivation (Pages.AccountActivation.Domain.Model.init id)
+        | [ Paths.ForgottenPassword ] -> ForgottenPassword (Pages.ForgottenPassword.Domain.Model.init)
+        | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> ResetPassword (Pages.ResetPassword.Domain.Model.init id)
+        | _ -> Calendar
+        
+//    let getPath = function
+//        | Login _ -> Paths.Login
+//        
+
 type Model = {
     CurrentPage : Page
-    LoggedUser : Yobo.Shared.UserAccount.Communication.Response.UserInfo option
+    LoggedUser : Yobo.Shared.UserAccount.Domain.Queries.UserAccount option
     IsCheckingUser : bool
 }
 
@@ -26,7 +43,7 @@ module Model =
 
 type Msg =
     | RetrieveLoggedUserAndRedirect of Page
-    | LoggedUserRetrieved of ServerResult<Yobo.Shared.UserAccount.Communication.Response.UserInfo> * Page
+    | LoggedUserRetrieved of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount> * Page
     // navigation
     | UrlChanged of Page
     // auth

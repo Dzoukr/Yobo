@@ -83,12 +83,6 @@ let private resetPassword (authRoot:AuthRoot) (r:Request.ResetPassword) =
         return! authRoot.CommandHandler.ResetPassword args            
     }
 
-open FSharp.Control.Tasks
-open Newtonsoft.Json
-
-
-
-
 let private authService (root:AuthRoot) : AuthService =
     {
         GetToken = ServerError.validate validateLogin >> (login root) >> Async.AwaitTask

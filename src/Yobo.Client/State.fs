@@ -6,7 +6,8 @@ open Feliz.Router
 open Server
 
 let init () =
-    Model.init (Router.currentPath() |> View.parseUrl), Cmd.none
+    let currentPage = (Router.currentPath() |> Page.parseFromUrlSegments)
+    (Model.init currentPage), (currentPage |> UrlChanged |> Cmd.ofMsg)
 
 let private upTo model toState toMsg (m,cmd) =
     { model with CurrentPage = toState(m) }, Cmd.map(toMsg) cmd
@@ -33,15 +34,13 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         else            
             { model with CurrentPage = p }, getPageInitCommands p
     | _, RetrieveLoggedUserAndRedirect p ->                
-        let x = (onUserAccountService (fun x -> x.GetUserInfo))
-        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult x () (fun u -> LoggedUserRetrieved(u, p))
+        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () (fun u -> LoggedUserRetrieved(u, p))
     | _, LoggedUserRetrieved(u, p) ->
-        Fable.Core.JS.console.log u
         match u with
         | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
-        | Error e ->
-            { model with IsCheckingUser = false },
-                [ SharedView.ServerResponseViews.showErrorToast e; Router.navigatePath Paths.Login ] |> Cmd.batch 
+        | Error _ ->
+            TokenStorage.removeToken()
+            { model with IsCheckingUser = false }, Router.navigatePath Paths.Login 
     // auth
     | Login m, LoginMsg subMsg -> Pages.Login.State.update subMsg m |> upTo model Login LoginMsg 
     | Registration m, RegistrationMsg subMsg -> Pages.Registration.State.update subMsg m |> upTo model Registration RegistrationMsg

@@ -1,5 +1,6 @@
 ﻿module Yobo.Shared.Domain
 
+open System
 open Yobo.Shared.Validation
 
 type AuthenticationError =
@@ -20,6 +21,7 @@ module AuthenticationError =
 
 type ServerError =
     | Exception of string
+    | DatabaseItemNotFound of Guid
     | Validation of ValidationError list
     | Authentication of AuthenticationError
 
@@ -30,6 +32,7 @@ exception ServerException of ServerError
 module ServerError =
     let explain = function
         | Exception e -> e
+        | DatabaseItemNotFound i -> sprintf "Položka s ID %A nebyla nalezena v databázi" i
         | Validation errs ->
             errs
             |> List.map ValidationError.explain

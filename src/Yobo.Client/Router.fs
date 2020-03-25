@@ -14,8 +14,11 @@ type Page =
     | ForgottenPassword
     | ResetPassword of Guid
 
+
 [<RequireQualifiedAccess>]    
 module Page =
+    
+    let defaultPage = Calendar
     
     module private Paths =
         let [<Literal>] Login = "login"
@@ -38,7 +41,7 @@ module Page =
             basicMapping
             |> List.tryFind (fun (p,_) -> p = path)
             |> Option.map snd
-            |> Option.defaultValue Calendar
+            |> Option.defaultValue defaultPage
         
     let toUrlSegments = function
         | AccountActivation i -> [ Yobo.Shared.ClientPaths.AccountActivation; string i ]

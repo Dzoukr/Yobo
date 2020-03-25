@@ -26,6 +26,6 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         | Ok token ->
             TokenStorage.setToken token
             { model with IsLoading = false; Form = Request.Login.init |> ValidatedForm.init },
-                Cmd.batch [ ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"; Router.navigatePage Calendar ]
+                Cmd.batch [ ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"; Router.navigatePage Page.defaultPage ]
         | Error e ->
             { model with IsLoading = false }, e |> ServerResponseViews.showErrorToast

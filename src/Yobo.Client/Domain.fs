@@ -36,11 +36,17 @@ module Model =
     let setPageModel (m:obj) (model:Model) = { model with PageWithModel = { model.PageWithModel with Model = m } }
 
 type Msg =
-    | RetrieveLoggedUserAndRedirect of Page
-    | LoggedUserRetrieved of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount> * Page
+    // auth
+    | RefreshUser
+    | UserRefreshed of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount>
+    | RefreshUserWithRedirect of Page
+    | UserRefreshedWithRedirect of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount> * Page
+    | RefreshToken of string
+    | TokenRefreshed of ServerResult<string>
+    | LoggedOut
     // navigation
     | UrlChanged of Page
-    // auth
+    // sub pages
     | LoginMsg of Pages.Login.Domain.Msg
     | RegistrationMsg of Pages.Registration.Domain.Msg
     | AccountActivationMsg of Pages.AccountActivation.Domain.Msg

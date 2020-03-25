@@ -9,6 +9,7 @@ open Elmish.HMR
 #endif
 
 Program.mkProgram State.init State.update View.view
+|> Program.withSubscription State.subscribe
 #if DEBUG
 |> Program.withConsoleTrace
 #endif

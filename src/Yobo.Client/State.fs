@@ -10,8 +10,10 @@ let init () =
     let currentPage = (Router.currentPath() |> Page.parseFromUrlSegments)
     (Model.init currentPage), (currentPage |> UrlChanged |> Cmd.ofMsg)
 
-let private setPageModel model toMsg (m,cmd) =
-    { model with PageWithModel = model.PageWithModel |> PageWithModel.setModel m }, Cmd.map(toMsg) cmd
+let private handleUpdate<'subModel,'subCmd> (fn:'subModel -> 'subModel * Cmd<'subCmd>) mapFn (m:Model) =
+    let pageModel = m |> Model.getPageModel<'subModel>
+    let newSubModel,subCmd = fn pageModel
+    (m |> Model.setPageModel newSubModel), (Cmd.map(mapFn) subCmd)
 
 let private isSecured page =
     match page with
@@ -43,13 +45,8 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
             TokenStorage.removeToken()
             { model with IsCheckingUser = false }, Router.navigatePage Login 
     // auth
-    | LoginMsg subMsg ->
-        model |> Model.getPageModel<Pages.Login.Domain.Model> |> Pages.Login.State.update subMsg |> setPageModel model LoginMsg
-    | RegistrationMsg subMsg ->
-        model |> Model.getPageModel<Pages.Registration.Domain.Model> |> Pages.Registration.State.update subMsg |> setPageModel model RegistrationMsg
-    | AccountActivationMsg subMsg ->
-        model |> Model.getPageModel<Pages.AccountActivation.Domain.Model> |> Pages.AccountActivation.State.update subMsg |> setPageModel model AccountActivationMsg
-    | ForgottenPasswordMsg subMsg -> 
-        model |> Model.getPageModel<Pages.ForgottenPassword.Domain.Model> |> Pages.ForgottenPassword.State.update subMsg |> setPageModel model ForgottenPasswordMsg
-    | ResetPasswordMsg subMsg ->
-        model |> Model.getPageModel<Pages.ResetPassword.Domain.Model> |> Pages.ResetPassword.State.update subMsg |> setPageModel model ResetPasswordMsg
+    | LoginMsg subMsg -> model |> handleUpdate (Pages.Login.State.update subMsg) LoginMsg
+    | RegistrationMsg subMsg -> model |> handleUpdate (Pages.Registration.State.update subMsg) RegistrationMsg
+    | AccountActivationMsg subMsg -> model |> handleUpdate (Pages.AccountActivation.State.update subMsg) AccountActivationMsg
+    | ForgottenPasswordMsg subMsg -> model |> handleUpdate (Pages.ForgottenPassword.State.update subMsg) ForgottenPasswordMsg
+    | ResetPasswordMsg subMsg -> model |> handleUpdate (Pages.ResetPassword.State.update subMsg) ResetPasswordMsg

@@ -18,7 +18,6 @@ type PageWithModel = {
 
 module PageWithModel =
     let create p = { Page = p; Model = p |> initPageModel }
-    let setModel (m:obj) (pm:PageWithModel) = { pm with Model = m }
 
 type Model = {
     PageWithModel : PageWithModel
@@ -34,6 +33,7 @@ module Model =
     }
 
     let getPageModel<'a> (m:Model) = m.PageWithModel.Model :?> 'a
+    let setPageModel (m:obj) (model:Model) = { model with PageWithModel = { model.PageWithModel with Model = m } }
 
 type Msg =
     | RetrieveLoggedUserAndRedirect of Page

@@ -1,5 +1,6 @@
 ﻿module Yobo.Client.Pages.Login.View
 
+open Yobo.Client.Router
 open Feliz
 open Feliz.Bulma
 open Yobo.Client
@@ -59,9 +60,9 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
         ]
         Html.div [
-            Html.a [ prop.text "Registrace"; prop.href (Router.formatPath Paths.Registration); prop.onClick Router.goToUrl ]
+            Html.aRouted "Registrace" Page.Registration
             Html.span " · "
-            Html.a [ prop.text "Zapomněl(a) jsem heslo!"; prop.href (Router.formatPath Paths.ForgottenPassword); prop.onClick Router.goToUrl  ]
+            Html.aRouted "Zapomněl(a) jsem heslo!" Page.ForgottenPassword
         ]
     ]
     |> inTemplate

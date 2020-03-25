@@ -1,11 +1,13 @@
 ﻿module Yobo.Client.View
 
+open Yobo.Client.Router
 open Domain
 open Elmish
 open Feliz
 open Feliz.Bulma
 open Feliz.Bulma.PageLoader
 open Feliz.Router
+open Yobo.Client.SharedView
 
 let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserAccount) (page:Page) content dispatch =
     //let item (pg:string) icon text =
@@ -78,6 +80,10 @@ let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserA
 //            ]
 //        ]
 //    ]
+
+let showView<'model,'msg> (fn:'model -> ('msg -> unit) -> Fable.React.ReactElement) (dispatch:'msg -> unit) (m:Model) =
+    let pm = m |> Model.getPageModel<'model>
+    fn pm dispatch
     
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
@@ -90,21 +96,17 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 ]
             ]
         else            
-            match model.CurrentPage with
-            | Login m -> Pages.Login.View.view m (LoginMsg >> dispatch)
-            | Registration m -> Pages.Registration.View.view m (RegistrationMsg >> dispatch)
+            match model.PageWithModel.Page with
+            | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
+            | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
                 
-            | AccountActivation m -> Pages.AccountActivation.View.view m (AccountActivationMsg >> dispatch)
-            | ForgottenPassword m -> Pages.ForgottenPassword.View.view m (ForgottenPasswordMsg >> dispatch)
-            | ResetPassword m -> Pages.ResetPassword.View.view m (ResetPasswordMsg >> dispatch)
+            | AccountActivation _ -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
+            | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
+            | ResetPassword _ -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
             | Calendar ->
                 Html.div [
                     Html.text (sprintf "%A" model.LoggedUser)
-                    Html.a [
-                        prop.text "Login"
-                        prop.href (Router.formatPath Paths.Login)
-                        prop.onClick Router.goToUrl
-                    ]
+                    Html.aRouted "Login" Page.Login
                 ]
             
     Router.router [

@@ -4,8 +4,16 @@ open Feliz
 open Feliz.Bulma
 open Yobo.Shared.Domain
 open Yobo.Shared.Validation
+open Yobo.Client.Router
+open Feliz.Router
 
-
+module Html =
+    let aRouted (text:string) (p:Page) =
+        Html.a [
+            prop.href (p |> Page.toUrlSegments |> Router.formatPath)
+            prop.onClick (Router.goToUrl)
+            prop.text text
+        ]
 
 module ServerResponseViews =
     open Elmish

@@ -1,7 +1,7 @@
 module Yobo.Client.Pages.ResetPassword.View
 
 open Domain
-open Yobo.Client
+open Yobo.Client.Router
 open Feliz
 open Feliz.Router
 open Feliz.Bulma
@@ -61,7 +61,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
         
         Html.div [
-            Html.a [ prop.text "Zpět na přihlášení"; prop.href (Router.formatPath Paths.Login);  prop.onClick Router.goToUrl  ]
+            Html.aRouted "Zpátky na přihlášení" Page.Login
         ]
     ]
     |> inTemplate

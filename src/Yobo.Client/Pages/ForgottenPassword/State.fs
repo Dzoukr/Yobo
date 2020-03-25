@@ -3,6 +3,7 @@
 open Domain
 open Elmish
 open Feliz.Router
+open Yobo.Client.Router
 open Yobo.Client
 open Yobo.Shared.Auth.Validation
 open Yobo.Client.Server
@@ -25,7 +26,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
             { model with IsLoading = false; Form = Request.ForgottenPassword.init |> ValidatedForm.init },
             [
                 ServerResponseViews.showSuccessToast "Pokud jste zadali váš email správně, brzy dorazí do vaší emailové schránky další instrukce."
-                (Router.navigatePath Paths.Login)
+                (Router.navigatePage Page.Login)
             ] |> Cmd.batch
         let onError = { model with IsLoading = false }
         let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 

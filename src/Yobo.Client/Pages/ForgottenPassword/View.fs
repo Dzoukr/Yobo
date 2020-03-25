@@ -2,11 +2,10 @@
 
 open Feliz
 open Feliz.Bulma
-open Yobo.Client
+open Yobo.Client.Router
 open Yobo.Client.Forms
 open Domain
 open Yobo.Client.SharedView
-open Feliz.Router
 
 let inTemplate (content:ReactElement) =
     Bulma.hero [
@@ -49,7 +48,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
         
         Html.div [
-            Html.a [ prop.text "Zpět na přihlášení"; prop.href (Router.formatPath Paths.Login);  prop.onClick Router.goToUrl  ]
+            Html.aRouted "Zpátky na přihlášení" Page.Login
         ]
     ]
     |> inTemplate

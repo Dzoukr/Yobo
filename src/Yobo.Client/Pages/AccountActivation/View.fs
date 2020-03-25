@@ -1,5 +1,7 @@
 module Yobo.Client.Pages.AccountActivation.View
 
+open Yobo.Client.Router
+open Yobo.Client.SharedView
 open Domain
 open Yobo.Client
 open Feliz
@@ -13,7 +15,7 @@ let view (state:Model) (dispatch : Msg -> unit) =
         Html.span [
             Html.text msg
             Html.div [
-                Html.a [ prop.text "Zpátky na přihlášení"; prop.href (Router.formatPath Paths.Login); prop.onClick Router.goToUrl ]
+                Html.aRouted "Zpátky na přihlášení" Page.Login
             ]
         ]
     

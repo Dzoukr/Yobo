@@ -7,9 +7,8 @@
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="TokenStorage.fs" />
-        <Compile Include="Feliz.Router.Extensions.fs" />
+        <Compile Include="Router.fs" />
         <Compile Include="Server.fs" />
-        <Compile Include="Paths.fs" />
         <Compile Include="Forms.fs" />
         <Compile Include="StaticText.fs" />
         <Compile Include="SharedView.fs" />

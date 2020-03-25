@@ -1,45 +1,39 @@
 ﻿module Yobo.Client.Domain
 
 open Yobo.Shared.Domain
+open Router
 
-type Page =
-    | Calendar
-    // auth
-    | Login of Pages.Login.Domain.Model
-    | Registration of Pages.Registration.Domain.Model
-    | AccountActivation of Pages.AccountActivation.Domain.Model
-    | ForgottenPassword of Pages.ForgottenPassword.Domain.Model
-    | ResetPassword of Pages.ResetPassword.Domain.Model
+let private initPageModel = function
+    | Page.AccountActivation i -> box (Pages.AccountActivation.Domain.Model.init i)
+    | Page.ResetPassword i -> box (Pages.ResetPassword.Domain.Model.init i)
+    | Page.Login -> box Pages.Login.Domain.Model.init
+    | Page.Registration -> box Pages.Registration.Domain.Model.init
+    | Page.ForgottenPassword -> box Pages.ForgottenPassword.Domain.Model.init
+    | Page.Calendar -> null // TODO
 
-[<RequireQualifiedAccess>]    
-module Page =
-    open Feliz.Router
-    
-    let parseFromUrlSegments = function
-        | [ Paths.Login ] -> Login (Pages.Login.Domain.Model.init)
-        | [ Paths.Registration ] -> Registration Pages.Registration.Domain.Model.init
-        | [ Paths.Calendar ] -> Calendar
-        | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> AccountActivation (Pages.AccountActivation.Domain.Model.init id)
-        | [ Paths.ForgottenPassword ] -> ForgottenPassword (Pages.ForgottenPassword.Domain.Model.init)
-        | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> ResetPassword (Pages.ResetPassword.Domain.Model.init id)
-        | _ -> Calendar
-        
-//    let getPath = function
-//        | Login _ -> Paths.Login
-//        
+type PageWithModel = {
+    Page : Page
+    Model : obj
+}
+
+module PageWithModel =
+    let create p = { Page = p; Model = p |> initPageModel }
+    let setModel (m:obj) (pm:PageWithModel) = { pm with Model = m }
 
 type Model = {
-    CurrentPage : Page
+    PageWithModel : PageWithModel
     LoggedUser : Yobo.Shared.UserAccount.Domain.Queries.UserAccount option
     IsCheckingUser : bool
 }
 
 module Model =
-    let init page = {
-        CurrentPage = page
+    let init (p:Page) = {
+        PageWithModel = PageWithModel.create p
         LoggedUser = None
         IsCheckingUser = false
     }
+
+    let getPageModel<'a> (m:Model) = m.PageWithModel.Model :?> 'a
 
 type Msg =
     | RetrieveLoggedUserAndRedirect of Page

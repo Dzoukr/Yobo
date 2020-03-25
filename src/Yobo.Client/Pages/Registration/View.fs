@@ -1,5 +1,6 @@
 ﻿module Yobo.Client.Pages.Registration.View
 
+open Yobo.Client.Router
 open Feliz
 open Feliz.Bulma
 open Yobo.Client
@@ -133,7 +134,7 @@ let registerForm model dispatch =
             ]
         ]
         Html.div [
-            Html.a [ prop.text "Zpět na přihlášení"; prop.href (Router.formatPath Paths.Login);  prop.onClick Router.goToUrl  ]
+            Html.aRouted "Zpět na přihlášení" Page.Login
         ]
     ]
 

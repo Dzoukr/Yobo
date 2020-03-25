@@ -1,5 +1,6 @@
 ﻿module Yobo.Client.Pages.Login.State
 
+open Yobo.Client.Router
 open Domain
 open Elmish
 open Fable.Core
@@ -25,6 +26,6 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         | Ok token ->
             TokenStorage.setToken token
             { model with IsLoading = false; Form = Request.Login.init |> ValidatedForm.init },
-                Cmd.batch [ ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"; Router.navigatePath Paths.Calendar ]
+                Cmd.batch [ ServerResponseViews.showSuccessToast "Byli jste úspěšně přihlášeni!"; Router.navigatePage Calendar ]
         | Error e ->
             { model with IsLoading = false }, e |> ServerResponseViews.showErrorToast

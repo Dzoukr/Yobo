@@ -7,6 +7,8 @@ open System
 open Domain
 open Feliz
 open Feliz.Bulma
+open Feliz.Bulma.QuickView
+open Feliz.Bulma.Calendar
 open Yobo.Client.SharedView
 open Yobo.Shared.Domain
 open Yobo.Shared.DateTime
@@ -27,7 +29,7 @@ let private userRow dispatch (u:User) =
         if u.Activated.IsSome then
             Bulma.button [
                 button.isPrimary
-                //prop.onClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch)
+                prop.onClick (fun _ -> u.Id |> Some |> ShowAddCreditsForm |> dispatch)
                 prop.text "Přidat kredity"
             ]
         else Html.none
@@ -37,7 +39,6 @@ let private userRow dispatch (u:User) =
             Bulma.button [
                 prop.style [ style.marginLeft 5 ]
                 button.isLight
-                //prop.onClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch)
                 prop.text "Prodloužit platnost"
             ]
         else Html.none
@@ -50,6 +51,73 @@ let private userRow dispatch (u:User) =
         Html.td (u.Credits |> string)
         Html.td expires
         Html.td [ addCreditBtn; prolongBtn ]
+    ]
+
+let addCreditsQuickView (model:Model) dispatch user =
+    
+    let form = [
+        Bulma.field [
+            Bulma.label "Uživatel"
+            Bulma.fieldBody [
+                Html.div (sprintf "%s %s" user.FirstName user.LastName)
+            ]
+        ]
+        Bulma.field [
+            Bulma.label "Počet kreditů"
+            Bulma.fieldBody [
+                Bulma.numberInput [
+                    //ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.LastName))
+                    //prop.onTextChange (fun x -> { model.Form.FormData with LastName = x } |> FormChanged |> dispatch)
+                    //prop.valueOrDefault model.Form.FormData.LastName
+                ]
+            ]
+        ]
+        Bulma.field [
+            Bulma.label "Datum expirace"
+            Bulma.fieldBody [
+                Calendar.calendar [
+                    prop.id "expCal"
+                    calendar.options [
+                        calendar.options.type'.date
+                        calendar.options.isRange false
+                        calendar.options.displayMode.inline'
+                        calendar.options.weekStart DayOfWeek.Monday
+                        calendar.options.showFooter false
+                        calendar.options.minDate DateTime.UtcNow
+                        calendar.options.lang "cs"
+                    ]
+                    calendar.onValueSelected (fun x ->
+                        Fable.Core.JS.console.log(x)
+                    )
+                ]
+            ]
+        ]
+        Bulma.field [
+            Bulma.fieldBody [
+                Bulma.button [
+                    button.isPrimary
+                    prop.text "Přidat kredity"
+                    //prop.onClick (fun _ -> Reset |> dispatch)
+                ]
+            ]
+        ]
+        
+    ]
+    
+    QuickView.quickview [
+        quickview.isActive
+        prop.children [
+            QuickView.header [
+                Html.div "Přidat kredity"
+                Bulma.delete [ prop.onClick (fun _ -> None |> ShowAddCreditsForm |> dispatch) ]
+            ]
+            QuickView.body [
+                QuickView.block [
+                    prop.style [ style.padding 15 ]
+                    prop.children form
+                ]
+            ]
+        ]
     ]
     
 //let private showForm dispatch (state:State) (user:User option) =
@@ -114,7 +182,11 @@ let private userRow dispatch (u:User) =
 let private loadingRow =
     Html.tr [
         prop.colSpan 7
-        prop.children [ Html.faIcon "fas fa-circle-notch fa-spin" ]
+        prop.children [
+            Html.td [
+                Html.faIcon "fas fa-circle-notch fa-spin"
+            ]
+        ]
     ]
 
 let view (model : Model) (dispatch : Msg -> unit) =
@@ -139,8 +211,13 @@ let view (model : Model) (dispatch : Msg -> unit) =
             ]
         ]
     
+    let quickviewAddCredits =
+        model.AddCreditsSelectedUser
+        |> Option.bind (fun uId -> model.Users |> List.tryFind (fun x -> x.Id = uId))
+        |> Option.map (addCreditsQuickView model dispatch)
+        |> Option.defaultValue Html.none
+    
     Html.div [
         table
-        //model.Users 
-        //state.Users |> List.tryFind (fun x -> Some x.Id = state.SelectedUserId) |> showForm dispatch state
+        quickviewAddCredits
     ]        

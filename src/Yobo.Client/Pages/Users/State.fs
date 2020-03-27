@@ -15,6 +15,8 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         match res with
         | Ok users -> { model with Users = users }, Cmd.none
         | Error e -> model, e |> ServerResponseViews.showErrorToast
+    | ShowAddCreditsForm userId ->
+        { model with AddCreditsSelectedUser = userId }, Cmd.none
 //    | ToggleAddCreditsForm i ->
 //        let userId = if state.SelectedUserId = Some i then None else Some i
 //        { state with SelectedUserId = userId }, Cmd.none

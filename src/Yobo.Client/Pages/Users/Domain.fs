@@ -10,10 +10,9 @@ type Model = {
     Users : User list
     UsersLoading : bool
     
+    AddCreditsSelectedUser : Guid option    
+    
 //    AddCreditsForm : ValidatedForm<Request.Login>
-//    
-//    
-//    SelectedUserId : Guid option
 //    ExpirationDate : DateTimeOffset option
 //    Credits : int
 }
@@ -23,7 +22,8 @@ module Model =
         {
             Users = []
             UsersLoading = false
-//            SelectedUserId = None
+            AddCreditsSelectedUser = None
+
 //            ExpirationDate = DateTimeOffset.Now.EndOfTheDay().AddMonths 4 |> Some
 //            Credits = 10
         }
@@ -31,6 +31,7 @@ module Model =
 type Msg =
     | LoadUsers
     | UsersLoaded of ServerResult<User list>
+    | ShowAddCreditsForm of Guid option
     
 //    | CalendarChanged of DateTimeOffset option
 //    | CreditsChanged of int

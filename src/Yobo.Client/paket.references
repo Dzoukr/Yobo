@@ -8,6 +8,8 @@ Feliz.Router
 Feliz.Bulma
 Feliz.Bulma.Checkradio
 Feliz.Bulma.PageLoader
+Feliz.Bulma.QuickView
+Feliz.Bulma.Calendar
 Elmish.SweetAlert
 Elmish.Toastr
 Fable.Remoting.Client

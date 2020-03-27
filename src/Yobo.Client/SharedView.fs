@@ -8,12 +8,20 @@ open Yobo.Client.Router
 open Feliz.Router
 
 module Html =
+    module Props =
+        let routed (p:Page) =
+            [
+                prop.href (p |> Page.toUrlSegments |> Router.formatPath)
+                prop.onClick (Router.goToUrl)
+            ]
+        
     let aRouted (text:string) (p:Page) =
         Html.a [
-            prop.href (p |> Page.toUrlSegments |> Router.formatPath)
-            prop.onClick (Router.goToUrl)
+            yield! Props.routed p
             prop.text text
         ]
+        
+    let faIcon (icon:string) = Html.i [ prop.className icon; prop.style [ style.marginRight 5 ] ]        
 
 module ServerResponseViews =
     open Elmish

@@ -4,14 +4,43 @@ open Yobo.Client.Router
 open Domain
 open Elmish
 open Feliz
+open Feliz
 open Feliz.Bulma
+open Feliz.Bulma.Operators
 open Feliz.Bulma.PageLoader
 open Feliz.Router
 open Yobo.Client.SharedView
 
-let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserAccount) (page:Page) content dispatch =
-    //let item (pg:string) icon text =
-        
+let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserAccount) (page:Page) dispatch (content:ReactElement)  =
+    
+    
+    let item (pg:Page) (icon:string) (text:string) =
+        let isActive = page = pg
+        Bulma.navbarItemA [
+            if isActive then navbarItem.isActive
+            yield! Html.Props.routed pg
+            prop.children [
+                Html.faIcon icon
+                Html.text text
+            ]
+        ]
+    
+    let adminButtons =
+        if user.IsAdmin then
+            [ item Users "fas fa-users" "Uživatelé"
+              item Lessons "fas fa-calendar-alt" "Lekce" ]
+        else []
+    
+    let userInfo =
+        Bulma.navbarItemDiv [
+            Bulma.tag [
+                tag.isInfo
+                prop.style [ style.marginRight 10 ]
+                prop.text (sprintf "%i kreditů" user.Credits)
+            ]
+            Html.faIcon "fas fa-user"
+            Html.text (sprintf "%s %s" user.FirstName user.LastName)
+        ]
     
     Html.div [
         Bulma.navbar [
@@ -19,57 +48,34 @@ let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserA
             prop.children [
                 Bulma.container [
                     Bulma.navbarStart [
-                        
+                        item Calendar "fas fa-calendar-alt" "Kalendář"
+                        item MyAccount "fas fa-user" "Můj účet"
+                    ]
+                    Bulma.navbarEnd [
+                        yield! adminButtons
+                        userInfo
+                        Bulma.navbarItemDiv [
+                            Bulma.buttons [
+                                Bulma.buttonLink [
+                                    button.isDanger
+                                    prop.onClick (fun _ -> LoggedOut |> dispatch)
+                                    prop.text "Odhlásit"
+                                ]
+                            ]
+                        ]
                     ]
                 ]
             ]
         ]
-    ]
-    
-//    let item (pg:string) icon text =
-//        let isActive = page.Path = pg
-//        Navbar.Item.a [ Navbar.Item.IsActive isActive ; Navbar.Item.Option.Props [ Href pg; OnClick Router.goToUrl ] ] [
-//            i [ ClassName icon; Style [ MarginRight 5] ] [ ]
-//            str text
-//        ]
-//
-//    let adminButtons =
-//        match user with
-//        | Some { IsAdmin = true } ->
-//                [ item Router.Users.Path "fas fa-users" "Uživatelé"
-//                  item Router.Lessons.Path "fas fa-calendar-alt" "Lekce" ]
-//        | _ -> []
-//
-//    let userInfo =
-//        match user with
-//        | Some user ->
-//            Navbar.Item.div [] [
-//                Tag.tag [ Tag.Color IsInfo; Tag.Props [ Style [ MarginRight 10 ] ] ] [ sprintf "%i kreditů" user.Credits |> str ]
-//                i [ ClassName "fas fa-user"; Style [ MarginRight 5 ] ] []
-//                sprintf "%s %s" user.FirstName user.LastName |> str
-//            ]
-//        | None -> str ""
-//    
-//    div [] [
-//        Navbar.navbar [ Navbar.Color IsLight; ] [
-//            Container.container [] [
-//                Navbar.Start.div [] [
-//                    item Router.Calendar.Path "fas fa-calendar-alt" "Kalendář"
-//                    item Router.MyLessons.Path "fas fa-user" "Můj účet"
-//                ]
-//                Navbar.End.div [] [
-//                    yield! adminButtons
-//                    yield userInfo
-//                    yield Navbar.Item.div [] [
-//                        div [ ClassName "buttons" ] [
-//                            Button.a [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> LoggedOut |> dispatch) ] ] [
-//                                str "Odhlásit"
-//                            ]
-//                        ]
-//                    ]
-//                ]
-//            ]
-//        ]
+        Html.main [
+            prop.style [ style.paddingTop(length.rem 2) ]
+            prop.children [
+                Bulma.container [
+                    content
+                ]
+            ]
+        ]
+        
 //        main [ Style [ PaddingTop "2rem" ] ] [
 //            Container.container [ ] [
 //                content
@@ -79,7 +85,8 @@ let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserA
 //                SharedView.termsModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
 //            ]
 //        ]
-//    ]
+    ]
+    
 
 let showView<'model,'msg> (fn:'model -> ('msg -> unit) -> Fable.React.ReactElement) (dispatch:'msg -> unit) (m:Model) =
     let pm = m |> Model.getPageModel<'model>
@@ -99,15 +106,15 @@ let view (model:Model) (dispatch:Msg -> unit) =
             match model.PageWithModel.Page with
             | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
             | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
-                
             | AccountActivation _ -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
             | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
             | ResetPassword _ -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
-            | Calendar ->
+            | Calendar when model.LoggedUser.IsSome ->
                 Html.div [
                     Html.text (sprintf "%A" model.LoggedUser)
                     Html.aRouted "Login" Page.Login
                 ]
+                |> displayLoggedPage model.LoggedUser.Value model.PageWithModel.Page dispatch
             
     Router.router [
         Router.pathMode

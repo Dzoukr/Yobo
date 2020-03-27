@@ -7,6 +7,10 @@ open Fable.Core.JsInterop
 
 type Page =
     | Calendar
+    | MyAccount
+    // admin
+    | Users
+    | Lessons
     // auth
     | Login
     | Registration
@@ -23,6 +27,9 @@ module Page =
     module private Paths =
         let [<Literal>] Login = "login"
         let [<Literal>] Calendar = "calendar"
+        let [<Literal>] MyAccount = "my-account"
+        let [<Literal>] Users = "users"
+        let [<Literal>] Lessons = "lessons"
         let [<Literal>] Registration = "registration"
         let [<Literal>] ForgottenPassword = "forgotten-password"
     
@@ -31,6 +38,9 @@ module Page =
             [ Paths.Login ], Login
             [ Paths.Registration ], Registration
             [ Paths.Calendar ], Calendar
+            [ Paths.MyAccount ], MyAccount
+            [ Paths.Users ], Users
+            [ Paths.Lessons ], Lessons
             [ Paths.ForgottenPassword ], ForgottenPassword
         ]
     
@@ -53,7 +63,7 @@ module Page =
             |> Option.defaultValue []
 
 module Router = 
-    let goToUrl (e: MouseEvent) =
+    let goToUrl (e:MouseEvent) =
         e.preventDefault()
         let href : string = !!e.currentTarget?attributes?href?value
         Router.navigatePath href |> List.map (fun f -> f ignore) |> ignore

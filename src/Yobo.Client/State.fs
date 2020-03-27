@@ -44,7 +44,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () (fun u -> UserRefreshedWithRedirect(u, p))
     | UserRefreshedWithRedirect(u, p) ->
         match u with
-        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, UrlChanged(p) |> Cmd.ofMsg
+        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, Router.navigatePage p
         | Error _ -> { model with IsCheckingUser = false }, Cmd.ofMsg LoggedOut
     | RefreshUser ->
         { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () UserRefreshed

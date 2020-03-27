@@ -7,6 +7,7 @@ open Microsoft.Extensions.Logging
 open Giraffe
 open Attributes
 open Microsoft.Azure.WebJobs.Extensions.Http
+open FSharp.Control.Tasks
 
 let webApp (root:CompositionRoot) =
     choose [
@@ -21,6 +22,9 @@ let webApp (root:CompositionRoot) =
 
 [<FunctionName("Index")>]
 let run ([<HttpTrigger (AuthorizationLevel.Anonymous, Route = "{*any}")>] req : HttpRequest, context : ExecutionContext, log : ILogger, [<CompositionRoot>]root: CompositionRoot) =
-    let hostingEnvironment = req.HttpContext.GetHostingEnvironment()
-    hostingEnvironment.ContentRootPath <- context.FunctionAppDirectory
-    webApp root (Some >> Task.FromResult) req.HttpContext
+    task {
+        let hostingEnvironment = req.HttpContext.GetHostingEnvironment()
+        hostingEnvironment.ContentRootPath <- context.FunctionAppDirectory
+        let! _ = webApp root (Some >> Task.FromResult) req.HttpContext
+        return Microsoft.AspNetCore.Mvc.EmptyResult()
+    }

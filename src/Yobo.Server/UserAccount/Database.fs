@@ -25,11 +25,13 @@ module Queries =
                 |> Option.map (fun x ->
                     {
                         Id = x.Id
+                        Email = x.Email
                         FirstName = x.FirstName
                         LastName = x.LastName
                         IsActivated = x.Activated.IsSome
                         Credits = x.Credits
                         CreditsExpiration = x.CreditsExpiration
+                        IsAdmin = false
                     } : Queries.UserAccount
                 )
         }        

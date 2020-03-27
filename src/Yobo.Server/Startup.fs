@@ -3,6 +3,7 @@
 open System
 open System.IO
 open System.Reflection
+open System.Threading.Tasks
 open Giraffe
 open Microsoft.Azure.Functions.Extensions.DependencyInjection
 open Microsoft.Azure.WebJobs
@@ -36,101 +37,121 @@ module private Configuration =
             .AddJsonFile("local.settings.json", true)
             .AddEnvironmentVariables().Build()
 
-let private withSqlConnection builder fn =
-    let conn = builder()
-    fn conn
-
-module AuthRoot =
-    
-    let compose sqlConnectionBuilder sendEmail emailBuilder (cfg:IConfigurationRoot) =
-        
-        let sql fn = withSqlConnection sqlConnectionBuilder fn
-        
-        // config
-        let issuer = cfg.["AuthIssuer"]
-        let audience = cfg.["AuthAudience"]
-        let secret = cfg.["AuthSecret"]
-        let tokenLifetime = cfg.["AuthTokenLifetime"] |> TimeSpan.Parse
-        let pars = Jwt.getParameters audience issuer secret
-        
-        let queries = {
-            TryGetUserByEmail = sql Auth.Database.Queries.tryGetUserByEmail
-            TryGetUserById = sql Auth.Database.Queries.tryGetUserById
-        }
-        
-        let handleEvents conn evns = task {
-            for e in evns do
-                do! Auth.DbEventHandler.handle conn e
-                do! Auth.EmailEventHandler.handle sendEmail emailBuilder queries.TryGetUserById e
-        }
-        
-        let toExn = Result.mapError ServerError.Authentication >> ServerError.ofResult
-        
-        {
-            CreateToken = Jwt.createJwtToken audience issuer secret tokenLifetime >> fun x -> x.Token
-            ValidateToken = Jwt.validateToken pars >> Option.map List.ofSeq
-            VerifyPassword = Password.verifyPassword
-            CreatePasswordHash = Password.createHash
-            Queries = queries
-            CommandHandler = {
-                Register = fun args -> task {
-                    let! projections = sql Auth.Database.Projections.getAll
-                    return! args |> CommandHandler.register projections |> toExn |> sql handleEvents
-                }
-                ActivateAccount = fun args -> task {
-                    let! projections = sql Auth.Database.Projections.getAll
-                    return! args |> CommandHandler.activate projections |> toExn |> sql handleEvents
-                }
-                ForgottenPassword = fun args -> task {
-                    let! projections = sql Auth.Database.Projections.getAll
-                    return! args |> CommandHandler.initiatePasswordReset projections |> toExn |> sql handleEvents
-                }
-                ResetPassword = fun args -> task {
-                    let! projections = sql Auth.Database.Projections.getAll
-                    return!
-                        args
-                        |> CommandHandler.completePasswordReset projections
-                        |> toExn
-                        |> sql handleEvents
-                }
-            }
-        } : AuthRoot
-
-module UserAccountRoot =
-    let compose sqlConnectionBuilder (cfg:IConfigurationRoot) =
-        let sql fn = withSqlConnection sqlConnectionBuilder fn
-        
-        {
-            Queries = {
-                TryGetUserInfo = sql UserAccount.Database.Queries.tryGetUserById
-            }    
-        }
-
-
-
 module CompositionRoot =
     open Yobo.Libraries.Emails
+    open Yobo.Libraries.Tasks
     
     type PartialEmail = {| To:Address; Subject:string; Message:string |}
     
     let compose (cfg:IConfigurationRoot) =
         Dapper.FSharp.OptionTypes.register()
         
+        let sql fn =
+            let conn = new SqlConnection(cfg.["ReadDbConnectionString"])
+            fn conn
+        
+        // JWT config
+        let issuer = cfg.["AuthIssuer"]
+        let audience = cfg.["AuthAudience"]
+        let secret = cfg.["AuthSecret"]
+        let tokenLifetime = cfg.["AuthTokenLifetime"] |> TimeSpan.Parse
+        let pars = Jwt.getParameters audience issuer secret
+        
+        let createPwdHash = Password.createHash
+        
+        // emailing
         let sendEmail partial =
             let from = { Name = cfg.["EmailsFromName"]; Email = cfg.["EmailsFromEmail"] }
-            let send = Yobo.Libraries.Emails.MailjetSender.sendEmail cfg.["MailjetApiKey"] cfg.["MailjetSecretKey"] >> fun _ -> task { return () }
+            let send = Yobo.Libraries.Emails.MailjetSender.sendEmail cfg.["MailjetApiKey"] cfg.["MailjetSecretKey"] >> Task.ignore
             partial
             |> (fun (x:PartialEmail) -> { From = from; To = [x.To]; Bcc = []; Cc = []; Subject = x.Subject; PlainTextMessage = ""; HtmlMessage = x.Message })
             |> send
-        
         let emailBuilder = EmailTemplates.getDefault (Uri cfg.["ServerBaseUrl"])
-        let sqlConnectionBuilder () = new SqlConnection(cfg.["ReadDbConnectionString"])
+        
+        // admin user
+        let adminUser =
+            {
+                Id = System.Guid("f65203d4-60dd-4580-a31c-e538807ef720")
+                Email = cfg.["AdminEmail"]
+                FirstName = "Admin"
+                LastName = "Admin"
+                IsAdmin = true
+                IsActivated = true
+                Credits = 0
+                CreditsExpiration = None
+                //CashReservationBlockedUntil = None
+            } : Yobo.Shared.UserAccount.Domain.Queries.UserAccount
+        
+        let adminPwd = cfg.["AdminPassword"] |> createPwdHash       
         
         {
-            Auth = AuthRoot.compose sqlConnectionBuilder sendEmail emailBuilder cfg
-            UserAccount = UserAccountRoot.compose sqlConnectionBuilder cfg
-        } : CompositionRoot
+            Auth =
+                let tryGetUserByEmail (email:string) =
+                    if email = adminUser.Email then
+                        ({
+                            Id = adminUser.Id
+                            Email = adminUser.Email
+                            PasswordHash = adminPwd
+                            FirstName = adminUser.FirstName
+                            LastName = adminUser.LastName
+                        } : Auth.Domain.Queries.AuthUserView)
+                        |> Some
+                        |> Task.FromResult
+                    else
+                        (sql Auth.Database.Queries.tryGetUserByEmail email)
+                
+                let queries = {
+                    TryGetUserByEmail = tryGetUserByEmail
+                    TryGetUserById = sql Auth.Database.Queries.tryGetUserById
+                }
 
+                let toExn = Result.mapError ServerError.Authentication >> ServerError.ofResult
+                
+                let handleEvents conn evns = task {
+                    for e in evns do
+                        do! Auth.DbEventHandler.handle conn e
+                        do! Auth.EmailEventHandler.handle sendEmail emailBuilder queries.TryGetUserById e
+                }
+                
+                {
+                    CreateToken = Jwt.createJwtToken audience issuer secret tokenLifetime >> fun x -> x.Token
+                    ValidateToken = Jwt.validateToken pars >> Option.map List.ofSeq
+                    VerifyPassword = Password.verifyPassword
+                    CreatePasswordHash = createPwdHash
+                    Queries = queries
+                    CommandHandler = {
+                        Register = fun args -> task {
+                            let! projections = sql Auth.Database.Projections.getAll
+                            return! args |> CommandHandler.register projections |> toExn |> sql handleEvents
+                        }
+                        ActivateAccount = fun args -> task {
+                            let! projections = sql Auth.Database.Projections.getAll
+                            return! args |> CommandHandler.activate projections |> toExn |> sql handleEvents
+                        }
+                        ForgottenPassword = fun args -> task {
+                            let! projections = sql Auth.Database.Projections.getAll
+                            return! args |> CommandHandler.initiatePasswordReset projections |> toExn |> sql handleEvents
+                        }
+                        ResetPassword = fun args -> task {
+                            let! projections = sql Auth.Database.Projections.getAll
+                            return!
+                                args
+                                |> CommandHandler.completePasswordReset projections
+                                |> toExn
+                                |> sql handleEvents
+                        }
+                    }
+                }
+            UserAccount = {
+                Queries =
+                    {
+                        TryGetUserInfo = (fun i ->
+                            if i = adminUser.Id then adminUser |> Some |> Task.FromResult
+                            else sql UserAccount.Database.Queries.tryGetUserById i
+                        )
+                    }    
+            }
+        } : CompositionRoot
 
 type private InjectCompositionRoot(root) =
     
@@ -141,7 +162,6 @@ type private InjectCompositionRoot(root) =
                 .BindToInput<CompositionRoot>(fun x -> root)
             |> ignore
 
-        
 type WebJobsStartup() =
     interface IWebJobsStartup with
         member this.Configure(builder:IWebJobsBuilder) =

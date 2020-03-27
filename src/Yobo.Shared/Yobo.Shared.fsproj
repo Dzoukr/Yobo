@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="DateTime.fs" />
         <Compile Include="ClientPaths.fs" />
         <Compile Include="Validation.fs" />
         <Compile Include="Domain.fs" />
@@ -13,6 +14,8 @@
         <Compile Include="Auth\Validation.fs" />
         <Compile Include="UserAccount\Domain.fs" />
         <Compile Include="UserAccount\Communication.fs" />
+        <Compile Include="Users\Domain.fs" />
+        <Compile Include="Users\Communication.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

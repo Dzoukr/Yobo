@@ -1,7 +1,6 @@
 module Yobo.Server.Auth.HttpHandlers
 
 open System
-open System.Net
 open System.Security.Claims
 open Fable.Remoting.Giraffe
 open Fable.Remoting.Server
@@ -10,10 +9,7 @@ open Yobo.Shared.Auth.Communication
 open FSharp.Control.Tasks
 open Yobo.Server.Auth.Domain
 open Yobo.Shared.Auth.Validation
-open FSharp.Rop.Result
-open FSharp.Rop.TaskResult
 open Microsoft.AspNetCore.Http
-open Microsoft.AspNetCore.Identity
 open Yobo.Server
 open Yobo.Shared.Domain
 
@@ -23,6 +19,7 @@ let private userToClaims (u:Domain.Queries.AuthUserView) =
         Claim("Email", u.Email)
         Claim("FirstName", u.FirstName)
         Claim("LastName", u.LastName)
+        Claim("IsAdmin", string u.IsAdmin)
     ]
 
 let private login (authRoot:AuthRoot) (l:Request.Login) =
@@ -125,5 +122,20 @@ let onlyForLoggedUser (authRoot:AuthRoot) next (ctx:HttpContext) =
         ctx.User <- ClaimsPrincipal(ClaimsIdentity(c))
         next ctx
     | None -> RequestErrors.UNAUTHORIZED "Bearer" "Yobo" "Unauthorized" next ctx
-    
+
+let onlyForAdmin next (ctx:HttpContext) =
+    let isAdmin =
+        ctx.User.Claims
+        |> Seq.find (fun x -> x.Type = "IsAdmin")
+        |> fun x -> x.Value
+        |> Boolean.Parse
+    if isAdmin then next ctx else RequestErrors.UNAUTHORIZED "Bearer" "Yobo" "Unauthorized" next ctx
+
+let withUser (proxyBuilder:Guid -> 'proxy) (ctx:HttpContext) =
+    let userId =
+        ctx.User.Claims
+        |> Seq.find (fun x -> x.Type = "Id")
+        |> fun x -> x.Value
+        |> Guid
+    userId |> proxyBuilder    
      

@@ -6,6 +6,7 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Interfaces.fs" />
         <Compile Include="TokenStorage.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Server.fs" />
@@ -31,6 +32,9 @@
         <Compile Include="Pages\MyAccount\Domain.fs" />
         <Compile Include="Pages\MyAccount\State.fs" />
         <Compile Include="Pages\MyAccount\View.fs" />
+        <Compile Include="Pages\Users\Domain.fs" />
+        <Compile Include="Pages\Users\State.fs" />
+        <Compile Include="Pages\Users\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />

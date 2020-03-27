@@ -106,6 +106,7 @@ module Queries =
                         PasswordHash = x.PasswordHash
                         FirstName = x.FirstName
                         LastName = x.LastName
+                        IsAdmin = false
                     } : Queries.AuthUserView
                 )
         }

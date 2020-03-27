@@ -9,6 +9,7 @@ module Queries =
         PasswordHash : string
         FirstName : string
         LastName : string
+        IsAdmin : bool
     }
     
     type BasicUserView = {

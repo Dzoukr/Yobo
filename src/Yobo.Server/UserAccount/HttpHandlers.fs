@@ -20,17 +20,9 @@ let private userAccountService (root:CompositionRoot) userId : UserAccountServic
         GetUserInfo = getUserInfo root userId >> Async.AwaitTask
     }
 
-let private withUser (proxyBuilder:Guid -> 'proxy) (ctx:HttpContext) =
-    let userId =
-        ctx.User.Claims
-        |> Seq.find (fun x -> x.Type = "Id")
-        |> fun x -> x.Value
-        |> Guid
-    userId |> proxyBuilder
-
 let userAccountServiceHandler (root:CompositionRoot) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder UserAccountService.RouteBuilder
-    |> Remoting.fromContext (withUser (userAccountService root))
+    |> Remoting.fromContext (Auth.HttpHandlers.withUser (userAccountService root))
     |> Remoting.withErrorHandler Remoting.errorHandler
     |> Remoting.buildHttpHandler

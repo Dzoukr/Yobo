@@ -36,9 +36,19 @@ type UserAccountQueries = {
 type UserAccountRoot = {
     Queries : UserAccountQueries
 }
+
+type UsersQueries = {
+    GetAllUsers : unit -> Task<Yobo.Shared.Users.Domain.Queries.User list>
+}
+
+type UsersRoot = {
+    Queries : UsersQueries
+}
+
 type CompositionRoot = {
     Auth : AuthRoot
     UserAccount : UserAccountRoot
+    Users : UsersRoot
 }    
 
 module Attributes =

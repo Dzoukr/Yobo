@@ -94,6 +94,7 @@ module CompositionRoot =
                             PasswordHash = adminPwd
                             FirstName = adminUser.FirstName
                             LastName = adminUser.LastName
+                            IsAdmin = true
                         } : Auth.Domain.Queries.AuthUserView)
                         |> Some
                         |> Task.FromResult
@@ -150,6 +151,11 @@ module CompositionRoot =
                             else sql UserAccount.Database.Queries.tryGetUserById i
                         )
                     }    
+            }
+            Users = {
+                Queries = {
+                    GetAllUsers = sql Users.Database.Queries.getAllUsers
+                }
             }
         } : CompositionRoot
 

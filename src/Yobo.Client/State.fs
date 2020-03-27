@@ -20,6 +20,10 @@ let private handleUpdate<'subModel,'subCmd> (fn:'subModel -> 'subModel * Cmd<'su
 let private getPageInitCommands targetPage =
     match targetPage with
     | Page.Anonymous (AccountActivation _) -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
+    | Page.Secured _ ->
+        [
+            RefreshUser
+        ] |> List.map Cmd.ofMsg |> Cmd.batch
     | _ -> Cmd.none
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
@@ -42,6 +46,12 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         match u with
         | Ok usr -> model |> Model.navigateToSecured usr p, Router.navigatePage (Secured p)
         | Error _ -> { model with IsCheckingUser = false }, Cmd.ofMsg LoggedOut
+    | RefreshUser ->
+        model, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () UserRefreshed
+    | UserRefreshed res ->
+        match res with
+        | Ok usr -> model |> Model.refreshUser usr, Cmd.none
+        | Error _ -> model, Cmd.ofMsg LoggedOut        
     | RefreshToken token -> model, Cmd.OfAsync.eitherAsResult authService.RefreshToken token TokenRefreshed
     | TokenRefreshed res ->
         match res with
@@ -58,6 +68,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | AccountActivationMsg subMsg -> model |> handleUpdate (Pages.AccountActivation.State.update subMsg) AccountActivationMsg
     | ForgottenPasswordMsg subMsg -> model |> handleUpdate (Pages.ForgottenPassword.State.update subMsg) ForgottenPasswordMsg
     | ResetPasswordMsg subMsg -> model |> handleUpdate (Pages.ResetPassword.State.update subMsg) ResetPasswordMsg
+    | MyAccountMsg subMsg -> model |> handleUpdate (Pages.MyAccount.State.update subMsg) MyAccountMsg
 
 let subscribe (_:Model) =
     let sub dispatch = 

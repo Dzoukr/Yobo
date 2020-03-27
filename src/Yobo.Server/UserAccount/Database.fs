@@ -29,7 +29,7 @@ module Queries =
                         FirstName = x.FirstName
                         LastName = x.LastName
                         IsActivated = x.Activated.IsSome
-                        Credits = x.Credits
+                        Credits = Random().Next() //x.Credits
                         CreditsExpiration = x.CreditsExpiration
                         IsAdmin = false
                     } : Queries.UserAccount

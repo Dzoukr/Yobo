@@ -19,8 +19,9 @@ module CurrentPage =
         | Secured (p,u) ->
             match p with
             | Calendar -> null
+            | Lessons -> null
+            | Users -> null
             | MyAccount -> u |> Pages.MyAccount.Domain.Model.init |> box
-    
     let init = Anonymous Login
 
 type Model = {
@@ -45,9 +46,22 @@ module Model =
         let newPage = Secured(p, user)
         let newSubModel = newPage |> CurrentPage.getInitSubPageModel
         { m with CurrentPage = newPage; SubPageModel = newSubModel }
-   
+    
     let getPageModel<'a> (m:Model) = m.SubPageModel :?> 'a
     let setPageModel (m:obj) (model:Model) = { model with SubPageModel = m }
+    
+    let refreshUser user (m:Model) =
+        match m.CurrentPage with
+        | Anonymous _ -> m
+        | Secured(p,_) ->
+            let newPage = Secured(p, user)
+            let newSubModel =
+                match p with
+                | MyAccount ->
+                    let model = m |> getPageModel<Pages.MyAccount.Domain.Model>
+                    { model with LoggedUser = user } |> box
+                | _ -> newPage |> CurrentPage.getInitSubPageModel
+            { m with CurrentPage = newPage; SubPageModel = newSubModel }
 
 type Msg =
     // auth

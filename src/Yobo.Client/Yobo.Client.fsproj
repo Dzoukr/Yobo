@@ -6,7 +6,6 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        
         <Compile Include="TokenStorage.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Server.fs" />

@@ -10,8 +10,8 @@ open Yobo.Shared
 open Yobo.Client
 open Yobo.Shared.Domain
 
-let view (state:Model) (dispatch:Msg -> unit) =
-    Html.text "AHOJ"
+let view (model:Model) (dispatch:Msg -> unit) =
+    Html.text (sprintf "%A" model.LoggedUser) 
     
 //    let txt = 
 //        match state.LoggedUser with

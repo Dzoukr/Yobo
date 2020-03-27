@@ -11,8 +11,11 @@ type Model = {
 }
 
 module Model =
-    let init user = {
+    let init user =
+        Fable.Core.JS.console.log user
+        {
         //IsLoading = false
+        
         LoggedUser = user
     }
 

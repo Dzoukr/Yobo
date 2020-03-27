@@ -134,7 +134,7 @@ let registerForm model dispatch =
             ]
         ]
         Html.div [
-            Html.aRouted "Zpět na přihlášení" Page.Login
+            Html.aRouted "Zpět na přihlášení" (Anonymous Login)
         ]
     ]
 

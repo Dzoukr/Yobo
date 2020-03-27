@@ -3,44 +3,58 @@
 open Yobo.Shared.Domain
 open Router
 
-let private initPageModel = function
-    | Page.AccountActivation i -> box (Pages.AccountActivation.Domain.Model.init i)
-    | Page.ResetPassword i -> box (Pages.ResetPassword.Domain.Model.init i)
-    | Page.Login -> box Pages.Login.Domain.Model.init
-    | Page.Registration -> box Pages.Registration.Domain.Model.init
-    | Page.ForgottenPassword -> box Pages.ForgottenPassword.Domain.Model.init
-    | Page.Calendar -> null // TODO
+type CurrentPage =
+    | Anonymous of AnonymousPage
+    | Secured of SecuredPage * Yobo.Shared.UserAccount.Domain.Queries.UserAccount
 
-type PageWithModel = {
-    Page : Page
-    Model : obj
-}
-
-module PageWithModel =
-    let create p = { Page = p; Model = p |> initPageModel }
+module CurrentPage =
+    let getInitSubPageModel = function
+        | Anonymous p ->
+            match p with
+            | AccountActivation i -> i |> Pages.AccountActivation.Domain.Model.init |> box
+            | ResetPassword i -> i |> Pages.ResetPassword.Domain.Model.init |> box
+            | Login -> Pages.Login.Domain.Model.init |> box
+            | Registration -> Pages.Registration.Domain.Model.init |> box
+            | ForgottenPassword -> Pages.ForgottenPassword.Domain.Model.init |> box
+        | Secured (p,u) ->
+            match p with
+            | Calendar -> null
+            | MyAccount -> u |> Pages.MyAccount.Domain.Model.init |> box
+    
+    let init = Anonymous Login
 
 type Model = {
-    PageWithModel : PageWithModel
-    LoggedUser : Yobo.Shared.UserAccount.Domain.Queries.UserAccount option
+    SubPageModel : obj
     IsCheckingUser : bool
+    CurrentPage : CurrentPage
 }
 
 module Model =
-    let init (p:Page) = {
-        PageWithModel = PageWithModel.create p
-        LoggedUser = None
+    let init = {
+        CurrentPage = CurrentPage.init
+        SubPageModel = CurrentPage.init |> CurrentPage.getInitSubPageModel
         IsCheckingUser = false
     }
-
-    let getPageModel<'a> (m:Model) = m.PageWithModel.Model :?> 'a
-    let setPageModel (m:obj) (model:Model) = { model with PageWithModel = { model.PageWithModel with Model = m } }
+    
+    let navigateToAnonymous (p:AnonymousPage) (m:Model) =
+        let newPage = Anonymous(p)
+        let newSubModel = newPage |> CurrentPage.getInitSubPageModel
+        { m with CurrentPage = newPage; SubPageModel = newSubModel }
+    
+    let navigateToSecured user (p:SecuredPage) (m:Model) =
+        let newPage = Secured(p, user)
+        let newSubModel = newPage |> CurrentPage.getInitSubPageModel
+        { m with CurrentPage = newPage; SubPageModel = newSubModel }
+   
+    let getPageModel<'a> (m:Model) = m.SubPageModel :?> 'a
+    let setPageModel (m:obj) (model:Model) = { model with SubPageModel = m }
 
 type Msg =
     // auth
     | RefreshUser
     | UserRefreshed of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount>
-    | RefreshUserWithRedirect of Page
-    | UserRefreshedWithRedirect of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount> * Page
+    | RefreshUserWithRedirect of SecuredPage
+    | UserRefreshedWithRedirect of SecuredPage * ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount> 
     | RefreshToken of string
     | TokenRefreshed of ServerResult<string>
     | LoggedOut
@@ -52,3 +66,4 @@ type Msg =
     | AccountActivationMsg of Pages.AccountActivation.Domain.Msg
     | ForgottenPasswordMsg of Pages.ForgottenPassword.Domain.Msg
     | ResetPasswordMsg of Pages.ResetPassword.Domain.Msg
+    | MyAccountMsg of Pages.MyAccount.Domain.Msg

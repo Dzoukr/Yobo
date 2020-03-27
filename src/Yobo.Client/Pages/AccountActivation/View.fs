@@ -15,7 +15,7 @@ let view (state:Model) (dispatch : Msg -> unit) =
         Html.span [
             Html.text msg
             Html.div [
-                Html.aRouted "Zpátky na přihlášení" Page.Login
+                Html.aRouted "Zpátky na přihlášení" (Anonymous Login)
             ]
         ]
     

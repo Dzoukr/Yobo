@@ -11,14 +11,14 @@ open Feliz.Bulma.PageLoader
 open Feliz.Router
 open Yobo.Client.SharedView
 
-let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserAccount) (page:Page) dispatch (content:ReactElement)  =
+let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserAccount) (page:SecuredPage) dispatch (content:ReactElement)  =
     
     
-    let item (pg:Page) (icon:string) (text:string) =
+    let item (pg:SecuredPage) (icon:string) (text:string) =
         let isActive = page = pg
         Bulma.navbarItemA [
             if isActive then navbarItem.isActive
-            yield! Html.Props.routed pg
+            yield! Html.Props.routed (Page.Secured pg)
             prop.children [
                 Html.faIcon icon
                 Html.text text
@@ -103,18 +103,24 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 ]
             ]
         else            
-            match model.PageWithModel.Page with
-            | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
-            | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
-            | AccountActivation _ -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
-            | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
-            | ResetPassword _ -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
-            | Calendar when model.LoggedUser.IsSome ->
-                Html.div [
-                    Html.text (sprintf "%A" model.LoggedUser)
-                    Html.aRouted "Login" Page.Login
-                ]
-                |> displayLoggedPage model.LoggedUser.Value model.PageWithModel.Page dispatch
+            match model.CurrentPage with
+            | Anonymous pg ->
+                match pg with
+                | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
+                | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
+                | (AccountActivation _) -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
+                | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
+                | (ResetPassword _) -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
+            | Secured (pg, user) ->
+                match pg with
+                | Calendar ->
+                    Html.div [
+                        Html.text (sprintf "%A" user)
+                        Html.aRouted "Login" (Page.Anonymous Login)
+                    ]
+                | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)
+                    
+                |> displayLoggedPage user pg dispatch
             
     Router.router [
         Router.pathMode

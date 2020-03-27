@@ -9,48 +9,38 @@ open Yobo.Client
 open Yobo.Client.Router
 
 let init () =
-    let currentPage = (Router.currentPath() |> Page.parseFromUrlSegments)
-    (Model.init currentPage), (currentPage |> UrlChanged |> Cmd.ofMsg)
-
+    let nextPage = (Router.currentPath() |> Page.parseFromUrlSegments)
+    Model.init, (nextPage |> UrlChanged |> Cmd.ofMsg)
+    
 let private handleUpdate<'subModel,'subCmd> (fn:'subModel -> 'subModel * Cmd<'subCmd>) mapFn (m:Model) =
     let pageModel = m |> Model.getPageModel<'subModel>
     let newSubModel,subCmd = fn pageModel
     (m |> Model.setPageModel newSubModel), (Cmd.map(mapFn) subCmd)
 
-let private isSecured page =
-    match page with
-    | Page.Login
-    | Page.Registration
-    | Page.AccountActivation _
-    | Page.ForgottenPassword _
-    | Page.ResetPassword _ -> false
-    | _ -> true
-
 let private getPageInitCommands targetPage =
     match targetPage with
-    | Page.AccountActivation _ -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
+    | Page.Anonymous (AccountActivation _) -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
     | _ -> Cmd.none
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
-    | UrlChanged p ->
-        if isSecured p && model.LoggedUser.IsNone then
-            // refresh user first
-            model, Cmd.ofMsg <| RefreshUserWithRedirect(p)
-        else
-            // user is logged, we can continue
-            { model with PageWithModel = p |> PageWithModel.create }, getPageInitCommands p
+    | UrlChanged page ->
+        match model.CurrentPage, page with
+        | CurrentPage.Secured(_,user), Page.Secured targetPage -> 
+            let newModel = model |> Model.navigateToSecured user targetPage
+            newModel, (getPageInitCommands page)
+        | CurrentPage.Anonymous _, Page.Anonymous targetPage
+        | CurrentPage.Secured _, Page.Anonymous targetPage ->
+            let newModel = model |> Model.navigateToAnonymous targetPage
+            newModel, (getPageInitCommands page)
+        | CurrentPage.Anonymous _, Page.Secured targetpage ->
+            model, Cmd.ofMsg <| RefreshUserWithRedirect(targetpage)
     | RefreshUserWithRedirect p ->                
-        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () (fun u -> UserRefreshedWithRedirect(u, p))
-    | UserRefreshedWithRedirect(u, p) ->
+        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () (fun u -> UserRefreshedWithRedirect(p, u))
+    | UserRefreshedWithRedirect(p, u) ->
+        let model = { model with IsCheckingUser = false }
         match u with
-        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, Router.navigatePage p
-        | Error _ -> { model with IsCheckingUser = false }, Cmd.ofMsg LoggedOut
-    | RefreshUser ->
-        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () UserRefreshed
-    | UserRefreshed res ->
-        match res with
-        | Ok usr -> { model with LoggedUser = Some usr; IsCheckingUser = false }, Cmd.none
+        | Ok usr -> model |> Model.navigateToSecured usr p, Router.navigatePage (Secured p)
         | Error _ -> { model with IsCheckingUser = false }, Cmd.ofMsg LoggedOut
     | RefreshToken token -> model, Cmd.OfAsync.eitherAsResult authService.RefreshToken token TokenRefreshed
     | TokenRefreshed res ->
@@ -61,7 +51,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         | Error _ -> model, Cmd.ofMsg LoggedOut
     | LoggedOut ->
         TokenStorage.removeToken()
-        { model with LoggedUser = None }, Router.navigatePage Login
+        model, Router.navigatePage (Anonymous Login)
     // auth
     | LoginMsg subMsg -> model |> handleUpdate (Pages.Login.State.update subMsg) LoginMsg
     | RegistrationMsg subMsg -> model |> handleUpdate (Pages.Registration.State.update subMsg) RegistrationMsg

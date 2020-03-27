@@ -5,24 +5,28 @@ open Browser.Types
 open Feliz.Router
 open Fable.Core.JsInterop
 
-type Page =
-    | Calendar
-    | MyAccount
-    // admin
-    | Users
-    | Lessons
-    // auth
+type AnonymousPage =
     | Login
     | Registration
     | AccountActivation of Guid
     | ForgottenPassword
     | ResetPassword of Guid
 
+type SecuredPage =    
+    | Calendar
+    | MyAccount
+    // admin
+    | Users
+    | Lessons
+
+type Page =
+    | Anonymous of AnonymousPage
+    | Secured of SecuredPage
 
 [<RequireQualifiedAccess>]    
 module Page =
     
-    let defaultPage = Calendar
+    let defaultPage = (Secured Calendar)
     
     module private Paths =
         let [<Literal>] Login = "login"
@@ -35,27 +39,27 @@ module Page =
     
     let private basicMapping =
         [
-            [ Paths.Login ], Login
-            [ Paths.Registration ], Registration
-            [ Paths.Calendar ], Calendar
-            [ Paths.MyAccount ], MyAccount
-            [ Paths.Users ], Users
-            [ Paths.Lessons ], Lessons
-            [ Paths.ForgottenPassword ], ForgottenPassword
+            [ Paths.Login ], Anonymous Login
+            [ Paths.Registration ], Anonymous Registration
+            [ Paths.ForgottenPassword ], Anonymous ForgottenPassword
+            [ Paths.Calendar ], Secured Calendar
+            [ Paths.MyAccount ], Secured MyAccount
+            [ Paths.Users ], Secured Users
+            [ Paths.Lessons ], Secured Lessons
         ]
     
     let parseFromUrlSegments = function
-        | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> AccountActivation id
-        | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> ResetPassword id
+        | [ Yobo.Shared.ClientPaths.AccountActivation; Route.Guid id ] -> Anonymous <| AccountActivation id
+        | [ Yobo.Shared.ClientPaths.ResetPassword; Route.Guid id ] -> Anonymous <| ResetPassword id
         | path ->
             basicMapping
             |> List.tryFind (fun (p,_) -> p = path)
             |> Option.map snd
-            |> Option.defaultValue defaultPage
+            |> Option.defaultValue (Secured Calendar)
         
     let toUrlSegments = function
-        | AccountActivation i -> [ Yobo.Shared.ClientPaths.AccountActivation; string i ]
-        | ResetPassword i -> [ Yobo.Shared.ClientPaths.ResetPassword; string i ]
+        | Anonymous (AccountActivation i) -> [ Yobo.Shared.ClientPaths.AccountActivation; string i ]
+        | Anonymous (ResetPassword i) -> [ Yobo.Shared.ClientPaths.ResetPassword; string i ]
         | page ->
             basicMapping
             |> List.tryFind (fun (_,p) -> p = page)

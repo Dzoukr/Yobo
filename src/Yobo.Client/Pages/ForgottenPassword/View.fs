@@ -48,7 +48,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
         
         Html.div [
-            Html.aRouted "Zpátky na přihlášení" Page.Login
+            Html.aRouted "Zpátky na přihlášení" (Anonymous Login)
         ]
     ]
     |> inTemplate

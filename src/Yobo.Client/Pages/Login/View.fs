@@ -60,9 +60,9 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
         ]
         Html.div [
-            Html.aRouted "Registrace" Page.Registration
+            Html.aRouted "Registrace" (Anonymous Registration)
             Html.span " · "
-            Html.aRouted "Zapomněl(a) jsem heslo!" Page.ForgottenPassword
+            Html.aRouted "Zapomněl(a) jsem heslo!" (Anonymous ForgottenPassword)
         ]
     ]
     |> inTemplate

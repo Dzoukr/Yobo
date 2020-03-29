@@ -1,15 +1,14 @@
-module Yobo.Server.UserAccount.Database
+module Yobo.Server.Core.UserAccount.Database
 
 open System
 open System.Data
 open FSharp.Control.Tasks.V2
-open Domain
 open Dapper.FSharp
 open Dapper.FSharp.MSSQL
 
 module Queries =
     open Yobo.Server.Auth.Database
-    open Yobo.Shared.UserAccount.Domain
+    open Yobo.Shared.Core.UserAccount.Domain
     
     let tryGetUserById (conn:IDbConnection) (id:Guid) =
         task {

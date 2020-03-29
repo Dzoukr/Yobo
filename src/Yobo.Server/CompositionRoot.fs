@@ -4,9 +4,6 @@ open Microsoft.Azure.WebJobs.Description
 open System
 open System.Security.Claims
 open System.Threading.Tasks
-open Yobo.Server.Auth
-open Yobo.Server.UserAccount
-open Yobo.Shared.Domain
 
 type AuthQueries = {
     TryGetUserByEmail : string -> Task<Auth.Domain.Queries.AuthUserView option>
@@ -14,10 +11,10 @@ type AuthQueries = {
 }
 
 type AuthCommandHandler = {
-    Register : Domain.CmdArgs.Register -> Task<unit>
-    ActivateAccount : Domain.CmdArgs.Activate -> Task<unit>
-    ForgottenPassword : Domain.CmdArgs.InitiatePasswordReset -> Task<unit>
-    ResetPassword : Domain.CmdArgs.CompleteResetPassword -> Task<unit>
+    Register : Auth.Domain.CmdArgs.Register -> Task<unit>
+    ActivateAccount : Auth.Domain.CmdArgs.Activate -> Task<unit>
+    ForgottenPassword : Auth.Domain.CmdArgs.InitiatePasswordReset -> Task<unit>
+    ResetPassword : Auth.Domain.CmdArgs.CompleteResetPassword -> Task<unit>
 }
 
 type AuthRoot = {
@@ -30,25 +27,30 @@ type AuthRoot = {
 }
 
 type UserAccountQueries = {
-    TryGetUserInfo : Guid -> Task<Yobo.Shared.UserAccount.Domain.Queries.UserAccount option>
+    TryGetUserInfo : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount option>
 }
 
 type UserAccountRoot = {
     Queries : UserAccountQueries
 }
 
-type UsersQueries = {
-    GetAllUsers : unit -> Task<Yobo.Shared.Users.Domain.Queries.User list>
+type AdminQueries = {
+    GetAllUsers : unit -> Task<Yobo.Shared.Core.Admin.Domain.Queries.User list>
 }
 
-type UsersRoot = {
-    Queries : UsersQueries
+type AdminCommandHandler = {
+    AddCredits : Core.Domain.CmdArgs.AddCredits -> Task<unit>
+}
+
+type AdminRoot = {
+    Queries : AdminQueries
+    CommandHandler : AdminCommandHandler
 }
 
 type CompositionRoot = {
     Auth : AuthRoot
     UserAccount : UserAccountRoot
-    Users : UsersRoot
+    Admin : AdminRoot
 }    
 
 module Attributes =

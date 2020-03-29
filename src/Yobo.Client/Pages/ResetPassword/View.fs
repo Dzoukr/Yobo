@@ -6,7 +6,7 @@ open Feliz
 open Feliz.Router
 open Feliz.Bulma
 open Yobo.Client.SharedView
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 let inTemplate (content:ReactElement) =
     Bulma.hero [

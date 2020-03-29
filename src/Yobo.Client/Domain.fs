@@ -1,12 +1,12 @@
 ﻿module Yobo.Client.Domain
 
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open Router
 open Yobo.Client.Interfaces
 
 type CurrentPage =
     | Anonymous of AnonymousPage
-    | Secured of SecuredPage * Yobo.Shared.UserAccount.Domain.Queries.UserAccount
+    | Secured of SecuredPage * Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount
 
 type Model = {
     SubPageModel : obj
@@ -21,9 +21,9 @@ module Model =
 type Msg =
     // auth
     | RefreshUser
-    | UserRefreshed of ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount>
+    | UserRefreshed of ServerResult<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount>
     | RefreshUserWithRedirect of SecuredPage
-    | UserRefreshedWithRedirect of SecuredPage * ServerResult<Yobo.Shared.UserAccount.Domain.Queries.UserAccount> 
+    | UserRefreshedWithRedirect of SecuredPage * ServerResult<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount> 
     | RefreshToken of string
     | TokenRefreshed of ServerResult<string>
     | LoggedOut

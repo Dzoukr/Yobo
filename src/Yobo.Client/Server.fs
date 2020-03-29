@@ -3,10 +3,10 @@ module Yobo.Client.Server
 open Fable.Core
 open Fable.Remoting.Client
 open Fable.SimpleJson
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open Yobo.Shared.Auth.Communication
-open Yobo.Shared.UserAccount.Communication
-open Yobo.Shared.Users.Communication
+open Yobo.Shared.Core.UserAccount.Communication
+open Yobo.Shared.Core.Admin.Communication
 
 let exnToError (e:exn) : ServerError =
     match e with
@@ -46,12 +46,12 @@ let onUserAccountService (fn:UserAccountService -> 'a) =
     |> Remoting.buildProxy<UserAccountService>
     |> fn
 
-let onUsersService (fn:UsersService -> 'a) =
+let onAdminService (fn:AdminService -> 'a) =
     let token = TokenStorage.tryGetToken() |> Option.defaultValue ""
     Remoting.createApi()
-    |> Remoting.withRouteBuilder UsersService.RouteBuilder
+    |> Remoting.withRouteBuilder AdminService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
     |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
-    |> Remoting.buildProxy<UsersService>
+    |> Remoting.buildProxy<AdminService>
     |> fn
     

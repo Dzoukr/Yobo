@@ -11,7 +11,7 @@ open Yobo.Server.Auth.Domain
 open Yobo.Shared.Auth.Validation
 open Microsoft.AspNetCore.Http
 open Yobo.Server
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 let private userToClaims (u:Domain.Queries.AuthUserView) =
     [

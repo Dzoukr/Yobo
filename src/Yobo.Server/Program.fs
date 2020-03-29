@@ -8,6 +8,7 @@ open Giraffe
 open Attributes
 open Microsoft.Azure.WebJobs.Extensions.Http
 open FSharp.Control.Tasks
+open Yobo.Server.Core
 
 let webApp (root:CompositionRoot) =
     choose [
@@ -20,7 +21,7 @@ let webApp (root:CompositionRoot) =
             
             // admin only
             Auth.HttpHandlers.onlyForAdmin >=> choose [
-                Users.HttpHandlers.usersServiceHandler root
+                Admin.HttpHandlers.usersServiceHandler root
             ]
         ]
     ]

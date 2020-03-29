@@ -1,7 +1,7 @@
 module Yobo.Client.StateHandlers
 
 open Elmish
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open Yobo.Shared.Validation
 open Yobo.Client.SharedView
 

@@ -3,8 +3,8 @@ module Yobo.Client.Pages.Users.Domain
 open System
 open Yobo.Client.Forms
 open Yobo.Shared.DateTime
-open Yobo.Shared.Domain
-open Yobo.Shared.Users.Domain.Queries
+open Yobo.Shared.Errors
+open Yobo.Shared.Core.Admin.Domain.Queries
 
 type Model = {
     Users : User list

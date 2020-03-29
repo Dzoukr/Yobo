@@ -1,7 +1,7 @@
 ﻿module Yobo.Client.Pages.Login.Domain
 
 open Yobo.Shared.Auth.Communication
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open Yobo.Shared.Validation
 open Yobo.Client.Forms
 

@@ -2,7 +2,7 @@ module Yobo.Client.SharedView
 
 open Feliz
 open Feliz.Bulma
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open Yobo.Shared.Validation
 open Yobo.Client.Router
 open Feliz.Router

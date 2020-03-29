@@ -7,7 +7,7 @@ open Yobo.Client
 open Feliz
 open Feliz.Router
 open Feliz.Bulma
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 let view (state:Model) (dispatch : Msg -> unit) =
     

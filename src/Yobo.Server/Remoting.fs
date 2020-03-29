@@ -3,7 +3,7 @@ module Yobo.Server.Remoting
 open System
 open Fable.Remoting.Server
 open Microsoft.AspNetCore.Http
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 let private statusCode = function
     | Exception _ -> 500

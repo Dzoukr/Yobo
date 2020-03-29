@@ -1,4 +1,4 @@
-module Yobo.Server.Users.Database
+module Yobo.Server.Core.Admin.Database
 
 open System
 open System.Data
@@ -8,7 +8,7 @@ open Dapper.FSharp.MSSQL
 
 module Queries =
     open Yobo.Server.Auth.Database
-    open Yobo.Shared.Users.Domain
+    open Yobo.Shared.Core.Admin.Domain
     
     let getAllUsers (conn:IDbConnection) () =
         task {

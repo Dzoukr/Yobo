@@ -11,7 +11,7 @@ open Feliz.Bulma.PageLoader
 open Feliz.Router
 open Yobo.Client.SharedView
 
-let private displayLoggedPage (user:Yobo.Shared.UserAccount.Domain.Queries.UserAccount) (page:SecuredPage) dispatch (content:ReactElement)  =
+let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) (page:SecuredPage) dispatch (content:ReactElement)  =
     
     
     let item (pg:SecuredPage) (icon:string) (text:string) =

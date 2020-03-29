@@ -30,13 +30,16 @@
     <Compile Include="Auth\Database.fs" />
     <Compile Include="Auth\EmailEventHandler.fs" />
     <Compile Include="Auth\DbEventHandler.fs" />
-    <Compile Include="UserAccount\Domain.fs" />
-    <Compile Include="UserAccount\Database.fs" />
-    <Compile Include="Users\Database.fs" />
+    <Compile Include="Core\Domain.fs" />
+    <Compile Include="Core\CommandHandler.fs" />
+    <Compile Include="Core\Database.fs" />
+    <Compile Include="Core\DbEventHandler.fs" />
+    <Compile Include="Core\UserAccount\Database.fs" />
+    <Compile Include="Core\Admin\Database.fs" />
     <Compile Include="CompositionRoot.fs" />
     <Compile Include="Auth\HttpHandlers.fs" />
-    <Compile Include="UserAccount\HttpHandlers.fs" />
-    <Compile Include="Users\HttpHandlers.fs" />
+    <Compile Include="Core\Admin\HttpHandlers.fs" />
+    <Compile Include="Core\UserAccount\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

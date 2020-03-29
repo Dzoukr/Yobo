@@ -3,7 +3,7 @@ module Yobo.Client.Pages.Registration.Domain
 open System
 open Yobo.Client.Forms
 open Yobo.Shared.Auth.Communication
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 type Model = {
     IsLoading : bool

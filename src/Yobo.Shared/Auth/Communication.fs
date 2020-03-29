@@ -1,7 +1,6 @@
 ﻿module Yobo.Shared.Auth.Communication
 
 open System
-open Yobo.Shared.Domain
 
 [<RequireQualifiedAccess>]
 module Request =

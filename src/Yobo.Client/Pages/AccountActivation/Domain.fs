@@ -1,7 +1,7 @@
 ﻿module Yobo.Client.Pages.AccountActivation.Domain
 
 open System
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 type Model = {
     ActivationId : Guid

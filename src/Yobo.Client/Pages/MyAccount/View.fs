@@ -8,7 +8,7 @@ open Fable.React.Props
 open System
 open Yobo.Shared
 open Yobo.Client
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 let view (model:Model) (dispatch:Msg -> unit) =
     Html.text (sprintf "%A" model.LoggedUser) 

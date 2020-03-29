@@ -9,7 +9,7 @@ open Yobo.Client.SharedView
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
-    | LoadUsers -> { model with UsersLoading = true }, Cmd.OfAsync.eitherAsResult (onUsersService (fun x -> x.GetAllUsers)) () UsersLoaded
+    | LoadUsers -> { model with UsersLoading = true }, Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.GetAllUsers)) () UsersLoaded
     | UsersLoaded res ->
         let model = { model with UsersLoading = false }
         match res with

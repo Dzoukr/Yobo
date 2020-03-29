@@ -1,4 +1,4 @@
-﻿module Yobo.Shared.Domain
+﻿module Yobo.Shared.Errors
 
 open System
 open Yobo.Shared.Validation
@@ -21,9 +21,10 @@ module AuthenticationError =
 
 type ServerError =
     | Exception of string
-    | DatabaseItemNotFound of Guid
     | Validation of ValidationError list
     | Authentication of AuthenticationError
+    | DatabaseItemNotFound of Guid
+    | UserNotActivated
 
 type ServerResult<'a> = Result<'a, ServerError>
 
@@ -32,12 +33,13 @@ exception ServerException of ServerError
 module ServerError =
     let explain = function
         | Exception e -> e
-        | DatabaseItemNotFound i -> sprintf "Položka s ID %A nebyla nalezena v databázi" i
         | Validation errs ->
             errs
             |> List.map ValidationError.explain
             |> String.concat ", "
         | Authentication e -> e |> AuthenticationError.explain
+        | DatabaseItemNotFound i -> sprintf "Položka s ID %A nebyla nalezena v databázi." i
+        | UserNotActivated -> "Uživatel ještě nebyl aktivován."
         
     let failwith (er:ServerError) = raise (ServerException er)
     

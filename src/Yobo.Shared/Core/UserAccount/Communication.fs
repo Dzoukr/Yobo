@@ -1,7 +1,5 @@
-module Yobo.Shared.UserAccount.Communication
+module Yobo.Shared.Core.UserAccount.Communication
 
-open System
-open Yobo.Shared.Domain
 open Domain
 
 type UserAccountService = {

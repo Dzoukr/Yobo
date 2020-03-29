@@ -2,7 +2,7 @@ module Yobo.Server.Auth.CommandHandler
 
 open System
 open Domain
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open FSharp.Rop.Result
 
 module Projections =

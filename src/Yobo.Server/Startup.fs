@@ -5,7 +5,6 @@ open System.IO
 open System.Reflection
 open System.Threading.Tasks
 open Giraffe
-open Microsoft.Azure.Functions.Extensions.DependencyInjection
 open Microsoft.Azure.WebJobs
 open Microsoft.Azure.WebJobs.Host.Config
 open Microsoft.Azure.WebJobs.Hosting
@@ -13,10 +12,9 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Yobo.Libraries.Authentication
 open FSharp.Control.Tasks
-open FSharp.Rop.TaskResult
 open Microsoft.Data.SqlClient
 open Yobo.Server.Auth
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 
 module private Configuration =
    
@@ -80,7 +78,7 @@ module CompositionRoot =
                 Credits = 0
                 CreditsExpiration = None
                 //CashReservationBlockedUntil = None
-            } : Yobo.Shared.UserAccount.Domain.Queries.UserAccount
+            } : Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount
         
         let adminPwd = cfg.["AdminPassword"] |> createPwdHash       
         
@@ -123,21 +121,21 @@ module CompositionRoot =
                     CommandHandler = {
                         Register = fun args -> task {
                             let! projections = sql Auth.Database.Projections.getAll
-                            return! args |> CommandHandler.register projections |> toExn |> sql handleEvents
+                            return! args |> Auth.CommandHandler.register projections |> toExn |> sql handleEvents
                         }
                         ActivateAccount = fun args -> task {
                             let! projections = sql Auth.Database.Projections.getAll
-                            return! args |> CommandHandler.activate projections |> toExn |> sql handleEvents
+                            return! args |> Auth.CommandHandler.activate projections |> toExn |> sql handleEvents
                         }
                         ForgottenPassword = fun args -> task {
                             let! projections = sql Auth.Database.Projections.getAll
-                            return! args |> CommandHandler.initiatePasswordReset projections |> toExn |> sql handleEvents
+                            return! args |> Auth.CommandHandler.initiatePasswordReset projections |> toExn |> sql handleEvents
                         }
                         ResetPassword = fun args -> task {
                             let! projections = sql Auth.Database.Projections.getAll
                             return!
                                 args
-                                |> CommandHandler.completePasswordReset projections
+                                |> Auth.CommandHandler.completePasswordReset projections
                                 |> toExn
                                 |> sql handleEvents
                         }
@@ -148,14 +146,29 @@ module CompositionRoot =
                     {
                         TryGetUserInfo = (fun i ->
                             if i = adminUser.Id then adminUser |> Some |> Task.FromResult
-                            else sql UserAccount.Database.Queries.tryGetUserById i
+                            else sql Core.UserAccount.Database.Queries.tryGetUserById i
                         )
                     }    
             }
-            Users = {
-                Queries = {
-                    GetAllUsers = sql Users.Database.Queries.getAllUsers
+            Admin =
+                
+                let toExn = ServerError.ofResult
+                
+                let handleEvents conn evns = task {
+                    for e in evns do
+                        do! Core.DbEventHandler.handle conn e
                 }
+                
+                {
+                    Queries = {
+                        GetAllUsers = sql Core.Admin.Database.Queries.getAllUsers
+                    }
+                    CommandHandler = {
+                        AddCredits = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getById args.UserId
+                            return! args |> Core.CommandHandler.addCredits projections |> toExn |> sql handleEvents
+                        }
+                    }
             }
         } : CompositionRoot
 

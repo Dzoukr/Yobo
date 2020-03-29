@@ -1,4 +1,4 @@
-module Yobo.Server.UserAccount.HttpHandlers
+module Yobo.Server.Core.UserAccount.HttpHandlers
 
 open System
 open Fable.Remoting.Giraffe
@@ -7,8 +7,8 @@ open Giraffe
 open Microsoft.AspNetCore.Http
 open Yobo.Libraries.Tasks
 open Yobo.Server
-open Yobo.Shared.Domain
-open Yobo.Shared.UserAccount.Communication
+open Yobo.Shared.Errors
+open Yobo.Shared.Core.UserAccount.Communication
 
 let private getUserInfo (root:CompositionRoot) userId () =
     userId

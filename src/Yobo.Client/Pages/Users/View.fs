@@ -10,9 +10,9 @@ open Feliz.Bulma
 open Feliz.Bulma.QuickView
 open Feliz.Bulma.Calendar
 open Yobo.Client.SharedView
-open Yobo.Shared.Domain
+open Yobo.Shared.Errors
 open Yobo.Shared.DateTime
-open Yobo.Shared.Users.Domain.Queries
+open Yobo.Shared.Core.Admin.Domain.Queries
 
 let private userRow dispatch (u:User) =
     let activated =

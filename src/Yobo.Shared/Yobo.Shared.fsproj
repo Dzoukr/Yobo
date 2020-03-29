@@ -9,13 +9,15 @@
         <Compile Include="DateTime.fs" />
         <Compile Include="ClientPaths.fs" />
         <Compile Include="Validation.fs" />
-        <Compile Include="Domain.fs" />
+        <Compile Include="Errors.fs" />
         <Compile Include="Auth\Communication.fs" />
         <Compile Include="Auth\Validation.fs" />
-        <Compile Include="UserAccount\Domain.fs" />
-        <Compile Include="UserAccount\Communication.fs" />
-        <Compile Include="Users\Domain.fs" />
-        <Compile Include="Users\Communication.fs" />
+        <Compile Include="Core\UserAccount\Domain.fs" />
+        <Compile Include="Core\UserAccount\Communication.fs" />
+        <Compile Include="Core\Admin\Domain.fs" />
+        <Compile Include="Core\Admin\Communication.fs" />
+        <Compile Include="Core\Admin\Validation.fs" />
+        <Compile Include="Core\Domain.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

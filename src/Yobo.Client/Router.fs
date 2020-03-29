@@ -19,6 +19,12 @@ type SecuredPage =
     | Users
     | Lessons
 
+[<RequireQualifiedAccess>]    
+module SecuredPage =
+    let isAdminOnly = function
+        | Users | Lessons -> true
+        | _ -> false
+
 type Page =
     | Anonymous of AnonymousPage
     | Secured of SecuredPage

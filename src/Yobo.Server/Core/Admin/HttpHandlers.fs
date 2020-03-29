@@ -21,14 +21,25 @@ let private addCredits (root:AdminRoot) (r:Request.AddCredits) =
             }
         return! root.CommandHandler.AddCredits args            
     }
+    
+let private setExpiration (root:AdminRoot) (r:Request.SetExpiration) =
+    task {
+        let args : CmdArgs.SetExpiration =
+            {
+                UserId = r.UserId
+                Expiration = r.Expiration
+            }
+        return! root.CommandHandler.SetExpiration args            
+    }
 
 let private adminService (root:CompositionRoot) userId : AdminService =
     {
         GetAllUsers = root.Admin.Queries.GetAllUsers >> Async.AwaitTask
         AddCredits = ServerError.validate validateAddCredits >> (addCredits root.Admin) >> Async.AwaitTask
+        SetExpiration = ServerError.validate validateSetExpiration >> (setExpiration root.Admin) >> Async.AwaitTask
     }
 
-let usersServiceHandler (root:CompositionRoot) : HttpHandler =
+let adminServiceHandler (root:CompositionRoot) : HttpHandler =
     Remoting.createApi()
     |> Remoting.withRouteBuilder AdminService.RouteBuilder
     |> Remoting.fromContext (Auth.HttpHandlers.withUser (adminService root))

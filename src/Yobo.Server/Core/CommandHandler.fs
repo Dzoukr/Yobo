@@ -18,4 +18,10 @@ let addCredits (user:Projections.ExistingUser) (args:CmdArgs.AddCredits) =
     user
     |> onlyIfActivated
     |>> (fun _ -> CreditsAdded args)
-    |>> List.singleton    
+    |>> List.singleton
+    
+let setExpiration (user:Projections.ExistingUser) (args:CmdArgs.SetExpiration) =
+    user
+    |> onlyIfActivated
+    |>> (fun _ -> ExpirationSet args)
+    |>> List.singleton            

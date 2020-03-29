@@ -39,6 +39,15 @@ module Updates =
                 } |> conn.UpdateAsync
             return ()
         }
+        
+    let expirationSet (conn:IDbConnection) (args:CmdArgs.SetExpiration) =
+        update {
+            table Tables.Users.name
+            set {| CreditsExpiration = args.Expiration |}
+            where (eq "Id" args.UserId)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore
     
 
 module Projections =

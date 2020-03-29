@@ -8,5 +8,6 @@ let handle (conn:SqlConnection) (e:Event) =
     task {
         match e with
         | CreditsAdded args -> do! args |> Database.Updates.creditsAdded conn
+        | ExpirationSet args -> do! args |> Database.Updates.expirationSet conn
         
     }

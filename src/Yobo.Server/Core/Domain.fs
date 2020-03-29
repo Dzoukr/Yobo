@@ -10,6 +10,11 @@ module CmdArgs =
         Expiration : DateTimeOffset
     }
     
+    type SetExpiration = {
+        UserId : Guid
+        Expiration : DateTimeOffset
+    }
+    
 //    type CreateLesson = {
 //        Id : Guid
 //        StartDate : DateTimeOffset
@@ -69,10 +74,7 @@ module CmdArgs =
 //        UserId : Guid
 //    }
 //
-//    type ExtendExpiration = {
-//        UserId : Guid
-//        Expiration : DateTimeOffset
-//    }
+
 //
 //    type DeleteLesson = {
 //        Id : Guid
@@ -89,6 +91,7 @@ module CmdArgs =
 
 type Event =
     | CreditsAdded of CmdArgs.AddCredits
+    | ExpirationSet of CmdArgs.SetExpiration
     
 //    | LessonCreated of CmdArgs.CreateLesson
 //    | ReservationAdded of CmdArgs.AddReservation
@@ -100,6 +103,5 @@ type Event =
 //    | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
 //    | WorkshopCreated of CmdArgs.CreateWorkshop
 //    | WorkshopDeleted of CmdArgs.DeleteWorkshop
-//    | ExpirationExtended of CmdArgs.ExtendExpiration
 //    | LessonDeleted of CmdArgs.DeleteLesson
 //    | LessonUpdated of CmdArgs.UpdateLesson

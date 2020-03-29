@@ -21,7 +21,7 @@ let webApp (root:CompositionRoot) =
             
             // admin only
             Auth.HttpHandlers.onlyForAdmin >=> choose [
-                Admin.HttpHandlers.usersServiceHandler root
+                Admin.HttpHandlers.adminServiceHandler root
             ]
         ]
     ]

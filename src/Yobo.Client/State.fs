@@ -77,8 +77,11 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | UrlChanged page ->
         match model.CurrentPage, page with
         | CurrentPage.Secured(_,user), Page.Secured targetPage -> 
-            let newModel = model |> Model.navigateToSecured user targetPage
-            newModel, (getPageInitCommands page)
+            if SecuredPage.isAdminOnly targetPage && not user.IsAdmin then
+                model, Cmd.ofMsg LoggedOut
+            else                
+                let newModel = model |> Model.navigateToSecured user targetPage
+                newModel, (getPageInitCommands page)
         | CurrentPage.Anonymous _, Page.Anonymous targetPage
         | CurrentPage.Secured _, Page.Anonymous targetPage ->
             let newModel = model |> Model.navigateToAnonymous targetPage
@@ -91,7 +94,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         let model = { model with IsCheckingUser = false }
         match u with
         | Ok usr -> model |> Model.navigateToSecured usr p, Router.navigatePage (Page.Secured p)
-        | Error _ -> { model with IsCheckingUser = false }, Cmd.ofMsg LoggedOut
+        | Error _ -> model, Cmd.ofMsg LoggedOut
     | RefreshUser ->
         model, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () UserRefreshed
     | UserRefreshed res ->

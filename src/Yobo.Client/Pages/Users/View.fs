@@ -1,8 +1,5 @@
 module Yobo.Client.Pages.Users.View
 
-open Fable.Core.JsInterop
-open Fable.React
-open Fable.React.Props
 open System
 open Domain
 open Feliz
@@ -10,7 +7,6 @@ open Feliz.Bulma
 open Feliz.Bulma.QuickView
 open Feliz.Bulma.Calendar
 open Yobo.Client.SharedView
-open Yobo.Shared.Errors
 open Yobo.Shared.DateTime
 open Yobo.Shared.Core.Admin.Domain.Queries
 
@@ -39,6 +35,7 @@ let private userRow dispatch (u:User) =
             Bulma.button [
                 prop.style [ style.marginLeft 5 ]
                 button.isLight
+                prop.onClick (fun _ -> u.Id |> Some |> ShowSetExpirationForm |> dispatch)
                 prop.text "Prodloužit platnost"
             ]
         else Html.none
@@ -66,11 +63,12 @@ let addCreditsQuickView (model:Model) dispatch user =
             Bulma.label "Počet kreditů"
             Bulma.fieldBody [
                 Bulma.numberInput [
-                    //ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.LastName))
-                    //prop.onTextChange (fun x -> { model.Form.FormData with LastName = x } |> FormChanged |> dispatch)
-                    //prop.valueOrDefault model.Form.FormData.LastName
+                    ValidationViews.color model.AddCreditsForm.ValidationErrors (nameof(model.AddCreditsForm.FormData.Credits))
+                    prop.onTextChange (fun x -> { model.AddCreditsForm.FormData with Credits = int x } |> AddCreditsFormChanged |> dispatch)
+                    prop.valueOrDefault model.AddCreditsForm.FormData.Credits
                 ]
             ]
+            ValidationViews.help model.AddCreditsForm.ValidationErrors (nameof(model.AddCreditsForm.FormData.Credits))
         ]
         Bulma.field [
             Bulma.label "Datum expirace"
@@ -87,21 +85,25 @@ let addCreditsQuickView (model:Model) dispatch user =
                         calendar.options.lang "cs"
                     ]
                     calendar.onValueSelected (fun x ->
-                        Fable.Core.JS.console.log(x)
+                        match x with
+                        | SingleValue (SingleValue.Date (Some v)) ->
+                            DateTimeOffset(v).EndOfTheDay() |> AddCreditsFormDateChanged |> dispatch
+                        | _ -> ()
                     )
                 ]
             ]
+            ValidationViews.help model.AddCreditsForm.ValidationErrors (nameof(model.AddCreditsForm.FormData.Expiration))
         ]
         Bulma.field [
             Bulma.fieldBody [
                 Bulma.button [
                     button.isPrimary
                     prop.text "Přidat kredity"
-                    //prop.onClick (fun _ -> Reset |> dispatch)
+                    if model.AddCreditsForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    prop.onClick (fun _ -> AddCredits |> dispatch)
                 ]
             ]
         ]
-        
     ]
     
     QuickView.quickview [
@@ -119,65 +121,67 @@ let addCreditsQuickView (model:Model) dispatch user =
             ]
         ]
     ]
+
+let setExpirationQuickView (model:Model) dispatch user =
     
-//let private showForm dispatch (state:State) (user:User option) =
-//    match user with
-//    | Some u ->
-//        let toDateTimeOffset = Option.map (fun (x:DateTime) -> DateTimeOffset(x).EndOfTheDay())
-//        let calendar =
-//            let opts = { 
-//                Yobo.Client.Components.Calendar.Options.Default 
-//                    with 
-//                        StartDate = state.ExpirationDate |> Option.map (fun x -> x.Date)
-//                        DisplayMode = Yobo.Client.Components.Calendar.DisplayMode.Inline
-//                        MinimumDate = Some (DateTimeOffset.Now.Date.AddDays 7.)
-//                        WeekStart = 1
-//                        Lang = "cs"
-//                }
-//            Yobo.Client.Components.Calendar.view opts "myCalc" (fst >> toDateTimeOffset >> CalendarChanged >> dispatch)
-//
-//        let lbl txt = Label.label [] [ str txt ]
-//
-//        let form = div [] [
-//            Field.div [ ] [
-//                lbl "Uživatel"
-//                div [] [ sprintf "%s %s" u.FirstName u.LastName |> str]
-//            ]
-//            Field.div [ ] [
-//                lbl "Počet kreditů"
-//                Control.div [ ] [
-//                    Input.number [
-//                        Input.Option.DefaultValue <| state.Credits.ToString()
-//                        Input.Option.Props [ Props.Min 1 ];
-//                        Input.Option.OnChange (fun e -> !!e.target?value |> int |> (CreditsChanged >> dispatch))
-//                    ]
-//                ] 
-//            ]
-//            Field.div [ ] [
-//                lbl "Datum expirace"
-//                Control.div [ ] [ calendar ] 
-//            ]
-//            Field.div [ Field.IsGrouped; Field.IsGroupedCentered ]
-//                [ Control.div [ ]
-//                    [ Button.button [
-//                        Button.OnClick (fun _ -> SubmitForm |> dispatch)
-//                        Button.Color IsPrimary
-//                        Button.Disabled (state.Credits < 1 || state.ExpirationDate.IsNone) ]
-//                        [ str "Přidat kredity" ] ]
-//                ] 
-//        ]
-//            
-//        div [ ] [
-//            Quickview.quickview [ Quickview.IsActive true ] [
-//                Quickview.header [ ] [
-//                    Quickview.title [ ] [ str "Přidat kredity" ]
-//                    Delete.delete [ Delete.OnClick (fun _ -> u.Id |> ToggleAddCreditsForm |> dispatch) ] [ ]
-//                ]
-//                Quickview.body [ ]
-//                    [ form ]
-//                ]
-//        ]
-//    | None -> str ""
+    let form = [
+        Bulma.field [
+            Bulma.label "Uživatel"
+            Bulma.fieldBody [
+                Html.div (sprintf "%s %s" user.FirstName user.LastName)
+            ]
+        ]
+        Bulma.field [
+            Bulma.label "Datum expirace"
+            Bulma.fieldBody [
+                Calendar.calendar [
+                    prop.id "expCal"
+                    calendar.options [
+                        calendar.options.type'.date
+                        calendar.options.isRange false
+                        calendar.options.displayMode.inline'
+                        calendar.options.weekStart DayOfWeek.Monday
+                        calendar.options.showFooter false
+                        calendar.options.minDate DateTime.UtcNow
+                        calendar.options.lang "cs"
+                    ]
+                    calendar.onValueSelected (fun x ->
+                        match x with
+                        | SingleValue (SingleValue.Date (Some v)) ->
+                            DateTimeOffset(v).EndOfTheDay() |> SetExpirationFormDateChanged |> dispatch
+                        | _ -> ()
+                    )
+                ]
+            ]
+            ValidationViews.help model.SetExpirationForm.ValidationErrors (nameof(model.SetExpirationForm.FormData.Expiration))
+        ]
+        Bulma.field [
+            Bulma.fieldBody [
+                Bulma.button [
+                    button.isPrimary
+                    prop.text "Nastavit platnost"
+                    if model.SetExpirationForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    prop.onClick (fun _ -> SetExpiration |> dispatch)
+                ]
+            ]
+        ]
+    ]
+    
+    QuickView.quickview [
+        quickview.isActive
+        prop.children [
+            QuickView.header [
+                Html.div "Přidat kredity"
+                Bulma.delete [ prop.onClick (fun _ -> None |> ShowSetExpirationForm |> dispatch) ]
+            ]
+            QuickView.body [
+                QuickView.block [
+                    prop.style [ style.padding 15 ]
+                    prop.children form
+                ]
+            ]
+        ]
+    ]
 
 let private loadingRow =
     Html.tr [
@@ -217,7 +221,14 @@ let view (model : Model) (dispatch : Msg -> unit) =
         |> Option.map (addCreditsQuickView model dispatch)
         |> Option.defaultValue Html.none
     
+    let quickviewSetExpiration =
+        model.SetExpirationSelectedUser
+        |> Option.bind (fun uId -> model.Users |> List.tryFind (fun x -> x.Id = uId))
+        |> Option.map (setExpirationQuickView model dispatch)
+        |> Option.defaultValue Html.none
+    
     Html.div [
         table
         quickviewAddCredits
+        quickviewSetExpiration
     ]        

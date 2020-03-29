@@ -40,6 +40,7 @@ type AdminQueries = {
 
 type AdminCommandHandler = {
     AddCredits : Core.Domain.CmdArgs.AddCredits -> Task<unit>
+    SetExpiration : Core.Domain.CmdArgs.SetExpiration -> Task<unit>
 }
 
 type AdminRoot = {

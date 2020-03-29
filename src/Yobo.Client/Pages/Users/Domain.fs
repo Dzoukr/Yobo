@@ -2,6 +2,7 @@ module Yobo.Client.Pages.Users.Domain
 
 open System
 open Yobo.Client.Forms
+open Yobo.Shared.Core.Admin.Communication
 open Yobo.Shared.DateTime
 open Yobo.Shared.Errors
 open Yobo.Shared.Core.Admin.Domain.Queries
@@ -9,12 +10,10 @@ open Yobo.Shared.Core.Admin.Domain.Queries
 type Model = {
     Users : User list
     UsersLoading : bool
-    
     AddCreditsSelectedUser : Guid option    
-    
-//    AddCreditsForm : ValidatedForm<Request.Login>
-//    ExpirationDate : DateTimeOffset option
-//    Credits : int
+    AddCreditsForm : ValidatedForm<Request.AddCredits>
+    SetExpirationSelectedUser : Guid option    
+    SetExpirationForm : ValidatedForm<Request.SetExpiration>
 }
 
 module Model =
@@ -23,18 +22,21 @@ module Model =
             Users = []
             UsersLoading = false
             AddCreditsSelectedUser = None
-
-//            ExpirationDate = DateTimeOffset.Now.EndOfTheDay().AddMonths 4 |> Some
-//            Credits = 10
+            AddCreditsForm = Request.AddCredits.init |> ValidatedForm.init
+            SetExpirationSelectedUser = None
+            SetExpirationForm = Request.SetExpiration.init |> ValidatedForm.init
         }
 
 type Msg =
     | LoadUsers
     | UsersLoaded of ServerResult<User list>
     | ShowAddCreditsForm of Guid option
-    
-//    | CalendarChanged of DateTimeOffset option
-//    | CreditsChanged of int
-//    | SubmitForm
-//    | FormSubmitted of Result<unit, ServerError>
-//    | ToggleAddCreditsForm of Guid
+    | AddCreditsFormChanged of Request.AddCredits
+    | AddCreditsFormDateChanged of DateTimeOffset
+    | AddCredits
+    | CreditsAdded of ServerResult<unit>
+    | ShowSetExpirationForm of Guid option
+    | SetExpirationFormChanged of Request.SetExpiration
+    | SetExpirationFormDateChanged of DateTimeOffset
+    | SetExpiration
+    | ExpirationSet of ServerResult<unit>

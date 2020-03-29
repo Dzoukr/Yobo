@@ -1,11 +1,11 @@
 module Yobo.Client.Pages.Users.State
 
-open System
 open Domain
 open Elmish
 open Yobo.Client.Server
-open Yobo.Client
+open Yobo.Client.Forms
 open Yobo.Client.SharedView
+open Yobo.Shared.Core.Admin.Validation
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
@@ -16,25 +16,50 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         | Ok users -> { model with Users = users }, Cmd.none
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     | ShowAddCreditsForm userId ->
-        { model with AddCreditsSelectedUser = userId }, Cmd.none
-//    | ToggleAddCreditsForm i ->
-//        let userId = if state.SelectedUserId = Some i then None else Some i
-//        { state with SelectedUserId = userId }, Cmd.none
-//    | CalendarChanged date ->
-//        { state with ExpirationDate = date }, Cmd.none
-//    | CreditsChanged c -> { state with Credits = c }, Cmd.none
-//    | SubmitForm ->
-//        state,
-//            ({  UserId = state.SelectedUserId.Value
-//                Credits = state.Credits
-//                Expiration = state.ExpirationDate.Value } : Yobo.Shared.Admin.Domain.AddCredits)
-//            |> SecuredParam.create |> Cmd.ofAsyncResult adminAPI.AddCredits FormSubmitted
-//    | FormSubmitted res ->
-//        match res with
-//        | Ok _ -> 
-//            State.Init,
-//                [
-//                    SharedView.successToast "Kredity úspěšně přidány."
-//                    LoadUsers |> Cmd.ofMsg ]
-//                    |> Cmd.batch
-//        | Error e -> state, (e |> SharedView.serverErrorToToast)
+        let model = { model with AddCreditsSelectedUser = userId }
+        match userId with
+        | Some i -> 
+            { model with
+                AddCreditsForm =
+                    model.AddCreditsForm
+                    |> ValidatedForm.updateWithFn (fun x -> { x with UserId = i }) }, Cmd.none
+        | None -> model, Cmd.none            
+    | AddCreditsFormChanged f ->
+        { model with AddCreditsForm = model.AddCreditsForm |> ValidatedForm.updateWith f |> ValidatedForm.validateWith validateAddCredits }, Cmd.none
+    | AddCreditsFormDateChanged v ->
+        model, ({ model.AddCreditsForm.FormData with Expiration = v } |> AddCreditsFormChanged) |> Cmd.ofMsg
+    | AddCredits ->
+        let model = { model with AddCreditsForm = model.AddCreditsForm |> ValidatedForm.validateWith validateAddCredits }
+        if model.AddCreditsForm |> ValidatedForm.isValid then
+            { model with AddCreditsForm = model.AddCreditsForm |> ValidatedForm.startLoading },
+                Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.AddCredits)) model.AddCreditsForm.FormData CreditsAdded
+        else model, Cmd.none
+    | CreditsAdded res ->
+        let model = { model with AddCreditsForm = model.AddCreditsForm |> ValidatedForm.stopLoading }
+        match res with
+        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Kredity úspěšně přidány."; Cmd.ofMsg <| ShowAddCreditsForm(None); Cmd.ofMsg LoadUsers ]
+        | Error e -> model, e |> ServerResponseViews.showErrorToast
+    | ShowSetExpirationForm userId ->
+        let model = { model with SetExpirationSelectedUser = userId }
+        match userId with
+        | Some i -> 
+            { model with
+                SetExpirationForm =
+                    model.SetExpirationForm
+                    |> ValidatedForm.updateWithFn (fun x -> { x with UserId = i }) }, Cmd.none
+        | None -> model, Cmd.none
+    | SetExpirationFormChanged f ->
+        { model with SetExpirationForm = model.SetExpirationForm |> ValidatedForm.updateWith f |> ValidatedForm.validateWith validateSetExpiration }, Cmd.none
+    | SetExpirationFormDateChanged v ->
+        model, ({ model.SetExpirationForm.FormData with Expiration = v } |> SetExpirationFormChanged) |> Cmd.ofMsg        
+    | SetExpiration ->
+        let model = { model with SetExpirationForm = model.SetExpirationForm |> ValidatedForm.validateWith validateSetExpiration }
+        if model.SetExpirationForm |> ValidatedForm.isValid then
+            { model with SetExpirationForm = model.SetExpirationForm |> ValidatedForm.startLoading },
+                Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.SetExpiration)) model.SetExpirationForm.FormData ExpirationSet
+        else model, Cmd.none
+    | ExpirationSet res ->
+        let model = { model with SetExpirationForm = model.SetExpirationForm |> ValidatedForm.stopLoading }
+        match res with
+        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Platnost úspěšně změněna."; Cmd.ofMsg <| ShowSetExpirationForm(None); Cmd.ofMsg LoadUsers ]
+        | Error e -> model, e |> ServerResponseViews.showErrorToast

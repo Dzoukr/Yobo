@@ -168,6 +168,10 @@ module CompositionRoot =
                             let! projections = sql Core.Database.Projections.getById args.UserId
                             return! args |> Core.CommandHandler.addCredits projections |> toExn |> sql handleEvents
                         }
+                        SetExpiration = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getById args.UserId
+                            return! args |> Core.CommandHandler.setExpiration projections |> toExn |> sql handleEvents
+                        }
                     }
             }
         } : CompositionRoot

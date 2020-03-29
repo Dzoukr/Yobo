@@ -36,7 +36,7 @@ let private userRow dispatch (u:User) =
                 prop.style [ style.marginLeft 5 ]
                 button.isLight
                 prop.onClick (fun _ -> u.Id |> Some |> ShowSetExpirationForm |> dispatch)
-                prop.text "Prodloužit platnost"
+                prop.text "Nastavit platnost"
             ]
         else Html.none
     
@@ -171,7 +171,7 @@ let setExpirationQuickView (model:Model) dispatch user =
         quickview.isActive
         prop.children [
             QuickView.header [
-                Html.div "Přidat kredity"
+                Html.div "Nastavit platnost"
                 Bulma.delete [ prop.onClick (fun _ -> None |> ShowSetExpirationForm |> dispatch) ]
             ]
             QuickView.body [

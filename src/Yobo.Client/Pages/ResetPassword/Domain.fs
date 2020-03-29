@@ -6,15 +6,11 @@ open Yobo.Shared.Auth.Communication
 open Yobo.Shared.Errors
 
 type Model = {
-    IsLoading : bool
-    FormSent : bool
     Form : ValidatedForm<Request.ResetPassword>
 }
 
 module Model =
     let init key  = {
-        IsLoading = false
-        FormSent = false
         Form = Request.ResetPassword.init |> fun x -> { x with PasswordResetKey = key } |> ValidatedForm.init
     }
 

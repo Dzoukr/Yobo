@@ -127,7 +127,7 @@ let registerForm model dispatch =
                 Bulma.button [
                     yield button.isPrimary
                     yield button.isFullwidth
-                    if model.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    if model.Form.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Registrovat"
                     yield prop.onClick (fun _ -> Register |> dispatch)
                 ]

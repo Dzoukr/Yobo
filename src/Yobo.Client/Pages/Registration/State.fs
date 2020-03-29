@@ -12,15 +12,15 @@ open Yobo.Client.Forms
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
     | FormChanged f ->
-        { model with Form = model.Form |> ValidatedForm.updateWith f |> ValidatedForm.validateConditionalWith model.FormSent validateRegister }, Cmd.none
+        { model with Form = model.Form |> ValidatedForm.updateWith f |> ValidatedForm.validateWithIfSent validateRegister }, Cmd.none
     | Register ->
-        let model = { model with FormSent = true; Form = model.Form |> ValidatedForm.validateWith validateRegister }
+        let model = { model with Form = model.Form |> ValidatedForm.validateWith validateRegister |> ValidatedForm.markAsSent }
         if model.Form |> ValidatedForm.isValid then
-            { model with IsLoading = true }, Cmd.OfAsync.eitherAsResult authService.Register model.Form.FormData Registered
+            { model with Form = model.Form |> ValidatedForm.startLoading }, Cmd.OfAsync.eitherAsResult authService.Register model.Form.FormData Registered
         else model, Cmd.none
     | Registered res ->
-        let onSuccess _ = { model with IsLoading = false; Form = Request.Register.init |> ValidatedForm.init; ShowThankYou = true }, Cmd.none
-        let onError = { model with IsLoading = false }
+        let onSuccess _ = { model with Form = Request.Register.init |> ValidatedForm.init |> ValidatedForm.stopLoading; ShowThankYou = true }, Cmd.none
+        let onError = { model with Form = model.Form |> ValidatedForm.stopLoading }
         let onValidationError (m:Model) e = { m with Form = m.Form |> ValidatedForm.updateWithErrors e } 
         res |> handleValidated onSuccess onError onValidationError
     | ToggleTerms -> { model with ShowTerms = not model.ShowTerms }, Cmd.none        

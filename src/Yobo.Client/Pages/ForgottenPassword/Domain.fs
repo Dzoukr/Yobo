@@ -6,15 +6,11 @@ open Yobo.Shared.Auth.Communication
 open Yobo.Shared.Errors
 
 type Model = {
-    IsLoading : bool
-    FormSent : bool
     Form : ValidatedForm<Request.ForgottenPassword>
 }
 
 module Model =
     let init = {
-        IsLoading = false
-        FormSent = false
         Form = Request.ForgottenPassword.init |> ValidatedForm.init
     }
 

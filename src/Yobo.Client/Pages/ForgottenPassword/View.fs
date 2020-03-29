@@ -40,7 +40,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 Bulma.button [
                     yield button.isPrimary
                     yield button.isFullwidth
-                    if model.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    if model.Form.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Resetovat heslo"
                     yield prop.onClick (fun _ -> InitiateReset |> dispatch)
                 ]

@@ -6,8 +6,6 @@ open Yobo.Shared.Auth.Communication
 open Yobo.Shared.Errors
 
 type Model = {
-    IsLoading : bool
-    FormSent : bool
     ShowTerms : bool
     Form : ValidatedForm<Request.Register>
     ShowThankYou : bool
@@ -15,8 +13,6 @@ type Model = {
 
 module Model =
     let init = {
-        IsLoading = false
-        FormSent = false
         ShowTerms = false
         Form = Request.Register.init |> ValidatedForm.init
         ShowThankYou = false

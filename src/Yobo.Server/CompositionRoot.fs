@@ -36,11 +36,13 @@ type UserAccountRoot = {
 
 type AdminQueries = {
     GetAllUsers : unit -> Task<Yobo.Shared.Core.Admin.Domain.Queries.User list>
+    GetLessons : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.Lesson list>
 }
 
 type AdminCommandHandler = {
     AddCredits : Core.Domain.CmdArgs.AddCredits -> Task<unit>
     SetExpiration : Core.Domain.CmdArgs.SetExpiration -> Task<unit>
+    CreateLesson : Core.Domain.CmdArgs.CreateLesson -> Task<unit>
 }
 
 type AdminRoot = {

@@ -36,4 +36,5 @@ type Msg =
     | ForgottenPasswordMsg of Pages.ForgottenPassword.Domain.Msg
     | ResetPasswordMsg of Pages.ResetPassword.Domain.Msg
     | UsersMsg of Pages.Users.Domain.Msg
+    | LessonsMsg of Pages.Lessons.Domain.Msg
     | MyAccountMsg of Pages.MyAccount.Domain.Msg

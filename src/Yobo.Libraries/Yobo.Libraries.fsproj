@@ -10,6 +10,8 @@
     <Compile Include="Emails\Emails.fs" />
     <Compile Include="Emails\MailjetSender.fs" />
     <Compile Include="Tasks.fs" />
+    <Compile Include="Tuples.fs" />
+    <Compile Include="DateTime.fs" />
   </ItemGroup>
   <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

@@ -15,13 +15,14 @@ module CmdArgs =
         Expiration : DateTimeOffset
     }
     
-//    type CreateLesson = {
-//        Id : Guid
-//        StartDate : DateTimeOffset
-//        EndDate : DateTimeOffset
-//        Name : string
-//        Description : string
-//    }
+    type CreateLesson = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+        Capacity : int
+    }
 //
 //    type AddReservation = {
 //        Id : Guid
@@ -92,8 +93,8 @@ module CmdArgs =
 type Event =
     | CreditsAdded of CmdArgs.AddCredits
     | ExpirationSet of CmdArgs.SetExpiration
+    | LessonCreated of CmdArgs.CreateLesson
     
-//    | LessonCreated of CmdArgs.CreateLesson
 //    | ReservationAdded of CmdArgs.AddReservation
 //    | ReservationCancelled of CmdArgs.CancelReservation
 //    | LessonCancelled of CmdArgs.CancelLesson

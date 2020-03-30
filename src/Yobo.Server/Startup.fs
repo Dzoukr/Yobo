@@ -38,7 +38,7 @@ module private Configuration =
 module CompositionRoot =
     open Yobo.Libraries.Emails
     open Yobo.Libraries.Tasks
-    
+        
     type PartialEmail = {| To:Address; Subject:string; Message:string |}
     
     let compose (cfg:IConfigurationRoot) =
@@ -152,7 +152,7 @@ module CompositionRoot =
             }
             Admin =
                 
-                let toExn = ServerError.ofResult
+                let toExn = Result.mapError ServerError.Domain >> ServerError.ofResult
                 
                 let handleEvents conn evns = task {
                     for e in evns do
@@ -162,6 +162,7 @@ module CompositionRoot =
                 {
                     Queries = {
                         GetAllUsers = sql Core.Admin.Database.Queries.getAllUsers
+                        GetLessons = sql Core.Admin.Database.Queries.getLessons
                     }
                     CommandHandler = {
                         AddCredits = fun args -> task {
@@ -171,6 +172,10 @@ module CompositionRoot =
                         SetExpiration = fun args -> task {
                             let! projections = sql Core.Database.Projections.getById args.UserId
                             return! args |> Core.CommandHandler.setExpiration projections |> toExn |> sql handleEvents
+                        }
+                        CreateLesson = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getAllLessons ()
+                            return! args |> Core.CommandHandler.createLesson projections |> toExn |> sql handleEvents
                         }
                     }
             }

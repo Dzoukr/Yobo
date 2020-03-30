@@ -9,5 +9,6 @@ let handle (conn:SqlConnection) (e:Event) =
         match e with
         | CreditsAdded args -> do! args |> Database.Updates.creditsAdded conn
         | ExpirationSet args -> do! args |> Database.Updates.expirationSet conn
+        | LessonCreated args -> do! args |> Database.Updates.lessonCreated conn
         
     }

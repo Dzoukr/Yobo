@@ -36,6 +36,8 @@
         <Compile Include="Pages\Users\State.fs" />
         <Compile Include="Pages\Users\View.fs" />
         <Compile Include="Pages\Lessons\Domain.fs" />
+        <Compile Include="Pages\Lessons\State.fs" />
+        <Compile Include="Pages\Lessons\View.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />
@@ -43,6 +45,9 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\..\src\Yobo.Shared\Yobo.Shared.fsproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Content Include="Pages\Lessons\styles.scss" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

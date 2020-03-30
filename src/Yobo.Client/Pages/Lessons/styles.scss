@@ -1,0 +1,86 @@
+.table-calendar {
+  table-layout: fixed;
+  border-radius: 2px;
+
+  .controls {
+    td {
+      height: 4rem;
+      border: none;
+      text-align: center;
+
+      button {
+        margin-left: 0.3rem;
+      }
+    }
+  }
+
+  .header td {
+    text-align: center;
+
+    .date {
+      font-size: 0.8rem;
+    }
+  }
+
+  .day td {
+    height: 70vh;
+
+    div {
+      min-width: 100%;
+    }
+
+    .lesson.cancelled {
+      opacity: 0.5;
+    }
+
+    .name {
+      font-weight: 500;
+    }
+
+    .time {
+      margin-bottom: 1rem;
+    }
+
+
+    .popover-content {
+      margin-top: -3rem;
+
+      .name {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+      }
+
+
+      .buttons {
+        text-align: center;
+        margin-bottom: 1rem;
+
+        div {
+          margin-top: 2rem;
+        }
+      }
+    }
+
+    .popover {
+
+      .lesson {
+        padding: 0.5rem;
+        background-color: #c4dbe2;
+        margin-top: 1rem;
+        margin-bottom: 3rem;
+        border-radius: 0.5rem;
+        text-align: center;
+
+
+        .name {
+          margin-bottom: 2rem;
+        }
+      }
+
+      .lesson.workshop {
+        background-color: rgb(12, 240, 240);
+      }
+    }
+
+  }
+}

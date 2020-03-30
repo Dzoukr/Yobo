@@ -22,6 +22,7 @@ module Html =
         ]
         
     let faIcon (icon:string) = Html.i [ prop.className icon; prop.style [ style.marginRight 5 ] ]        
+    let faIconSingle (icon:string) = Html.i [ prop.className icon ]        
 
 module ServerResponseViews =
     open Elmish

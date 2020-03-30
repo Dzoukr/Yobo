@@ -119,6 +119,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                         Html.aRouted "Login" (Page.Anonymous Login)
                     ]
                 | Users -> model |> showView Pages.Users.View.view (UsersMsg >> dispatch)
+                | Lessons -> model |> showView Pages.Lessons.View.view (LessonsMsg >> dispatch)
                 | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)
                     
                 |> displayLoggedPage user pg dispatch

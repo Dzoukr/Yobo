@@ -5,6 +5,7 @@ open DateTime
 
 type ValidationErrorType =
     | IsEmpty
+    | IsEmptyList
     | IsNotValidEmail
     | IsBelowMinimalLength of int
     | IsBelowMinimalValue of int
@@ -15,6 +16,7 @@ type ValidationErrorType =
 module ValidationErrorType =
     let explain = function
         | IsEmpty -> "Prosím vyplňte hodnotu."
+        | IsEmptyList -> "Pole musí obsahovat alespoň jednu hodnotu."
         | IsNotValidEmail -> "Vyplňte správný formát pro emailovou adresu."
         | IsBelowMinimalLength l -> sprintf "Hodnota musí být nejméně %i znaků." l
         | IsBelowMinimalValue l -> sprintf "Hodnota musí být nejméně %i." l
@@ -33,6 +35,9 @@ module ValidationError =
 
 let validateNotEmpty value = 
     if String.IsNullOrWhiteSpace(value) then IsEmpty |> Some else None
+
+let validateNotEmptyList (value:'a list) = 
+    if value.Length = 0 then IsEmptyList |> Some else None
     
 let private isValidEmail (value:string) =
     let parts = value.Split([|'@'|])

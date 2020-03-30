@@ -18,13 +18,21 @@ module AuthenticationError =
         | AccountAlreadyActivatedOrNotFound -> "Tento účet je již zaktivován nebo byl zadán neplatný aktivační klíč."
         | InvalidPasswordResetKey -> "Kód pro nastavení nového hesla je nesprávný, nebo byl již použit."
 
+type DomainError =
+    | UserNotActivated
+    | LessonAlreadyExists
+
+module DomainError =
+    let explain = function
+        | UserNotActivated -> "Uživatel ještě nebyl aktivován."
+        | LessonAlreadyExists -> "Tato lekce již existuje."
 
 type ServerError =
     | Exception of string
     | Validation of ValidationError list
     | Authentication of AuthenticationError
     | DatabaseItemNotFound of Guid
-    | UserNotActivated
+    | Domain of DomainError
 
 type ServerResult<'a> = Result<'a, ServerError>
 
@@ -39,7 +47,7 @@ module ServerError =
             |> String.concat ", "
         | Authentication e -> e |> AuthenticationError.explain
         | DatabaseItemNotFound i -> sprintf "Položka s ID %A nebyla nalezena v databázi." i
-        | UserNotActivated -> "Uživatel ještě nebyl aktivován."
+        | Domain e -> e |> DomainError.explain
         
     let failwith (er:ServerError) = raise (ServerException er)
     

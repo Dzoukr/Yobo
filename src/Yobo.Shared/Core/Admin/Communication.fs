@@ -29,11 +29,32 @@ module Request =
             Expiration = DateTimeOffset.MinValue
         }
         
+    type CreateLessons = {
+        Dates : DateTimeOffset list
+        StartTime : int * int
+        EndTime : int * int
+        Name : string
+        Description : string
+        Capacity : int
+    }
+    
+    module CreateLessons =
+        let init = {
+            Dates = []
+            StartTime = 0,0
+            EndTime = 0,0
+            Name = ""
+            Description = ""
+            Capacity = 0
+        }
+        
     
 type AdminService = {
     GetAllUsers : unit -> Async<Queries.User list>
     AddCredits : Request.AddCredits -> Async<unit>
     SetExpiration : Request.SetExpiration -> Async<unit>
+    GetLessons : DateTimeOffset * DateTimeOffset -> Async<Queries.Lesson list>
+    CreateLessons : Request.CreateLessons -> Async<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/admin/%s" m    

@@ -22,7 +22,7 @@ module CurrentPage =
         | CurrentPage.Secured (p,u) ->
             match p with
             | Calendar -> null
-            | Lessons -> null
+            | Lessons -> Pages.Lessons.Domain.Model.init |> box
             | Users -> Pages.Users.Domain.Model.init |> box
             | MyAccount -> u |> Pages.MyAccount.Domain.Model.init |> box
     let init = CurrentPage.Anonymous Login
@@ -70,6 +70,7 @@ let private getPageInitCommands targetPage =
     | Page.Anonymous (AccountActivation _) -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
     | Page.Secured MyAccount -> RefreshUser |> Cmd.ofMsg
     | Page.Secured Users -> Pages.Users.Domain.LoadUsers |> UsersMsg |> Cmd.ofMsg
+    | Page.Secured Lessons -> Pages.Lessons.Domain.LoadLessons |> LessonsMsg |> Cmd.ofMsg
     | _ -> Cmd.none
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
@@ -119,6 +120,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | ResetPasswordMsg subMsg -> model |> handleUpdate (Pages.ResetPassword.State.update subMsg) ResetPasswordMsg
     | MyAccountMsg subMsg -> model |> handleUpdate (Pages.MyAccount.State.update subMsg) MyAccountMsg
     | UsersMsg subMsg -> model |> handleUpdate (Pages.Users.State.update subMsg) UsersMsg
+    | LessonsMsg subMsg -> model |> handleUpdate (Pages.Lessons.State.update subMsg) LessonsMsg
 
 let subscribe (_:Model) =
     let sub dispatch = 

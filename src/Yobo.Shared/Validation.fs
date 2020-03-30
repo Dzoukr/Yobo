@@ -1,6 +1,7 @@
 module Yobo.Shared.Validation
 
 open System
+open DateTime
 
 type ValidationErrorType =
     | IsEmpty
@@ -17,7 +18,7 @@ module ValidationErrorType =
         | IsNotValidEmail -> "Vyplňte správný formát pro emailovou adresu."
         | IsBelowMinimalLength l -> sprintf "Hodnota musí být nejméně %i znaků." l
         | IsBelowMinimalValue l -> sprintf "Hodnota musí být nejméně %i." l
-        | IsBelowMinimalDate d -> sprintf "Hodnota musí být minimálně %A." d
+        | IsBelowMinimalDate d -> sprintf "Hodnota musí být minimálně %s." (d |> DateTimeOffset.toCzDate)
         | PasswordsDontMatch -> "Hesla se neshodují."
         | TermsNotAgreed -> "Potvrďte souhlas s obchodními podmínkami."
 

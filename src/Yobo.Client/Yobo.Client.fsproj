@@ -35,6 +35,7 @@
         <Compile Include="Pages\Users\Domain.fs" />
         <Compile Include="Pages\Users\State.fs" />
         <Compile Include="Pages\Users\View.fs" />
+        <Compile Include="Pages\Lessons\Domain.fs" />
         <Compile Include="Domain.fs" />
         <Compile Include="View.fs" />
         <Compile Include="State.fs" />

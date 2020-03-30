@@ -13,12 +13,12 @@ open Yobo.Shared.Core.Admin.Domain.Queries
 let private userRow dispatch (u:User) =
     let activated =
         match u.Activated with
-        | Some a -> a.ToString("dd. MM. yyyy") |> Html.text
+        | Some a -> a |> DateTimeOffset.toCzDate |> Html.text
         | None -> Bulma.tag [ tag.isWarning; prop.text "Neaktivní" ]
 
     let expires =
         match u.CreditsExpiration with
-        | Some a -> a.ToString("dd. MM. yyyy") |> Html.text
+        | Some a -> a |> DateTimeOffset.toCzDate |> Html.text
         | None -> Html.text "-"
 
     let addCreditBtn =
@@ -87,7 +87,7 @@ let addCreditsQuickView (model:Model) dispatch user =
                     calendar.onValueSelected (fun x ->
                         match x with
                         | SingleValue (SingleValue.Date (Some v)) ->
-                            DateTimeOffset(v).EndOfTheDay() |> AddCreditsFormDateChanged |> dispatch
+                            DateTimeOffset(v) |> DateTimeOffset.endOfTheDay |> AddCreditsFormDateChanged |> dispatch
                         | _ -> ()
                     )
                 ]
@@ -148,7 +148,7 @@ let setExpirationQuickView (model:Model) dispatch user =
                     calendar.onValueSelected (fun x ->
                         match x with
                         | SingleValue (SingleValue.Date (Some v)) ->
-                            DateTimeOffset(v).EndOfTheDay() |> SetExpirationFormDateChanged |> dispatch
+                            DateTimeOffset(v) |> DateTimeOffset.endOfTheDay |> SetExpirationFormDateChanged |> dispatch
                         | _ -> ()
                     )
                 ]

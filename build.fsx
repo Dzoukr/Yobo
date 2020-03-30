@@ -41,6 +41,8 @@ module Tools =
 let clientSrcPath = "src" </> "Yobo.Client"
 let serverWatcherPath = "src" </> "Yobo.Server.Local"
 let clientDeployPath = "deploy" </> "client"
+let migrationsToolPath = "tools" </> "DbMigrations"
+let migrationsDeployPath = "deploy" </> "dbMigrations"
 
 // Targets
 let clean proj = [ proj </> "bin"; proj </> "obj" ] |> Shell.cleanDirs
@@ -74,7 +76,20 @@ Target.create "Run" (fun _ ->
     |> ignore
 )
 
+open Fake.IO.Globbing.Operators
+
+Target.create "PublishDbMigrations" (fun  _ ->
+    !! "./database/*.sql" |> Shell.copyFiles migrationsDeployPath
+)
+
+Target.create "RunDbMigrations" (fun _ ->
+    let connString = "..\Yobo.Private\ConnectionString.txt" |> File.readAsString
+    let cmd = sprintf "run \"%s\" \"%s\" " connString (migrationsDeployPath |> Path.getFullName)
+    Tools.dotnet cmd migrationsToolPath
+)
+
 "InstallClient" ==> "Run"
 "InstallClient" ==> "PublishClient"
+"PublishDbMigrations" ==> "RunDbMigrations"
 
 Target.runOrDefaultWithArguments "Run"

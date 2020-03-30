@@ -10,6 +10,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Shared", "src\Yobo.Sha
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Yobo.Server.Local", "src\Yobo.Server.Local\Yobo.Server.Local.fsproj", "{71775CD2-A079-4981-9F18-E11B03519398}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{81919207-6A2C-4C31-B169-2429AD61B3D2}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "DbMigrations", "tools\DbMigrations\DbMigrations.fsproj", "{393BF224-2FF2-486F-8C2C-5D982A2AC2CD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +40,12 @@ Global
 		{71775CD2-A079-4981-9F18-E11B03519398}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71775CD2-A079-4981-9F18-E11B03519398}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71775CD2-A079-4981-9F18-E11B03519398}.Release|Any CPU.Build.0 = Release|Any CPU
+		{393BF224-2FF2-486F-8C2C-5D982A2AC2CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{393BF224-2FF2-486F-8C2C-5D982A2AC2CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{393BF224-2FF2-486F-8C2C-5D982A2AC2CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{393BF224-2FF2-486F-8C2C-5D982A2AC2CD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{393BF224-2FF2-486F-8C2C-5D982A2AC2CD} = {81919207-6A2C-4C31-B169-2429AD61B3D2}
 	EndGlobalSection
 EndGlobal

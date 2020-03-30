@@ -36,6 +36,9 @@ github Dzoukr/FSharp.Rop FSharp.Rop.TaskResult.fs
 nuget Dapper.FSharp
 nuget Microsoft.Data.SqlClient
 
+// tools
+nuget dbup-sqlserver
+
 group Build
     source https://api.nuget.org/v3/index.json
     storage: none

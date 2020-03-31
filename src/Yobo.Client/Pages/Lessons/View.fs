@@ -117,8 +117,49 @@ let formQuickView model dispatch =
                 ]
                 ValidationViews.help f.ValidationErrors (nameof(f.FormData.EndTime))
             ]
-            
-            
+            Bulma.field [
+                Bulma.label "Název"
+                Bulma.fieldBody [
+                    Bulma.textInput [
+                        ValidationViews.color model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.Name))
+                        prop.onTextChange (fun x -> { model.LessonsForm.FormData with Name = x } |> LessonsFormChanged |> dispatch)
+                        prop.valueOrDefault (model.LessonsForm.FormData.Name)
+                    ]
+                ]
+                ValidationViews.help f.ValidationErrors (nameof(f.FormData.Name))
+            ]
+            Bulma.field [
+                Bulma.label "Popis"
+                Bulma.fieldBody [
+                    Bulma.textarea [
+                        ValidationViews.color model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.Description))
+                        prop.onTextChange (fun x -> { model.LessonsForm.FormData with Description = x } |> LessonsFormChanged |> dispatch)
+                        prop.valueOrDefault (model.LessonsForm.FormData.Description)
+                    ]
+                ]
+                ValidationViews.help f.ValidationErrors (nameof(f.FormData.Description))
+            ]
+            Bulma.field [
+                Bulma.label "Kapacita"
+                Bulma.fieldBody [
+                    Bulma.numberInput [
+                        ValidationViews.color model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.Capacity))
+                        prop.onTextChange (fun x -> { model.LessonsForm.FormData with Capacity = int x } |> LessonsFormChanged |> dispatch)
+                        prop.valueOrDefault (model.LessonsForm.FormData.Capacity)
+                    ]
+                ]
+                ValidationViews.help f.ValidationErrors (nameof(f.FormData.Capacity))
+            ]
+            Bulma.field [
+                Bulma.fieldBody [
+                    Bulma.button [
+                        button.isPrimary
+                        prop.text "Přidat lekce"
+                        if model.LessonsForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                        prop.onClick (fun _ -> CreateLessons |> dispatch)
+                    ]
+                ]
+            ]
             
             
         ]

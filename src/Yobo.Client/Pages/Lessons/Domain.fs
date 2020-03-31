@@ -33,10 +33,13 @@ module Model =
         }
 
 type Msg =
+    | Init
     | LoadLessons
     | LessonsLoaded of ServerResult<Lesson list>
     | ToggleDate of DateTimeOffset
     | WeekOffsetChanged of int
     | ShowForm of bool
     | LessonsFormChanged of Request.CreateLessons
+    | CreateLessons
+    | LessonsCreated of ServerResult<unit>
     

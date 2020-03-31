@@ -70,7 +70,7 @@ let private getPageInitCommands targetPage =
     | Page.Anonymous (AccountActivation _) -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
     | Page.Secured MyAccount -> RefreshUser |> Cmd.ofMsg
     | Page.Secured Users -> Pages.Users.Domain.LoadUsers |> UsersMsg |> Cmd.ofMsg
-    | Page.Secured Lessons -> Pages.Lessons.Domain.LoadLessons |> LessonsMsg |> Cmd.ofMsg
+    | Page.Secured Lessons -> Pages.Lessons.Domain.Init |> LessonsMsg |> Cmd.ofMsg
     | _ -> Cmd.none
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =

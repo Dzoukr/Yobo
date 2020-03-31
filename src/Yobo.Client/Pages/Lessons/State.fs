@@ -10,6 +10,7 @@ open Yobo.Shared.Core.Admin.Validation
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
+    | Init -> { Model.init with WeekOffset = model.WeekOffset }, Cmd.batch [ Cmd.ofMsg LoadLessons ]
     | ShowForm v -> { model with FormShown = v }, Cmd.none
     | ToggleDate d ->
         let newDates =
@@ -22,7 +23,28 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | WeekOffsetChanged o ->
         { model with WeekOffset = o }, [ LoadLessons ] |> List.map Cmd.ofMsg |> Cmd.batch
     | LessonsFormChanged f ->
-        { model with LessonsForm = model.LessonsForm |> ValidatedForm.updateWith f }, Cmd.none
+        { model
+            with LessonsForm =
+                    model.LessonsForm
+                    |> ValidatedForm.updateWith f
+                    |> ValidatedForm.updateWithFn (fun x -> { x with Dates = model.SelectedDates })
+                    |> ValidatedForm.validateWithIfSent validateCreateLessons }, Cmd.none
+    | CreateLessons ->
+        let model =
+            { model with
+                LessonsForm = model.LessonsForm
+                              |> ValidatedForm.validateWith validateCreateLessons
+                              |> ValidatedForm.markAsSent
+            }
+        if model.LessonsForm |> ValidatedForm.isValid then
+            { model with LessonsForm = model.LessonsForm |> ValidatedForm.startLoading },
+                Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.CreateLessons)) model.LessonsForm.FormData LessonsCreated
+        else model, Cmd.none
+    | LessonsCreated res ->
+        let model = { model with LessonsForm = model.LessonsForm |> ValidatedForm.stopLoading; SelectedDates = [] }
+        match res with
+        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce úspěšně přidány."; Cmd.ofMsg Init ]
+        | Error e -> model, e |> ServerResponseViews.showErrorToast
     | LoadLessons ->
         let pars = model.WeekOffset |> DateRange.getDateRangeForWeekOffset
         { model with LessonsLoading = true }, Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.GetLessons)) pars LessonsLoaded

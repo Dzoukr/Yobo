@@ -87,7 +87,9 @@ let addCreditsQuickView (model:Model) dispatch user =
                     calendar.onValueSelected (fun x ->
                         match x with
                         | SingleValue (SingleValue.Date (Some v)) ->
-                            DateTimeOffset(v) |> DateTimeOffset.endOfTheDay |> AddCreditsFormDateChanged |> dispatch
+                            { model.AddCreditsForm.FormData with Expiration = DateTimeOffset(v) |> DateTimeOffset.endOfTheDay }
+                            |> AddCreditsFormChanged
+                            |> dispatch
                         | _ -> ()
                     )
                 ]
@@ -148,7 +150,9 @@ let setExpirationQuickView (model:Model) dispatch user =
                     calendar.onValueSelected (fun x ->
                         match x with
                         | SingleValue (SingleValue.Date (Some v)) ->
-                            DateTimeOffset(v) |> DateTimeOffset.endOfTheDay |> SetExpirationFormDateChanged |> dispatch
+                            { model.SetExpirationForm.FormData with Expiration = DateTimeOffset(v) |> DateTimeOffset.endOfTheDay }
+                            |> SetExpirationFormChanged
+                            |> dispatch
                         | _ -> ()
                     )
                 ]

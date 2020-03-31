@@ -32,11 +32,9 @@ type Msg =
     | UsersLoaded of ServerResult<User list>
     | ShowAddCreditsForm of Guid option
     | AddCreditsFormChanged of Request.AddCredits
-    | AddCreditsFormDateChanged of DateTimeOffset
     | AddCredits
     | CreditsAdded of ServerResult<unit>
     | ShowSetExpirationForm of Guid option
     | SetExpirationFormChanged of Request.SetExpiration
-    | SetExpirationFormDateChanged of DateTimeOffset
     | SetExpiration
     | ExpirationSet of ServerResult<unit>

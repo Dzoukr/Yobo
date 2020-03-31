@@ -77,12 +77,6 @@ let navigationRow (model:Model) dispatch =
 
 let formQuickView model dispatch =
     
-    let toTime (s:string) =
-        let parts = s.Split[|':'|]
-        (int parts.[0]), (int parts.[1])
-    
-    let toValue (hrs,mn) = sprintf "%i:%i" hrs mn        
-    
     let lessonsForm (f:ValidatedForm<Request.CreateLessons>) =
         Html.div [
             Bulma.field [
@@ -95,27 +89,32 @@ let formQuickView model dispatch =
                 ]
                 ValidationViews.help f.ValidationErrors (nameof(f.FormData.Dates))
             ]
+            
             Bulma.field [
-                Bulma.label "Začátek"
+                Bulma.label "Začátek a konec"
                 Bulma.fieldBody [
-                    Bulma.textInput [
-                        ValidationViews.color model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.StartTime))
-                        prop.onTextChange (fun x -> { model.LessonsForm.FormData with StartTime = toTime x } |> LessonsFormChanged |> dispatch)
-                        prop.valueOrDefault (model.LessonsForm.FormData.StartTime |> toValue)
+                    Calendar.calendar [
+                        prop.id "expCal"
+                        calendar.options [
+                            calendar.options.experimental.triggerOnTimeChange true
+                            calendar.options.type'.time
+                            calendar.options.isRange true
+                            calendar.options.minuteSteps 1
+                            calendar.options.displayMode.inline'
+                            calendar.options.showFooter false
+                            calendar.options.startDate DateTime.Now
+                            calendar.options.endDate DateTime.Now
+                        ]
+                        calendar.onValueSelected (fun x ->
+                            match x with
+                            | RangeValue (RangeValue.Time (f,t)) ->
+                                { model.LessonsForm.FormData with StartTime = f.Hours,f.Minutes; EndTime = t.Hours,t.Minutes } |> LessonsFormChanged |> dispatch
+                            | _ -> ()
+                        )
                     ]
                 ]
-                ValidationViews.help f.ValidationErrors (nameof(f.FormData.StartTime))
-            ]
-            Bulma.field [
-                Bulma.label "Konec"
-                Bulma.fieldBody [
-                    Bulma.textInput [
-                        ValidationViews.color model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.EndTime))
-                        prop.onTextChange (fun x -> { model.LessonsForm.FormData with EndTime = toTime x } |> LessonsFormChanged |> dispatch)
-                        prop.valueOrDefault (model.LessonsForm.FormData.EndTime |> toValue)
-                    ]
-                ]
-                ValidationViews.help f.ValidationErrors (nameof(f.FormData.EndTime))
+                ValidationViews.help model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.StartTime))
+                ValidationViews.help model.LessonsForm.ValidationErrors (nameof(model.LessonsForm.FormData.EndTime))
             ]
             Bulma.field [
                 Bulma.label "Název"
@@ -163,31 +162,108 @@ let formQuickView model dispatch =
             
             
         ]
+    
+    let workshopsForm (f:ValidatedForm<Request.CreateWorkshops>) =
+        Html.div [
+            Bulma.field [
+                Bulma.label "Termíny"
+                Bulma.fieldBody [
+                    model.SelectedDates
+                    |> List.map DateTimeOffset.toCzDate
+                    |> String.concat ", "
+                    |> Html.span
+                ]
+                ValidationViews.help f.ValidationErrors (nameof(f.FormData.Dates))
+            ]
+            
+            Bulma.field [
+                Bulma.label "Začátek a konec"
+                Bulma.fieldBody [
+                    Calendar.calendar [
+                        prop.id "workCal"
+                        calendar.options [
+                            calendar.options.experimental.triggerOnTimeChange true
+                            calendar.options.type'.time
+                            calendar.options.isRange true
+                            calendar.options.minuteSteps 1
+                            calendar.options.displayMode.inline'
+                            calendar.options.showFooter false
+                            calendar.options.startDate DateTime.Now
+                            calendar.options.endDate DateTime.Now
+                        ]
+                        calendar.onValueSelected (fun x ->
+                            match x with
+                            | RangeValue (RangeValue.Time (f,t)) ->
+                                { model.WorkshopsForm.FormData with StartTime = f.Hours,f.Minutes; EndTime = t.Hours,t.Minutes } |> WorkshopsFormChanged |> dispatch
+                            | _ -> ()
+                        )
+                    ]
+                ]
+                ValidationViews.help model.WorkshopsForm.ValidationErrors (nameof(model.WorkshopsForm.FormData.StartTime))
+                ValidationViews.help model.WorkshopsForm.ValidationErrors (nameof(model.WorkshopsForm.FormData.EndTime))
+            ]
+            Bulma.field [
+                Bulma.label "Název"
+                Bulma.fieldBody [
+                    Bulma.textInput [
+                        ValidationViews.color model.WorkshopsForm.ValidationErrors (nameof(model.WorkshopsForm.FormData.Name))
+                        prop.onTextChange (fun x -> { model.WorkshopsForm.FormData with Name = x } |> WorkshopsFormChanged |> dispatch)
+                        prop.valueOrDefault (model.WorkshopsForm.FormData.Name)
+                    ]
+                ]
+                ValidationViews.help f.ValidationErrors (nameof(f.FormData.Name))
+            ]
+            Bulma.field [
+                Bulma.label "Popis"
+                Bulma.fieldBody [
+                    Bulma.textarea [
+                        ValidationViews.color model.WorkshopsForm.ValidationErrors (nameof(model.WorkshopsForm.FormData.Description))
+                        prop.onTextChange (fun x -> { model.WorkshopsForm.FormData with Description = x } |> WorkshopsFormChanged |> dispatch)
+                        prop.valueOrDefault (model.WorkshopsForm.FormData.Description)
+                    ]
+                ]
+                ValidationViews.help f.ValidationErrors (nameof(f.FormData.Description))
+            ]
+            
+            Bulma.field [
+                Bulma.fieldBody [
+                    Bulma.button [
+                        button.isPrimary
+                        prop.text "Přidat workshopy"
+                        if model.WorkshopsForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                        prop.onClick (fun _ -> CreateWorkshops |> dispatch)
+                    ]
+                ]
+            ]
+            
+            
+        ]
         
     
     let activeForm =
         match model.ActiveForm with
         | LessonsForm -> model.LessonsForm |> lessonsForm
+        | WorkshopsForm -> model.WorkshopsForm |> workshopsForm
     
     let form = [
+        let item (name:string) formType =
+            Html.li [                       
+                if model.ActiveForm = formType then tabs.isActive
+                prop.children [
+                    Html.a [
+                        Html.span name
+                    ]
+                ]
+                prop.onClick (fun _ -> formType |> SwitchActiveForm |> dispatch)
+            ]
+            
         Bulma.tabs [
             tabs.isCentered
             tabs.isToggle
             prop.children [
                 Html.ul [
-                    Html.li [
-                        tabs.isActive
-                        prop.children [
-                            Html.a [
-                                Html.span "Lekce"
-                            ]
-                        ]
-                    ]
-                    Html.li [
-                        Html.a [
-                            Html.span "Workshop"
-                        ]
-                    ]
+                    item "Lekce" ActiveForm.LessonsForm
+                    item "Workshop" WorkshopsForm
                     Html.li [
                         Html.a [
                             Html.span "Online lekce"

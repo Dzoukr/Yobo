@@ -48,6 +48,23 @@ module Request =
             Capacity = 0
         }
         
+    type CreateWorkshops = {
+        Dates : DateTimeOffset list
+        StartTime : int * int
+        EndTime : int * int
+        Name : string
+        Description : string
+    }
+    
+    module CreateWorkshops =
+        let init = {
+            Dates = []
+            StartTime = 0,0
+            EndTime = 0,0
+            Name = ""
+            Description = ""
+        }
+        
     
 type AdminService = {
     GetAllUsers : unit -> Async<Queries.User list>

@@ -9,6 +9,7 @@ open Yobo.Shared.Core.Admin.Domain.Queries
 
 type ActiveForm =
     | LessonsForm
+    | WorkshopsForm
 
 type Model = {
     Lessons : Lesson list
@@ -18,6 +19,7 @@ type Model = {
     FormShown : bool
     ActiveForm : ActiveForm
     LessonsForm : ValidatedForm<Request.CreateLessons>
+    WorkshopsForm : ValidatedForm<Request.CreateWorkshops>
 }
 
 module Model =
@@ -30,10 +32,12 @@ module Model =
             FormShown = false
             ActiveForm = LessonsForm
             LessonsForm = Request.CreateLessons.init |> ValidatedForm.init
+            WorkshopsForm = Request.CreateWorkshops.init |> ValidatedForm.init
         }
 
 type Msg =
     | Init
+    | SwitchActiveForm of ActiveForm
     | LoadLessons
     | LessonsLoaded of ServerResult<Lesson list>
     | ToggleDate of DateTimeOffset
@@ -42,4 +46,6 @@ type Msg =
     | LessonsFormChanged of Request.CreateLessons
     | CreateLessons
     | LessonsCreated of ServerResult<unit>
+    | WorkshopsFormChanged of Request.CreateWorkshops
+    | CreateWorkshops
     

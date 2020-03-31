@@ -26,8 +26,6 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         | None -> model, Cmd.none            
     | AddCreditsFormChanged f ->
         { model with AddCreditsForm = model.AddCreditsForm |> ValidatedForm.updateWith f |> ValidatedForm.validateWith validateAddCredits }, Cmd.none
-    | AddCreditsFormDateChanged v ->
-        model, ({ model.AddCreditsForm.FormData with Expiration = v } |> AddCreditsFormChanged) |> Cmd.ofMsg
     | AddCredits ->
         let model = { model with AddCreditsForm = model.AddCreditsForm |> ValidatedForm.validateWith validateAddCredits }
         if model.AddCreditsForm |> ValidatedForm.isValid then
@@ -50,8 +48,6 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         | None -> model, Cmd.none
     | SetExpirationFormChanged f ->
         { model with SetExpirationForm = model.SetExpirationForm |> ValidatedForm.updateWith f |> ValidatedForm.validateWith validateSetExpiration }, Cmd.none
-    | SetExpirationFormDateChanged v ->
-        model, ({ model.SetExpirationForm.FormData with Expiration = v } |> SetExpirationFormChanged) |> Cmd.ofMsg        
     | SetExpiration ->
         let model = { model with SetExpirationForm = model.SetExpirationForm |> ValidatedForm.validateWith validateSetExpiration }
         if model.SetExpirationForm |> ValidatedForm.isValid then

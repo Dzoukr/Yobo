@@ -12,6 +12,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
     | Init -> { Model.init with WeekOffset = model.WeekOffset }, Cmd.batch [ Cmd.ofMsg LoadLessons ]
     | ShowForm v -> { model with FormShown = v }, Cmd.none
+    | SwitchActiveForm v -> { model with ActiveForm = v }, Cmd.none
     | ToggleDate d ->
         let newDates =
             if model.SelectedDates |> List.contains d then
@@ -45,6 +46,14 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         match res with
         | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce úspěšně přidány."; Cmd.ofMsg Init ]
         | Error e -> model, e |> ServerResponseViews.showErrorToast
+    | WorkshopsFormChanged f ->
+        { model
+            with WorkshopsForm =
+                    model.WorkshopsForm
+                    |> ValidatedForm.updateWith f
+                    |> ValidatedForm.updateWithFn (fun x -> { x with Dates = model.SelectedDates })
+                    |> ValidatedForm.validateWithIfSent validateCreateWorkshops }, Cmd.none
+    
     | LoadLessons ->
         let pars = model.WeekOffset |> DateRange.getDateRangeForWeekOffset
         { model with LessonsLoading = true }, Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.GetLessons)) pars LessonsLoaded

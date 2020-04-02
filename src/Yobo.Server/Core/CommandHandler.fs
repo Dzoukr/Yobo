@@ -23,15 +23,18 @@ module Projections =
         StartDate : DateTimeOffset
         EndDate : DateTimeOffset
         IsCancelled : bool
+        Capacity : int
     }
-
-
-let private tryFindById (allLessons:Projections.ExistingLesson list) (id:Guid) =
-    allLessons
-    |> List.tryFind (fun x -> x.Id = id)
 
 let private onlyIfActivated (user:Projections.ExistingUser) =
     if user.IsActivated then Ok user else DomainError.UserNotActivated |> Error
+
+//let private onlyIfNotInPast (args:CmdArgs.UpdateLesson) =
+//    let now = DateTimeOffset.UtcNow
+//    if args.StartDate <= now || args.EndDate <= now then
+//        DomainError.CannotMoveLessonToPast |> Error
+//    else args |> Ok
+
     
 let addCredits (user:Projections.ExistingUser) (args:CmdArgs.AddCredits) =
     user
@@ -53,4 +56,7 @@ let createWorkshop (args:CmdArgs.CreateWorkshop) =
     
 let createOnlineLesson (args:CmdArgs.CreateOnlineLesson) =
     [ OnlineLessonCreated args ] |> Ok
+
+let changeLessonDescription (lessons:Projections.ExistingLesson) (args:CmdArgs.ChangeLessonDescription) =
+    [ LessonDescriptionChanged args ] |> Ok
     

@@ -40,3 +40,10 @@ let validateCreateOnlineLessons (r:Request.CreateOnlineLessons) =
         nameof(r.Description), validateNotEmpty r.Description
         nameof(r.Capacity), validateMinimumValue 1 r.Capacity
     ] |> validate
+    
+let validateChangeLessonDescription (r:Request.ChangeLessonDescription) =
+    [
+        nameof(r.Id), validateNotEmptyGuid r.Id
+        nameof(r.Name), validateNotEmpty r.Name
+        nameof(r.Description), validateNotEmpty r.Description
+    ] |> validate

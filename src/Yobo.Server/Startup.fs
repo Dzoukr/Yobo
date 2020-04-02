@@ -178,6 +178,10 @@ module CompositionRoot =
                         CreateLesson = Core.CommandHandler.createLesson >> toExn >> sql handleEvents
                         CreateWorkshop = Core.CommandHandler.createWorkshop >> toExn >> sql handleEvents
                         CreateOnlineLesson = Core.CommandHandler.createOnlineLesson >> toExn >> sql handleEvents
+                        ChangeLessonDescription = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getLessonById args.Id
+                            return! args |> Core.CommandHandler.changeLessonDescription projections |> toExn |> sql handleEvents
+                        }
                     }
             }
         } : CompositionRoot

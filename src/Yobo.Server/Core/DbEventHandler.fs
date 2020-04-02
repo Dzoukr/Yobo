@@ -13,4 +13,5 @@ let handle (conn:SqlConnection) (e:Event) =
         | LessonCreated args -> do! args |> Database.Updates.lessonCreated conn
         | WorkshopCreated args -> do! args |> Database.Updates.workshopCreated conn 
         | OnlineLessonCreated args -> do! args |> Database.Updates.onlineLessonCreated conn
+        | LessonDescriptionChanged args -> do! args |> Database.Updates.lessonDescriptionChanged conn
     }

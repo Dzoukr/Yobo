@@ -48,6 +48,7 @@ type AdminCommandHandler = {
     CreateLesson : Core.Domain.CmdArgs.CreateLesson -> Task<unit>
     CreateWorkshop : Core.Domain.CmdArgs.CreateWorkshop -> Task<unit>
     CreateOnlineLesson : Core.Domain.CmdArgs.CreateOnlineLesson -> Task<unit>
+    ChangeLessonDescription : Core.Domain.CmdArgs.ChangeLessonDescription -> Task<unit>
 }
 
 type AdminRoot = {

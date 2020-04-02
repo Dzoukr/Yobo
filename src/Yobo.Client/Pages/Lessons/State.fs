@@ -14,17 +14,15 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | SelectActiveForm v -> { model with ActiveForm = v }, Cmd.none
     | ToggleDate d ->
         let newDates =
-            if model.SelectedDates |> List.contains d then
-                model.SelectedDates |> List.filter ((<>) d)
-            else
-                d :: model.SelectedDates
+            if model.SelectedDates |> List.contains d then model.SelectedDates |> List.filter ((<>) d)
+            else d :: model.SelectedDates
             |> List.sort
-        
         let cmd = if newDates.Length = 0 then Cmd.ofMsg <| SelectActiveForm None else Cmd.none                
         { model with
             SelectedDates = newDates
             LessonsForm = model.LessonsForm |> ValidatedForm.updateWithFn (fun x -> { x with Dates = newDates })
             WorkshopsForm = model.WorkshopsForm |> ValidatedForm.updateWithFn (fun x -> { x with Dates = newDates })
+            OnlinesForm = model.OnlinesForm |> ValidatedForm.updateWithFn (fun x -> { x with Dates = newDates })
             }, cmd
     | WeekOffsetChanged o ->
         { model with WeekOffset = o }, [ LoadLessons; LoadWorkshops; LoadOnlineLessons ] |> List.map Cmd.ofMsg |> Cmd.batch
@@ -119,5 +117,4 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         match res with
         | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshopy úspěšně přidány."; Cmd.ofMsg Init ]
         | Error e -> model, e |> ServerResponseViews.showErrorToast
-    | SelectLesson i ->
-        { model with ActiveDetailForm = i |> LessonDetailForm |> Some }, Cmd.none
+    | SelectActiveItem i -> { model with ActiveItem = i }, Cmd.none

@@ -40,6 +40,12 @@ module CmdArgs =
         Description : string
         Capacity : int
     }
+    
+    type ChangeLessonDescription = {
+        Id : Guid
+        Name : string
+        Description : string
+    }
 
 //
 //    type AddReservation = {
@@ -108,6 +114,7 @@ type Event =
     | LessonCreated of CmdArgs.CreateLesson
     | WorkshopCreated of CmdArgs.CreateWorkshop
     | OnlineLessonCreated of CmdArgs.CreateOnlineLesson
+    | LessonDescriptionChanged of CmdArgs.ChangeLessonDescription
     
 //    | ReservationAdded of CmdArgs.AddReservation
 //    | ReservationCancelled of CmdArgs.CancelReservation
@@ -118,4 +125,3 @@ type Event =
 //    | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
 //    | WorkshopDeleted of CmdArgs.DeleteWorkshop
 //    | LessonDeleted of CmdArgs.DeleteLesson
-//    | LessonUpdated of CmdArgs.UpdateLesson

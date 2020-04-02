@@ -80,6 +80,17 @@ let private createOnlineLessons (root:AdminRoot) (r:Request.CreateOnlineLessons)
             do! root.CommandHandler.CreateOnlineLesson args                
         return ()            
     }
+    
+let private changeLessonDescription (root:AdminRoot) (r:Request.ChangeLessonDescription) =
+    task {
+        let args : CmdArgs.ChangeLessonDescription =
+            {
+                Id = r.Id
+                Name = r.Name
+                Description = r.Description
+            }
+        return! root.CommandHandler.ChangeLessonDescription args              
+    }    
 
 let private adminService (root:CompositionRoot) userId : AdminService =
     {
@@ -92,6 +103,7 @@ let private adminService (root:CompositionRoot) userId : AdminService =
         CreateLessons = ServerError.validate validateCreateLessons >> createLessons root.Admin >> Async.AwaitTask
         CreateWorkshops = ServerError.validate validateCreateWorkshops >> createWorkshops root.Admin >> Async.AwaitTask
         CreateOnlineLessons = ServerError.validate validateCreateOnlineLessons >> createOnlineLessons root.Admin >> Async.AwaitTask
+        ChangeLessonDescription = ServerError.validate validateChangeLessonDescription >> changeLessonDescription root.Admin >> Async.AwaitTask
     }
 
 let adminServiceHandler (root:CompositionRoot) : HttpHandler =

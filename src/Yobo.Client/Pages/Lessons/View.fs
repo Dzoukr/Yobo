@@ -62,20 +62,14 @@ let navigationRow (model:Model) dispatch =
                     ]
                     Bulma.dropdownMenu [
                         Bulma.dropdownContent [
-                            Bulma.dropdownItem [
-                                Html.a [
-                                    prop.text "Lekce"; prop.onClick (fun _ -> SelectActiveForm (Some LessonsForm) |> dispatch)
-                                ]
+                            Bulma.dropdownItemA [
+                                prop.text "Lekce"; prop.onClick (fun _ -> SelectActiveForm (Some LessonsForm) |> dispatch)
                             ]
-                            Bulma.dropdownItem [
-                                Html.a [
-                                    prop.text "Workshopy"; prop.onClick (fun _ -> SelectActiveForm (Some WorkshopsForm) |> dispatch)
-                                ]
+                            Bulma.dropdownItemA [
+                                prop.text "Workshopy"; prop.onClick (fun _ -> SelectActiveForm (Some WorkshopsForm) |> dispatch)
                             ]
-                            Bulma.dropdownItem [
-                                Html.a [
-                                    prop.text "Online lekce"; prop.onClick (fun _ -> SelectActiveForm (Some OnlinesForm) |> dispatch)
-                                ]
+                            Bulma.dropdownItemA [
+                                prop.text "Online lekce"; prop.onClick (fun _ -> SelectActiveForm (Some OnlinesForm) |> dispatch)
                             ]
                         ]
                     ]
@@ -356,13 +350,30 @@ let onlinesForm (f:ValidatedForm<Request.CreateOnlineLessons>) dispatch =
         ]
     ]
     
-let inQuickView dispatch (header:string) (content:ReactElement) =    
+let inFormQuickView dispatch (header:string) (content:ReactElement) =    
     QuickView.quickview [
         quickview.isActive
         prop.children [
             QuickView.header [
                 Html.div header
                 Bulma.delete [ prop.onClick (fun _ -> None |> SelectActiveForm |> dispatch) ]
+            ]
+            QuickView.body [
+                QuickView.block [
+                    prop.style [ style.padding 15 ]
+                    prop.children content
+                ]
+            ]
+        ]
+    ]
+    
+let inItemQuickView dispatch (header:string) (content:ReactElement) =    
+    QuickView.quickview [
+        quickview.isActive
+        prop.children [
+            QuickView.header [
+                Html.div header
+                Bulma.delete [ prop.onClick (fun _ -> None |> SelectActiveItem |> dispatch) ]
             ]
             QuickView.body [
                 QuickView.block [
@@ -386,7 +397,7 @@ let getTag (res:'a list) capacity isCancelled =
     
     Bulma.tag [ tagColor; prop.text tagText ]    
 
-let workshopDiv (workshop:Queries.Workshop) =
+let workshopDiv dispatch (workshop:Queries.Workshop) =
     Html.div [
         prop.className "workshop"
         prop.children [
@@ -402,12 +413,13 @@ let workshopDiv (workshop:Queries.Workshop) =
                 Bulma.button [
                     button.isLight
                     prop.text "Detail"
+                    prop.onClick (fun _ -> workshop |> ActiveItem.Workshop |> Some |> SelectActiveItem |> dispatch)
                 ]
             ]
         ]
     ]
 
-let lessonDiv (lesson:Queries.Lesson) =
+let lessonDiv dispatch (lesson:Queries.Lesson) =
     Html.div [
         prop.className "lesson"
         prop.children [
@@ -426,12 +438,13 @@ let lessonDiv (lesson:Queries.Lesson) =
                 Bulma.button [
                     button.isLight
                     prop.text "Detail"
+                    prop.onClick (fun _ -> lesson |> ActiveItem.Lesson |> Some |> SelectActiveItem |> dispatch)
                 ]
             ]
         ]
     ]
 
-let onlineLessonDiv (lesson:Queries.OnlineLesson) =
+let onlineLessonDiv dispatch (lesson:Queries.OnlineLesson) =
       
     Html.div [
         prop.className "online-lesson"
@@ -451,6 +464,7 @@ let onlineLessonDiv (lesson:Queries.OnlineLesson) =
                 Bulma.button [
                     button.isLight
                     prop.text "Detail"
+                    prop.onClick (fun _ -> lesson |> ActiveItem.OnlineLesson |> Some |> SelectActiveItem |> dispatch)
                 ]
             ]
         ]
@@ -458,9 +472,9 @@ let onlineLessonDiv (lesson:Queries.OnlineLesson) =
 
 let col (lessons:Queries.Lesson list) (workshops:Queries.Workshop list) (onlines:Queries.OnlineLesson list) (date:DateTimeOffset) dispatch =
     Html.td [
-        Html.div (workshops |> List.map workshopDiv)
-        Html.div (lessons |> List.map lessonDiv)
-        Html.div (onlines |> List.map onlineLessonDiv)
+        Html.div (workshops |> List.map (workshopDiv dispatch))
+        Html.div (lessons |> List.map (lessonDiv dispatch))
+        Html.div (onlines |> List.map (onlineLessonDiv dispatch))
     ]
 
 let row model dispatch dates =
@@ -492,9 +506,16 @@ let row model dispatch dates =
 
 let formQuickView model dispatch =
     match model.ActiveForm with
-    | Some LessonsForm -> lessonsForm model.LessonsForm dispatch |> inQuickView dispatch "Lekce"
-    | Some WorkshopsForm -> workshopsForm model.WorkshopsForm dispatch |> inQuickView dispatch "Workshopy"
-    | Some OnlinesForm -> onlinesForm model.OnlinesForm dispatch |> inQuickView dispatch "Online lekce"
+    | Some LessonsForm -> lessonsForm model.LessonsForm dispatch |> inFormQuickView dispatch "Lekce"
+    | Some WorkshopsForm -> workshopsForm model.WorkshopsForm dispatch |> inFormQuickView dispatch "Workshopy"
+    | Some OnlinesForm -> onlinesForm model.OnlinesForm dispatch |> inFormQuickView dispatch "Online lekce"
+    | None -> Html.none
+
+let activeItemQuickView model dispatch =
+    match model.ActiveItem with
+    | Some (Lesson l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
+    | Some (Workshop l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
+    | Some (OnlineLesson l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
     | None -> Html.none
     
 let view (model:Model) (dispatch: Msg -> unit) =
@@ -506,6 +527,7 @@ let view (model:Model) (dispatch: Msg -> unit) =
     
     Html.div [
         formQuickView model dispatch
+        activeItemQuickView model dispatch
         Bulma.table [
             table.isFullwidth
             table.isBordered

@@ -169,7 +169,16 @@ module Updates =
             value newValue
         }
         |> conn.InsertAsync
-        |> Task.ignore     
+        |> Task.ignore
+        
+    let lessonDescriptionChanged (conn:IDbConnection) (args:CmdArgs.ChangeLessonDescription) =
+        update {
+            table Tables.Lessons.name
+            set {| Name = args.Name; Description = args.Description |}
+            where (eq "Id" args.Id)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore        
 
 module Projections =
     let getById (conn:IDbConnection) (i:Guid) =
@@ -192,7 +201,39 @@ module Projections =
             CreditsExpiration = usr.CreditsExpiration
             UseCredits = res.UseCredits
         }
-            
+    
+    let private toLesson (lsn:Tables.Lessons,gr) =
+        let res =
+            gr
+            |> List.choose (ignoreFstOf3 >> optionOf2)
+            |> List.map toUserReservation
+        {
+            Id = lsn.Id
+            StartDate = lsn.StartDate
+            EndDate = lsn.EndDate
+            IsCancelled = lsn.IsCancelled
+            Reservations = res
+            Capacity = lsn.Capacity
+        } : CommandHandler.Projections.ExistingLesson
+    
+    let getLessonById (conn:IDbConnection) (i:Guid) =
+        task {
+            let! res =
+                select {
+                    table Tables.Lessons.name
+                    leftJoin Tables.LessonReservations.name "LessonId" "Lessons.Id"
+                    leftJoin Tables.Users.name "Id" "LessonReservations.UserId"
+                    where (eq "Lessons.Id" i)
+                }
+                |> conn.SelectAsyncOption<Tables.Lessons, Tables.LessonReservations, Tables.Users>
+            return
+                res
+                |> List.ofSeq
+                |> List.groupBy fstOf3
+                |> List.map toLesson
+                |> (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))
+        }
+                
     let getAllLessons (conn:IDbConnection) () =
         task {
             let! res =
@@ -206,18 +247,6 @@ module Projections =
                 res
                 |> List.ofSeq
                 |> List.groupBy fstOf3
-                |> List.map (fun (lsn,gr) ->
-                    let res =
-                        gr
-                        |> List.choose (ignoreFstOf3 >> optionOf2)
-                        |> List.map toUserReservation
-                    {
-                        Id = lsn.Id
-                        StartDate = lsn.StartDate
-                        EndDate = lsn.EndDate
-                        IsCancelled = lsn.IsCancelled
-                        Reservations = res
-                    } : CommandHandler.Projections.ExistingLesson
-                )
+                |> List.map toLesson
         }
         

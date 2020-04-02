@@ -3,7 +3,6 @@ module Yobo.Client.Pages.Lessons.Domain
 open System
 open Yobo.Client.Forms
 open Yobo.Shared.Core.Admin.Communication
-open Yobo.Shared.DateTime
 open Yobo.Shared.Errors
 open Yobo.Shared.Core.Admin.Domain.Queries
 
@@ -12,8 +11,10 @@ type ActiveForm =
     | WorkshopsForm
     | OnlinesForm
 
-type ActiveDetailForm =
-    | LessonDetailForm of Guid
+type ActiveItem =
+    | Lesson of Lesson
+    | Workshop of Workshop
+    | OnlineLesson of OnlineLesson
 
 type Model = {
     Lessons : Lesson list
@@ -27,7 +28,7 @@ type Model = {
     WorkshopsForm : ValidatedForm<Request.CreateWorkshops>
     OnlinesForm : ValidatedForm<Request.CreateOnlineLessons>
     
-    ActiveDetailForm : ActiveDetailForm option
+    ActiveItem : ActiveItem option
 }
 
 module Model =
@@ -42,7 +43,7 @@ module Model =
             LessonsForm = Request.CreateLessons.init |> ValidatedForm.init
             WorkshopsForm = Request.CreateWorkshops.init |> ValidatedForm.init
             OnlinesForm = Request.CreateOnlineLessons.init |> ValidatedForm.init
-            ActiveDetailForm = None
+            ActiveItem = None
         }
 
 type Msg =
@@ -65,5 +66,5 @@ type Msg =
     | LessonsCreated of ServerResult<unit>
     | WorkshopsCreated of ServerResult<unit>
     | OnlineLessonsCreated of ServerResult<unit>
-    | SelectLesson of Guid
+    | SelectActiveItem of ActiveItem option
     

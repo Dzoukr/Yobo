@@ -83,7 +83,19 @@ module Request =
             Description = ""
             Capacity = 0
         }
-
+    
+    type ChangeLessonDescription = {
+        Id : Guid
+        Name : string
+        Description : string
+    }
+    
+    module ChangeLessonDescription =
+        let init = {
+            Id = Guid.Empty
+            Name = ""
+            Description = ""
+        }
         
     
 type AdminService = {
@@ -96,6 +108,7 @@ type AdminService = {
     CreateWorkshops : Request.CreateWorkshops -> Async<unit>
     CreateOnlineLessons : Request.CreateOnlineLessons -> Async<unit>
     GetOnlineLessons : DateTimeOffset * DateTimeOffset -> Async<Queries.OnlineLesson list>
+    ChangeLessonDescription : Request.ChangeLessonDescription -> Async<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/admin/%s" m    

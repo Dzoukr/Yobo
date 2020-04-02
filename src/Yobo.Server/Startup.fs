@@ -163,6 +163,8 @@ module CompositionRoot =
                     Queries = {
                         GetAllUsers = sql Core.Admin.Database.Queries.getAllUsers
                         GetLessons = sql Core.Admin.Database.Queries.getLessons
+                        GetWorkshops = sql Core.Admin.Database.Queries.getWorkshops
+                        GetOnlineLessons = sql Core.Admin.Database.Queries.getOnlineLessons
                     }
                     CommandHandler = {
                         AddCredits = fun args -> task {
@@ -173,13 +175,13 @@ module CompositionRoot =
                             let! projections = sql Core.Database.Projections.getById args.UserId
                             return! args |> Core.CommandHandler.setExpiration projections |> toExn |> sql handleEvents
                         }
-                        CreateLesson = fun args -> task {
-                            let! projections = sql Core.Database.Projections.getAllLessons ()
-                            return! args |> Core.CommandHandler.createLesson projections |> toExn |> sql handleEvents
-                        }
+                        CreateLesson = Core.CommandHandler.createLesson >> toExn >> sql handleEvents
+                        CreateWorkshop = Core.CommandHandler.createWorkshop >> toExn >> sql handleEvents
+                        CreateOnlineLesson = Core.CommandHandler.createOnlineLesson >> toExn >> sql handleEvents
                     }
             }
         } : CompositionRoot
+
 
 type private InjectCompositionRoot(root) =
     

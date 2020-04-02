@@ -48,15 +48,50 @@ let private createLessons (root:AdminRoot) (r:Request.CreateLessons) =
                 }
             do! root.CommandHandler.CreateLesson args                
         return ()            
+    }
+    
+let private createWorkshops (root:AdminRoot) (r:Request.CreateWorkshops) =
+    task {
+        for d in r.Dates do
+            let args : CmdArgs.CreateWorkshop =
+                {
+                    Id = Guid.NewGuid()
+                    StartDate = d |> DateTimeOffset.toCzDateTimeOffset |> DateTimeOffset.withHoursMins r.StartTime
+                    EndDate = d |> DateTimeOffset.toCzDateTimeOffset |> DateTimeOffset.withHoursMins r.EndTime
+                    Name = r.Name
+                    Description = r.Description
+                }
+            do! root.CommandHandler.CreateWorkshop args                
+        return ()            
     }    
+
+let private createOnlineLessons (root:AdminRoot) (r:Request.CreateOnlineLessons) =
+    task {
+        for d in r.Dates do
+            let args : CmdArgs.CreateOnlineLesson =
+                {
+                    Id = Guid.NewGuid()
+                    StartDate = d |> DateTimeOffset.toCzDateTimeOffset |> DateTimeOffset.withHoursMins r.StartTime
+                    EndDate = d |> DateTimeOffset.toCzDateTimeOffset |> DateTimeOffset.withHoursMins r.EndTime
+                    Name = r.Name
+                    Description = r.Description
+                    Capacity = r.Capacity
+                }
+            do! root.CommandHandler.CreateOnlineLesson args                
+        return ()            
+    }
 
 let private adminService (root:CompositionRoot) userId : AdminService =
     {
+        GetOnlineLessons = root.Admin.Queries.GetOnlineLessons >> Async.AwaitTask
         GetLessons = root.Admin.Queries.GetLessons >> Async.AwaitTask
+        GetWorkshops = root.Admin.Queries.GetWorkshops >> Async.AwaitTask
         GetAllUsers = root.Admin.Queries.GetAllUsers >> Async.AwaitTask
         AddCredits = ServerError.validate validateAddCredits >> addCredits root.Admin >> Async.AwaitTask
         SetExpiration = ServerError.validate validateSetExpiration >> setExpiration root.Admin >> Async.AwaitTask
         CreateLessons = ServerError.validate validateCreateLessons >> createLessons root.Admin >> Async.AwaitTask
+        CreateWorkshops = ServerError.validate validateCreateWorkshops >> createWorkshops root.Admin >> Async.AwaitTask
+        CreateOnlineLessons = ServerError.validate validateCreateOnlineLessons >> createOnlineLessons root.Admin >> Async.AwaitTask
     }
 
 let adminServiceHandler (root:CompositionRoot) : HttpHandler =

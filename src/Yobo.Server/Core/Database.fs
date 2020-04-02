@@ -42,8 +42,47 @@ module Tables =
     
     [<RequireQualifiedAccess>]
     module LessonReservations =
-        let name = "LessonReservations"           
-
+        let name = "LessonReservations"
+        
+    type Workshops = {
+        Id : Guid
+        Name : string
+        Description : string
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Created : DateTimeOffset
+    }         
+    
+    [<RequireQualifiedAccess>]
+    module Workshops =
+        let name = "Workshops"
+    
+    type OnlineLessons = {
+        Id : Guid
+        Name : string
+        Description : string
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Created : DateTimeOffset
+        IsCancelled : bool
+        Capacity : int
+    }
+    
+    [<RequireQualifiedAccess>]
+    module OnlineLessons =
+        let name = "OnlineLessons"
+        
+    type OnlineLessonReservations = {
+        OnlineLessonId : Guid
+        UserId : Guid
+        Created : DateTimeOffset
+        UseCredits : bool
+    }
+    
+    [<RequireQualifiedAccess>]
+    module OnlineLessonReservations =
+        let name = "OnlineLessonReservations"        
+    
 module Updates =
     let private getUserById (conn:IDbConnection) (i:Guid) =
         select {
@@ -96,6 +135,41 @@ module Updates =
         |> conn.InsertAsync
         |> Task.ignore        
     
+    let workshopCreated (conn:IDbConnection) (args:CmdArgs.CreateWorkshop) =
+        let newValue =
+            {
+                Id = args.Id
+                Name = args.Name
+                Description = args.Description
+                StartDate = args.StartDate
+                EndDate = args.EndDate
+                Created = DateTimeOffset.UtcNow
+            } : Tables.Workshops
+        insert {
+            table Tables.Workshops.name
+            value newValue
+        }
+        |> conn.InsertAsync
+        |> Task.ignore        
+    
+    let onlineLessonCreated (conn:IDbConnection) (args:CmdArgs.CreateOnlineLesson) =
+        let newValue =
+            {
+                Id = args.Id
+                Name = args.Name
+                Description = args.Description
+                StartDate = args.StartDate
+                EndDate = args.EndDate
+                Created = DateTimeOffset.UtcNow
+                IsCancelled = false
+                Capacity = args.Capacity
+            } : Tables.OnlineLessons
+        insert {
+            table Tables.OnlineLessons.name
+            value newValue
+        }
+        |> conn.InsertAsync
+        |> Task.ignore     
 
 module Projections =
     let getById (conn:IDbConnection) (i:Guid) =
@@ -146,3 +220,4 @@ module Projections =
                     } : CommandHandler.Projections.ExistingLesson
                 )
         }
+        

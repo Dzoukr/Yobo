@@ -14,7 +14,7 @@ module Queries =
         CashReservationBlockedUntil : DateTimeOffset option
     }
     
-    type LessonReservation =
+    type LessonPayment =
         | Cash
         | Credits
     
@@ -24,7 +24,26 @@ module Queries =
         EndDate : DateTimeOffset
         Name : string
         Description : string
-        Reservations : (User * LessonReservation) list
+        Reservations : (User * LessonPayment) list
+        IsCancelled : bool
+        Capacity : int
+    }
+    
+    type Workshop = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+    }
+    
+    type OnlineLesson = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+        Reservations : (User * LessonPayment) list
         IsCancelled : bool
         Capacity : int
     }

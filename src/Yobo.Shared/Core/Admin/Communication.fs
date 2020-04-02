@@ -65,6 +65,26 @@ module Request =
             Description = ""
         }
         
+    type CreateOnlineLessons = {
+        Dates : DateTimeOffset list
+        StartTime : int * int
+        EndTime : int * int
+        Name : string
+        Description : string
+        Capacity : int
+    }
+    
+    module CreateOnlineLessons =
+        let init = {
+            Dates = []
+            StartTime = 0,0
+            EndTime = 0,0
+            Name = ""
+            Description = ""
+            Capacity = 0
+        }
+
+        
     
 type AdminService = {
     GetAllUsers : unit -> Async<Queries.User list>
@@ -72,6 +92,10 @@ type AdminService = {
     SetExpiration : Request.SetExpiration -> Async<unit>
     GetLessons : DateTimeOffset * DateTimeOffset -> Async<Queries.Lesson list>
     CreateLessons : Request.CreateLessons -> Async<unit>
+    GetWorkshops : DateTimeOffset * DateTimeOffset -> Async<Queries.Workshop list>
+    CreateWorkshops : Request.CreateWorkshops -> Async<unit>
+    CreateOnlineLessons : Request.CreateOnlineLessons -> Async<unit>
+    GetOnlineLessons : DateTimeOffset * DateTimeOffset -> Async<Queries.OnlineLesson list>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/admin/%s" m    

@@ -20,12 +20,10 @@ module AuthenticationError =
 
 type DomainError =
     | UserNotActivated
-    | LessonAlreadyExists
 
 module DomainError =
     let explain = function
         | UserNotActivated -> "Uživatel ještě nebyl aktivován."
-        | LessonAlreadyExists -> "Tato lekce již existuje."
 
 type ServerError =
     | Exception of string

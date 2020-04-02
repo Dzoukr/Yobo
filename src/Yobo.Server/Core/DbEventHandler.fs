@@ -2,6 +2,7 @@ module Yobo.Server.Core.DbEventHandler
 
 open Microsoft.Data.SqlClient
 open FSharp.Control.Tasks
+open Yobo.Server.Core.Database.Tables
 open Yobo.Server.Core.Domain
 
 let handle (conn:SqlConnection) (e:Event) =
@@ -10,5 +11,6 @@ let handle (conn:SqlConnection) (e:Event) =
         | CreditsAdded args -> do! args |> Database.Updates.creditsAdded conn
         | ExpirationSet args -> do! args |> Database.Updates.expirationSet conn
         | LessonCreated args -> do! args |> Database.Updates.lessonCreated conn
-        
+        | WorkshopCreated args -> do! args |> Database.Updates.workshopCreated conn 
+        | OnlineLessonCreated args -> do! args |> Database.Updates.onlineLessonCreated conn
     }

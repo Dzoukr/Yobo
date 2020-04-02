@@ -31,4 +31,12 @@ let validateCreateWorkshops (r:Request.CreateWorkshops) =
         nameof(r.Dates), validateNotEmptyList r.Dates
         nameof(r.Name), validateNotEmpty r.Name
         nameof(r.Description), validateNotEmpty r.Description
-    ] |> validate    
+    ] |> validate
+
+let validateCreateOnlineLessons (r:Request.CreateOnlineLessons) =
+    [
+        nameof(r.Dates), validateNotEmptyList r.Dates
+        nameof(r.Name), validateNotEmpty r.Name
+        nameof(r.Description), validateNotEmpty r.Description
+        nameof(r.Capacity), validateMinimumValue 1 r.Capacity
+    ] |> validate

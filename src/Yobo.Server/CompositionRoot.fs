@@ -1,5 +1,6 @@
 namespace Yobo.Server
 
+open Core.Domain.CmdArgs
 open Microsoft.Azure.WebJobs.Description
 open System
 open System.Security.Claims
@@ -37,12 +38,16 @@ type UserAccountRoot = {
 type AdminQueries = {
     GetAllUsers : unit -> Task<Yobo.Shared.Core.Admin.Domain.Queries.User list>
     GetLessons : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.Lesson list>
+    GetWorkshops : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.Workshop list>
+    GetOnlineLessons : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.OnlineLesson list>
 }
 
 type AdminCommandHandler = {
     AddCredits : Core.Domain.CmdArgs.AddCredits -> Task<unit>
     SetExpiration : Core.Domain.CmdArgs.SetExpiration -> Task<unit>
     CreateLesson : Core.Domain.CmdArgs.CreateLesson -> Task<unit>
+    CreateWorkshop : Core.Domain.CmdArgs.CreateWorkshop -> Task<unit>
+    CreateOnlineLesson : Core.Domain.CmdArgs.CreateOnlineLesson -> Task<unit>
 }
 
 type AdminRoot = {

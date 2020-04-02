@@ -25,6 +25,7 @@ module Projections =
         IsCancelled : bool
     }
 
+
 let private tryFindById (allLessons:Projections.ExistingLesson list) (id:Guid) =
     allLessons
     |> List.tryFind (fun x -> x.Id = id)
@@ -44,7 +45,12 @@ let setExpiration (user:Projections.ExistingUser) (args:CmdArgs.SetExpiration) =
     |>> (fun _ -> ExpirationSet args)
     |>> List.singleton
     
-let createLesson (allLessons:Projections.ExistingLesson list) (args:CmdArgs.CreateLesson) =
-    match tryFindById allLessons args.Id with
-    | Some e -> DomainError.LessonAlreadyExists |> Error
-    | None -> [ LessonCreated args ] |> Ok                
+let createLesson (args:CmdArgs.CreateLesson) =
+    [ LessonCreated args ] |> Ok
+    
+let createWorkshop (args:CmdArgs.CreateWorkshop) =
+    [ WorkshopCreated args ] |> Ok            
+    
+let createOnlineLesson (args:CmdArgs.CreateOnlineLesson) =
+    [ OnlineLessonCreated args ] |> Ok
+    

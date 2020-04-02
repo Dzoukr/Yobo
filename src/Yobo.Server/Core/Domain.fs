@@ -23,6 +23,24 @@ module CmdArgs =
         Description : string
         Capacity : int
     }
+    
+    type CreateWorkshop = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+    }
+    
+    type CreateOnlineLesson = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+        Capacity : int
+    }
+
 //
 //    type AddReservation = {
 //        Id : Guid
@@ -40,13 +58,7 @@ module CmdArgs =
 //        Id : Guid
 //    }
 //
-//    type CreateWorkshop = {
-//        Id : Guid
-//        StartDate : DateTimeOffset
-//        EndDate : DateTimeOffset
-//        Name : string
-//        Description : string
-//    }
+
 //
 //    type DeleteWorkshop = {
 //        Id : Guid
@@ -94,6 +106,8 @@ type Event =
     | CreditsAdded of CmdArgs.AddCredits
     | ExpirationSet of CmdArgs.SetExpiration
     | LessonCreated of CmdArgs.CreateLesson
+    | WorkshopCreated of CmdArgs.CreateWorkshop
+    | OnlineLessonCreated of CmdArgs.CreateOnlineLesson
     
 //    | ReservationAdded of CmdArgs.AddReservation
 //    | ReservationCancelled of CmdArgs.CancelReservation
@@ -102,7 +116,6 @@ type Event =
 //    | CreditsRefunded of CmdArgs.RefundCredits
 //    | CashReservationsBlocked of CmdArgs.BlockCashReservations
 //    | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
-//    | WorkshopCreated of CmdArgs.CreateWorkshop
 //    | WorkshopDeleted of CmdArgs.DeleteWorkshop
 //    | LessonDeleted of CmdArgs.DeleteLesson
 //    | LessonUpdated of CmdArgs.UpdateLesson

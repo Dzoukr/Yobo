@@ -1,86 +1,63 @@
 .table-calendar {
-  table-layout: fixed;
-  border-radius: 2px;
+    table-layout: fixed;
+    border-radius: 2px;
 
-  .controls {
-    td {
-      height: 4rem;
-      border: none;
-      text-align: center;
-
-      button {
-        margin-left: 0.3rem;
-      }
-    }
-  }
-
-  .header td {
-    text-align: center;
-
-    .date {
-      font-size: 0.8rem;
-    }
-  }
-
-  .day td {
-    height: 70vh;
-
-    div {
-      min-width: 100%;
+    .controls {
+        td {
+            height: 4rem;
+            border: none;
+            text-align: center;
+            
+            button {
+                margin-left: 0.3rem;
+            }
+        }
     }
 
-    .lesson.cancelled {
-      opacity: 0.5;
-    }
-
-    .name {
-      font-weight: 500;
-    }
-
-    .time {
-      margin-bottom: 1rem;
-    }
-
-
-    .popover-content {
-      margin-top: -3rem;
-
-      .name {
-        margin-top: 1rem;
-        margin-bottom: 1rem;
-      }
-
-
-      .buttons {
+    .header td {
         text-align: center;
-        margin-bottom: 1rem;
+
+        .date {
+            font-size: 0.8rem;
+        }
+    }
+
+    .day td {
+        height: 70vh;
 
         div {
-          margin-top: 2rem;
+            min-width: 100%;
         }
-      }
-    }
-
-    .popover {
-
-      .lesson {
-        padding: 0.5rem;
-        background-color: #c4dbe2;
-        margin-top: 1rem;
-        margin-bottom: 3rem;
-        border-radius: 0.5rem;
-        text-align: center;
-
 
         .name {
-          margin-bottom: 2rem;
+            font-weight: 500;
         }
-      }
 
-      .lesson.workshop {
-        background-color: rgb(12, 240, 240);
-      }
+        .time {
+            margin-bottom: 1rem;
+        }
+
+        .lesson {
+            padding: 0.5rem;
+            background-color: #c4dbe2;
+            margin-top: 1rem;
+            margin-bottom: 3rem;
+            border-radius: 0.5rem;
+            text-align: center;
+
+            .name {
+                margin-bottom: 2rem;
+            }
+        }
+        
+        .workshop {
+            @extend .lesson;
+            background-color: rgb(12, 240, 240);
+        }
+
+        .online-lesson {
+            @extend .lesson;
+            background-color: rgb(21, 220, 84);
+        }
     }
-
-  }
 }

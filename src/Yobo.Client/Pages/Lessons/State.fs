@@ -11,8 +11,7 @@ open Yobo.Shared.Core.Admin.Validation
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
     | Init -> { Model.init with WeekOffset = model.WeekOffset }, Cmd.ofMsg <| WeekOffsetChanged 0
-    | ShowForm v -> { model with FormShown = v }, Cmd.none
-    | SwitchActiveForm v -> { model with ActiveForm = v }, Cmd.none
+    | SelectActiveForm v -> { model with ActiveForm = v }, Cmd.none
     | ToggleDate d ->
         let newDates =
             if model.SelectedDates |> List.contains d then
@@ -21,7 +20,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                 d :: model.SelectedDates
             |> List.sort
         
-        let cmd = if newDates.Length = 0 then Cmd.ofMsg <| ShowForm(false) else Cmd.none                
+        let cmd = if newDates.Length = 0 then Cmd.ofMsg <| SelectActiveForm None else Cmd.none                
         { model with
             SelectedDates = newDates
             LessonsForm = model.LessonsForm |> ValidatedForm.updateWithFn (fun x -> { x with Dates = newDates })
@@ -120,3 +119,5 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         match res with
         | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshopy úspěšně přidány."; Cmd.ofMsg Init ]
         | Error e -> model, e |> ServerResponseViews.showErrorToast
+    | SelectLesson i ->
+        { model with ActiveDetailForm = i |> LessonDetailForm |> Some }, Cmd.none

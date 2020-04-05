@@ -20,4 +20,8 @@ let handle (conn:SqlConnection) (e:Event) =
         | LessonReservationCancelled args -> do! args |> Database.Updates.lessonReservationCancelled conn
         | LessonDeleted args -> do! args |> Database.Updates.lessonDeleted conn
         | WorkshopDeleted args -> do! args |> Database.Updates.workshopDeleted conn
+        | OnlineLessonDescriptionChanged args -> do! args |> Database.Updates.onlineLessonDescriptionChanged conn
+        | OnlineLessonCancelled args -> do! args |> Database.Updates.onlineLessonCancelled conn
+        | OnlineLessonDeleted args -> do! args |> Database.Updates.onlineLessonDeleted conn
+        | OnlineLessonReservationCancelled args -> do! args |> Database.Updates.onlineLessonReservationCancelled conn
     }

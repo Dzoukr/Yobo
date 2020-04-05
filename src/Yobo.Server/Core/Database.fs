@@ -236,6 +236,41 @@ module Updates =
         |> conn.DeleteAsync
         |> Task.ignore        
 
+    let onlineLessonDescriptionChanged (conn:IDbConnection) (args:CmdArgs.ChangeOnlineLessonDescription) =
+        update {
+            table Tables.OnlineLessons.name
+            set {| Name = args.Name; Description = args.Description |}
+            where (eq "Id" args.Id)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore
+    
+    let onlineLessonCancelled (conn:IDbConnection) (args:CmdArgs.CancelOnlineLesson) =
+        update {
+            table Tables.OnlineLessons.name
+            set {| IsCancelled = true |}
+            where (eq "Id" args.Id)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore
+    
+    let onlineLessonDeleted (conn:IDbConnection) (args:CmdArgs.DeleteOnlineLesson) =
+        delete {
+            table Tables.OnlineLessons.name
+            where (eq "Id" args.Id)
+        }
+        |> conn.DeleteAsync
+        |> Task.ignore        
+        
+    let onlineLessonReservationCancelled (conn:IDbConnection) (args:CmdArgs.CancelOnlineLessonReservation) =
+        delete {
+            table Tables.OnlineLessonReservations.name
+            where (eq "OnlineLessonId" args.OnlineLessonId + eq "UserId" args.UserId)
+        }
+        |> conn.DeleteAsync
+        |> Task.ignore
+
+
 module Projections =
     let getById (conn:IDbConnection) (i:Guid) =
         select {
@@ -271,6 +306,13 @@ module Projections =
             UseCredits = res.UseCredits
         }
     
+    let private toUserOnlineReservation (res:Tables.OnlineLessonReservations,usr:Tables.Users) : CommandHandler.Projections.UserReservation =
+        {
+            UserId = usr.Id
+            CreditsExpiration = usr.CreditsExpiration
+            UseCredits = res.UseCredits
+        }
+    
     let private toLesson (lsn:Tables.Lessons,gr) =
         let res =
             gr
@@ -284,6 +326,20 @@ module Projections =
             Reservations = res
             Capacity = lsn.Capacity
         } : CommandHandler.Projections.ExistingLesson
+    
+    let private toOnlineLesson (lsn:Tables.OnlineLessons,gr) =
+        let res =
+            gr
+            |> List.choose (ignoreFstOf3 >> optionOf2)
+            |> List.map toUserOnlineReservation
+        {
+            Id = lsn.Id
+            StartDate = lsn.StartDate
+            EndDate = lsn.EndDate
+            IsCancelled = lsn.IsCancelled
+            Reservations = res
+            Capacity = lsn.Capacity
+        } : CommandHandler.Projections.ExistingOnlineLesson
     
     let getLessonById (conn:IDbConnection) (i:Guid) =
         task {
@@ -302,6 +358,25 @@ module Projections =
                 |> List.map toLesson
                 |> (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))
         }
+    
+    let getOnlineLessonById (conn:IDbConnection) (i:Guid) =
+        task {
+            let! res =
+                select {
+                    table Tables.OnlineLessons.name
+                    leftJoin Tables.OnlineLessonReservations.name "OnlineLessonId" "OnlineLessons.Id"
+                    leftJoin Tables.Users.name "Id" "OnlineLessonReservations.UserId"
+                    where (eq "OnlineLessons.Id" i)
+                }
+                |> conn.SelectAsyncOption<Tables.OnlineLessons, Tables.OnlineLessonReservations, Tables.Users>
+            return
+                res
+                |> List.ofSeq
+                |> List.groupBy fstOf3
+                |> List.map toOnlineLesson
+                |> (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))
+        }
+
                 
     let getAllLessons (conn:IDbConnection) () =
         task {

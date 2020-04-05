@@ -424,7 +424,7 @@ let workshopDiv dispatch (workshop:Queries.Workshop) =
 
 let lessonDiv dispatch (lesson:Queries.Lesson) =
     Html.div [
-        prop.className "lesson"
+        prop.className [true, "lesson"; lesson.IsCancelled, "cancelled"]
         prop.children [
             Html.div [
                 prop.className "time"
@@ -450,7 +450,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
 let onlineLessonDiv dispatch (lesson:Queries.OnlineLesson) =
       
     Html.div [
-        prop.className "online-lesson"
+        prop.className [true, "online-lesson"; lesson.IsCancelled, "cancelled"]
         prop.children [
             Html.div [
                 prop.className "time"
@@ -563,7 +563,7 @@ let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
             Bulma.label "Název"
             Bulma.textInput [
                 ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Name))
-                prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Name = x } |> ChangeLessonDescriptionFromChanged |> dispatch)
+                prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Name = x } |> ChangeLessonDescriptionFormChanged |> dispatch)
                 prop.valueOrDefault l.ChangeDescriptionForm.FormData.Name
             ]
             ValidationViews.help l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Name))
@@ -573,7 +573,7 @@ let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
             Bulma.fieldBody [
                 Bulma.textInput [
                     ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Description))
-                    prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Description = x } |> ChangeLessonDescriptionFromChanged |> dispatch)
+                    prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Description = x } |> ChangeLessonDescriptionFormChanged |> dispatch)
                     prop.valueOrDefault l.ChangeDescriptionForm.FormData.Description
                 ]
             ]
@@ -593,7 +593,6 @@ let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
         Bulma.field [ Bulma.label "Kapacita"; Bulma.fieldBody (l.Lesson.Capacity) ]
         Bulma.field [ Bulma.label "Přihlášení"; Bulma.fieldBody reserved ]
         Bulma.field [ Bulma.label "Akce"; Bulma.fieldBody actions ]
-        
     ]
 
 let workshopItemForm (dispatch:ActiveWorkshopMsg -> unit) (w:ActiveWorkshopModel) =
@@ -617,12 +616,93 @@ let workshopItemForm (dispatch:ActiveWorkshopMsg -> unit) (w:ActiveWorkshopModel
         Bulma.field [ Bulma.label "Čas"; Bulma.fieldBody (sprintf "%s - %s" (w.Workshop.StartDate |> DateTimeOffset.toCzTime) (w.Workshop.EndDate |> DateTimeOffset.toCzTime)) ]
         Bulma.field [ Bulma.label "Akce"; Bulma.fieldBody actions ]
     ]
+    
+let onlineLessonItemForm (dispatch:ActiveOnlineLessonMsg -> unit) (l:ActiveOnlineLessonModel) =
+    
+    let payment = function
+        | Cash -> "hotově"
+        | Credits -> "kredity"
+    
+    let reserved =
+        let rows = 
+            l.OnlineLesson.Reservations
+            |> List.map (fun (x,p) ->
+                Html.tr [
+                    Html.td (sprintf "%s %s" x.FirstName x.LastName)
+                    Html.td (p |> payment)
+                ]
+            )
+            
+        Bulma.table [
+            table.isNarrow
+            table.isStriped
+            prop.children [
+                Html.tbody rows
+            ]
+        ]
+        
+    let actions =
+        Html.div [
+            Bulma.buttons [
+                if Domain.canOnlineLessonBeCancelled l.OnlineLesson.IsCancelled l.OnlineLesson.StartDate then
+                    Bulma.button [
+                        button.isWarning
+                        prop.text "Zrušit lekci"
+                        prop.onClick (fun _ -> CancelOnlineLesson |> dispatch)
+                        if l.CancelOnlineLessonForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    ]
+                if Domain.canLessonBeDeleted l.OnlineLesson.StartDate then                    
+                    Bulma.button [
+                        button.isDanger
+                        prop.text "Smazat lekci"
+                        prop.onClick (fun _ -> DeleteOnlineLesson |> dispatch)
+                        if l.DeleteOnlineLessonForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    ]
+            ]
+        ]
+    
+    Html.div [
+        Bulma.field [
+            Bulma.label "Název"
+            Bulma.textInput [
+                ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Name))
+                prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Name = x } |> ChangeOnlineLessonDescriptionFormChanged |> dispatch)
+                prop.valueOrDefault l.ChangeDescriptionForm.FormData.Name
+            ]
+            ValidationViews.help l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Name))
+        ]
+        Bulma.field [
+            Bulma.label "Popis"
+            Bulma.fieldBody [
+                Bulma.textInput [
+                    ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Description))
+                    prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Description = x } |> ChangeOnlineLessonDescriptionFormChanged |> dispatch)
+                    prop.valueOrDefault l.ChangeDescriptionForm.FormData.Description
+                ]
+            ]
+            ValidationViews.help l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Description))
+        ]
+        Bulma.field [ Bulma.fieldBody [
+            Bulma.button [
+                button.isInfo
+                prop.text "Upravit popis"
+                if l.ChangeDescriptionForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                prop.onClick (fun _ -> ChangeOnlineLessonDescription |> dispatch)
+            ]
+        ] ]
+        
+        Bulma.field [ Bulma.label "Datum"; Bulma.fieldBody (l.OnlineLesson.StartDate |> DateTimeOffset.toCzDate) ]
+        Bulma.field [ Bulma.label "Čas"; Bulma.fieldBody (sprintf "%s - %s" (l.OnlineLesson.StartDate |> DateTimeOffset.toCzTime) (l.OnlineLesson.EndDate |> DateTimeOffset.toCzTime)) ]
+        Bulma.field [ Bulma.label "Kapacita"; Bulma.fieldBody (l.OnlineLesson.Capacity) ]
+        Bulma.field [ Bulma.label "Přihlášení"; Bulma.fieldBody reserved ]
+        Bulma.field [ Bulma.label "Akce"; Bulma.fieldBody actions ]
+    ]    
 
 let activeItemQuickView (model:Model) (dispatch:Msg -> unit) =
     match model.ActiveItemModel with
     | Some (Lesson l) -> l |> lessonItemForm (ActiveLessonMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch l.Lesson.Name
     | Some (Workshop w) -> w |> workshopItemForm (ActiveWorkshopMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch w.Workshop.Name
-    | Some (OnlineLesson l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
+    | Some (OnlineLesson l) -> l |> onlineLessonItemForm (ActiveOnlineLessonMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch l.OnlineLesson.Name
     | None -> Html.none
     
 let view (model:Model) (dispatch: Msg -> unit) =

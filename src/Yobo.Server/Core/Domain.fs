@@ -53,7 +53,6 @@ module CmdArgs =
     
     type RefundCredit = {
         UserId : Guid
-        LessonId : Guid
     }
     
     type UnblockCashReservations = {
@@ -70,6 +69,25 @@ module CmdArgs =
     }
     
     type DeleteWorkshop = {
+        Id : Guid
+    }
+    
+    type ChangeOnlineLessonDescription = {
+        Id : Guid
+        Name : string
+        Description : string
+    }
+    
+    type CancelOnlineLesson = {
+        Id : Guid
+    }
+    
+    type CancelOnlineLessonReservation = {
+        UserId : Guid
+        OnlineLessonId : Guid
+    }
+    
+    type DeleteOnlineLesson = {
         Id : Guid
     }
 
@@ -114,6 +132,10 @@ type Event =
     | LessonReservationCancelled of CmdArgs.CancelLessonReservation
     | LessonDeleted of CmdArgs.DeleteLesson
     | WorkshopDeleted of CmdArgs.DeleteWorkshop
+    | OnlineLessonDescriptionChanged of CmdArgs.ChangeOnlineLessonDescription
+    | OnlineLessonCancelled of CmdArgs.CancelOnlineLesson
+    | OnlineLessonReservationCancelled of CmdArgs.CancelOnlineLessonReservation
+    | OnlineLessonDeleted of CmdArgs.DeleteOnlineLesson
     
 //    | ReservationAdded of CmdArgs.AddReservation
 //    | CreditsWithdrawn of CmdArgs.WithdrawCredits

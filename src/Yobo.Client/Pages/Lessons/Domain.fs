@@ -35,13 +35,31 @@ module ActiveWorkshopModel =
         DeleteWorkshopForm = ({ Id = w.Id } : Request.DeleteWorkshop) |> ValidatedForm.init
     }
 
+type ActiveOnlineLessonModel = {
+    OnlineLesson : OnlineLesson
+    ChangeDescriptionForm : ValidatedForm<Request.ChangeOnlineLessonDescription>
+    CancelOnlineLessonForm : ValidatedForm<Request.CancelOnlineLesson>
+    DeleteOnlineLessonForm : ValidatedForm<Request.DeleteOnlineLesson>
+}
+
+module ActiveOnlineLessonModel =
+    let init lsn = {
+        OnlineLesson = lsn
+        ChangeDescriptionForm =
+            ({ Id = lsn.Id; Name = lsn.Name; Description = lsn.Description } : Request.ChangeOnlineLessonDescription)
+            |> ValidatedForm.init
+        CancelOnlineLessonForm = ({ Id = lsn.Id } : Request.CancelOnlineLesson) |> ValidatedForm.init
+        DeleteOnlineLessonForm = ({ Id = lsn.Id } : Request.DeleteOnlineLesson) |> ValidatedForm.init
+    }
+    
+
 type ActiveItemModel =
     | Lesson of ActiveLessonModel
     | Workshop of ActiveWorkshopModel
-    | OnlineLesson of OnlineLesson
+    | OnlineLesson of ActiveOnlineLessonModel
 
 type ActiveLessonMsg =
-    | ChangeLessonDescriptionFromChanged of Request.ChangeLessonDescription
+    | ChangeLessonDescriptionFormChanged of Request.ChangeLessonDescription
     | ChangeLessonDescription
     | LessonDescriptionChanged of ServerResult<unit>
     | CancelLesson
@@ -53,9 +71,19 @@ type ActiveWorkshopMsg =
     | DeleteWorkshop
     | WorkshopDeleted of ServerResult<unit>
 
+type ActiveOnlineLessonMsg =
+    | ChangeOnlineLessonDescriptionFormChanged of Request.ChangeOnlineLessonDescription
+    | ChangeOnlineLessonDescription
+    | OnlineLessonDescriptionChanged of ServerResult<unit>
+    | CancelOnlineLesson
+    | OnlineLessonCancelled of ServerResult<unit>
+    | DeleteOnlineLesson
+    | OnlineLessonDeleted of ServerResult<unit>
+
 type ActiveItemMsg =
     | ActiveLessonMsg of ActiveLessonMsg
     | ActiveWorkshopMsg of ActiveWorkshopMsg
+    | ActiveOnlineLessonMsg of ActiveOnlineLessonMsg
 
 type ActiveForm =
     | LessonsForm
@@ -117,5 +145,3 @@ type Msg =
     | SetActiveWorkshop of Workshop option
     | SetActiveOnlineLesson of OnlineLesson option
     | ActiveItemMsg of ActiveItemMsg
-    
-    

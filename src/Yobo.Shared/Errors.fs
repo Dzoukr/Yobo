@@ -22,12 +22,16 @@ type DomainError =
     | UserNotActivated
     | LessonCannotBeCancelled
     | LessonCannotBeDeleted
+    | OnlineLessonCannotBeCancelled
+    | OnlineLessonCannotBeDeleted
 
 module DomainError =
     let explain = function
         | UserNotActivated -> "Uživatel ještě nebyl aktivován."
         | LessonCannotBeCancelled -> "Lekci nelze zrušit."
         | LessonCannotBeDeleted -> "Lekci nelze smazat."
+        | OnlineLessonCannotBeCancelled -> "Online lekci nelze zrušit."
+        | OnlineLessonCannotBeDeleted -> "Online lekci nelze smazat."
 
 type ServerError =
     | Exception of string

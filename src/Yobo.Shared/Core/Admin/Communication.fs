@@ -104,11 +104,24 @@ module Request =
     type DeleteLesson = {
         Id : Guid
     }
-    
     type DeleteWorkshop = {
         Id : Guid
     }
-        
+    
+    type ChangeOnlineLessonDescription = {
+        Id : Guid
+        Name : string
+        Description : string
+    }        
+    
+    type CancelOnlineLesson = {
+        Id : Guid
+    }
+    
+    type DeleteOnlineLesson = {
+        Id : Guid
+    }
+    
     
 type AdminService = {
     GetAllUsers : unit -> Async<Queries.User list>
@@ -124,6 +137,9 @@ type AdminService = {
     CancelLesson : Request.CancelLesson -> Async<unit>
     DeleteLesson : Request.DeleteLesson -> Async<unit>
     DeleteWorkshop : Request.DeleteWorkshop -> Async<unit>
+    ChangeOnlineLessonDescription : Request.ChangeOnlineLessonDescription -> Async<unit>
+    CancelOnlineLesson : Request.CancelOnlineLesson -> Async<unit>
+    DeleteOnlineLesson : Request.DeleteOnlineLesson -> Async<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/admin/%s" m    

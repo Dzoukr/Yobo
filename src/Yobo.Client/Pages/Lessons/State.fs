@@ -120,12 +120,12 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     | SetActiveLesson l -> { model with ActiveItemModel = l |> Option.map (ActiveLessonModel.init >> ActiveItemModel.Lesson) }, Cmd.none
     | SetActiveWorkshop l -> { model with ActiveItemModel = l |> Option.map (ActiveWorkshopModel.init >> ActiveItemModel.Workshop) }, Cmd.none
-    | SetActiveOnlineLesson l -> { model with ActiveItemModel = l |> Option.map (ActiveItemModel.OnlineLesson) }, Cmd.none
+    | SetActiveOnlineLesson l -> { model with ActiveItemModel = l |> Option.map (ActiveOnlineLessonModel.init >> ActiveItemModel.OnlineLesson) }, Cmd.none
     | ActiveItemMsg msg ->
         match msg, model.ActiveItemModel with
         | ActiveLessonMsg m, (Some (Lesson subModel)) ->
             match m with 
-            | ChangeLessonDescriptionFromChanged v ->
+            | ChangeLessonDescriptionFormChanged v ->
                 ({ subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm
                                                              |> ValidatedForm.updateWith v
                                                              |> ValidatedForm.validateWithIfSent validateChangeLessonDescription }, Cmd.none)
@@ -197,5 +197,60 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
                 | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshop byla úspěšně smazán."; Cmd.ofMsg Init ]
                 | Error e -> subModel, e |> ServerResponseViews.showErrorToast
                 |> mapFst (ActiveItemModel.Workshop >> Some >> (fun x -> { model with ActiveItemModel = x }))
-        
+        | ActiveOnlineLessonMsg m, (Some (OnlineLesson subModel)) ->
+            match m with 
+            | ChangeOnlineLessonDescriptionFormChanged v ->
+                ({ subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm
+                                                             |> ValidatedForm.updateWith v
+                                                             |> ValidatedForm.validateWithIfSent validateChangeOnlineLessonDescription }, Cmd.none)
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+            | ChangeOnlineLessonDescription ->
+                let subModel = { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateChangeOnlineLessonDescription }
+                if subModel.ChangeDescriptionForm |> ValidatedForm.isValid then
+                    { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.ChangeOnlineLessonDescription)) subModel.ChangeDescriptionForm.FormData OnlineLessonDescriptionChanged
+                else subModel, Cmd.none                        
+                
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveOnlineLessonMsg >> ActiveItemMsg))
+            | OnlineLessonDescriptionChanged res ->
+                let subModel = { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Popis úspěšně změněn."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+            | CancelOnlineLesson ->
+                let subModel = { subModel with CancelOnlineLessonForm = subModel.CancelOnlineLessonForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateCancelOnlineLesson }
+                if subModel.CancelOnlineLessonForm |> ValidatedForm.isValid then
+                    { subModel with CancelOnlineLessonForm = subModel.CancelOnlineLessonForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.CancelOnlineLesson)) subModel.CancelOnlineLessonForm.FormData OnlineLessonCancelled
+                else subModel, Cmd.none
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveOnlineLessonMsg >> ActiveItemMsg))
+            | OnlineLessonCancelled res ->
+                let subModel = { subModel with CancelOnlineLessonForm = subModel.CancelOnlineLessonForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Online lekce byla úspěšně zrušena."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+            | DeleteOnlineLesson ->
+                let subModel = { subModel with DeleteOnlineLessonForm = subModel.DeleteOnlineLessonForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateDeleteOnlineLesson }
+                if subModel.DeleteOnlineLessonForm |> ValidatedForm.isValid then
+                    { subModel with DeleteOnlineLessonForm = subModel.DeleteOnlineLessonForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.DeleteOnlineLesson)) subModel.DeleteOnlineLessonForm.FormData OnlineLessonDeleted
+                else subModel, Cmd.none
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveOnlineLessonMsg >> ActiveItemMsg))
+            | OnlineLessonDeleted res ->
+                let subModel = { subModel with DeleteOnlineLessonForm = subModel.DeleteOnlineLessonForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Online lekce byla úspěšně smazána."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.OnlineLesson >> Some >> (fun x -> { model with ActiveItemModel = x }))  
         | _ -> model, Cmd.none                

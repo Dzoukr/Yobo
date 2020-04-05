@@ -30,6 +30,15 @@ module Projections =
     type ExistingWorkshop = {
         Id : Guid
     }
+    
+    type ExistingOnlineLesson = {
+        Id : Guid
+        Reservations : UserReservation list
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        IsCancelled : bool
+        Capacity : int
+    }
 
 let private onlyIfActivated (user:Projections.ExistingUser) =
     if user.IsActivated then Ok user else DomainError.UserNotActivated |> Error
@@ -38,9 +47,17 @@ let private onlyIfCanBeCancelled (lsn:Projections.ExistingLesson) =
     if Yobo.Shared.Core.Domain.canLessonBeCancelled lsn.IsCancelled lsn.StartDate then Ok lsn
     else Error DomainError.LessonCannotBeCancelled
 
+let private onlyIfOnlineCanBeCancelled (lsn:Projections.ExistingOnlineLesson) =
+    if Yobo.Shared.Core.Domain.canOnlineLessonBeCancelled lsn.IsCancelled lsn.StartDate then Ok lsn
+    else Error DomainError.LessonCannotBeCancelled
+
 let private onlyIfCanBeDeleted (lsn:Projections.ExistingLesson) =
     if Yobo.Shared.Core.Domain.canLessonBeDeleted lsn.StartDate then Ok lsn
     else Error DomainError.LessonCannotBeCancelled
+
+let private onlyIfOnlineCanBeDeleted (lsn:Projections.ExistingOnlineLesson) =
+    if Yobo.Shared.Core.Domain.canLessonBeDeleted lsn.StartDate then Ok lsn
+    else Error DomainError.OnlineLessonCannotBeCancelled
     
 let addCredits (user:Projections.ExistingUser) (args:CmdArgs.AddCredits) =
     user
@@ -74,7 +91,7 @@ let cancelLesson (lesson:Projections.ExistingLesson) (args:CmdArgs.CancelLesson)
         let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
         let refunds =
             refund
-            |> List.map ((fun x -> { UserId = x.UserId; LessonId = lsn.Id } : CmdArgs.RefundCredit ) >> CreditRefunded)
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.RefundCredit ) >> CreditRefunded)
         let unblocks =
             unblock
             |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
@@ -100,7 +117,7 @@ let deleteLesson (lesson:Projections.ExistingLesson) (args:CmdArgs.DeleteLesson)
         let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
         let refunds =
             refund
-            |> List.map ((fun x -> { UserId = x.UserId; LessonId = lsn.Id } : CmdArgs.RefundCredit ) >> CreditRefunded)
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.RefundCredit ) >> CreditRefunded)
         let unblocks =
             unblock
             |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
@@ -119,4 +136,59 @@ let deleteLesson (lesson:Projections.ExistingLesson) (args:CmdArgs.DeleteLesson)
     )
 
 let deleteWorkshop (workshop:Projections.ExistingWorkshop) (args:CmdArgs.DeleteWorkshop) =
-    [ WorkshopDeleted args ] |> Ok    
+    [ WorkshopDeleted args ] |> Ok
+    
+let changeOnlineLessonDescription (lesson:Projections.ExistingOnlineLesson) (args:CmdArgs.ChangeOnlineLessonDescription) =
+    [ OnlineLessonDescriptionChanged args ] |> Ok
+    
+let cancelOnlineLesson (lesson:Projections.ExistingOnlineLesson) (args:CmdArgs.CancelOnlineLesson) =
+    lesson
+    |> onlyIfOnlineCanBeCancelled
+    |>> (fun lsn ->
+        let resCancels = lsn.Reservations |> List.map ((fun x -> { OnlineLessonId = lsn.Id; UserId = x.UserId } : CmdArgs.CancelOnlineLessonReservation) >> OnlineLessonReservationCancelled) 
+        let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
+        let refunds =
+            refund
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.RefundCredit ) >> CreditRefunded)
+        let unblocks =
+            unblock
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
+        let extends =
+            refund
+            |> List.filter (fun x -> x.CreditsExpiration.IsSome)
+            |> List.map (fun x -> { UserId = x.UserId; Expiration = x.CreditsExpiration.Value.Add(TimeSpan.FromDays 7.) } : CmdArgs.SetExpiration)
+            |> List.map ExpirationSet
+        [
+            yield! resCancels
+            yield! extends
+            yield! refunds
+            yield! unblocks
+            yield OnlineLessonCancelled args
+        ]
+    )
+    
+let deleteOnlineLesson (lesson:Projections.ExistingOnlineLesson) (args:CmdArgs.DeleteOnlineLesson) =
+    lesson
+    |> onlyIfOnlineCanBeDeleted
+    |>> (fun lsn ->
+        let resCancels = lsn.Reservations |> List.map ((fun x -> { OnlineLessonId = lsn.Id; UserId = x.UserId } : CmdArgs.CancelOnlineLessonReservation) >> OnlineLessonReservationCancelled) 
+        let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
+        let refunds =
+            refund
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.RefundCredit ) >> CreditRefunded)
+        let unblocks =
+            unblock
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
+        let extends =
+            refund
+            |> List.filter (fun x -> x.CreditsExpiration.IsSome)
+            |> List.map (fun x -> { UserId = x.UserId; Expiration = x.CreditsExpiration.Value.Add(TimeSpan.FromDays 7.) } : CmdArgs.SetExpiration)
+            |> List.map ExpirationSet
+        [
+            yield! resCancels
+            yield! extends
+            yield! refunds
+            yield! unblocks
+            yield OnlineLessonDeleted args
+        ]
+    )                  

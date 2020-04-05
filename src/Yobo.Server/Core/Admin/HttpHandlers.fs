@@ -119,6 +119,34 @@ let private deleteWorkshop (root:AdminRoot) (r:Request.DeleteWorkshop) =
         return! root.CommandHandler.DeleteWorkshop args              
     }    
 
+let private changeOnlineLessonDescription (root:AdminRoot) (r:Request.ChangeOnlineLessonDescription) =
+    task {
+        let args : CmdArgs.ChangeOnlineLessonDescription =
+            {
+                Id = r.Id
+                Name = r.Name
+                Description = r.Description
+            }
+        return! root.CommandHandler.ChangeOnlineLessonDescription args              
+    }  
+
+let private cancelOnlineLesson (root:AdminRoot) (r:Request.CancelOnlineLesson) =
+    task {
+        let args : CmdArgs.CancelOnlineLesson =
+            {
+                Id = r.Id
+            }
+        return! root.CommandHandler.CancelOnlineLesson args              
+    }
+
+let private deleteOnlineLesson (root:AdminRoot) (r:Request.DeleteOnlineLesson) =
+    task {
+        let args : CmdArgs.DeleteOnlineLesson =
+            {
+                Id = r.Id
+            }
+        return! root.CommandHandler.DeleteOnlineLesson args              
+    }
 
 let private adminService (root:CompositionRoot) userId : AdminService =
     {
@@ -135,6 +163,9 @@ let private adminService (root:CompositionRoot) userId : AdminService =
         CancelLesson = ServerError.validate validateCancelLesson >> cancelLesson root.Admin >> Async.AwaitTask
         DeleteLesson = ServerError.validate validateDeleteLesson >> deleteLesson root.Admin >> Async.AwaitTask
         DeleteWorkshop = ServerError.validate validateDeleteWorkshop >> deleteWorkshop root.Admin >> Async.AwaitTask
+        ChangeOnlineLessonDescription = ServerError.validate validateChangeOnlineLessonDescription >> changeOnlineLessonDescription root.Admin >> Async.AwaitTask
+        CancelOnlineLesson = ServerError.validate validateCancelOnlineLesson >> cancelOnlineLesson root.Admin >> Async.AwaitTask
+        DeleteOnlineLesson = ServerError.validate validateDeleteOnlineLesson >> deleteOnlineLesson root.Admin >> Async.AwaitTask
     }
 
 let adminServiceHandler (root:CompositionRoot) : HttpHandler =

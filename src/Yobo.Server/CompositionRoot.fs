@@ -52,6 +52,9 @@ type AdminCommandHandler = {
     CancelLesson : Core.Domain.CmdArgs.CancelLesson -> Task<unit>
     DeleteLesson : Core.Domain.CmdArgs.DeleteLesson -> Task<unit>
     DeleteWorkshop : Core.Domain.CmdArgs.DeleteWorkshop -> Task<unit>
+    ChangeOnlineLessonDescription : Core.Domain.CmdArgs.ChangeOnlineLessonDescription -> Task<unit>
+    CancelOnlineLesson : Core.Domain.CmdArgs.CancelOnlineLesson -> Task<unit>
+    DeleteOnlineLesson : Core.Domain.CmdArgs.DeleteOnlineLesson -> Task<unit>
 }
 
 type AdminRoot = {

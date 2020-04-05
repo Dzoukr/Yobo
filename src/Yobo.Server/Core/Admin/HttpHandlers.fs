@@ -92,6 +92,34 @@ let private changeLessonDescription (root:AdminRoot) (r:Request.ChangeLessonDesc
         return! root.CommandHandler.ChangeLessonDescription args              
     }    
 
+let private cancelLesson (root:AdminRoot) (r:Request.CancelLesson) =
+    task {
+        let args : CmdArgs.CancelLesson =
+            {
+                Id = r.Id
+            }
+        return! root.CommandHandler.CancelLesson args              
+    }
+
+let private deleteLesson (root:AdminRoot) (r:Request.DeleteLesson) =
+    task {
+        let args : CmdArgs.DeleteLesson =
+            {
+                Id = r.Id
+            }
+        return! root.CommandHandler.DeleteLesson args              
+    }
+    
+let private deleteWorkshop (root:AdminRoot) (r:Request.DeleteWorkshop) =
+    task {
+        let args : CmdArgs.DeleteWorkshop =
+            {
+                Id = r.Id
+            }
+        return! root.CommandHandler.DeleteWorkshop args              
+    }    
+
+
 let private adminService (root:CompositionRoot) userId : AdminService =
     {
         GetOnlineLessons = root.Admin.Queries.GetOnlineLessons >> Async.AwaitTask
@@ -104,6 +132,9 @@ let private adminService (root:CompositionRoot) userId : AdminService =
         CreateWorkshops = ServerError.validate validateCreateWorkshops >> createWorkshops root.Admin >> Async.AwaitTask
         CreateOnlineLessons = ServerError.validate validateCreateOnlineLessons >> createOnlineLessons root.Admin >> Async.AwaitTask
         ChangeLessonDescription = ServerError.validate validateChangeLessonDescription >> changeLessonDescription root.Admin >> Async.AwaitTask
+        CancelLesson = ServerError.validate validateCancelLesson >> cancelLesson root.Admin >> Async.AwaitTask
+        DeleteLesson = ServerError.validate validateDeleteLesson >> deleteLesson root.Admin >> Async.AwaitTask
+        DeleteWorkshop = ServerError.validate validateDeleteWorkshop >> deleteWorkshop root.Admin >> Async.AwaitTask
     }
 
 let adminServiceHandler (root:CompositionRoot) : HttpHandler =

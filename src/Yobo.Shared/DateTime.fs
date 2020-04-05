@@ -23,7 +23,6 @@ let private closestSunday (date:DateTimeOffset) =
 
 [<RequireQualifiedAccess>]
 module DateRange =
-    
     let getWeekDateRange dayInWeek =
         (dayInWeek |> closestMonday), (dayInWeek |> closestSunday)
 

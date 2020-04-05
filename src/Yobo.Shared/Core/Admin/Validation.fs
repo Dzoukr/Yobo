@@ -47,3 +47,18 @@ let validateChangeLessonDescription (r:Request.ChangeLessonDescription) =
         nameof(r.Name), validateNotEmpty r.Name
         nameof(r.Description), validateNotEmpty r.Description
     ] |> validate
+
+let validateCancelLesson (r:Request.CancelLesson) =
+    [
+        nameof(r.Id), validateNotEmptyGuid r.Id
+    ] |> validate
+    
+let validateDeleteLesson (r:Request.DeleteLesson) =
+    [
+        nameof(r.Id), validateNotEmptyGuid r.Id
+    ] |> validate
+    
+let validateDeleteWorkshop (r:Request.DeleteWorkshop) =
+    [
+        nameof(r.Id), validateNotEmptyGuid r.Id
+    ] |> validate

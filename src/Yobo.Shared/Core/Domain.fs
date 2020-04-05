@@ -7,3 +7,9 @@ let calculateCredits amount expiration =
     | None -> amount
     | Some exp ->
         if DateTimeOffset.UtcNow > exp then 0 else amount
+        
+let canLessonBeCancelled (isCanceled:bool) (lessonStart:DateTimeOffset) =
+    (not isCanceled) && lessonStart > DateTimeOffset.Now
+    
+let canLessonBeDeleted (lessonStart:DateTimeOffset) =
+    lessonStart > DateTimeOffset.Now    

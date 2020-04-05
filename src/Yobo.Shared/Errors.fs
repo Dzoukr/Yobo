@@ -20,12 +20,14 @@ module AuthenticationError =
 
 type DomainError =
     | UserNotActivated
-    | CannotMoveLessonToPast
+    | LessonCannotBeCancelled
+    | LessonCannotBeDeleted
 
 module DomainError =
     let explain = function
         | UserNotActivated -> "Uživatel ještě nebyl aktivován."
-        | CannotMoveLessonToPast -> "Lekci nelze posunout do minulosti."
+        | LessonCannotBeCancelled -> "Lekci nelze zrušit."
+        | LessonCannotBeDeleted -> "Lekci nelze smazat."
 
 type ServerError =
     | Exception of string

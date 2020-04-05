@@ -9,10 +9,13 @@ open Feliz.Bulma.QuickView
 open Feliz.Bulma.Calendar
 open Feliz.Bulma.Operators
 open Yobo.Client.Forms
+open Yobo.Client.Pages.Lessons.Domain
 open Yobo.Shared.DateTime
 open Yobo.Client.SharedView
+open Yobo.Shared.Core
 open Yobo.Shared.Core.Admin.Communication
 open Yobo.Shared.Core.Admin.Domain
+open Yobo.Shared.Core.Admin.Domain.Queries
 
 let headerTd (state:Model) (dispatch : Msg -> unit) (date:DateTimeOffset) =
     let checkBox =
@@ -373,7 +376,7 @@ let inItemQuickView dispatch (header:string) (content:ReactElement) =
         prop.children [
             QuickView.header [
                 Html.div header
-                Bulma.delete [ prop.onClick (fun _ -> None |> SelectActiveItem |> dispatch) ]
+                Bulma.delete [ prop.onClick (fun _ -> None |> SetActiveLesson |> dispatch) ]
             ]
             QuickView.body [
                 QuickView.block [
@@ -413,7 +416,7 @@ let workshopDiv dispatch (workshop:Queries.Workshop) =
                 Bulma.button [
                     button.isLight
                     prop.text "Detail"
-                    prop.onClick (fun _ -> workshop |> ActiveItem.Workshop |> Some |> SelectActiveItem |> dispatch)
+                    prop.onClick (fun _ -> workshop |> Some |> SetActiveWorkshop |> dispatch)
                 ]
             ]
         ]
@@ -438,7 +441,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
                 Bulma.button [
                     button.isLight
                     prop.text "Detail"
-                    prop.onClick (fun _ -> lesson |> ActiveItem.Lesson |> Some |> SelectActiveItem |> dispatch)
+                    prop.onClick (fun _ -> lesson |> Some |> SetActiveLesson |> dispatch)
                 ]
             ]
         ]
@@ -464,7 +467,7 @@ let onlineLessonDiv dispatch (lesson:Queries.OnlineLesson) =
                 Bulma.button [
                     button.isLight
                     prop.text "Detail"
-                    prop.onClick (fun _ -> lesson |> ActiveItem.OnlineLesson |> Some |> SelectActiveItem |> dispatch)
+                    prop.onClick (fun _ -> lesson |> Some |> SetActiveOnlineLesson |> dispatch)
                 ]
             ]
         ]
@@ -511,10 +514,114 @@ let formQuickView model dispatch =
     | Some OnlinesForm -> onlinesForm model.OnlinesForm dispatch |> inFormQuickView dispatch "Online lekce"
     | None -> Html.none
 
-let activeItemQuickView model dispatch =
-    match model.ActiveItem with
-    | Some (Lesson l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
-    | Some (Workshop l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
+let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
+    
+    let payment = function
+        | Cash -> "hotově"
+        | Credits -> "kredity"
+    
+    let reserved =
+        let rows = 
+            l.Lesson.Reservations
+            |> List.map (fun (x,p) ->
+                Html.tr [
+                    Html.td (sprintf "%s %s" x.FirstName x.LastName)
+                    Html.td (p |> payment)
+                ]
+            )
+            
+        Bulma.table [
+            table.isNarrow
+            table.isStriped
+            prop.children [
+                Html.tbody rows
+            ]
+        ]
+        
+    let actions =
+        Html.div [
+            Bulma.buttons [
+                if Domain.canLessonBeCancelled l.Lesson.IsCancelled l.Lesson.StartDate then
+                    Bulma.button [
+                        button.isWarning
+                        prop.text "Zrušit lekci"
+                        prop.onClick (fun _ -> CancelLesson |> dispatch)
+                        if l.CancelLessonForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    ]
+                if Domain.canLessonBeDeleted l.Lesson.StartDate then                    
+                    Bulma.button [
+                        button.isDanger
+                        prop.text "Smazat lekci"
+                        prop.onClick (fun _ -> DeleteLesson |> dispatch)
+                        if l.DeleteLessonForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                    ]
+            ]
+        ]
+    
+    Html.div [
+        Bulma.field [
+            Bulma.label "Název"
+            Bulma.textInput [
+                ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Name))
+                prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Name = x } |> ChangeLessonDescriptionFromChanged |> dispatch)
+                prop.valueOrDefault l.ChangeDescriptionForm.FormData.Name
+            ]
+            ValidationViews.help l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Name))
+        ]
+        Bulma.field [
+            Bulma.label "Popis"
+            Bulma.fieldBody [
+                Bulma.textInput [
+                    ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Description))
+                    prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Description = x } |> ChangeLessonDescriptionFromChanged |> dispatch)
+                    prop.valueOrDefault l.ChangeDescriptionForm.FormData.Description
+                ]
+            ]
+            ValidationViews.help l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Description))
+        ]
+        Bulma.field [ Bulma.fieldBody [
+            Bulma.button [
+                button.isInfo
+                prop.text "Upravit popis"
+                if l.ChangeDescriptionForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                prop.onClick (fun _ -> ChangeLessonDescription |> dispatch)
+            ]
+        ] ]
+        
+        Bulma.field [ Bulma.label "Datum"; Bulma.fieldBody (l.Lesson.StartDate |> DateTimeOffset.toCzDate) ]
+        Bulma.field [ Bulma.label "Čas"; Bulma.fieldBody (sprintf "%s - %s" (l.Lesson.StartDate |> DateTimeOffset.toCzTime) (l.Lesson.EndDate |> DateTimeOffset.toCzTime)) ]
+        Bulma.field [ Bulma.label "Kapacita"; Bulma.fieldBody (l.Lesson.Capacity) ]
+        Bulma.field [ Bulma.label "Přihlášení"; Bulma.fieldBody reserved ]
+        Bulma.field [ Bulma.label "Akce"; Bulma.fieldBody actions ]
+        
+    ]
+
+let workshopItemForm (dispatch:ActiveWorkshopMsg -> unit) (w:ActiveWorkshopModel) =
+        
+    let actions =
+        Html.div [
+            Bulma.buttons [
+                Bulma.button [
+                    button.isDanger
+                    prop.text "Smazat workshop"
+                    prop.onClick (fun _ -> DeleteWorkshop |> dispatch)
+                    if w.DeleteWorkshopForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
+                ]
+            ]
+        ]
+    
+    Html.div [
+        Bulma.field [ Bulma.label "Název"; Bulma.fieldBody w.Workshop.Name ]
+        Bulma.field [ Bulma.label "Popis"; Bulma.fieldBody w.Workshop.Description ]
+        Bulma.field [ Bulma.label "Datum"; Bulma.fieldBody (w.Workshop.StartDate |> DateTimeOffset.toCzDate) ]
+        Bulma.field [ Bulma.label "Čas"; Bulma.fieldBody (sprintf "%s - %s" (w.Workshop.StartDate |> DateTimeOffset.toCzTime) (w.Workshop.EndDate |> DateTimeOffset.toCzTime)) ]
+        Bulma.field [ Bulma.label "Akce"; Bulma.fieldBody actions ]
+    ]
+
+let activeItemQuickView (model:Model) (dispatch:Msg -> unit) =
+    match model.ActiveItemModel with
+    | Some (Lesson l) -> l |> lessonItemForm (ActiveLessonMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch l.Lesson.Name
+    | Some (Workshop w) -> w |> workshopItemForm (ActiveWorkshopMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch w.Workshop.Name
     | Some (OnlineLesson l) -> Html.div "HAAAA" |> inItemQuickView dispatch l.Name
     | None -> Html.none
     
@@ -533,9 +640,11 @@ let view (model:Model) (dispatch: Msg -> unit) =
             table.isBordered
             ++ prop.className "table-calendar"
             prop.children [
-                navigationRow model dispatch
-                dates |> headerRow model dispatch
-                dates |> row model dispatch
+                Html.tbody [
+                    navigationRow model dispatch
+                    dates |> headerRow model dispatch
+                    dates |> row model dispatch
+                ]
             ]
         ]
     ]

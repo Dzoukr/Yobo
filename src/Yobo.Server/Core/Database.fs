@@ -8,7 +8,7 @@ open Dapper.FSharp.MSSQL
 open Yobo.Libraries
 open Yobo.Server.Core.Domain
 open Yobo.Libraries.Tasks
-open Yobo.Libraries.Tuples
+open Yobo.Shared.Tuples
 open Yobo.Shared.Errors
 
 module Tables =
@@ -178,12 +178,68 @@ module Updates =
             where (eq "Id" args.Id)
         }
         |> conn.UpdateAsync
+        |> Task.ignore
+        
+    let lessonCancelled (conn:IDbConnection) (args:CmdArgs.CancelLesson) =
+        update {
+            table Tables.Lessons.name
+            set {| IsCancelled = true |}
+            where (eq "Id" args.Id)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore
+    
+    let cashReservationsUnblocked (conn:IDbConnection) (args:CmdArgs.UnblockCashReservations) =
+        update {
+            table Tables.Users.name
+            set {| CashReservationBlockedUntil = None |}
+            where (eq "Id" args.UserId)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore        
+
+    let creditRefunded (conn:IDbConnection) (args:CmdArgs.RefundCredit) =
+        task {
+            let! user = args.UserId |> getUserById conn
+            let userCredits = Yobo.Shared.Core.Domain.calculateCredits user.Credits user.CreditsExpiration
+            let newCredits = userCredits + 1
+            let! _ =
+                update {
+                    table Tables.Users.name
+                    set {| Credits = newCredits |}
+                    where (eq "Id" args.UserId)
+                } |> conn.UpdateAsync
+            return ()
+        }
+    
+    let lessonReservationCancelled (conn:IDbConnection) (args:CmdArgs.CancelLessonReservation) =
+        delete {
+            table Tables.LessonReservations.name
+            where (eq "LessonId" args.LessonId + eq "UserId" args.UserId)
+        }
+        |> conn.DeleteAsync
+        |> Task.ignore
+        
+    let lessonDeleted (conn:IDbConnection) (args:CmdArgs.DeleteLesson) =
+        delete {
+            table Tables.Lessons.name
+            where (eq "Id" args.Id)
+        }
+        |> conn.DeleteAsync
+        |> Task.ignore        
+
+    let workshopDeleted (conn:IDbConnection) (args:CmdArgs.DeleteWorkshop) =
+        delete {
+            table Tables.Workshops.name
+            where (eq "Id" args.Id)
+        }
+        |> conn.DeleteAsync
         |> Task.ignore        
 
 module Projections =
     let getById (conn:IDbConnection) (i:Guid) =
         select {
-            table "Users"
+            table Tables.Users.name
             where (eq "Id" i)
         }
         |> conn.SelectAsync<Tables.Users>
@@ -192,6 +248,19 @@ module Projections =
                 Id = x.Id
                 IsActivated = x.Activated.IsSome
             } : CommandHandler.Projections.ExistingUser    
+        ))
+        |> Task.map (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))
+    
+    let getWorkshopById (conn:IDbConnection) (i:Guid) =
+        select {
+            table Tables.Workshops.name
+            where (eq "Id" i)
+        }
+        |> conn.SelectAsync<Tables.Workshops>
+        |> Task.map (Seq.toList >> List.map (fun x ->
+            {
+                Id = x.Id
+            } : CommandHandler.Projections.ExistingWorkshop    
         ))
         |> Task.map (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))
     

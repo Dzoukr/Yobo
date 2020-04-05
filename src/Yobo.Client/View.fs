@@ -73,6 +73,9 @@ let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.
                 Bulma.container [
                     content
                 ]
+                Bulma.container [
+                    
+                ]
             ]
         ]
         

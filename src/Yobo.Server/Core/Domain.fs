@@ -46,7 +46,39 @@ module CmdArgs =
         Name : string
         Description : string
     }
+    
+    type CancelLesson = {
+        Id : Guid
+    }
+    
+    type RefundCredit = {
+        UserId : Guid
+        LessonId : Guid
+    }
+    
+    type UnblockCashReservations = {
+        UserId : Guid
+    }
+    
+    type CancelLessonReservation = {
+        UserId : Guid
+        LessonId : Guid
+    }
+    
+    type DeleteLesson = {
+        Id : Guid
+    }
+    
+    type DeleteWorkshop = {
+        Id : Guid
+    }
 
+//    type BlockCashReservations = {
+//        UserId : Guid
+//        Expires : DateTimeOffset
+//        LessonId : Guid
+//    }
+    
 //
 //    type AddReservation = {
 //        Id : Guid
@@ -55,20 +87,9 @@ module CmdArgs =
 //        UseCredits : bool
 //    }
 //
-//    type CancelReservation = {
-//        Id : Guid
-//        UserId : Guid
-//    }
-//
-//    type CancelLesson = {
-//        Id : Guid
-//    }
-//
 
 //
-//    type DeleteWorkshop = {
-//        Id : Guid
-//    }
+
 //
 //
 //    type WithdrawCredits = {
@@ -76,36 +97,8 @@ module CmdArgs =
 //        Amount : int
 //        LessonId : Guid
 //    }
-//
-//    type RefundCredits = {
-//        UserId : Guid
-//        Amount : int
-//        LessonId : Guid
-//    }
-//
-//    type BlockCashReservations = {
-//        UserId : Guid
-//        Expires : DateTimeOffset
-//        LessonId : Guid
-//    }
-//
-//    type UnblockCashReservations = {
-//        UserId : Guid
-//    }
-//
 
-//
-//    type DeleteLesson = {
-//        Id : Guid
-//    }
-//
-//    type UpdateLesson = {
-//        Id : Guid
-//        StartDate : DateTimeOffset
-//        EndDate : DateTimeOffset
-//        Name : string
-//        Description : string
-//    }
+
 
 
 type Event =
@@ -115,13 +108,13 @@ type Event =
     | WorkshopCreated of CmdArgs.CreateWorkshop
     | OnlineLessonCreated of CmdArgs.CreateOnlineLesson
     | LessonDescriptionChanged of CmdArgs.ChangeLessonDescription
+    | LessonCancelled of CmdArgs.CancelLesson
+    | CreditRefunded of CmdArgs.RefundCredit
+    | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
+    | LessonReservationCancelled of CmdArgs.CancelLessonReservation
+    | LessonDeleted of CmdArgs.DeleteLesson
+    | WorkshopDeleted of CmdArgs.DeleteWorkshop
     
 //    | ReservationAdded of CmdArgs.AddReservation
-//    | ReservationCancelled of CmdArgs.CancelReservation
-//    | LessonCancelled of CmdArgs.CancelLesson
 //    | CreditsWithdrawn of CmdArgs.WithdrawCredits
-//    | CreditsRefunded of CmdArgs.RefundCredits
 //    | CashReservationsBlocked of CmdArgs.BlockCashReservations
-//    | CashReservationsUnblocked of CmdArgs.UnblockCashReservations
-//    | WorkshopDeleted of CmdArgs.DeleteWorkshop
-//    | LessonDeleted of CmdArgs.DeleteLesson

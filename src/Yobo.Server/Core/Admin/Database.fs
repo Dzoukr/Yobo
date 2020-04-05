@@ -5,7 +5,7 @@ open System.Data
 open FSharp.Control.Tasks.V2
 open Dapper.FSharp
 open Dapper.FSharp.MSSQL
-open Yobo.Libraries.Tuples
+open Yobo.Shared.Tuples
 
 module Queries =
     open Yobo.Server.Auth.Database

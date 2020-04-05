@@ -4,7 +4,7 @@ NUGET
   remote: https://api.nuget.org/v3/index.json
     Dapper (2.0.30)
       System.Reflection.Emit.Lightweight (>= 4.6)
-    Dapper.FSharp (1.3.1)
+    Dapper.FSharp (1.4)
       Dapper (>= 2.0.30)
       FSharp.Core (>= 4.7)
     dbup-core (4.3.1)

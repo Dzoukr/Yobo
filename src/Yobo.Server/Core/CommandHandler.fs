@@ -4,6 +4,7 @@ open System
 open Domain
 open Yobo.Shared.Errors
 open FSharp.Rop.Result.Operators
+open Yobo.Server.Core.Domain.CmdArgs
 
 module Projections =
     type ExistingUser = {
@@ -25,16 +26,21 @@ module Projections =
         IsCancelled : bool
         Capacity : int
     }
+    
+    type ExistingWorkshop = {
+        Id : Guid
+    }
 
 let private onlyIfActivated (user:Projections.ExistingUser) =
     if user.IsActivated then Ok user else DomainError.UserNotActivated |> Error
 
-//let private onlyIfNotInPast (args:CmdArgs.UpdateLesson) =
-//    let now = DateTimeOffset.UtcNow
-//    if args.StartDate <= now || args.EndDate <= now then
-//        DomainError.CannotMoveLessonToPast |> Error
-//    else args |> Ok
+let private onlyIfCanBeCancelled (lsn:Projections.ExistingLesson) =
+    if Yobo.Shared.Core.Domain.canLessonBeCancelled lsn.IsCancelled lsn.StartDate then Ok lsn
+    else Error DomainError.LessonCannotBeCancelled
 
+let private onlyIfCanBeDeleted (lsn:Projections.ExistingLesson) =
+    if Yobo.Shared.Core.Domain.canLessonBeDeleted lsn.StartDate then Ok lsn
+    else Error DomainError.LessonCannotBeCancelled
     
 let addCredits (user:Projections.ExistingUser) (args:CmdArgs.AddCredits) =
     user
@@ -57,6 +63,60 @@ let createWorkshop (args:CmdArgs.CreateWorkshop) =
 let createOnlineLesson (args:CmdArgs.CreateOnlineLesson) =
     [ OnlineLessonCreated args ] |> Ok
 
-let changeLessonDescription (lessons:Projections.ExistingLesson) (args:CmdArgs.ChangeLessonDescription) =
+let changeLessonDescription (lesson:Projections.ExistingLesson) (args:CmdArgs.ChangeLessonDescription) =
     [ LessonDescriptionChanged args ] |> Ok
+
+let cancelLesson (lesson:Projections.ExistingLesson) (args:CmdArgs.CancelLesson) =
+    lesson
+    |> onlyIfCanBeCancelled
+    |>> (fun lsn ->
+        let resCancels = lsn.Reservations |> List.map ((fun x -> { LessonId = lsn.Id; UserId = x.UserId } : CmdArgs.CancelLessonReservation) >> LessonReservationCancelled) 
+        let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
+        let refunds =
+            refund
+            |> List.map ((fun x -> { UserId = x.UserId; LessonId = lsn.Id } : CmdArgs.RefundCredit ) >> CreditRefunded)
+        let unblocks =
+            unblock
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
+        let extends =
+            refund
+            |> List.filter (fun x -> x.CreditsExpiration.IsSome)
+            |> List.map (fun x -> { UserId = x.UserId; Expiration = x.CreditsExpiration.Value.Add(TimeSpan.FromDays 7.) } : CmdArgs.SetExpiration)
+            |> List.map ExpirationSet
+        [
+            yield! resCancels
+            yield! extends
+            yield! refunds
+            yield! unblocks
+            yield LessonCancelled args
+        ]
+    )
     
+let deleteLesson (lesson:Projections.ExistingLesson) (args:CmdArgs.DeleteLesson) =
+    lesson
+    |> onlyIfCanBeDeleted
+    |>> (fun lsn ->
+        let resCancels = lsn.Reservations |> List.map ((fun x -> { LessonId = lsn.Id; UserId = x.UserId } : CmdArgs.CancelLessonReservation) >> LessonReservationCancelled) 
+        let refund,unblock = lsn.Reservations |> List.partition (fun x -> x.UseCredits)
+        let refunds =
+            refund
+            |> List.map ((fun x -> { UserId = x.UserId; LessonId = lsn.Id } : CmdArgs.RefundCredit ) >> CreditRefunded)
+        let unblocks =
+            unblock
+            |> List.map ((fun x -> { UserId = x.UserId } : CmdArgs.UnblockCashReservations) >> CashReservationsUnblocked)
+        let extends =
+            refund
+            |> List.filter (fun x -> x.CreditsExpiration.IsSome)
+            |> List.map (fun x -> { UserId = x.UserId; Expiration = x.CreditsExpiration.Value.Add(TimeSpan.FromDays 7.) } : CmdArgs.SetExpiration)
+            |> List.map ExpirationSet
+        [
+            yield! resCancels
+            yield! extends
+            yield! refunds
+            yield! unblocks
+            yield LessonDeleted args
+        ]
+    )
+
+let deleteWorkshop (workshop:Projections.ExistingWorkshop) (args:CmdArgs.DeleteWorkshop) =
+    [ WorkshopDeleted args ] |> Ok    

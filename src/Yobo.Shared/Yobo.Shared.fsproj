@@ -18,6 +18,7 @@
         <Compile Include="Core\Admin\Communication.fs" />
         <Compile Include="Core\Admin\Validation.fs" />
         <Compile Include="Core\Domain.fs" />
+        <Compile Include="Tuples.fs" />
     </ItemGroup>
     <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

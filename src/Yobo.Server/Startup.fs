@@ -182,6 +182,18 @@ module CompositionRoot =
                             let! projections = sql Core.Database.Projections.getLessonById args.Id
                             return! args |> Core.CommandHandler.changeLessonDescription projections |> toExn |> sql handleEvents
                         }
+                        CancelLesson = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getLessonById args.Id
+                            return! args |> Core.CommandHandler.cancelLesson projections |> toExn |> sql handleEvents
+                        }
+                        DeleteLesson = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getLessonById args.Id
+                            return! args |> Core.CommandHandler.deleteLesson projections |> toExn |> sql handleEvents
+                        }
+                        DeleteWorkshop = fun args -> task {
+                            let! projections = sql Core.Database.Projections.getWorkshopById args.Id
+                            return! args |> Core.CommandHandler.deleteWorkshop projections |> toExn |> sql handleEvents
+                        }
                     }
             }
         } : CompositionRoot

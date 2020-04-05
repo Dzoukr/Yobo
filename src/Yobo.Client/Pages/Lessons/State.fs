@@ -5,12 +5,13 @@ open Elmish
 open Yobo.Client.Server
 open Yobo.Client.Forms
 open Yobo.Client.SharedView
+open Yobo.Shared.Tuples
 open Yobo.Shared.DateTime
 open Yobo.Shared.Core.Admin.Validation
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
-    | Init -> { Model.init with WeekOffset = model.WeekOffset }, Cmd.ofMsg <| WeekOffsetChanged 0
+    | Init -> { Model.init with WeekOffset = model.WeekOffset }, Cmd.ofMsg <| WeekOffsetChanged model.WeekOffset
     | SelectActiveForm v -> { model with ActiveForm = v }, Cmd.none
     | ToggleDate d ->
         let newDates =
@@ -117,4 +118,84 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
         match res with
         | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshopy úspěšně přidány."; Cmd.ofMsg Init ]
         | Error e -> model, e |> ServerResponseViews.showErrorToast
-    | SelectActiveItem i -> { model with ActiveItem = i }, Cmd.none
+    | SetActiveLesson l -> { model with ActiveItemModel = l |> Option.map (ActiveLessonModel.init >> ActiveItemModel.Lesson) }, Cmd.none
+    | SetActiveWorkshop l -> { model with ActiveItemModel = l |> Option.map (ActiveWorkshopModel.init >> ActiveItemModel.Workshop) }, Cmd.none
+    | SetActiveOnlineLesson l -> { model with ActiveItemModel = l |> Option.map (ActiveItemModel.OnlineLesson) }, Cmd.none
+    | ActiveItemMsg msg ->
+        match msg, model.ActiveItemModel with
+        | ActiveLessonMsg m, (Some (Lesson subModel)) ->
+            match m with 
+            | ChangeLessonDescriptionFromChanged v ->
+                ({ subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm
+                                                             |> ValidatedForm.updateWith v
+                                                             |> ValidatedForm.validateWithIfSent validateChangeLessonDescription }, Cmd.none)
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+            | ChangeLessonDescription ->
+                let subModel = { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateChangeLessonDescription }
+                if subModel.ChangeDescriptionForm |> ValidatedForm.isValid then
+                    { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.ChangeLessonDescription)) subModel.ChangeDescriptionForm.FormData LessonDescriptionChanged
+                else subModel, Cmd.none                        
+                
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveLessonMsg >> ActiveItemMsg))
+            | LessonDescriptionChanged res ->
+                let subModel = { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Popis úspěšně změněn."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+            | CancelLesson ->
+                let subModel = { subModel with CancelLessonForm = subModel.CancelLessonForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateCancelLesson }
+                if subModel.CancelLessonForm |> ValidatedForm.isValid then
+                    { subModel with CancelLessonForm = subModel.CancelLessonForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.CancelLesson)) subModel.CancelLessonForm.FormData LessonCancelled
+                else subModel, Cmd.none
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveLessonMsg >> ActiveItemMsg))
+            | LessonCancelled res ->
+                let subModel = { subModel with CancelLessonForm = subModel.CancelLessonForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce byla úspěšně zrušena."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+            | DeleteLesson ->
+                let subModel = { subModel with DeleteLessonForm = subModel.DeleteLessonForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateDeleteLesson }
+                if subModel.DeleteLessonForm |> ValidatedForm.isValid then
+                    { subModel with DeleteLessonForm = subModel.DeleteLessonForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.DeleteLesson)) subModel.DeleteLessonForm.FormData LessonDeleted
+                else subModel, Cmd.none
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveLessonMsg >> ActiveItemMsg))
+            | LessonDeleted res ->
+                let subModel = { subModel with DeleteLessonForm = subModel.DeleteLessonForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce byla úspěšně smazána."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))                
+        | ActiveWorkshopMsg m, (Some (Workshop subModel)) ->
+            match m with
+            | DeleteWorkshop ->
+                let subModel = { subModel with DeleteWorkshopForm = subModel.DeleteWorkshopForm
+                                                             |> ValidatedForm.markAsSent
+                                                             |> ValidatedForm.validateWith validateDeleteWorkshop }
+                if subModel.DeleteWorkshopForm |> ValidatedForm.isValid then
+                    { subModel with DeleteWorkshopForm = subModel.DeleteWorkshopForm |> ValidatedForm.startLoading },
+                        Cmd.OfAsync.eitherAsResult (onAdminService (fun x -> x.DeleteWorkshop)) subModel.DeleteWorkshopForm.FormData WorkshopDeleted
+                else subModel, Cmd.none
+                |> mapFst (ActiveItemModel.Workshop >> Some >> (fun x -> { model with ActiveItemModel = x }))
+                |> mapSnd (Cmd.map (ActiveWorkshopMsg >> ActiveItemMsg))
+            | WorkshopDeleted res ->
+                let subModel = { subModel with DeleteWorkshopForm = subModel.DeleteWorkshopForm |> ValidatedForm.stopLoading }
+                match res with
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshop byla úspěšně smazán."; Cmd.ofMsg Init ]
+                | Error e -> subModel, e |> ServerResponseViews.showErrorToast
+                |> mapFst (ActiveItemModel.Workshop >> Some >> (fun x -> { model with ActiveItemModel = x }))
+        
+        | _ -> model, Cmd.none                

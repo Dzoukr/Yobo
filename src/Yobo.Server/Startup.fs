@@ -148,6 +148,8 @@ module CompositionRoot =
                             if i = adminUser.Id then adminUser |> Some |> Task.FromResult
                             else sql Core.UserAccount.Database.Queries.tryGetUserById i
                         )
+                        GetUserLessons = sql Core.UserAccount.Database.Queries.getLessonsForUserId
+                        GetUserOnlineLessons = sql Core.UserAccount.Database.Queries.getOnlineLessonsForUserId
                     }    
             }
             Admin =

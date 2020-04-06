@@ -1,6 +1,7 @@
 module Yobo.Shared.Core.Admin.Domain
 
 open System
+open Yobo.Shared.Core.Domain
 
 module Queries =
     type User = {
@@ -13,18 +14,14 @@ module Queries =
         CreditsExpiration : DateTimeOffset option
         CashReservationBlockedUntil : DateTimeOffset option
     }
-    
-    type LessonPayment =
-        | Cash
-        | Credits
-    
+        
     type Lesson = {
         Id : Guid
         StartDate : DateTimeOffset
         EndDate : DateTimeOffset
         Name : string
         Description : string
-        Reservations : (User * LessonPayment) list
+        Reservations : (User * Queries.LessonPayment) list
         IsCancelled : bool
         Capacity : int
     }
@@ -43,7 +40,7 @@ module Queries =
         EndDate : DateTimeOffset
         Name : string
         Description : string
-        Reservations : (User * LessonPayment) list
+        Reservations : (User * Queries.LessonPayment) list
         IsCancelled : bool
         Capacity : int
     }

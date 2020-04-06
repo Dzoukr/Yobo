@@ -7,6 +7,12 @@ open Yobo.Shared.Validation
 open Yobo.Client.Router
 open Feliz.Router
 
+module Queries =
+    open Yobo.Shared.Core.Domain.Queries
+    let paymentToText = function
+        | LessonPayment.Credits -> "Kredity"
+        | LessonPayment.Cash -> "Hotově"
+
 module Html =
     module Props =
         let routed (p:Page) =

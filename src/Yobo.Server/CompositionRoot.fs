@@ -29,6 +29,8 @@ type AuthRoot = {
 
 type UserAccountQueries = {
     TryGetUserInfo : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount option>
+    GetUserLessons : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.Lesson list>
+    GetUserOnlineLessons : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.OnlineLesson list>
 }
 
 type UserAccountRoot = {

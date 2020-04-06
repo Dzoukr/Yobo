@@ -16,3 +16,8 @@ let canLessonBeDeleted (lessonStart:DateTimeOffset) =
     
 let canOnlineLessonBeCancelled = canLessonBeCancelled        
 let canOnlineLessonBeDeleted = canLessonBeDeleted
+
+module Queries =
+    type LessonPayment =
+        | Cash
+        | Credits

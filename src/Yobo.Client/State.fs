@@ -68,7 +68,7 @@ let private handleUpdate<'subModel,'subCmd> (fn:'subModel -> 'subModel * Cmd<'su
 let private getPageInitCommands targetPage =
     match targetPage with
     | Page.Anonymous (AccountActivation _) -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
-    | Page.Secured MyAccount -> RefreshUser |> Cmd.ofMsg
+    | Page.Secured MyAccount -> [RefreshUser; (Pages.MyAccount.Domain.Init |> MyAccountMsg)] |> List.map Cmd.ofMsg |> Cmd.batch
     | Page.Secured Users -> Pages.Users.Domain.LoadUsers |> UsersMsg |> Cmd.ofMsg
     | Page.Secured Lessons -> Pages.Lessons.Domain.Init |> LessonsMsg |> Cmd.ofMsg
     | _ -> Cmd.none

@@ -17,6 +17,7 @@ nuget Feliz.Bulma.Checkradio
 nuget Feliz.Bulma.PageLoader
 nuget Feliz.Bulma.QuickView
 nuget Feliz.Bulma.Calendar
+nuget Feliz.Bulma.Popover
 nuget Elmish.SweetAlert
 nuget Elmish.Toastr
 nuget Fable.Remoting.Client

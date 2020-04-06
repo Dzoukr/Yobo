@@ -102,7 +102,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 pageLoader.isWhite
                 pageLoader.isActive
                 prop.children [
-                    PageLoader.title "Přihlašuji vás"
+                    PageLoader.title "Ověřuji přihlášení"
                 ]
             ]
         else            
@@ -116,11 +116,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 | (ResetPassword _) -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
             | Secured (pg, user) ->
                 match pg with
-                | Calendar ->
-                    Html.div [
-                        Html.text (sprintf "%A" user)
-                        Html.aRouted "Login" (Page.Anonymous Login)
-                    ]
+                | Calendar -> model |> showView Pages.Calendar.View.view (CalendarMsg >> dispatch)
                 | Users -> model |> showView Pages.Users.View.view (UsersMsg >> dispatch)
                 | Lessons -> model |> showView Pages.Lessons.View.view (LessonsMsg >> dispatch)
                 | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)

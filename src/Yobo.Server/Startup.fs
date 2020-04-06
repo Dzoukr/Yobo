@@ -210,6 +210,12 @@ module CompositionRoot =
                         }
                     }
             }
+            Reservations = {
+                Queries = {
+                    GetLessons = sql Core.Reservations.Database.Queries.getLessons
+                    GetOnlineLessons = sql Core.Reservations.Database.Queries.getOnlineLessons
+                }
+            }                
         } : CompositionRoot
 
 

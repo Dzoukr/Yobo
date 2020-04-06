@@ -42,7 +42,7 @@ module Queries =
             let! res =
                 select {
                     table Tables.Lessons.name
-                    leftJoin Tables.LessonReservations.name "LessonId" "Lessons.Id"
+                    innerJoin Tables.LessonReservations.name "LessonId" "Lessons.Id"
                     where (gt "Lessons.EndDate" DateTimeOffset.Now + eq "LessonReservations.UserId" userId)
                 }
                 |> conn.SelectAsync<Tables.Lessons, Tables.LessonReservations>
@@ -56,7 +56,7 @@ module Queries =
                         EndDate = lsn.EndDate
                         Name = lsn.Name
                         Description = lsn.Description
-                        Payment = if gr.UseCredits then Queries.LessonPayment.Credits else Queries.LessonPayment.Cash
+                        Payment = Queries.LessonPayment.fromUseCredits gr.UseCredits
                     } : Queries.Lesson
                 )
         }
@@ -66,7 +66,7 @@ module Queries =
             let! res =
                 select {
                     table Tables.OnlineLessons.name
-                    leftJoin Tables.OnlineLessonReservations.name "OnlineLessonId" "OnlineLessons.Id"
+                    innerJoin Tables.OnlineLessonReservations.name "OnlineLessonId" "OnlineLessons.Id"
                     where (gt "OnlineLessons.EndDate" DateTimeOffset.Now + eq "OnlineLessonReservations.UserId" userId)
                 }
                 |> conn.SelectAsync<Tables.OnlineLessons, Tables.OnlineLessonReservations>
@@ -80,27 +80,7 @@ module Queries =
                         EndDate = lsn.EndDate
                         Name = lsn.Name
                         Description = lsn.Description
-                        Payment = if gr.UseCredits then Queries.LessonPayment.Credits else Queries.LessonPayment.Cash
+                        Payment = Queries.LessonPayment.fromUseCredits gr.UseCredits
                     } : Queries.OnlineLesson
                 )
-        }         
-        
-//
-//module Projections =
-//    let getAll (conn:IDbConnection) =
-//        task {
-//            let! res = select { table "Users" } |> conn.SelectAsync<Tables.Users>
-//            return
-//                res
-//                |> Seq.toList
-//                |> List.map (fun x ->
-//                    {
-//                        Id = x.Id
-//                        Email = x.Email
-//                        IsActivated = x.Activated.IsSome
-//                        ActivationKey = x.ActivationKey
-//                        PasswordResetKey = x.PasswordResetKey
-//                        Newsletters = x.Newsletters
-//                    } : CommandHandler.Projections.ExistingUser    
-//                )
-//        }
+        }

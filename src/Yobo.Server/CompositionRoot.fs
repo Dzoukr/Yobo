@@ -64,10 +64,21 @@ type AdminRoot = {
     CommandHandler : AdminCommandHandler
 }
 
+type ReservationsQueries = {
+    GetLessons : Guid -> DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Lesson list>
+    GetOnlineLessons : Guid -> DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.OnlineLesson list>
+    //GetWorkshops : int -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Workshop list>
+}
+
+type ReservationsRoot = {
+    Queries : ReservationsQueries
+}
+
 type CompositionRoot = {
     Auth : AuthRoot
     UserAccount : UserAccountRoot
     Admin : AdminRoot
+    Reservations : ReservationsRoot
 }    
 
 module Attributes =

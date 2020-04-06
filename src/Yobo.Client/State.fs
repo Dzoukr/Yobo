@@ -9,6 +9,7 @@ open Yobo.Client.Router
 open Domain
 open Yobo.Client.Interfaces
 open Fable.Core.JsInterop
+open Feliz.Bulma.Calendar
 
 module CurrentPage =
     let getInitSubPageModel = function
@@ -21,7 +22,7 @@ module CurrentPage =
             | ForgottenPassword -> Pages.ForgottenPassword.Domain.Model.init |> box
         | CurrentPage.Secured (p,u) ->
             match p with
-            | Calendar -> null
+            | Calendar -> Pages.Calendar.Domain.Model.init |> box
             | Lessons -> Pages.Lessons.Domain.Model.init |> box
             | Users -> Pages.Users.Domain.Model.init |> box
             | MyAccount -> u |> Pages.MyAccount.Domain.Model.init |> box
@@ -71,6 +72,7 @@ let private getPageInitCommands targetPage =
     | Page.Secured MyAccount -> [RefreshUser; (Pages.MyAccount.Domain.Init |> MyAccountMsg)] |> List.map Cmd.ofMsg |> Cmd.batch
     | Page.Secured Users -> Pages.Users.Domain.LoadUsers |> UsersMsg |> Cmd.ofMsg
     | Page.Secured Lessons -> Pages.Lessons.Domain.Init |> LessonsMsg |> Cmd.ofMsg
+    | Page.Secured Calendar -> Pages.Calendar.Domain.Init |> CalendarMsg |> Cmd.ofMsg
     | _ -> Cmd.none
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
@@ -121,6 +123,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | MyAccountMsg subMsg -> model |> handleUpdate (Pages.MyAccount.State.update subMsg) MyAccountMsg
     | UsersMsg subMsg -> model |> handleUpdate (Pages.Users.State.update subMsg) UsersMsg
     | LessonsMsg subMsg -> model |> handleUpdate (Pages.Lessons.State.update subMsg) LessonsMsg
+    | CalendarMsg subMsg -> model |> handleUpdate (Pages.Calendar.State.update subMsg) CalendarMsg
 
 let subscribe (_:Model) =
     let sub dispatch = 

@@ -9,8 +9,8 @@ open Feliz.Bulma.QuickView
 open Feliz.Bulma.Calendar
 open Feliz.Bulma.Operators
 open Yobo.Client.Forms
-open Yobo.Client.Pages.Lessons.Domain
 open Yobo.Shared.DateTime
+open Yobo.Client.SharedView
 open Yobo.Client.SharedView
 open Yobo.Shared.Core
 open Yobo.Shared.Core.Admin.Communication
@@ -516,17 +516,13 @@ let formQuickView model dispatch =
 
 let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
     
-    let payment = function
-        | Cash -> "hotově"
-        | Credits -> "kredity"
-    
     let reserved =
         let rows = 
             l.Lesson.Reservations
             |> List.map (fun (x,p) ->
                 Html.tr [
                     Html.td (sprintf "%s %s" x.FirstName x.LastName)
-                    Html.td (p |> payment)
+                    Html.td (p |> Queries.paymentToText)
                 ]
             )
             
@@ -619,17 +615,13 @@ let workshopItemForm (dispatch:ActiveWorkshopMsg -> unit) (w:ActiveWorkshopModel
     
 let onlineLessonItemForm (dispatch:ActiveOnlineLessonMsg -> unit) (l:ActiveOnlineLessonModel) =
     
-    let payment = function
-        | Cash -> "hotově"
-        | Credits -> "kredity"
-    
     let reserved =
         let rows = 
             l.OnlineLesson.Reservations
             |> List.map (fun (x,p) ->
                 Html.tr [
                     Html.td (sprintf "%s %s" x.FirstName x.LastName)
-                    Html.td (p |> payment)
+                    Html.td (p |> Queries.paymentToText)
                 ]
             )
             

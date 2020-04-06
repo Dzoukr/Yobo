@@ -2,7 +2,6 @@
 
 open Yobo.Shared.Errors
 open Router
-open Yobo.Client.Interfaces
 
 type CurrentPage =
     | Anonymous of AnonymousPage
@@ -38,3 +37,4 @@ type Msg =
     | UsersMsg of Pages.Users.Domain.Msg
     | LessonsMsg of Pages.Lessons.Domain.Msg
     | MyAccountMsg of Pages.MyAccount.Domain.Msg
+    | CalendarMsg of Pages.Calendar.Domain.Msg

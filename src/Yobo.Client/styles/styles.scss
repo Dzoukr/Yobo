@@ -9,9 +9,33 @@
 //@import "~bulma-tooltip";
 @import "~bulma-checkradio";
 @import "~bulma-pageloader/dist/css/bulma-pageloader.min.css";
-//@import "~bulma-popover/css/bulma-popover.css";
+@import "~bulma-popover/css/bulma-popover.css";
 @import "~sweetalert2/dist/sweetalert2.min.css";
 
 @import "terms";
 @import "../Pages/Registration/styles";
 @import "../Pages/Lessons/styles";
+@import "../Pages/Calendar/styles";
+
+
+.popover .popover-content {
+    z-index: 99999;
+    position: absolute;
+    display: inline-block;
+    opacity: 0;
+    visibility: hidden;
+    //font-size: 0.75rem;
+    font-size: 1rem;
+    padding: .4rem .8rem;
+    color: #4a4a4a;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 3px rgba(10, 10, 10, 0.1), 0 0 0 1px rgba(10, 10, 10, 0.1);
+    width: -webkit-max-content;
+    width: -moz-max-content;
+    width: max-content;
+    max-width: 24rem;
+
+    transition: opacity 0.5s, visibility 0.5s;
+    -webkit-transition: opacity 0.5s, visibility 0.5s;
+}

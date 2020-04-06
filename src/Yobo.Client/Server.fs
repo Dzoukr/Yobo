@@ -7,6 +7,7 @@ open Yobo.Shared.Errors
 open Yobo.Shared.Auth.Communication
 open Yobo.Shared.Core.UserAccount.Communication
 open Yobo.Shared.Core.Admin.Communication
+open Yobo.Shared.Core.Reservations.Communication
 
 let exnToError (e:exn) : ServerError =
     match e with
@@ -54,4 +55,12 @@ let onAdminService (fn:AdminService -> 'a) =
     |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
     |> Remoting.buildProxy<AdminService>
     |> fn
-    
+
+let onReservationsService (fn:ReservationsService -> 'a) =
+    let token = TokenStorage.tryGetToken() |> Option.defaultValue ""
+    Remoting.createApi()
+    |> Remoting.withRouteBuilder ReservationsService.RouteBuilder
+    |> Remoting.withBaseUrl baseUrl
+    |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
+    |> Remoting.buildProxy<ReservationsService>
+    |> fn    

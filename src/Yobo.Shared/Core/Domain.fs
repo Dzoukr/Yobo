@@ -1,6 +1,7 @@
 module Yobo.Shared.Core.Domain
 
 open System
+open Yobo.Shared.DateTime
 
 let calculateCredits amount expiration =
     match expiration with
@@ -17,7 +18,15 @@ let canLessonBeDeleted (lessonStart:DateTimeOffset) =
 let canOnlineLessonBeCancelled = canLessonBeCancelled        
 let canOnlineLessonBeDeleted = canLessonBeDeleted
 
+let getCancellingDate (d:DateTimeOffset) =
+    d
+    |> DateTimeOffset.startOfTheDay
+    |> (fun x -> x.AddHours 10.)
+
 module Queries =
     type LessonPayment =
         | Cash
         | Credits
+    
+    module LessonPayment =        
+        let fromUseCredits uc = if uc then Credits else Cash         

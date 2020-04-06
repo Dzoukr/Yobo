@@ -40,6 +40,8 @@
     <Compile Include="Auth\HttpHandlers.fs" />
     <Compile Include="Core\Admin\HttpHandlers.fs" />
     <Compile Include="Core\UserAccount\HttpHandlers.fs" />
+    <Compile Include="Core\Reservations\Database.fs" />
+    <Compile Include="Core\Reservations\HttpHandlers.fs" />
     <Compile Include="Startup.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>

@@ -5,16 +5,54 @@ open System.Data
 open FSharp.Control.Tasks.V2
 open Dapper.FSharp
 open Dapper.FSharp.MSSQL
+open Yobo.Libraries.Tasks
 open Yobo.Shared.Core.Domain
-open Yobo.Shared.Core.Reservations.Domain.Queries
+open Yobo.Shared.Errors
 
 module Queries =
     open Yobo.Server.Auth.Database
     open Yobo.Shared.Core.Reservations.Domain
     open Yobo.Server.Core.Database
+    open Yobo.Shared.Core.Domain.Queries
     
+    module Availability =
+        let getAvailability startDate isCancelled capacity allReservation =
+            let freeSpots = capacity - allReservation
+            let isAlreadyStarted = DateTimeOffset.UtcNow > startDate
+            
+            if isCancelled then Cancelled |> Unavailable
+            else if isAlreadyStarted then AlreadyStarted |> Unavailable
+            else
+                match freeSpots with
+                | 0 -> Full |> Unavailable
+                | 1 -> LastFreeSpot |> Available
+                | _ -> Free |> Available 
+    
+    module ReservationAvailability =
+        let getReservationAvailability startDate (userReservation:LessonPayment option) userCredits (cashBlockedUntil:DateTimeOffset option) =
+            let canBeCancelled = DateTimeOffset.UtcNow < (startDate |> getLessonCancellingDate)
+            match userReservation with
+            | Some pay -> AlreadyReserved(pay, canBeCancelled)
+            | None ->
+                if userCredits > 0 then Credits |> Reservable
+                else
+                    match cashBlockedUntil with
+                    | None -> Cash |> Reservable
+                    | Some until ->
+                        if until < DateTimeOffset.UtcNow then Cash |> Reservable
+                        else Unreservable
+    
+    let private tryGetUserById (conn:IDbConnection) (userId:Guid) =
+        select {
+            table Tables.Users.name
+            where (eq "Id" userId)
+        }
+        |> conn.SelectAsync<Tables.Users>
+        |> Task.map Seq.tryHead
+                
     let getLessons (conn:IDbConnection) userId (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
         task {
+            let! userInfo = tryGetUserById conn userId
             let! res =
                 select {
                     table Tables.Lessons.name
@@ -27,9 +65,16 @@ module Queries =
                 |> List.ofSeq
                 |> List.groupBy fst
                 |> List.map (fun (lsn,gr) ->
+                    
                     let res = gr |> List.choose snd
-                    let userRes = res |> List.tryFind (fun x -> x.UserId = userId)
-                                            
+                    let userRes =
+                        res
+                        |> List.tryFind (fun x -> x.UserId = userId)
+                        |> Option.map (fun x -> Queries.LessonPayment.fromUseCredits x.UseCredits)
+                    
+                    let credits = userInfo |> Option.map (fun x -> x.Credits) |> Option.defaultValue 0
+                    let cashBlocked = userInfo |> Option.map (fun x -> x.CashReservationBlockedUntil) |> Option.defaultValue (Some DateTimeOffset.MaxValue)
+                                                                
                     {
                         Id = lsn.Id
                         StartDate = lsn.StartDate
@@ -37,9 +82,7 @@ module Queries =
                         Name = lsn.Name
                         Description = lsn.Description
                         Availability = Availability.getAvailability lsn.StartDate lsn.IsCancelled lsn.Capacity res.Length
-                        UserReservation = userRes |> Option.map (fun x -> Queries.LessonPayment.fromUseCredits x.UseCredits)
-                        IsCancelled = lsn.IsCancelled
-                        CancellableUntil = lsn.StartDate |> Yobo.Shared.Core.Domain.getCancellingDate
+                        ReservationAvailability = ReservationAvailability.getReservationAvailability lsn.StartDate userRes credits cashBlocked
                     } : Queries.Lesson
                 )
         }
@@ -68,6 +111,7 @@ module Queries =
     
     let getOnlineLessons (conn:IDbConnection) userId (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
         task {
+            let! userInfo = tryGetUserById conn userId
             let! res =
                 select {
                     table Tables.OnlineLessons.name
@@ -80,9 +124,16 @@ module Queries =
                 |> List.ofSeq
                 |> List.groupBy fst
                 |> List.map (fun (lsn,gr) ->
+                    
                     let res = gr |> List.choose snd
-                    let userRes = res |> List.tryFind (fun x -> x.UserId = userId)
-                                            
+                    let userRes =
+                        res
+                        |> List.tryFind (fun x -> x.UserId = userId)
+                        |> Option.map (fun x -> Queries.LessonPayment.fromUseCredits x.UseCredits)
+                        
+                    let credits = userInfo |> Option.map (fun x -> x.Credits) |> Option.defaultValue 0
+                    let cashBlocked = userInfo |> Option.map (fun x -> x.CashReservationBlockedUntil) |> Option.defaultValue (Some DateTimeOffset.MaxValue)
+
                     {
                         Id = lsn.Id
                         StartDate = lsn.StartDate
@@ -90,9 +141,7 @@ module Queries =
                         Name = lsn.Name
                         Description = lsn.Description
                         Availability = Availability.getAvailability lsn.StartDate lsn.IsCancelled lsn.Capacity res.Length
-                        UserReservation = userRes |> Option.map (fun x -> Queries.LessonPayment.fromUseCredits x.UseCredits)
-                        IsCancelled = lsn.IsCancelled
-                        CancellableUntil = lsn.StartDate |> Yobo.Shared.Core.Domain.getCancellingDate
+                        ReservationAvailability = ReservationAvailability.getReservationAvailability lsn.StartDate userRes credits cashBlocked 
                     } : Queries.OnlineLesson
                 )
         } 

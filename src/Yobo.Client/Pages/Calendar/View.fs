@@ -12,6 +12,7 @@ open Yobo.Shared
 open Yobo.Client
 open Yobo.Client.SharedView
 open Yobo.Client.SharedView
+open Yobo.Shared.Core.Domain.Queries
 open Yobo.Shared.Errors
 open Yobo.Shared.DateTime
 open Yobo.Shared.Core.Reservations.Domain
@@ -53,71 +54,95 @@ let headerRow dates =
     |> List.map headerTd
     |> (fun x -> Html.tr [ prop.className "header"; prop.children x ])
 
-let getTag (aval:Availability) isCancelled =
-    let tagColor =
-        match aval with
-        | Closed -> tag.isBlack
-        | Available Free -> tag.isSuccess
-        | Available LastFreeSpot -> tag.isWarning
-        | Available Full -> tag.isDanger
-        
-    let tagText =
-        if isCancelled then "Lekce zrušena"
-        else
-            match aval with
-            | Closed -> "Lekce uzavřena"
-            | Available Free -> "Volno"
-            | Available LastFreeSpot -> "Poslední volné místo"
-            | Available Full -> "Obsazeno"
+let getTag (la:LessonAvailability) =
+    let tagColor, tagText =
+        match la with
+        | Available Free -> tag.isSuccess, "Volno"
+        | Available LastFreeSpot -> tag.isWarning, "Poslední volné místo"
+        | Unavailable Full -> tag.isDanger, "Obsazeno"
+        | Unavailable AlreadyStarted -> tag.isBlack, "Lekce uzavřena"
+        | Unavailable Cancelled -> tag.isBlack, "Lekce zrušena"
     Bulma.tag [ tagColor; prop.text tagText ] 
 
+let isCancelled (la:LessonAvailability) =
+    match la with
+    | Unavailable Cancelled -> true
+    | _ -> false
+
+let getPopoverPosition (d:DateTimeOffset) =
+    match d.DayOfWeek with
+    | DayOfWeek.Monday -> popover.isRight
+    | DayOfWeek.Sunday -> popover.isLeft
+    | _ -> popover.isBottom
+
 let lessonDiv dispatch (lesson:Queries.Lesson) =
+    let isCancelled = lesson.Availability |> isCancelled
+    let position = lesson.StartDate |> getPopoverPosition
+    let btns =
+        match lesson.ReservationAvailability with
+        | Reservable Cash ->
+            Bulma.button [
+                prop.text "Rezervovat (hotovost)"
+            ]
+        | Reservable Credits -> 
+            Bulma.button [
+                prop.text "Rezervovat"
+            ]
+        | AlreadyReserved (tp, true) ->
+            Bulma.button [
+                prop.text "Zrušit rezervaci"
+            ]
+        | AlreadyReserved (_, false)
+        | Unreservable -> Html.none
     
-    Popover.popover [
-        popover.isRight
+    Html.div [
+        prop.className "lesson"
         prop.children [
-            Html.div [
-                popover.trigger
-                ++ prop.className [true, "lesson"; lesson.IsCancelled, "cancelled"]
+            Popover.popover [
+                position
                 prop.children [
                     Html.div [
-                        prop.className "time"
+                        prop.className [isCancelled, "cancelled"]
                         prop.children [
-                            Html.text (sprintf "%s - %s" (lesson.StartDate |> DateTimeOffset.toCzTime) (lesson.EndDate |> DateTimeOffset.toCzTime))
+                            Html.div [
+                                prop.className "time"
+                                prop.children [
+                                    Html.text (sprintf "%s - %s" (lesson.StartDate |> DateTimeOffset.toCzTime) (lesson.EndDate |> DateTimeOffset.toCzTime))
+                                ]
+                            ]
+                            Html.div [
+                                prop.className "name"
+                                prop.text lesson.Name
+                            ]
+                            Html.div [ getTag lesson.Availability ]
                         ]
                     ]
-                    Html.div [
-                        prop.className "name"
-                        prop.text lesson.Name
+                    Popover.content [
+                        Html.div [
+                            prop.className "name"
+                            prop.text lesson.Name
+                        ]
+                        Html.div [
+                            prop.className "time"
+                            prop.children [
+                                Html.faIcon "far fa-clock"
+                                Html.text (sprintf "%s od %s do %s" (lesson.StartDate |> DateTimeOffset.toCzDate) (lesson.StartDate |> DateTimeOffset.toCzTime) (lesson.EndDate |> DateTimeOffset.toCzTime))
+                            ]
+                        ]
+                        Html.div lesson.Description
+                        Bulma.buttons [ btns ]
                     ]
-                    Html.div [ getTag lesson.Availability lesson.IsCancelled ]
-                ]
-            ]
-            Popover.content [
-                Html.div [
-                    prop.className "name"
-                    prop.text lesson.Name
-                ]
-                Html.div [
-                    prop.className "time"
-                    prop.children [
-                        Html.faIcon "far fa-clock"
-                        Html.text (sprintf "%s od %s do %s" (lesson.StartDate |> DateTimeOffset.toCzDate) (lesson.StartDate |> DateTimeOffset.toCzTime) (lesson.EndDate |> DateTimeOffset.toCzTime))
-                    ]
-                ]
-                Html.div lesson.Description
-                Bulma.buttons [
-                    
                 ]
             ]
         ]
     ]
     
     
+    
 let onlineLessonDiv dispatch (lesson:Queries.OnlineLesson) =
-      
+    let isCancelled = lesson.Availability |> isCancelled 
     Html.div [
-        prop.className [true, "online-lesson"; lesson.IsCancelled, "cancelled"]
+        prop.className [true, "online-lesson"; isCancelled, "cancelled"]
         prop.children [
             Html.div [
                 prop.className "time"
@@ -129,7 +154,7 @@ let onlineLessonDiv dispatch (lesson:Queries.OnlineLesson) =
                 prop.className "name"
                 prop.text lesson.Name
             ]
-            Html.div [ getTag lesson.Availability lesson.IsCancelled ]
+            Html.div [ getTag lesson.Availability ]
             
         ]
     ]    

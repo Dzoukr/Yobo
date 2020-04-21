@@ -36,15 +36,15 @@ let view (model:Model) (dispatch:Msg -> unit) =
             
     Html.div [
         Bulma.notification [
-            notification.isWarning
+            color.isWarning
             prop.children [
                 Html.faIcon "fas fa-info-circle"
                 Html.span [ prop.dangerouslySetInnerHTML msg ]
             ]
         ]
-        Bulma.title "Rezervované lekce"
+        Bulma.title.h1 "Rezervované lekce"
         Bulma.table [
-            table.isFullwidth
+            table.isFullWidth
             table.isStriped
             prop.children [
                 Html.thead [

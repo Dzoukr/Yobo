@@ -7,7 +7,6 @@ open Yobo.Client
 open Yobo.Client.Forms
 open Domain
 open Yobo.Client.SharedView
-open Feliz.Router
 open Feliz.Bulma.Checkradio
 
 let inTemplate (content:ReactElement) =
@@ -26,12 +25,12 @@ let inTemplate (content:ReactElement) =
 
 let registerForm model dispatch =
     Bulma.box [
-        Bulma.title1 "Registrace"
+        Bulma.title.h1 "Registrace"
         
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Křestní jméno"
             Bulma.fieldBody [
-                Bulma.textInput [
+                Bulma.input.text [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.FirstName))
                     prop.onTextChange (fun x -> { model.Form.FormData with FirstName = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.FirstName
@@ -40,10 +39,10 @@ let registerForm model dispatch =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.FirstName))
         ]
         
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Příjmení"
             Bulma.fieldBody [
-                Bulma.textInput [
+                Bulma.input.text [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.LastName))
                     prop.onTextChange (fun x -> { model.Form.FormData with LastName = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.LastName
@@ -52,10 +51,10 @@ let registerForm model dispatch =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.LastName))
         ]
         
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Email"
             Bulma.fieldBody [
-                Bulma.textInput [
+                Bulma.input.text [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
                     prop.onTextChange (fun x -> { model.Form.FormData with Email = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.Email
@@ -64,10 +63,10 @@ let registerForm model dispatch =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
         ]
         
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Heslo"
             Bulma.fieldBody [
-                Bulma.passwordInput [
+                Bulma.input.password [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
                     prop.onTextChange (fun x -> { model.Form.FormData with Password = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.Password
@@ -76,10 +75,10 @@ let registerForm model dispatch =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
         ]
         
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Heslo (ještě jednou pro kontrolu)"
             Bulma.fieldBody [
-                Bulma.passwordInput [
+                Bulma.input.password [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.SecondPassword))
                     prop.onTextChange (fun x -> { model.Form.FormData with SecondPassword = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.SecondPassword
@@ -88,7 +87,7 @@ let registerForm model dispatch =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.SecondPassword))
         ]
         
-        Bulma.field [
+        Bulma.field.p [
             Bulma.fieldBody [
                 Checkradio.checkbox [
                     prop.id "terms"
@@ -107,26 +106,28 @@ let registerForm model dispatch =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.AgreeButtonChecked))
         ]
         
-        Bulma.field [
+//        Bulma.field.div [
+//            Bulma.fieldBody [
+//                Html.div [
+//                    Checkradio.checkbox [
+//                        prop.id "newsletters"
+//                        color.isSuccess
+//                        prop.onCheckedChange (fun chkd -> { model.Form.FormData with NewslettersButtonChecked = chkd } |> FormChanged |> dispatch )
+//                    ]
+//                    Html.label [
+//                        prop.htmlFor "newsletters"
+//                        prop.text "Souhlasím se zasíláním informačních emailů (newsletterů)"
+//                    ]
+//                ]
+//            ]
+//            ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.NewslettersButtonChecked))
+//        ]
+//        
+        Bulma.field.div [
             Bulma.fieldBody [
-                Checkradio.checkbox [
-                    prop.id "newsletters"
-                    color.isSuccess
-                    prop.onCheckedChange (fun chkd -> { model.Form.FormData with NewslettersButtonChecked = chkd } |> FormChanged |> dispatch )
-                ]
-                Html.label [
-                    prop.htmlFor "newsletters"
-                    prop.text "Souhlasím se zasíláním informačních emailů (newsletterů)"
-                ]
-            ]
-            ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.NewslettersButtonChecked))
-        ]
-        
-        Bulma.field [
-            Bulma.fieldBody [
-                Bulma.button [
-                    yield button.isPrimary
-                    yield button.isFullwidth
+                Bulma.button.button [
+                    yield color.isPrimary
+                    yield button.isFullWidth
                     if model.Form.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Registrovat"
                     yield prop.onClick (fun _ -> Register |> dispatch)

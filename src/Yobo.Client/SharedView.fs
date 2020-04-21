@@ -74,7 +74,7 @@ module BoxedViews =
     
     let showSuccess elm =
         Bulma.message [
-            message.isSuccess
+            color.isSuccess
             prop.children [
                 Bulma.messageBody [
                     Html.i [ prop.className "fas fa-check-circle"; prop.style [ style.paddingRight 10 ] ]
@@ -85,7 +85,7 @@ module BoxedViews =
     
     let showError elm =
         Bulma.message [
-            message.isDanger
+            color.isDanger
             prop.children [
                 Bulma.messageBody [
                     Html.i [ prop.className "fas fa-exclamation-circle"; prop.style [ style.paddingRight 10 ] ]
@@ -96,7 +96,7 @@ module BoxedViews =
     
     let showInProgress elm =
         Bulma.message [
-            message.isInfo
+            color.isInfo
             prop.children [
                 Bulma.messageBody [
                     Html.i [ prop.className "fas fa-circle-notch fa-spin" ]
@@ -119,7 +119,7 @@ module ValidationViews =
         |> List.tryFind (fun x -> x.Field = name)
         |> Option.map (fun x ->
             Bulma.help [
-                help.isDanger
+                color.isDanger
                 prop.text (x.Type |> ValidationErrorType.explain)
             ]
         )
@@ -128,7 +128,7 @@ module ValidationViews =
     let color errors name =
         errors
         |> List.tryFind (fun x -> x.Field = name)
-        |> Option.map (fun _ -> input.isDanger)
+        |> Option.map (fun _ -> color.isDanger)
         |> Option.defaultValue (Interop.mkAttr "dummy" "")
 
 

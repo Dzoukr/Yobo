@@ -26,9 +26,9 @@ let inTemplate (content:ReactElement) =
 let view (model:Model) (dispatch:Msg -> unit) =
     Bulma.box [
         Html.img [ prop.src "img/logo.png" ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.textInput [
+                Bulma.input.text [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
                     prop.placeholder "Váš email"
                     prop.onTextChange (fun x -> { model.Form.FormData with Email = x } |> FormChanged |> dispatch)
@@ -37,9 +37,9 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.passwordInput [
+                Bulma.input.password [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
                     prop.placeholder "Vaše heslo"
                     prop.onTextChange (fun x -> { model.Form.FormData with Password = x } |> FormChanged |> dispatch)
@@ -48,11 +48,11 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.button [
-                    yield button.isPrimary
-                    yield button.isFullwidth
+                Bulma.button.button [
+                    yield color.isPrimary
+                    yield button.isFullWidth
                     if model.Form.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Přihlásit se"
                     yield prop.onClick (fun _ -> Login |> dispatch)

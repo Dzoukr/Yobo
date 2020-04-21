@@ -16,7 +16,7 @@ let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.
     
     let item (pg:SecuredPage) (icon:string) (text:string) =
         let isActive = page = pg
-        Bulma.navbarItemA [
+        Bulma.navbarItem.a [
             if isActive then navbarItem.isActive
             yield! Html.Props.routed (Page.Secured pg)
             prop.children [
@@ -32,9 +32,9 @@ let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.
         else []
     
     let userInfo =
-        Bulma.navbarItemDiv [
+        Bulma.navbarItem.div [
             Bulma.tag [
-                tag.isInfo
+                color.isInfo
                 prop.style [ style.marginRight 10 ]
                 prop.text (sprintf "%i kreditů" user.Credits)
             ]
@@ -44,20 +44,20 @@ let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.
     
     Html.div [
         Bulma.navbar [
-            navbar.isLight
+            color.isLight
             prop.children [
                 Bulma.container [
-                    Bulma.navbarStart [
+                    Bulma.navbarStart.div [
                         item Calendar "fas fa-calendar-alt" "Kalendář"
                         item MyAccount "fas fa-user" "Můj účet"
                     ]
-                    Bulma.navbarEnd [
+                    Bulma.navbarEnd.div [
                         yield! adminButtons
                         userInfo
-                        Bulma.navbarItemDiv [
+                        Bulma.navbarItem.div [
                             Bulma.buttons [
-                                Bulma.buttonLink [
-                                    button.isDanger
+                                Bulma.button.a [
+                                    color.isDanger
                                     prop.onClick (fun _ -> LoggedOut |> dispatch)
                                     prop.text "Odhlásit"
                                 ]

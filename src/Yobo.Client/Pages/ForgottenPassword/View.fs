@@ -23,10 +23,10 @@ let inTemplate (content:ReactElement) =
 
 let view (model:Model) (dispatch:Msg -> unit) =
     Bulma.box [
-        Bulma.title1 "Zapomenuté heslo"
-        Bulma.field [
+        Bulma.title.h1 "Zapomenuté heslo"
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.textInput [
+                Bulma.input.text [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
                     prop.placeholder "Váš email"
                     prop.onTextChange (fun x -> { model.Form.FormData with Email = x } |> FormChanged |> dispatch)
@@ -35,11 +35,11 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Email))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.button [
-                    yield button.isPrimary
-                    yield button.isFullwidth
+                Bulma.button.button [
+                    yield color.isPrimary
+                    yield button.isFullWidth
                     if model.Form.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Resetovat heslo"
                     yield prop.onClick (fun _ -> InitiateReset |> dispatch)

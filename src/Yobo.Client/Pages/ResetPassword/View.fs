@@ -24,11 +24,11 @@ let inTemplate (content:ReactElement) =
 
 let view (model:Model) (dispatch:Msg -> unit) =
     Bulma.box [
-        Bulma.title1 "Nastavení nového hesla"
-        Bulma.field [
+        Bulma.title.h1 "Nastavení nového hesla"
+        Bulma.field.div [
             Bulma.label "Heslo"
             Bulma.fieldBody [
-                Bulma.passwordInput [
+                Bulma.input.password [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
                     prop.onTextChange (fun x -> { model.Form.FormData with Password = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.Password
@@ -37,10 +37,10 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.Password))
         ]
         
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Heslo (ještě jednou pro kontrolu)"
             Bulma.fieldBody [
-                Bulma.passwordInput [
+                Bulma.input.password [
                     ValidationViews.color model.Form.ValidationErrors (nameof(model.Form.FormData.SecondPassword))
                     prop.onTextChange (fun x -> { model.Form.FormData with SecondPassword = x } |> FormChanged |> dispatch)
                     prop.valueOrDefault model.Form.FormData.SecondPassword
@@ -48,11 +48,11 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
             ValidationViews.help model.Form.ValidationErrors (nameof(model.Form.FormData.SecondPassword))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.button [
-                    yield button.isPrimary
-                    yield button.isFullwidth
+                Bulma.button.button [
+                    yield color.isPrimary
+                    yield button.isFullWidth
                     if model.Form.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     yield prop.text "Nastavit heslo"
                     yield prop.onClick (fun _ -> Reset |> dispatch)

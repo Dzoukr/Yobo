@@ -14,7 +14,7 @@ let private userRow dispatch (u:User) =
     let activated =
         match u.Activated with
         | Some a -> a |> DateTimeOffset.toCzDate |> Html.text
-        | None -> Bulma.tag [ tag.isWarning; prop.text "Neaktivní" ]
+        | None -> Bulma.tag [ color.isWarning; prop.text "Neaktivní" ]
 
     let expires =
         match u.CreditsExpiration with
@@ -23,8 +23,8 @@ let private userRow dispatch (u:User) =
 
     let addCreditBtn =
         if u.Activated.IsSome then
-            Bulma.button [
-                button.isPrimary
+            Bulma.button.button [
+                color.isPrimary
                 prop.onClick (fun _ -> u.Id |> Some |> ShowAddCreditsForm |> dispatch)
                 prop.text "Přidat kredity"
             ]
@@ -32,9 +32,9 @@ let private userRow dispatch (u:User) =
         
     let prolongBtn =
         if u.Activated.IsSome && u.Credits > 0 then
-            Bulma.button [
+            Bulma.button.button [
                 prop.style [ style.marginLeft 5 ]
-                button.isLight
+                color.isLight
                 prop.onClick (fun _ -> u.Id |> Some |> ShowSetExpirationForm |> dispatch)
                 prop.text "Nastavit platnost"
             ]
@@ -53,16 +53,16 @@ let private userRow dispatch (u:User) =
 let addCreditsQuickView (model:Model) dispatch user =
     
     let form = [
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Uživatel"
             Bulma.fieldBody [
                 Html.div (sprintf "%s %s" user.FirstName user.LastName)
             ]
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Počet kreditů"
             Bulma.fieldBody [
-                Bulma.numberInput [
+                Bulma.input.number [
                     ValidationViews.color model.AddCreditsForm.ValidationErrors (nameof(model.AddCreditsForm.FormData.Credits))
                     prop.onTextChange (fun x -> { model.AddCreditsForm.FormData with Credits = int x } |> AddCreditsFormChanged |> dispatch)
                     prop.valueOrDefault model.AddCreditsForm.FormData.Credits
@@ -70,7 +70,7 @@ let addCreditsQuickView (model:Model) dispatch user =
             ]
             ValidationViews.help model.AddCreditsForm.ValidationErrors (nameof(model.AddCreditsForm.FormData.Credits))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Datum expirace"
             Bulma.fieldBody [
                 Calendar.calendar [
@@ -96,10 +96,10 @@ let addCreditsQuickView (model:Model) dispatch user =
             ]
             ValidationViews.help model.AddCreditsForm.ValidationErrors (nameof(model.AddCreditsForm.FormData.Expiration))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.button [
-                    button.isPrimary
+                Bulma.button.button [
+                    color.isPrimary
                     prop.text "Přidat kredity"
                     if model.AddCreditsForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     prop.onClick (fun _ -> AddCredits |> dispatch)
@@ -127,13 +127,13 @@ let addCreditsQuickView (model:Model) dispatch user =
 let setExpirationQuickView (model:Model) dispatch user =
     
     let form = [
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Uživatel"
             Bulma.fieldBody [
                 Html.div (sprintf "%s %s" user.FirstName user.LastName)
             ]
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.label "Datum expirace"
             Bulma.fieldBody [
                 Calendar.calendar [
@@ -159,10 +159,10 @@ let setExpirationQuickView (model:Model) dispatch user =
             ]
             ValidationViews.help model.SetExpirationForm.ValidationErrors (nameof(model.SetExpirationForm.FormData.Expiration))
         ]
-        Bulma.field [
+        Bulma.field.div [
             Bulma.fieldBody [
-                Bulma.button [
-                    button.isPrimary
+                Bulma.button.button [
+                    color.isPrimary
                     prop.text "Nastavit platnost"
                     if model.SetExpirationForm.IsLoading then yield! [ button.isLoading; prop.disabled true ]
                     prop.onClick (fun _ -> SetExpiration |> dispatch)
@@ -201,8 +201,8 @@ let view (model : Model) (dispatch : Msg -> unit) =
     let rows = if model.UsersLoading then [ loadingRow ] else model.Users |> List.map (userRow dispatch)
     let table =
         Bulma.table [
-            Bulma.table.isHoverable
-            Bulma.table.isFullwidth
+            table.isHoverable
+            table.isFullWidth
             prop.children [
                 Html.thead [
                     Html.tr [

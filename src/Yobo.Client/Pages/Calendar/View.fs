@@ -26,15 +26,15 @@ let navigationRow model dispatch =
                 prop.colSpan 7
                 prop.children [
                     if model.WeekOffset - 1 >= Yobo.Shared.Core.Reservations.Domain.minWeekOffset then
-                        Bulma.button [
+                        Bulma.button.button [
                             prop.onClick (fun _ -> WeekOffsetChanged(model.WeekOffset - 1) |> dispatch)
                             prop.children [ Html.faIconSingle "fas fa-chevron-circle-left" ]
                         ]
-                    Bulma.button [
+                    Bulma.button.button [
                         prop.onClick (fun _ -> WeekOffsetChanged(0) |> dispatch)
                         prop.children [ Html.faIconSingle "fas fa-home" ]
                     ]
-                    Bulma.button [
+                    Bulma.button.button [
                         prop.onClick (fun _ -> WeekOffsetChanged(model.WeekOffset + 1) |> dispatch)
                         prop.children [ Html.faIconSingle "fas fa-chevron-circle-right" ]
                     ]
@@ -57,11 +57,11 @@ let headerRow dates =
 let getTag (la:LessonAvailability) =
     let tagColor, tagText =
         match la with
-        | Available Free -> tag.isSuccess, "Volno"
-        | Available LastFreeSpot -> tag.isWarning, "Poslední volné místo"
-        | Unavailable Full -> tag.isDanger, "Obsazeno"
-        | Unavailable AlreadyStarted -> tag.isBlack, "Lekce uzavřena"
-        | Unavailable Cancelled -> tag.isBlack, "Lekce zrušena"
+        | Available Free -> color.isSuccess, "Volno"
+        | Available LastFreeSpot -> color.isWarning, "Poslední volné místo"
+        | Unavailable Full -> color.isDanger, "Obsazeno"
+        | Unavailable AlreadyStarted -> color.isBlack, "Lekce uzavřena"
+        | Unavailable Cancelled -> color.isBlack, "Lekce zrušena"
     Bulma.tag [ tagColor; prop.text tagText ] 
 
 let isCancelled (la:LessonAvailability) =
@@ -81,15 +81,15 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
     let btns =
         match lesson.ReservationAvailability with
         | Reservable Cash ->
-            Bulma.button [
+            Bulma.button.button [
                 prop.text "Rezervovat (hotovost)"
             ]
         | Reservable Credits -> 
-            Bulma.button [
+            Bulma.button.button [
                 prop.text "Rezervovat"
             ]
         | AlreadyReserved (tp, true) ->
-            Bulma.button [
+            Bulma.button.button [
                 prop.text "Zrušit rezervaci"
             ]
         | AlreadyReserved (_, false)
@@ -202,7 +202,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
     Html.div [
         
         Bulma.table [
-            table.isFullwidth
+            table.isFullWidth
             table.isBordered
             ++ prop.className "table-calendar"
             prop.children [

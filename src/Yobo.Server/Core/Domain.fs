@@ -91,30 +91,22 @@ module CmdArgs =
         Id : Guid
     }
 
-//    type BlockCashReservations = {
-//        UserId : Guid
-//        Expires : DateTimeOffset
-//        LessonId : Guid
-//    }
+    type AddLessonReservation = {
+        LessonId : Guid
+        UserId : Guid
+        UseCredits : bool
+    }
     
-//
-//    type AddReservation = {
-//        Id : Guid
-//        UserId : Guid
-//        Count : int
-//        UseCredits : bool
-//    }
-//
-
-//
-
-//
-//
-//    type WithdrawCredits = {
-//        UserId : Guid
-//        Amount : int
-//        LessonId : Guid
-//    }
+    type BlockCashReservations = {
+        UserId : Guid
+        Expires : DateTimeOffset
+        LessonId : Guid
+    }
+    
+    type WithdrawCredit = {
+        UserId : Guid
+        LessonId : Guid
+    }
 
 
 
@@ -135,8 +127,7 @@ type Event =
     | OnlineLessonDescriptionChanged of CmdArgs.ChangeOnlineLessonDescription
     | OnlineLessonCancelled of CmdArgs.CancelOnlineLesson
     | OnlineLessonReservationCancelled of CmdArgs.CancelOnlineLessonReservation
-    | OnlineLessonDeleted of CmdArgs.DeleteOnlineLesson
-    
-//    | ReservationAdded of CmdArgs.AddReservation
-//    | CreditsWithdrawn of CmdArgs.WithdrawCredits
-//    | CashReservationsBlocked of CmdArgs.BlockCashReservations
+    | OnlineLessonDeleted of CmdArgs.DeleteOnlineLesson    
+    | LessonReservationAdded of CmdArgs.AddLessonReservation
+    | CreditWithdrawn of CmdArgs.WithdrawCredit
+    | CashReservationsBlocked of CmdArgs.BlockCashReservations

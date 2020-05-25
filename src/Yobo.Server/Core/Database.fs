@@ -282,6 +282,9 @@ module Projections =
             {
                 Id = x.Id
                 IsActivated = x.Activated.IsSome
+                Credits = x.Credits
+                CreditsExpiration = x.CreditsExpiration
+                CashReservationBlockedUntil = x.CashReservationBlockedUntil
             } : CommandHandler.Projections.ExistingUser    
         ))
         |> Task.map (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))

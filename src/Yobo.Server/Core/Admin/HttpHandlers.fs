@@ -65,22 +65,6 @@ let private createWorkshops (root:AdminRoot) (r:Request.CreateWorkshops) =
         return ()            
     }    
 
-let private createOnlineLessons (root:AdminRoot) (r:Request.CreateOnlineLessons) =
-    task {
-        for d in r.Dates do
-            let args : CmdArgs.CreateOnlineLesson =
-                {
-                    Id = Guid.NewGuid()
-                    StartDate = d |> DateTimeOffset.toCzDateTimeOffset |> DateTimeOffset.withHoursMins r.StartTime
-                    EndDate = d |> DateTimeOffset.toCzDateTimeOffset |> DateTimeOffset.withHoursMins r.EndTime
-                    Name = r.Name
-                    Description = r.Description
-                    Capacity = r.Capacity
-                }
-            do! root.CommandHandler.CreateOnlineLesson args                
-        return ()            
-    }
-    
 let private changeLessonDescription (root:AdminRoot) (r:Request.ChangeLessonDescription) =
     task {
         let args : CmdArgs.ChangeLessonDescription =
@@ -119,38 +103,8 @@ let private deleteWorkshop (root:AdminRoot) (r:Request.DeleteWorkshop) =
         return! root.CommandHandler.DeleteWorkshop args              
     }    
 
-let private changeOnlineLessonDescription (root:AdminRoot) (r:Request.ChangeOnlineLessonDescription) =
-    task {
-        let args : CmdArgs.ChangeOnlineLessonDescription =
-            {
-                Id = r.Id
-                Name = r.Name
-                Description = r.Description
-            }
-        return! root.CommandHandler.ChangeOnlineLessonDescription args              
-    }  
-
-let private cancelOnlineLesson (root:AdminRoot) (r:Request.CancelOnlineLesson) =
-    task {
-        let args : CmdArgs.CancelOnlineLesson =
-            {
-                Id = r.Id
-            }
-        return! root.CommandHandler.CancelOnlineLesson args              
-    }
-
-let private deleteOnlineLesson (root:AdminRoot) (r:Request.DeleteOnlineLesson) =
-    task {
-        let args : CmdArgs.DeleteOnlineLesson =
-            {
-                Id = r.Id
-            }
-        return! root.CommandHandler.DeleteOnlineLesson args              
-    }
-
 let private adminService (root:CompositionRoot) userId : AdminService =
     {
-        GetOnlineLessons = root.Admin.Queries.GetOnlineLessons >> Async.AwaitTask
         GetLessons = root.Admin.Queries.GetLessons >> Async.AwaitTask
         GetWorkshops = root.Admin.Queries.GetWorkshops >> Async.AwaitTask
         GetAllUsers = root.Admin.Queries.GetAllUsers >> Async.AwaitTask
@@ -158,14 +112,10 @@ let private adminService (root:CompositionRoot) userId : AdminService =
         SetExpiration = ServerError.validate validateSetExpiration >> setExpiration root.Admin >> Async.AwaitTask
         CreateLessons = ServerError.validate validateCreateLessons >> createLessons root.Admin >> Async.AwaitTask
         CreateWorkshops = ServerError.validate validateCreateWorkshops >> createWorkshops root.Admin >> Async.AwaitTask
-        CreateOnlineLessons = ServerError.validate validateCreateOnlineLessons >> createOnlineLessons root.Admin >> Async.AwaitTask
         ChangeLessonDescription = ServerError.validate validateChangeLessonDescription >> changeLessonDescription root.Admin >> Async.AwaitTask
         CancelLesson = ServerError.validate validateCancelLesson >> cancelLesson root.Admin >> Async.AwaitTask
         DeleteLesson = ServerError.validate validateDeleteLesson >> deleteLesson root.Admin >> Async.AwaitTask
         DeleteWorkshop = ServerError.validate validateDeleteWorkshop >> deleteWorkshop root.Admin >> Async.AwaitTask
-        ChangeOnlineLessonDescription = ServerError.validate validateChangeOnlineLessonDescription >> changeOnlineLessonDescription root.Admin >> Async.AwaitTask
-        CancelOnlineLesson = ServerError.validate validateCancelOnlineLesson >> cancelOnlineLesson root.Admin >> Async.AwaitTask
-        DeleteOnlineLesson = ServerError.validate validateDeleteOnlineLesson >> deleteOnlineLesson root.Admin >> Async.AwaitTask
     }
 
 let adminServiceHandler (root:CompositionRoot) : HttpHandler =

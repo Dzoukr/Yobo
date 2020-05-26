@@ -14,9 +14,6 @@ let canLessonBeCancelled (isCanceled:bool) (lessonStart:DateTimeOffset) =
     
 let canLessonBeDeleted (lessonStart:DateTimeOffset) =
     lessonStart > DateTimeOffset.Now
-    
-let canOnlineLessonBeCancelled = canLessonBeCancelled        
-let canOnlineLessonBeDeleted = canLessonBeDeleted
 
 let getLessonCancellingDate (d:DateTimeOffset) =
     d

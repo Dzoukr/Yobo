@@ -32,15 +32,6 @@ module CmdArgs =
         Description : string
     }
     
-    type CreateOnlineLesson = {
-        Id : Guid
-        StartDate : DateTimeOffset
-        EndDate : DateTimeOffset
-        Name : string
-        Description : string
-        Capacity : int
-    }
-    
     type ChangeLessonDescription = {
         Id : Guid
         Name : string
@@ -72,25 +63,6 @@ module CmdArgs =
         Id : Guid
     }
     
-    type ChangeOnlineLessonDescription = {
-        Id : Guid
-        Name : string
-        Description : string
-    }
-    
-    type CancelOnlineLesson = {
-        Id : Guid
-    }
-    
-    type CancelOnlineLessonReservation = {
-        UserId : Guid
-        OnlineLessonId : Guid
-    }
-    
-    type DeleteOnlineLesson = {
-        Id : Guid
-    }
-
     type AddLessonReservation = {
         LessonId : Guid
         UserId : Guid
@@ -108,15 +80,11 @@ module CmdArgs =
         LessonId : Guid
     }
 
-
-
-
 type Event =
     | CreditsAdded of CmdArgs.AddCredits
     | ExpirationSet of CmdArgs.SetExpiration
     | LessonCreated of CmdArgs.CreateLesson
     | WorkshopCreated of CmdArgs.CreateWorkshop
-    | OnlineLessonCreated of CmdArgs.CreateOnlineLesson
     | LessonDescriptionChanged of CmdArgs.ChangeLessonDescription
     | LessonCancelled of CmdArgs.CancelLesson
     | CreditRefunded of CmdArgs.RefundCredit
@@ -124,10 +92,6 @@ type Event =
     | LessonReservationCancelled of CmdArgs.CancelLessonReservation
     | LessonDeleted of CmdArgs.DeleteLesson
     | WorkshopDeleted of CmdArgs.DeleteWorkshop
-    | OnlineLessonDescriptionChanged of CmdArgs.ChangeOnlineLessonDescription
-    | OnlineLessonCancelled of CmdArgs.CancelOnlineLesson
-    | OnlineLessonReservationCancelled of CmdArgs.CancelOnlineLessonReservation
-    | OnlineLessonDeleted of CmdArgs.DeleteOnlineLesson    
     | LessonReservationAdded of CmdArgs.AddLessonReservation
     | CreditWithdrawn of CmdArgs.WithdrawCredit
     | CashReservationsBlocked of CmdArgs.BlockCashReservations

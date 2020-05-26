@@ -25,8 +25,6 @@ type DomainError =
     | LessonAlreadyFull
     | LessonAlreadyReserved
     | LessonCannotBeReserved
-    | OnlineLessonCannotBeCancelled
-    | OnlineLessonCannotBeDeleted
     | NotEnoughCredits
     | CreditsExpiresBeforeLessonStart
     | CashReservationIsBlocked
@@ -39,8 +37,6 @@ module DomainError =
         | LessonAlreadyFull -> "Lekci je již plně obsazena."
         | LessonAlreadyReserved -> "Lekci je již zarezervována."
         | LessonCannotBeReserved -> "Lekci nelze zarezervovat."
-        | OnlineLessonCannotBeCancelled -> "Online lekci nelze zrušit."
-        | OnlineLessonCannotBeDeleted -> "Online lekci nelze smazat."
         | NotEnoughCredits -> "Nemáte dostatek kreditů."
         | CreditsExpiresBeforeLessonStart -> "Kredity vyprší před začátkem lekce."
         | CashReservationIsBlocked -> "Rezervace za hotové je zablokována."

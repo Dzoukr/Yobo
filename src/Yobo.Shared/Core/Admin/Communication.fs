@@ -64,25 +64,6 @@ module Request =
             Name = ""
             Description = ""
         }
-        
-    type CreateOnlineLessons = {
-        Dates : DateTimeOffset list
-        StartTime : int * int
-        EndTime : int * int
-        Name : string
-        Description : string
-        Capacity : int
-    }
-    
-    module CreateOnlineLessons =
-        let init = {
-            Dates = []
-            StartTime = 0,0
-            EndTime = 0,0
-            Name = ""
-            Description = ""
-            Capacity = 0
-        }
     
     type ChangeLessonDescription = {
         Id : Guid
@@ -107,22 +88,7 @@ module Request =
     type DeleteWorkshop = {
         Id : Guid
     }
-    
-    type ChangeOnlineLessonDescription = {
-        Id : Guid
-        Name : string
-        Description : string
-    }        
-    
-    type CancelOnlineLesson = {
-        Id : Guid
-    }
-    
-    type DeleteOnlineLesson = {
-        Id : Guid
-    }
-    
-    
+        
 type AdminService = {
     GetAllUsers : unit -> Async<Queries.User list>
     AddCredits : Request.AddCredits -> Async<unit>
@@ -131,15 +97,10 @@ type AdminService = {
     CreateLessons : Request.CreateLessons -> Async<unit>
     GetWorkshops : DateTimeOffset * DateTimeOffset -> Async<Queries.Workshop list>
     CreateWorkshops : Request.CreateWorkshops -> Async<unit>
-    CreateOnlineLessons : Request.CreateOnlineLessons -> Async<unit>
-    GetOnlineLessons : DateTimeOffset * DateTimeOffset -> Async<Queries.OnlineLesson list>
     ChangeLessonDescription : Request.ChangeLessonDescription -> Async<unit>
     CancelLesson : Request.CancelLesson -> Async<unit>
     DeleteLesson : Request.DeleteLesson -> Async<unit>
     DeleteWorkshop : Request.DeleteWorkshop -> Async<unit>
-    ChangeOnlineLessonDescription : Request.ChangeOnlineLessonDescription -> Async<unit>
-    CancelOnlineLesson : Request.CancelOnlineLesson -> Async<unit>
-    DeleteOnlineLesson : Request.DeleteOnlineLesson -> Async<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/admin/%s" m    

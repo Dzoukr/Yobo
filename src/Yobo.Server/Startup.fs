@@ -149,7 +149,6 @@ module CompositionRoot =
                             else sql Core.UserAccount.Database.Queries.tryGetUserById i
                         )
                         GetUserLessons = sql Core.UserAccount.Database.Queries.getLessonsForUserId
-                        GetUserOnlineLessons = sql Core.UserAccount.Database.Queries.getOnlineLessonsForUserId
                     }    
             }
             Admin =
@@ -166,7 +165,6 @@ module CompositionRoot =
                         GetAllUsers = sql Core.Admin.Database.Queries.getAllUsers
                         GetLessons = sql Core.Admin.Database.Queries.getLessons
                         GetWorkshops = sql Core.Admin.Database.Queries.getWorkshops
-                        GetOnlineLessons = sql Core.Admin.Database.Queries.getOnlineLessons
                     }
                     CommandHandler = {
                         AddCredits = fun args -> task {
@@ -179,7 +177,6 @@ module CompositionRoot =
                         }
                         CreateLesson = Core.CommandHandler.createLesson >> toExn >> sql handleEvents
                         CreateWorkshop = Core.CommandHandler.createWorkshop >> toExn >> sql handleEvents
-                        CreateOnlineLesson = Core.CommandHandler.createOnlineLesson >> toExn >> sql handleEvents
                         ChangeLessonDescription = fun args -> task {
                             let! projections = sql Core.Database.Projections.getLessonById args.Id
                             return! args |> Core.CommandHandler.changeLessonDescription projections |> toExn |> sql handleEvents
@@ -196,24 +193,11 @@ module CompositionRoot =
                             let! projections = sql Core.Database.Projections.getWorkshopById args.Id
                             return! args |> Core.CommandHandler.deleteWorkshop projections |> toExn |> sql handleEvents
                         }
-                        ChangeOnlineLessonDescription = fun args -> task {
-                            let! projections = sql Core.Database.Projections.getOnlineLessonById args.Id
-                            return! args |> Core.CommandHandler.changeOnlineLessonDescription projections |> toExn |> sql handleEvents
-                        }
-                        CancelOnlineLesson = fun args -> task {
-                            let! projections = sql Core.Database.Projections.getOnlineLessonById args.Id
-                            return! args |> Core.CommandHandler.cancelOnlineLesson projections |> toExn |> sql handleEvents
-                        }
-                        DeleteOnlineLesson = fun args -> task {
-                            let! projections = sql Core.Database.Projections.getOnlineLessonById args.Id
-                            return! args |> Core.CommandHandler.deleteOnlineLesson projections |> toExn |> sql handleEvents
-                        }
                     }
             }
             Reservations = {
                 Queries = {
                     GetLessons = sql Core.Reservations.Database.Queries.getLessons
-                    GetOnlineLessons = sql Core.Reservations.Database.Queries.getOnlineLessons
                 }
             }                
         } : CompositionRoot

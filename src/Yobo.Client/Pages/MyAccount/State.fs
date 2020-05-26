@@ -14,16 +14,11 @@ open Yobo.Client.Forms
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
-    | Init -> model, ([LoadMyLessons; LoadMyOnlineLessons] |> List.map Cmd.ofMsg |> Cmd.batch)
+    | Init -> model, ([LoadMyLessons] |> List.map Cmd.ofMsg |> Cmd.batch)
     | LoadMyLessons -> model, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetMyLessons)) () MyLessonsLoaded
-    | LoadMyOnlineLessons -> model, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetMyOnlineLessons)) () MyOnlineLessonsLoaded
     | MyLessonsLoaded res ->
         match res with
         | Ok lsn -> { model with Lessons = lsn }, Cmd.none
-        | Error e -> model, e |> ServerResponseViews.showErrorToast
-    | MyOnlineLessonsLoaded res ->
-        match res with
-        | Ok lsn -> { model with OnlineLessons = lsn }, Cmd.none
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     
     

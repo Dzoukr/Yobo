@@ -58,10 +58,5 @@
             @extend .lesson;
             background-color: rgb(12, 240, 240);
         }
-
-        .online-lesson {
-            @extend .lesson;
-            background-color: rgb(21, 220, 84);
-        }
     }
 }

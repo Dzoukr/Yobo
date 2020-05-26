@@ -29,10 +29,6 @@ module Queries =
         if x.UseCredits then Queries.LessonPayment.Credits
         else Queries.LessonPayment.Cash
     
-    let private toLessonPaymentFromOnline (x:Tables.OnlineLessonReservations) : Queries.LessonPayment =
-        if x.UseCredits then Queries.LessonPayment.Credits
-        else Queries.LessonPayment.Cash
-    
     let getAllUsers (conn:IDbConnection) () =
         task {
             let! res =
@@ -100,38 +96,4 @@ module Queries =
                         Description = x.Description
                     } : Queries.Workshop
                 )
-        }         
-    
-    let getOnlineLessons (conn:IDbConnection) (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
-        task {
-            let! res =
-                select {
-                    table Tables.OnlineLessons.name
-                    leftJoin Tables.OnlineLessonReservations.name "OnlineLessonId" "OnlineLessons.Id"
-                    leftJoin Tables.Users.name "Id" "OnlineLessonReservations.UserId"
-                    where (ge "OnlineLessons.StartDate" dFrom + le "OnlineLessons.StartDate" dTo)
-                }
-                |> conn.SelectAsyncOption<Tables.OnlineLessons, Tables.OnlineLessonReservations, Tables.Users>
-            return
-                res
-                |> List.ofSeq
-                |> List.groupBy fstOf3
-                |> List.map (fun (lsn,gr) ->
-                    let res =
-                        gr
-                        |> List.choose (ignoreFstOf3 >> optionOf2)
-                        |> List.map (fun (res,usr) ->
-                            (usr |> toUser), (res |> toLessonPaymentFromOnline)
-                        )
-                    {
-                        Id = lsn.Id
-                        StartDate = lsn.StartDate
-                        EndDate = lsn.EndDate
-                        Name = lsn.Name
-                        Description = lsn.Description
-                        Reservations = res
-                        IsCancelled = lsn.IsCancelled
-                        Capacity = lsn.Capacity
-                    } : Queries.OnlineLesson
-                )
-        } 
+        }

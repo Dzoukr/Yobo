@@ -33,14 +33,6 @@ let validateCreateWorkshops (r:Request.CreateWorkshops) =
         nameof(r.Description), validateNotEmpty r.Description
     ] |> validate
 
-let validateCreateOnlineLessons (r:Request.CreateOnlineLessons) =
-    [
-        nameof(r.Dates), validateNotEmptyList r.Dates
-        nameof(r.Name), validateNotEmpty r.Name
-        nameof(r.Description), validateNotEmpty r.Description
-        nameof(r.Capacity), validateMinimumValue 1 r.Capacity
-    ] |> validate
-    
 let validateChangeLessonDescription (r:Request.ChangeLessonDescription) =
     [
         nameof(r.Id), validateNotEmptyGuid r.Id
@@ -62,22 +54,3 @@ let validateDeleteWorkshop (r:Request.DeleteWorkshop) =
     [
         nameof(r.Id), validateNotEmptyGuid r.Id
     ] |> validate
-    
-let validateChangeOnlineLessonDescription (r:Request.ChangeOnlineLessonDescription) =
-    [
-        nameof(r.Id), validateNotEmptyGuid r.Id
-        nameof(r.Name), validateNotEmpty r.Name
-        nameof(r.Description), validateNotEmpty r.Description
-    ] |> validate
-    
-let validateCancelOnlineLesson (r:Request.CancelOnlineLesson) =
-    [
-        nameof(r.Id), validateNotEmptyGuid r.Id
-    ] |> validate
-    
-let validateDeleteOnlineLesson (r:Request.DeleteOnlineLesson) =
-    [
-        nameof(r.Id), validateNotEmptyGuid r.Id
-    ] |> validate
-    
-    

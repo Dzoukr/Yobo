@@ -24,7 +24,6 @@ let private offsetToDateRange (offset:int) =
 let private reservationsService (root:CompositionRoot) userId : ReservationsService =
     {
         GetLessons = offsetToDateRange >> root.Reservations.Queries.GetLessons userId >> Async.AwaitTask
-        GetOnlineLessons = offsetToDateRange >> root.Reservations.Queries.GetOnlineLessons userId >> Async.AwaitTask
     }
 
 let reservationsServiceHandler (root:CompositionRoot) : HttpHandler =

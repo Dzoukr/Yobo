@@ -60,27 +60,3 @@ module Queries =
                     } : Queries.Lesson
                 )
         }
-        
-    let getOnlineLessonsForUserId (conn:IDbConnection) (userId:Guid) =
-        task {
-            let! res =
-                select {
-                    table Tables.OnlineLessons.name
-                    innerJoin Tables.OnlineLessonReservations.name "OnlineLessonId" "OnlineLessons.Id"
-                    where (gt "OnlineLessons.EndDate" DateTimeOffset.Now + eq "OnlineLessonReservations.UserId" userId)
-                }
-                |> conn.SelectAsync<Tables.OnlineLessons, Tables.OnlineLessonReservations>
-            return
-                res
-                |> List.ofSeq
-                |> List.map (fun (lsn,gr) ->
-                    {
-                        Id = lsn.Id
-                        StartDate = lsn.StartDate
-                        EndDate = lsn.EndDate
-                        Name = lsn.Name
-                        Description = lsn.Description
-                        Payment = Queries.LessonPayment.fromUseCredits gr.UseCredits
-                    } : Queries.OnlineLesson
-                )
-        }

@@ -33,14 +33,3 @@ module Queries =
         Name : string
         Description : string
     }
-    
-    type OnlineLesson = {
-        Id : Guid
-        StartDate : DateTimeOffset
-        EndDate : DateTimeOffset
-        Name : string
-        Description : string
-        Reservations : (User * Queries.LessonPayment) list
-        IsCancelled : bool
-        Capacity : int
-    }

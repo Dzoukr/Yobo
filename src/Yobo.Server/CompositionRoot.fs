@@ -30,7 +30,6 @@ type AuthRoot = {
 type UserAccountQueries = {
     TryGetUserInfo : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount option>
     GetUserLessons : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.Lesson list>
-    GetUserOnlineLessons : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.OnlineLesson list>
 }
 
 type UserAccountRoot = {
@@ -41,7 +40,6 @@ type AdminQueries = {
     GetAllUsers : unit -> Task<Yobo.Shared.Core.Admin.Domain.Queries.User list>
     GetLessons : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.Lesson list>
     GetWorkshops : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.Workshop list>
-    GetOnlineLessons : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Admin.Domain.Queries.OnlineLesson list>
 }
 
 type AdminCommandHandler = {
@@ -49,14 +47,10 @@ type AdminCommandHandler = {
     SetExpiration : Core.Domain.CmdArgs.SetExpiration -> Task<unit>
     CreateLesson : Core.Domain.CmdArgs.CreateLesson -> Task<unit>
     CreateWorkshop : Core.Domain.CmdArgs.CreateWorkshop -> Task<unit>
-    CreateOnlineLesson : Core.Domain.CmdArgs.CreateOnlineLesson -> Task<unit>
     ChangeLessonDescription : Core.Domain.CmdArgs.ChangeLessonDescription -> Task<unit>
     CancelLesson : Core.Domain.CmdArgs.CancelLesson -> Task<unit>
     DeleteLesson : Core.Domain.CmdArgs.DeleteLesson -> Task<unit>
     DeleteWorkshop : Core.Domain.CmdArgs.DeleteWorkshop -> Task<unit>
-    ChangeOnlineLessonDescription : Core.Domain.CmdArgs.ChangeOnlineLessonDescription -> Task<unit>
-    CancelOnlineLesson : Core.Domain.CmdArgs.CancelOnlineLesson -> Task<unit>
-    DeleteOnlineLesson : Core.Domain.CmdArgs.DeleteOnlineLesson -> Task<unit>
 }
 
 type AdminRoot = {
@@ -66,7 +60,6 @@ type AdminRoot = {
 
 type ReservationsQueries = {
     GetLessons : Guid -> DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Lesson list>
-    GetOnlineLessons : Guid -> DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.OnlineLesson list>
     //GetWorkshops : int -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Workshop list>
 }
 

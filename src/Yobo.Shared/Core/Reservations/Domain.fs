@@ -16,13 +16,3 @@ module Queries =
         Availability : LessonAvailability
         ReservationAvailability : ReservationAvailability
     }
-    
-    type OnlineLesson = {
-        Id : Guid
-        StartDate : DateTimeOffset
-        EndDate : DateTimeOffset
-        Name : string
-        Description : string
-        Availability : LessonAvailability
-        ReservationAvailability : ReservationAvailability
-    }

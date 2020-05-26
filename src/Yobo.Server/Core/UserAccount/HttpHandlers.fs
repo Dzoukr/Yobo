@@ -19,7 +19,6 @@ let private userAccountService (root:CompositionRoot) userId : UserAccountServic
     {
         GetUserInfo = getUserInfo root userId >> Async.AwaitTask
         GetMyLessons = (fun _ -> root.UserAccount.Queries.GetUserLessons userId) >> Async.AwaitTask
-        GetMyOnlineLessons = (fun _ -> root.UserAccount.Queries.GetUserOnlineLessons userId) >> Async.AwaitTask
     }
 
 let userAccountServiceHandler (root:CompositionRoot) : HttpHandler =

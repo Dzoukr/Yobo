@@ -23,12 +23,3 @@ module Queries =
         Description : string
         Payment : Queries.LessonPayment
     }
-    
-    type OnlineLesson = {
-        Id : Guid
-        StartDate : DateTimeOffset
-        EndDate : DateTimeOffset
-        Name : string
-        Description : string
-        Payment : Queries.LessonPayment
-    }

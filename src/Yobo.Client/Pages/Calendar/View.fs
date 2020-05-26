@@ -137,33 +137,10 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
         ]
     ]
     
-    
-    
-let onlineLessonDiv dispatch (lesson:Queries.OnlineLesson) =
-    let isCancelled = lesson.Availability |> isCancelled 
-    Html.div [
-        prop.className [true, "online-lesson"; isCancelled, "cancelled"]
-        prop.children [
-            Html.div [
-                prop.className "time"
-                prop.children [
-                    Html.text (sprintf "%s - %s" (lesson.StartDate |> DateTimeOffset.toCzTime) (lesson.EndDate |> DateTimeOffset.toCzTime))
-                ]
-            ]
-            Html.div [
-                prop.className "name"
-                prop.text lesson.Name
-            ]
-            Html.div [ getTag lesson.Availability ]
-            
-        ]
-    ]    
-
-let col (lessons:Queries.Lesson list) (*workshops:Queries.Workshop list*) (onlines:Queries.OnlineLesson list) (date:DateTimeOffset) dispatch =
+let col (lessons:Queries.Lesson list) (*workshops:Queries.Workshop list*) (date:DateTimeOffset) dispatch =
     Html.td [
         // Html.div (workshops |> List.map (workshopDiv dispatch))
         Html.div (lessons |> List.map (lessonDiv dispatch))
-        Html.div (onlines |> List.map (onlineLessonDiv dispatch))
     ]
 
 let row model dispatch dates =
@@ -175,16 +152,11 @@ let row model dispatch dates =
 //        model.Workshops
 //        |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
-    let getOnlineLessonsForDate (date:DateTimeOffset) =
-        model.OnlineLessons
-        |> List.filter (fun x -> x.StartDate.Date = date.Date)
-
     dates
     |> List.map (fun date ->
         let lsns = date |> getLessonsForDate
         //let wrksps = date |> getWorkshopsForDate
-        let onlns = date |> getOnlineLessonsForDate
-        col lsns onlns date dispatch
+        col lsns date dispatch
     )
     |> (fun x ->
         Html.tr [

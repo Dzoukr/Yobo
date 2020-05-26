@@ -35,28 +35,9 @@ module ActiveWorkshopModel =
         DeleteWorkshopForm = ({ Id = w.Id } : Request.DeleteWorkshop) |> ValidatedForm.init
     }
 
-type ActiveOnlineLessonModel = {
-    OnlineLesson : OnlineLesson
-    ChangeDescriptionForm : ValidatedForm<Request.ChangeOnlineLessonDescription>
-    CancelOnlineLessonForm : ValidatedForm<Request.CancelOnlineLesson>
-    DeleteOnlineLessonForm : ValidatedForm<Request.DeleteOnlineLesson>
-}
-
-module ActiveOnlineLessonModel =
-    let init lsn = {
-        OnlineLesson = lsn
-        ChangeDescriptionForm =
-            ({ Id = lsn.Id; Name = lsn.Name; Description = lsn.Description } : Request.ChangeOnlineLessonDescription)
-            |> ValidatedForm.init
-        CancelOnlineLessonForm = ({ Id = lsn.Id } : Request.CancelOnlineLesson) |> ValidatedForm.init
-        DeleteOnlineLessonForm = ({ Id = lsn.Id } : Request.DeleteOnlineLesson) |> ValidatedForm.init
-    }
-    
-
 type ActiveItemModel =
     | Lesson of ActiveLessonModel
     | Workshop of ActiveWorkshopModel
-    | OnlineLesson of ActiveOnlineLessonModel
 
 type ActiveLessonMsg =
     | ChangeLessonDescriptionFormChanged of Request.ChangeLessonDescription
@@ -71,36 +52,23 @@ type ActiveWorkshopMsg =
     | DeleteWorkshop
     | WorkshopDeleted of ServerResult<unit>
 
-type ActiveOnlineLessonMsg =
-    | ChangeOnlineLessonDescriptionFormChanged of Request.ChangeOnlineLessonDescription
-    | ChangeOnlineLessonDescription
-    | OnlineLessonDescriptionChanged of ServerResult<unit>
-    | CancelOnlineLesson
-    | OnlineLessonCancelled of ServerResult<unit>
-    | DeleteOnlineLesson
-    | OnlineLessonDeleted of ServerResult<unit>
-
 type ActiveItemMsg =
     | ActiveLessonMsg of ActiveLessonMsg
     | ActiveWorkshopMsg of ActiveWorkshopMsg
-    | ActiveOnlineLessonMsg of ActiveOnlineLessonMsg
 
 type ActiveForm =
     | LessonsForm
     | WorkshopsForm
-    | OnlinesForm
 
 type Model = {
     Lessons : Lesson list
     Workshops : Workshop list
-    Onlines : OnlineLesson list
     WeekOffset : int
     SelectedDates : DateTimeOffset list
     
     ActiveForm : ActiveForm option
     LessonsForm : ValidatedForm<Request.CreateLessons>
     WorkshopsForm : ValidatedForm<Request.CreateWorkshops>
-    OnlinesForm : ValidatedForm<Request.CreateOnlineLessons>
     
     ActiveItemModel : ActiveItemModel option
 }
@@ -110,13 +78,11 @@ module Model =
         {
             Lessons = []
             Workshops = []
-            Onlines = []
             WeekOffset = 0
             SelectedDates = []
             ActiveForm = None
             LessonsForm = Request.CreateLessons.init |> ValidatedForm.init
             WorkshopsForm = Request.CreateWorkshops.init |> ValidatedForm.init
-            OnlinesForm = Request.CreateOnlineLessons.init |> ValidatedForm.init
             ActiveItemModel = None
         }
 
@@ -126,22 +92,16 @@ type Msg =
     | ToggleDate of DateTimeOffset
     | WeekOffsetChanged of int
     | LoadLessons
-    | LoadOnlineLessons
     | LoadWorkshops
     | LessonsLoaded of ServerResult<Lesson list>
-    | OnlineLessonsLoaded of ServerResult<OnlineLesson list>
     | WorkshopsLoaded of ServerResult<Workshop list>
     | LessonsFormChanged of Request.CreateLessons
-    | OnlineLessonsFormChanged of Request.CreateOnlineLessons
     | WorkshopsFormChanged of Request.CreateWorkshops
     | CreateLessons
     | CreateWorkshops
-    | CreateOnlineLessons
     | LessonsCreated of ServerResult<unit>
     | WorkshopsCreated of ServerResult<unit>
-    | OnlineLessonsCreated of ServerResult<unit>
     
     | SetActiveLesson of Lesson option
     | SetActiveWorkshop of Workshop option
-    | SetActiveOnlineLesson of OnlineLesson option
     | ActiveItemMsg of ActiveItemMsg

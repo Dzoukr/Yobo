@@ -22,24 +22,14 @@ type DomainError =
     | UserNotActivated
     | LessonCannotBeCancelled
     | LessonCannotBeDeleted
-    | LessonAlreadyFull
-    | LessonAlreadyReserved
     | LessonCannotBeReserved
-    | NotEnoughCredits
-    | CreditsExpiresBeforeLessonStart
-    | CashReservationIsBlocked
 
 module DomainError =
     let explain = function
         | UserNotActivated -> "Uživatel ještě nebyl aktivován."
         | LessonCannotBeCancelled -> "Lekci nelze zrušit."
         | LessonCannotBeDeleted -> "Lekci nelze smazat."
-        | LessonAlreadyFull -> "Lekci je již plně obsazena."
-        | LessonAlreadyReserved -> "Lekci je již zarezervována."
         | LessonCannotBeReserved -> "Lekci nelze zarezervovat."
-        | NotEnoughCredits -> "Nemáte dostatek kreditů."
-        | CreditsExpiresBeforeLessonStart -> "Kredity vyprší před začátkem lekce."
-        | CashReservationIsBlocked -> "Rezervace za hotové je zablokována."
 
 type ServerError =
     | Exception of string

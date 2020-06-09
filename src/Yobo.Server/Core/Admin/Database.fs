@@ -20,14 +20,10 @@ module Queries =
             FirstName = x.FirstName
             LastName = x.LastName
             Activated = x.Activated
-            Credits = x.Credits
+            Credits = Yobo.Shared.Core.Domain.calculateCredits x.Credits x.CreditsExpiration
             CreditsExpiration = x.CreditsExpiration
             CashReservationBlockedUntil = x.CashReservationBlockedUntil
         } : Queries.User
-    
-    let private toLessonPayment (x:Tables.LessonReservations) : Queries.LessonPayment =
-        if x.UseCredits then Queries.LessonPayment.Credits
-        else Queries.LessonPayment.Cash
     
     let getAllUsers (conn:IDbConnection) () =
         task {
@@ -61,7 +57,7 @@ module Queries =
                         gr
                         |> List.choose (ignoreFstOf3 >> optionOf2)
                         |> List.map (fun (res,usr) ->
-                            (usr |> toUser), (res |> toLessonPayment)
+                            (usr |> toUser), (res.UseCredits |> LessonPayment.fromUseCredits)
                         )
                     {
                         Id = lsn.Id
@@ -72,6 +68,7 @@ module Queries =
                         Reservations = res
                         IsCancelled = lsn.IsCancelled
                         Capacity = lsn.Capacity
+                        CancellableBeforeStart = lsn.CancellableBeforeStart
                     } : Queries.Lesson
                 )
         }

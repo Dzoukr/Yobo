@@ -28,7 +28,7 @@ type AuthRoot = {
 }
 
 type UserAccountQueries = {
-    TryGetUserInfo : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount option>
+    GetUserInfo : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount>
     GetUserLessons : Guid -> Task<Yobo.Shared.Core.UserAccount.Domain.Queries.Lesson list>
 }
 
@@ -58,6 +58,10 @@ type AdminRoot = {
     CommandHandler : AdminCommandHandler
 }
 
+type ReservationsCommandHandler = {
+    AddReservation : Core.Domain.CmdArgs.AddLessonReservation -> Task<unit>
+}
+
 type ReservationsQueries = {
     GetLessons : Guid -> DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Lesson list>
     //GetWorkshops : int -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Workshop list>
@@ -65,6 +69,7 @@ type ReservationsQueries = {
 
 type ReservationsRoot = {
     Queries : ReservationsQueries
+    CommandHandler : ReservationsCommandHandler
 }
 
 type CompositionRoot = {

@@ -12,8 +12,7 @@ open Yobo.Shared.Core.UserAccount.Communication
 
 let private getUserInfo (root:CompositionRoot) userId () =
     userId
-    |> root.UserAccount.Queries.TryGetUserInfo
-    |> Task.map (ServerError.ofOption <| DatabaseItemNotFound(userId))
+    |> root.UserAccount.Queries.GetUserInfo
 
 let private userAccountService (root:CompositionRoot) userId : UserAccountService =
     {

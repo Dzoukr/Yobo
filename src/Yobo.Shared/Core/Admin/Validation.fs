@@ -24,6 +24,7 @@ let validateCreateLessons (r:Request.CreateLessons) =
         nameof(r.Name), validateNotEmpty r.Name
         nameof(r.Description), validateNotEmpty r.Description
         nameof(r.Capacity), validateMinimumValue 1 r.Capacity
+        nameof(r.CancellableBeforeStart), validateMinimumValue 1. r.CancellableBeforeStart.TotalHours
     ] |> validate
 
 let validateCreateWorkshops (r:Request.CreateWorkshops) =

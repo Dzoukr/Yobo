@@ -8,7 +8,7 @@ type ValidationErrorType =
     | IsEmptyList
     | IsNotValidEmail
     | IsBelowMinimalLength of int
-    | IsBelowMinimalValue of int
+    | IsBelowMinimalValue of obj
     | IsBelowMinimalDate of DateTimeOffset
     | PasswordsDontMatch
     | TermsNotAgreed
@@ -19,7 +19,7 @@ module ValidationErrorType =
         | IsEmptyList -> "Pole musí obsahovat alespoň jednu hodnotu."
         | IsNotValidEmail -> "Vyplňte správný formát pro emailovou adresu."
         | IsBelowMinimalLength l -> sprintf "Hodnota musí být nejméně %i znaků." l
-        | IsBelowMinimalValue l -> sprintf "Hodnota musí být nejméně %i." l
+        | IsBelowMinimalValue l -> sprintf "Hodnota musí být nejméně %A." l
         | IsBelowMinimalDate d -> sprintf "Hodnota musí být minimálně %s." (d |> DateTimeOffset.toCzDate)
         | PasswordsDontMatch -> "Hesla se neshodují."
         | TermsNotAgreed -> "Potvrďte souhlas s obchodními podmínkami."
@@ -53,7 +53,7 @@ let validateEmail value =
 let validateMinimumLength l (value:string) =
     if value.Length < l then IsBelowMinimalLength l |> Some else None
 
-let validateMinimumValue l (value:int) =
+let validateMinimumValue<'a when 'a : comparison> l (value:'a) =
     if value < l then IsBelowMinimalValue l |> Some else None
 
 let validateMinimumDate l (value:DateTimeOffset) =

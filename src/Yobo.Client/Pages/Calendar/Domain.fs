@@ -1,5 +1,6 @@
 module Yobo.Client.Pages.Calendar.Domain
 
+open Yobo.Shared.Core.Reservations.Communication
 open Yobo.Shared.Core.Reservations.Domain
 open Yobo.Shared.Errors
 
@@ -20,9 +21,9 @@ type Msg =
     | LoadLessons
     | LessonsLoaded of ServerResult<Queries.Lesson list>
     | WeekOffsetChanged of int
+    | AddReservation of Request.AddReservation
+    | ReservationAdded of ServerResult<unit>
 //    | LoadWorkshops
 //    | WorkshopsLoaded of ServerResult<Yobo.Shared.Domain.Workshop list>
-//    | AddReservation of AddReservation
-//    | ReservationAdded of ServerResult<unit>
 //    | CancelReservation of Guid
 //    | ReservationCancelled of ServerResult<unit>

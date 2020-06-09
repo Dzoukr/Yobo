@@ -12,11 +12,13 @@ open Yobo.Shared
 open Yobo.Client
 open Yobo.Client.SharedView
 open Yobo.Client.SharedView
+open Yobo.Shared.Core.Domain
 open Yobo.Shared.Core.Domain.Queries
 open Yobo.Shared.Errors
 open Yobo.Shared.DateTime
 open Yobo.Shared.Core.Reservations.Domain
 open Yobo.Shared.Core.Reservations.Domain.Queries
+open Yobo.Shared.Core.Reservations.Communication
 
 let navigationRow model dispatch =
     Html.tr [
@@ -54,19 +56,19 @@ let headerRow dates =
     |> List.map headerTd
     |> (fun x -> Html.tr [ prop.className "header"; prop.children x ])
 
-let getTag (la:LessonAvailability) =
+let getTag (la:LessonStatus) =
     let tagColor, tagText =
         match la with
-        | Available Free -> color.isSuccess, "Volno"
-        | Available LastFreeSpot -> color.isWarning, "Poslední volné místo"
-        | Unavailable Full -> color.isDanger, "Obsazeno"
-        | Unavailable AlreadyStarted -> color.isBlack, "Lekce uzavřena"
-        | Unavailable Cancelled -> color.isBlack, "Lekce zrušena"
+        | Open Free -> color.isSuccess, "Volno"
+        | Open LastFreeSpot -> color.isWarning, "Poslední volné místo"
+        | Closed Full -> color.isDanger, "Obsazeno"
+        | Closed AlreadyStarted -> color.isBlack, "Lekce uzavřena"
+        | Closed Cancelled -> color.isBlack, "Lekce zrušena"
     Bulma.tag [ tagColor; prop.text tagText ] 
 
-let isCancelled (la:LessonAvailability) =
+let isCancelled (la:LessonStatus) =
     match la with
-    | Unavailable Cancelled -> true
+    | Closed Cancelled -> true
     | _ -> false
 
 let getPopoverPosition (d:DateTimeOffset) =
@@ -76,23 +78,27 @@ let getPopoverPosition (d:DateTimeOffset) =
     | _ -> popover.isBottom
 
 let lessonDiv dispatch (lesson:Queries.Lesson) =
-    let isCancelled = lesson.Availability |> isCancelled
+    let isCancelled = lesson.LessonStatus |> isCancelled
     let position = lesson.StartDate |> getPopoverPosition
     let btns =
-        match lesson.ReservationAvailability with
-        | Reservable Cash ->
+        match lesson.ReservationStatus with
+        | CanBeReserved LessonPayment.Cash ->
             Bulma.button.button [
+                color.isPrimary
                 prop.text "Rezervovat (hotovost)"
+                prop.onClick (fun _ -> ({ LessonId = lesson.Id; Payment = LessonPayment.Cash } : Request.AddReservation) |> AddReservation |> dispatch )
             ]
-        | Reservable Credits -> 
+        | CanBeReserved LessonPayment.Credits -> 
             Bulma.button.button [
+                color.isPrimary
                 prop.text "Rezervovat"
+                prop.onClick (fun _ -> ({ LessonId = lesson.Id; Payment = LessonPayment.Credits } : Request.AddReservation) |> AddReservation |> dispatch )
             ]
-        | AlreadyReserved (tp, true) ->
+        | Reserved (tp, true) ->
             Bulma.button.button [
                 prop.text "Zrušit rezervaci"
             ]
-        | AlreadyReserved (_, false)
+        | Reserved (_, false)
         | Unreservable -> Html.none
     
     Html.div [
@@ -102,7 +108,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
                 position
                 prop.children [
                     Html.div [
-                        prop.className [isCancelled, "cancelled"]
+                        if isCancelled then prop.className "cancelled"
                         prop.children [
                             Html.div [
                                 prop.className "time"
@@ -114,7 +120,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
                                 prop.className "name"
                                 prop.text lesson.Name
                             ]
-                            Html.div [ getTag lesson.Availability ]
+                            Html.div [ getTag lesson.LessonStatus ]
                         ]
                     ]
                     Popover.content [
@@ -130,7 +136,10 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
                             ]
                         ]
                         Html.div lesson.Description
-                        Bulma.buttons [ btns ]
+                        Bulma.buttons [
+                            buttons.isCentered
+                            prop.children btns
+                        ]
                     ]
                 ]
             ]

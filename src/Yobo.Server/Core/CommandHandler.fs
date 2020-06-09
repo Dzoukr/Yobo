@@ -2,6 +2,8 @@ module Yobo.Server.Core.CommandHandler
 
 open System
 open Domain
+open Yobo.Shared.Core.Domain
+open Yobo.Shared.Core.Domain.Queries
 open Yobo.Shared.Errors
 open FSharp.Rop.Result.Operators
 open Yobo.Server.Core.Domain.CmdArgs
@@ -28,6 +30,7 @@ module Projections =
         EndDate : DateTimeOffset
         IsCancelled : bool
         Capacity : int
+        CancellableBeforeStart : TimeSpan
     }
     
     type ExistingWorkshop = {
@@ -44,33 +47,6 @@ let private onlyIfCanBeCancelled (lsn:Projections.ExistingLesson) =
 let private onlyIfCanBeDeleted (lsn:Projections.ExistingLesson) =
     if Yobo.Shared.Core.Domain.canLessonBeDeleted lsn.StartDate then Ok lsn
     else Error DomainError.LessonCannotBeCancelled
-
-let private onlyIfLessonAvailable (lsn:Projections.ExistingLesson) =
-    if lsn.Reservations.Length >= lsn.Capacity then Error DomainError.LessonAlreadyFull
-    else if lsn.IsCancelled then Error DomainError.LessonCannotBeReserved
-    else if lsn.StartDate < DateTimeOffset.UtcNow then Error DomainError.LessonCannotBeReserved
-    else Ok lsn
-
-let private onlyIfUserNotAlreadyReserved userId (lsn:Projections.ExistingLesson) =
-    if lsn.Reservations |> List.exists (fun x -> x.UserId = userId) then
-        Error DomainError.LessonAlreadyReserved
-    else Ok lsn
-    
-let private onlyIfEnoughCredits (user:Projections.ExistingUser) =
-    if user.Credits - 1 < 0 then DomainError.NotEnoughCredits |> Error else Ok user
-
-let private onlyIfNotAfterCreditsExpiration date (user:Projections.ExistingUser) =
-    match user.CreditsExpiration with
-    | None -> Ok user
-    | Some exp ->
-        if date > exp then Error DomainError.CreditsExpiresBeforeLessonStart
-        else Ok user
-
-let private onlyIfNotAlreadyBlocked (user:Projections.ExistingUser) =
-    match user.CashReservationBlockedUntil with
-    | None -> Ok user
-    | Some d ->
-        if d < DateTimeOffset.Now then Ok user else DomainError.CashReservationIsBlocked |> Error
 
 let addCredits (user:Projections.ExistingUser) (args:CmdArgs.AddCredits) =
     user
@@ -148,18 +124,25 @@ let deleteLesson (lesson:Projections.ExistingLesson) (args:CmdArgs.DeleteLesson)
 let deleteWorkshop (workshop:Projections.ExistingWorkshop) (args:CmdArgs.DeleteWorkshop) =
     [ WorkshopDeleted args ] |> Ok
 
+let private tryGetUserReservation (lesson:Projections.ExistingLesson) (user:Projections.ExistingUser) =
+    lesson.Reservations
+    |> List.tryFind (fun x -> x.UserId = user.Id)
+    |> Option.map (fun x -> x.UseCredits |> LessonPayment.fromUseCredits)
+
 let addLessonReservation (lesson:Projections.ExistingLesson,user:Projections.ExistingUser) (args:CmdArgs.AddLessonReservation) =
-    lesson
-    |> onlyIfLessonAvailable
-    >>= onlyIfUserNotAlreadyReserved args.UserId
-    >>= (fun _ -> if args.UseCredits then onlyIfEnoughCredits user else onlyIfNotAlreadyBlocked user)
-    >>= (fun _ -> if args.UseCredits then onlyIfNotAfterCreditsExpiration lesson.StartDate user else Ok user)
-    |>> (fun _ ->
+    let lessonStatus = LessonStatus.getLessonStatus lesson.StartDate lesson.IsCancelled lesson.Capacity lesson.Reservations.Length
+    let userReservation = tryGetUserReservation lesson user
+    let desiredPayment = LessonPayment.fromUseCredits args.UseCredits
+    let reservationStatus = ReservationStatus.getReservationStatus lessonStatus lesson.StartDate lesson.CancellableBeforeStart userReservation user.Credits user.CreditsExpiration user.CashReservationBlockedUntil
+    
+    match reservationStatus with
+    | CanBeReserved payment when payment = desiredPayment ->
         [
             yield LessonReservationAdded args
             if args.UseCredits then
                 yield CreditWithdrawn { UserId = args.UserId; LessonId = lesson.Id }
             else
                 yield CashReservationsBlocked { UserId = args.UserId; Expires = lesson.EndDate; LessonId = lesson.Id }
-        ]
-    )               
+        ] |> Ok
+    | _ -> Error DomainError.LessonCannotBeReserved
+            

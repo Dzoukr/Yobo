@@ -18,7 +18,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | LoadMyLessons -> model, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetMyLessons)) () MyLessonsLoaded
     | MyLessonsLoaded res ->
         match res with
-        | Ok lsn -> { model with Lessons = lsn }, Cmd.none
+        | Ok lsn -> { model with Lessons = lsn |> List.sortBy (fun x -> x.StartDate) }, Cmd.none
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     
     

@@ -182,6 +182,17 @@ let lessonsForm (f:ValidatedForm<Request.CreateLessons>) dispatch =
             ValidationViews.help f.ValidationErrors (nameof(f.FormData.Capacity))
         ]
         Bulma.field.div [
+            Bulma.label "Odhlášení před začátkem (hodin)"
+            Bulma.fieldBody [
+                Bulma.input.number [
+                    ValidationViews.color f.ValidationErrors (nameof(f.FormData.CancellableBeforeStart))
+                    prop.onTextChange (fun x -> { f.FormData with CancellableBeforeStart = float x |> TimeSpan.FromHours } |> LessonsFormChanged |> dispatch)
+                    prop.valueOrDefault (f.FormData.CancellableBeforeStart.TotalHours)
+                ]
+            ]
+            ValidationViews.help f.ValidationErrors (nameof(f.FormData.CancellableBeforeStart))
+        ]
+        Bulma.field.div [
             Bulma.fieldBody [
                 Bulma.button.button [
                     color.isPrimary
@@ -338,7 +349,7 @@ let workshopDiv dispatch (workshop:Queries.Workshop) =
 
 let lessonDiv dispatch (lesson:Queries.Lesson) =
     Html.div [
-        prop.className [true, "lesson"; lesson.IsCancelled, "cancelled"]
+        prop.classes [ "lesson"; if lesson.IsCancelled then "cancelled" ]
         prop.children [
             Html.div [
                 prop.className "time"
@@ -468,6 +479,7 @@ let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
         Bulma.field.div [ Bulma.label "Datum"; Bulma.fieldBody (l.Lesson.StartDate |> DateTimeOffset.toCzDate) ]
         Bulma.field.div [ Bulma.label "Čas"; Bulma.fieldBody (sprintf "%s - %s" (l.Lesson.StartDate |> DateTimeOffset.toCzTime) (l.Lesson.EndDate |> DateTimeOffset.toCzTime)) ]
         Bulma.field.div [ Bulma.label "Kapacita"; Bulma.fieldBody (l.Lesson.Capacity) ]
+        Bulma.field.div [ Bulma.label "Odhlášení před začátkem (hodin)"; Bulma.fieldBody (string l.Lesson.CancellableBeforeStart.TotalHours) ]
         Bulma.field.div [ Bulma.label "Přihlášení"; Bulma.fieldBody reserved ]
         Bulma.field.div [ Bulma.label "Akce"; Bulma.fieldBody actions ]
     ]

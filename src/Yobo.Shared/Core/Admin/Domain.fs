@@ -21,9 +21,10 @@ module Queries =
         EndDate : DateTimeOffset
         Name : string
         Description : string
-        Reservations : (User * Queries.LessonPayment) list
+        Reservations : (User * LessonPayment) list
         IsCancelled : bool
         Capacity : int
+        CancellableBeforeStart : TimeSpan
     }
     
     type Workshop = {

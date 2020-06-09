@@ -27,6 +27,7 @@ module Tables =
         Created : DateTimeOffset
         IsCancelled : bool
         Capacity : int
+        CancellableBeforeStart : TimeSpan
     }
     
     [<RequireQualifiedAccess>]
@@ -56,26 +57,39 @@ module Tables =
     [<RequireQualifiedAccess>]
     module Workshops =
         let name = "Workshops"
+
+let internal getUserById (conn:IDbConnection) (i:Guid) =
+    select {
+        table Tables.Users.name
+        where (eq "Id" i)
+    }
+    |> conn.SelectAsync<Tables.Users>
+    |> Task.map Seq.tryHead
+    |> Task.map (ServerError.ofOption (DatabaseItemNotFound i))
+    |> Task.map (fun x -> { x with Credits = Yobo.Shared.Core.Domain.calculateCredits x.Credits x.CreditsExpiration })
     
 module Updates =
-    let private getUserById (conn:IDbConnection) (i:Guid) =
-        select {
-            table Tables.Users.name
-            where (eq "Id" i)
-        }
-        |> conn.SelectAsync<Tables.Users>
-        |> Task.map Seq.tryHead
-        |> Task.map (ServerError.ofOption (DatabaseItemNotFound i))
-    
     let creditsAdded (conn:IDbConnection) (args:CmdArgs.AddCredits) =
         task {
             let! user = args.UserId |> getUserById conn
-            let userCredits = Yobo.Shared.Core.Domain.calculateCredits user.Credits user.CreditsExpiration
-            let newCredits = userCredits + args.Credits
+            let newCredits = user.Credits + args.Credits
             let! _ =
                 update {
                     table Tables.Users.name
                     set {| Credits = newCredits; CreditsExpiration = args.Expiration |}
+                    where (eq "Id" args.UserId)
+                } |> conn.UpdateAsync
+            return ()
+        }
+    
+    let creditWithdrawn (conn:IDbConnection) (args:CmdArgs.WithdrawCredit) =
+        task {
+            let! user = args.UserId |> getUserById conn
+            let newCredits = user.Credits - 1
+            let! _ =
+                update {
+                    table Tables.Users.name
+                    set {| Credits = newCredits |}
                     where (eq "Id" args.UserId)
                 } |> conn.UpdateAsync
             return ()
@@ -101,6 +115,7 @@ module Updates =
                 Created = DateTimeOffset.UtcNow
                 IsCancelled = false
                 Capacity = args.Capacity
+                CancellableBeforeStart = args.CancellableBeforeStart
             } : Tables.Lessons
         insert {
             table Tables.Lessons.name
@@ -152,12 +167,20 @@ module Updates =
         }
         |> conn.UpdateAsync
         |> Task.ignore        
+    
+    let cashReservationsBlocked (conn:IDbConnection) (args:CmdArgs.BlockCashReservations) =
+        update {
+            table Tables.Users.name
+            set {| CashReservationBlockedUntil = args.Expires |}
+            where (eq "Id" args.UserId)
+        }
+        |> conn.UpdateAsync
+        |> Task.ignore        
 
     let creditRefunded (conn:IDbConnection) (args:CmdArgs.RefundCredit) =
         task {
             let! user = args.UserId |> getUserById conn
-            let userCredits = Yobo.Shared.Core.Domain.calculateCredits user.Credits user.CreditsExpiration
-            let newCredits = userCredits + 1
+            let newCredits = user.Credits + 1
             let! _ =
                 update {
                     table Tables.Users.name
@@ -173,6 +196,14 @@ module Updates =
             where (eq "LessonId" args.LessonId + eq "UserId" args.UserId)
         }
         |> conn.DeleteAsync
+        |> Task.ignore
+    
+    let lessonReservationAdded (conn:IDbConnection) (args:CmdArgs.AddLessonReservation) =
+        insert {
+            table Tables.LessonReservations.name
+            value {| LessonId = args.LessonId; UserId = args.UserId; UseCredits = args.UseCredits; Created = DateTimeOffset.UtcNow |}
+        }
+        |> conn.InsertAsync
         |> Task.ignore
         
     let lessonDeleted (conn:IDbConnection) (args:CmdArgs.DeleteLesson) =
@@ -193,22 +224,18 @@ module Updates =
 
 module Projections =
     let getById (conn:IDbConnection) (i:Guid) =
-        select {
-            table Tables.Users.name
-            where (eq "Id" i)
-        }
-        |> conn.SelectAsync<Tables.Users>
-        |> Task.map (Seq.toList >> List.map (fun x ->
-            {
+        i
+        |> getUserById conn
+        |> Task.map (fun x ->
+            ({
                 Id = x.Id
                 IsActivated = x.Activated.IsSome
                 Credits = x.Credits
                 CreditsExpiration = x.CreditsExpiration
                 CashReservationBlockedUntil = x.CashReservationBlockedUntil
-            } : CommandHandler.Projections.ExistingUser    
-        ))
-        |> Task.map (List.tryHead >> ServerError.ofOption (DatabaseItemNotFound i))
-    
+            } : CommandHandler.Projections.ExistingUser)    
+        )
+        
     let getWorkshopById (conn:IDbConnection) (i:Guid) =
         select {
             table Tables.Workshops.name
@@ -241,6 +268,7 @@ module Projections =
             IsCancelled = lsn.IsCancelled
             Reservations = res
             Capacity = lsn.Capacity
+            CancellableBeforeStart = lsn.CancellableBeforeStart
         } : CommandHandler.Projections.ExistingLesson
     
     let getLessonById (conn:IDbConnection) (i:Guid) =

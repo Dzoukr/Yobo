@@ -18,5 +18,11 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
         match res with
         | Ok lsns -> { model with Lessons = lsns }, Cmd.none
         | Error e -> model, e |> ServerResponseViews.showErrorToast
+    | AddReservation res -> model, Cmd.OfAsync.eitherAsResult (onReservationsService (fun x -> x.AddReservation)) res ReservationAdded
+    | ReservationAdded res ->
+        match res with
+        | Ok _ -> model, [ Cmd.ofMsg LoadLessons; (ServerResponseViews.showSuccessToast "Lekce úspěšně zarezervována") ] |> Cmd.batch
+        | Error e ->
+            model, e |> ServerResponseViews.showErrorToast
             
         

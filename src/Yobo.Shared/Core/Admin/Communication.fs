@@ -36,6 +36,7 @@ module Request =
         Name : string
         Description : string
         Capacity : int
+        CancellableBeforeStart : TimeSpan
     }
     
     module CreateLessons =
@@ -46,6 +47,7 @@ module Request =
             Name = ""
             Description = ""
             Capacity = 0
+            CancellableBeforeStart = TimeSpan.FromHours 3.
         }
         
     type CreateWorkshops = {

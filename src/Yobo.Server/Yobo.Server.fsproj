@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <AzureFunctionsVersion>v3</AzureFunctionsVersion>
     <LangVersion>preview</LangVersion>
+    <_FunctionsSkipCleanOutput>true</_FunctionsSkipCleanOutput>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="..\..\paket-files\Dzoukr\FSharp.Rop\FSharp.Rop.Result.fs">

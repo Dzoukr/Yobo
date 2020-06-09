@@ -8,7 +8,7 @@ open Yobo.Client.Router
 open Feliz.Router
 
 module Queries =
-    open Yobo.Shared.Core.Domain.Queries
+    open Yobo.Shared.Core.Domain
     let paymentToText = function
         | LessonPayment.Credits -> "Kredity"
         | LessonPayment.Cash -> "Hotově"

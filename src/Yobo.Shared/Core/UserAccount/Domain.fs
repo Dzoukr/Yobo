@@ -21,5 +21,5 @@ module Queries =
         EndDate : DateTimeOffset
         Name : string
         Description : string
-        Payment : Queries.LessonPayment
+        Payment : LessonPayment
     }

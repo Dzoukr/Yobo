@@ -5,6 +5,7 @@ open System.Data
 open FSharp.Control.Tasks.V2
 open Dapper.FSharp
 open Dapper.FSharp.MSSQL
+open Yobo.Libraries.Tasks
 open Yobo.Server.Core.Database
 open Yobo.Shared.Core.Domain
 
@@ -12,30 +13,20 @@ module Queries =
     open Yobo.Server.Auth.Database
     open Yobo.Shared.Core.UserAccount.Domain
     
-    let tryGetUserById (conn:IDbConnection) (id:Guid) =
-        task {
-            let! res =
-                select {
-                    table Tables.Users.name
-                    where (eq "Id" id)
-                }
-                |> conn.SelectAsync<Tables.Users>
-            return
-                res
-                |> Seq.tryHead
-                |> Option.map (fun x ->
-                    {
-                        Id = x.Id
-                        Email = x.Email
-                        FirstName = x.FirstName
-                        LastName = x.LastName
-                        IsActivated = x.Activated.IsSome
-                        Credits = x.Credits
-                        CreditsExpiration = x.CreditsExpiration
-                        IsAdmin = false
-                    } : Queries.UserAccount
-                )
-        }
+    let getUserById (conn:IDbConnection) (id:Guid) =
+        id
+        |> getUserById conn
+        |> Task.map (fun x ->
+            {
+                Id = x.Id
+                Email = x.Email
+                FirstName = x.FirstName
+                LastName = x.LastName
+                IsActivated = x.Activated.IsSome
+                Credits = x.Credits
+                CreditsExpiration = x.CreditsExpiration
+                IsAdmin = false
+            } : Queries.UserAccount)
         
     let getLessonsForUserId (conn:IDbConnection) (userId:Guid) =
         task {
@@ -56,7 +47,7 @@ module Queries =
                         EndDate = lsn.EndDate
                         Name = lsn.Name
                         Description = lsn.Description
-                        Payment = Queries.LessonPayment.fromUseCredits gr.UseCredits
+                        Payment = LessonPayment.fromUseCredits gr.UseCredits
                     } : Queries.Lesson
                 )
         }

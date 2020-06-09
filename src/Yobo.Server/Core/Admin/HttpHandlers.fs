@@ -45,6 +45,7 @@ let private createLessons (root:AdminRoot) (r:Request.CreateLessons) =
                     Name = r.Name
                     Description = r.Description
                     Capacity = r.Capacity
+                    CancellableBeforeStart = r.CancellableBeforeStart
                 }
             do! root.CommandHandler.CreateLesson args                
         return ()            

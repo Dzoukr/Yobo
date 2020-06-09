@@ -13,6 +13,6 @@ module Queries =
         EndDate : DateTimeOffset
         Name : string
         Description : string
-        Availability : LessonAvailability
-        ReservationAvailability : ReservationAvailability
+        LessonStatus : LessonStatus
+        ReservationStatus : ReservationStatus
     }

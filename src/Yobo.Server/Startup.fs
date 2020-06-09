@@ -144,15 +144,14 @@ module CompositionRoot =
             UserAccount = {
                 Queries =
                     {
-                        TryGetUserInfo = (fun i ->
-                            if i = adminUser.Id then adminUser |> Some |> Task.FromResult
-                            else sql Core.UserAccount.Database.Queries.tryGetUserById i
+                        GetUserInfo = (fun i ->
+                            if i = adminUser.Id then adminUser |> Task.FromResult
+                            else sql Core.UserAccount.Database.Queries.getUserById i
                         )
                         GetUserLessons = sql Core.UserAccount.Database.Queries.getLessonsForUserId
                     }    
             }
             Admin =
-                
                 let toExn = Result.mapError ServerError.Domain >> ServerError.ofResult
                 
                 let handleEvents conn evns = task {
@@ -195,10 +194,25 @@ module CompositionRoot =
                         }
                     }
             }
-            Reservations = {
-                Queries = {
-                    GetLessons = sql Core.Reservations.Database.Queries.getLessons
+            Reservations =
+                let toExn = Result.mapError ServerError.Domain >> ServerError.ofResult
+                
+                let handleEvents conn evns = task {
+                    for e in evns do
+                        do! Core.DbEventHandler.handle conn e
                 }
+                
+                {
+                    Queries = {
+                        GetLessons = sql Core.Reservations.Database.Queries.getLessons
+                    }
+                    CommandHandler = {
+                        AddReservation = fun args -> task {
+                            let! user = sql Core.Database.Projections.getById args.UserId
+                            let! lesson = sql Core.Database.Projections.getLessonById args.LessonId
+                            return! args |> Core.CommandHandler.addLessonReservation (lesson, user) |> toExn |> sql handleEvents
+                        }
+                    }
             }                
         } : CompositionRoot
 

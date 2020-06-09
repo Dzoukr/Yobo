@@ -8,29 +8,7 @@ open Yobo.Client.Forms
 open Yobo.Client.Interfaces
 open Yobo.Shared.Core.Domain.Queries
 open Yobo.Shared.Core.UserAccount.Domain.Queries
-
-type SharedLesson = {
-    Id : Guid
-    StartDate : DateTimeOffset
-    EndDate : DateTimeOffset
-    Name : string
-    Description : string
-    Payment : LessonPayment
-    IsOnline : bool
-}
-
-module SharedLesson =
-    let fromLesson (l:Lesson) =
-        {
-            Id = l.Id
-            StartDate = l.StartDate
-            EndDate = l.EndDate
-            Name = l.Name
-            Description = l.Description
-            Payment = l.Payment
-            IsOnline = false
-        }
-   
+  
 
 type Model =
     {
@@ -46,11 +24,7 @@ module Model =
             LoggedUser = user
             Lessons = []
         }
-        
-    let sharedLessons (m:Model) =
-        (m.Lessons |> List.map SharedLesson.fromLesson)
-        |> List.sortBy (fun x -> x.StartDate)
-
+    
 type Msg =
     | Init
     | LoadMyLessons

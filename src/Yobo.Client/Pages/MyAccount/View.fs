@@ -20,7 +20,7 @@ let view (model:Model) (dispatch:Msg -> unit) =
         else "Na účtu nemáte žádné kredity."
     
     let lessonRows =
-        match model |> Model.sharedLessons with
+        match model.Lessons with
         | [] -> [ Html.tr [ prop.colSpan 5; prop.children [ Html.td "Nemáte zarezervovány žádné lekce" ] ] ]
         | rows ->
             rows

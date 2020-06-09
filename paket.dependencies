@@ -29,7 +29,7 @@ nuget System.IdentityModel.Tokens.Jwt
 
 // server
 nuget Microsoft.Azure.Functions.Extensions
-nuget Microsoft.NET.Sdk.Functions = 3.0.3
+nuget Microsoft.NET.Sdk.Functions
 nuget Giraffe
 nuget Fable.Remoting.Giraffe
 github Dzoukr/FSharp.Rop FSharp.Rop.Result.fs

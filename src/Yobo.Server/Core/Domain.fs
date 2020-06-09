@@ -22,6 +22,7 @@ module CmdArgs =
         Name : string
         Description : string
         Capacity : int
+        CancellableBeforeStart : TimeSpan
     }
     
     type CreateWorkshop = {

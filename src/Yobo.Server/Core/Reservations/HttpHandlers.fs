@@ -6,6 +6,7 @@ open Yobo.Server
 open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open FSharp.Control.Tasks
+open Yobo.Shared.Core.Domain
 open Yobo.Shared.Errors
 open Yobo.Shared.Core.Admin.Communication
 open Yobo.Shared.Core.Admin.Validation
@@ -21,9 +22,21 @@ let private offsetToDateRange (offset:int) =
         else offset
     safeOffset |> DateRange.getDateRangeForWeekOffset        
 
+let private addReservation (root:ReservationsRoot) userId (r:Request.AddReservation) =
+    task {
+        let args : CmdArgs.AddLessonReservation =
+            {
+                UserId = userId
+                LessonId = r.LessonId
+                UseCredits = r.Payment |> LessonPayment.toUseCredits
+            }
+        return! root.CommandHandler.AddReservation args            
+    }
+
 let private reservationsService (root:CompositionRoot) userId : ReservationsService =
     {
         GetLessons = offsetToDateRange >> root.Reservations.Queries.GetLessons userId >> Async.AwaitTask
+        AddReservation = addReservation root.Reservations userId >> Async.AwaitTask
     }
 
 let reservationsServiceHandler (root:CompositionRoot) : HttpHandler =

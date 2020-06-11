@@ -145,4 +145,18 @@ let addLessonReservation (lesson:Projections.ExistingLesson,user:Projections.Exi
                 yield CashReservationsBlocked { UserId = args.UserId; Expires = lesson.EndDate; LessonId = lesson.Id }
         ] |> Ok
     | _ -> Error DomainError.LessonCannotBeReserved
-            
+
+let cancelLessonReservation (lesson:Projections.ExistingLesson,user:Projections.ExistingUser) (args:CmdArgs.CancelLessonReservation) =
+    let lessonStatus = LessonStatus.getLessonStatus lesson.StartDate lesson.IsCancelled lesson.Capacity lesson.Reservations.Length
+    let userReservation = tryGetUserReservation lesson user
+    let reservationStatus = ReservationStatus.getReservationStatus lessonStatus lesson.StartDate lesson.CancellableBeforeStart userReservation user.Credits user.CreditsExpiration user.CashReservationBlockedUntil
+    
+    match reservationStatus with
+    | Reserved(p,true) ->
+        [
+            LessonReservationCancelled args
+            match p with
+            | Credits -> CreditRefunded { UserId = args.UserId }
+            | Cash -> CashReservationsUnblocked { UserId = args.UserId }
+        ] |> Ok
+    | _ -> Error DomainError.LessonCannotBeReserved            

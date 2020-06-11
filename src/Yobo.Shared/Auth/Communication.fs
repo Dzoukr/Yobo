@@ -56,6 +56,7 @@ type AuthService = {
     ActivateAccount : Guid -> Async<unit>
     ForgottenPassword : Request.ForgottenPassword -> Async<unit>
     ResetPassword : Request.ResetPassword -> Async<unit>
+    ResendActivation : Guid -> Async<unit>
 }
 with
     static member RouteBuilder _ m = sprintf "/api/auth/%s" m

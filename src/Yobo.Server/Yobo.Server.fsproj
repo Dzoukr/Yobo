@@ -29,6 +29,7 @@
     <Compile Include="Auth\Domain.fs" />
     <Compile Include="Auth\CommandHandler.fs" />
     <Compile Include="Auth\Database.fs" />
+    <Compile Include="Auth\MailChimpEventHandler.fs" />
     <Compile Include="Auth\EmailEventHandler.fs" />
     <Compile Include="Auth\DbEventHandler.fs" />
     <Compile Include="Core\Domain.fs" />

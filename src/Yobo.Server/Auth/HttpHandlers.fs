@@ -79,6 +79,16 @@ let private resetPassword (authRoot:AuthRoot) (r:Request.ResetPassword) =
             }
         return! authRoot.CommandHandler.ResetPassword args            
     }
+    
+let private resendActivation (authRoot:AuthRoot) id =
+    task {
+        let args : CmdArgs.RegenerateActivationKey =
+            {
+                Id = id
+                ActivationKey = Guid.NewGuid()
+            }
+        return! authRoot.CommandHandler.RegenerateActivationKey args            
+    }    
 
 let private authService (root:AuthRoot) : AuthService =
     {
@@ -88,6 +98,7 @@ let private authService (root:AuthRoot) : AuthService =
         ActivateAccount = (activateAccount root) >> Async.AwaitTask
         ForgottenPassword = ServerError.validate validateForgottenPassword >> (forgottenPassword root) >> Async.AwaitTask
         ResetPassword = ServerError.validate validateResetPassword >> (resetPassword root) >> Async.AwaitTask
+        ResendActivation = resendActivation root >> Async.AwaitTask
     }
 
 let authServiceHandler (root:CompositionRoot) : HttpHandler =

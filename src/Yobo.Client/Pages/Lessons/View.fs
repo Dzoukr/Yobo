@@ -374,8 +374,8 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
 
 let col (lessons:Queries.Lesson list) (workshops:Queries.Workshop list) (date:DateTimeOffset) dispatch =
     Html.td [
-        Html.div (workshops |> List.map (workshopDiv dispatch))
         Html.div (lessons |> List.map (lessonDiv dispatch))
+        Html.div (workshops |> List.map (workshopDiv dispatch))
     ]
 
 let row model dispatch dates =

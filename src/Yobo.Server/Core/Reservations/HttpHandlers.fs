@@ -7,12 +7,8 @@ open Fable.Remoting.Server
 open Fable.Remoting.Giraffe
 open FSharp.Control.Tasks
 open Yobo.Shared.Core.Domain
-open Yobo.Shared.Errors
 open Yobo.Shared.Core.Admin.Communication
-open Yobo.Shared.Core.Admin.Validation
-open Yobo.Shared.Core.Admin.Domain
 open Yobo.Server.Core.Domain
-open Yobo.Libraries.DateTime
 open Yobo.Shared.Core.Reservations.Communication
 open Yobo.Shared.DateTime
 
@@ -33,10 +29,22 @@ let private addReservation (root:ReservationsRoot) userId (r:Request.AddReservat
         return! root.CommandHandler.AddReservation args            
     }
 
+let private cancelReservation (root:ReservationsRoot) userId (lessonId:Guid) =
+    task {
+        let args : CmdArgs.CancelLessonReservation =
+            {
+                UserId = userId
+                LessonId = lessonId
+            }
+        return! root.CommandHandler.CancelReservation args
+    }
+
 let private reservationsService (root:CompositionRoot) userId : ReservationsService =
     {
         GetLessons = offsetToDateRange >> root.Reservations.Queries.GetLessons userId >> Async.AwaitTask
+        GetWorkshops = offsetToDateRange >> root.Reservations.Queries.GetWorkshops >> Async.AwaitTask
         AddReservation = addReservation root.Reservations userId >> Async.AwaitTask
+        CancelReservation = cancelReservation root.Reservations userId >> Async.AwaitTask
     }
 
 let reservationsServiceHandler (root:CompositionRoot) : HttpHandler =

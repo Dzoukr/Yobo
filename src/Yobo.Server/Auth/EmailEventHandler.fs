@@ -31,5 +31,15 @@ let handle
                 do! {| To = tos; Subject = subject; Message = message |} |> sendEmail
                 return ()
             | None -> return ()
+        | ActivationKeyRegenerated args ->
+            match! args.Id |> tryGetUserById with
+            | Some user ->
+                let name = sprintf "%s %s" user.FirstName user.LastName
+                let tos = { Email = user.Email; Name = name }
+                let subject = "Registrace Mindful Yoga"
+                let message = args.ActivationKey |> templateBuilder.RegisterEmailMessage
+                do! {| To = tos; Subject = subject; Message = message |} |> sendEmail
+                return ()
+            | None -> return ()
         | _ -> return ()
     }

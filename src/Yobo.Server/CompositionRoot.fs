@@ -16,6 +16,7 @@ type AuthCommandHandler = {
     ActivateAccount : Auth.Domain.CmdArgs.Activate -> Task<unit>
     ForgottenPassword : Auth.Domain.CmdArgs.InitiatePasswordReset -> Task<unit>
     ResetPassword : Auth.Domain.CmdArgs.CompleteResetPassword -> Task<unit>
+    RegenerateActivationKey : Auth.Domain.CmdArgs.RegenerateActivationKey -> Task<unit>
 }
 
 type AuthRoot = {
@@ -60,11 +61,12 @@ type AdminRoot = {
 
 type ReservationsCommandHandler = {
     AddReservation : Core.Domain.CmdArgs.AddLessonReservation -> Task<unit>
+    CancelReservation : Core.Domain.CmdArgs.CancelLessonReservation -> Task<unit>
 }
 
 type ReservationsQueries = {
     GetLessons : Guid -> DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Lesson list>
-    //GetWorkshops : int -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Workshop list>
+    GetWorkshops : DateTimeOffset * DateTimeOffset -> Task<Yobo.Shared.Core.Reservations.Domain.Queries.Workshop list>
 }
 
 type ReservationsRoot = {

@@ -23,6 +23,7 @@ type DomainError =
     | LessonCannotBeCancelled
     | LessonCannotBeDeleted
     | LessonCannotBeReserved
+    | LessonReservationCannotBeCancelled
 
 module DomainError =
     let explain = function
@@ -30,6 +31,7 @@ module DomainError =
         | LessonCannotBeCancelled -> "Lekci nelze zrušit."
         | LessonCannotBeDeleted -> "Lekci nelze smazat."
         | LessonCannotBeReserved -> "Lekci nelze zarezervovat."
+        | LessonReservationCannotBeCancelled -> "Rezervaci na lekci nelze již zrušit."
 
 type ServerError =
     | Exception of string

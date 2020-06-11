@@ -63,24 +63,24 @@ module Queries =
                 )
         }
         
-//    let getWorkshops (conn:IDbConnection) (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
-//        task {
-//            let! res =
-//                select {
-//                    table Tables.Workshops.name
-//                    where (ge "Workshops.StartDate" dFrom + le "Workshops.StartDate" dTo)
-//                }
-//                |> conn.SelectAsync<Tables.Workshops>
-//            return
-//                res
-//                |> List.ofSeq
-//                |> List.map (fun x ->
-//                    {
-//                        Id = x.Id
-//                        StartDate = x.StartDate
-//                        EndDate = x.EndDate
-//                        Name = x.Name
-//                        Description = x.Description
-//                    } : Queries.Workshop
-//                )
-//        }         
+    let getWorkshops (conn:IDbConnection) (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
+        task {
+            let! res =
+                select {
+                    table Tables.Workshops.name
+                    where (ge "Workshops.StartDate" dFrom + le "Workshops.StartDate" dTo)
+                }
+                |> conn.SelectAsync<Tables.Workshops>
+            return
+                res
+                |> List.ofSeq
+                |> List.map (fun x ->
+                    {
+                        Id = x.Id
+                        StartDate = x.StartDate
+                        EndDate = x.EndDate
+                        Name = x.Name
+                        Description = x.Description
+                    } : Queries.Workshop
+                )
+        }         

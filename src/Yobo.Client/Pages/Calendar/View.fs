@@ -97,6 +97,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
         | Reserved (tp, true) ->
             Bulma.button.button [
                 prop.text "Zrušit rezervaci"
+                prop.onClick (fun _ -> lesson.Id |> CancelReservation |> dispatch )
             ]
         | Reserved (_, false)
         | Unreservable -> Html.none
@@ -146,10 +147,51 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
         ]
     ]
     
-let col (lessons:Queries.Lesson list) (*workshops:Queries.Workshop list*) (date:DateTimeOffset) dispatch =
+let workshopDiv dispatch (workshop:Queries.Workshop) =
+    let position = workshop.StartDate |> getPopoverPosition
+    Html.div [
+        prop.className "workshop"
+        prop.children [
+            Popover.popover [
+                position
+                prop.children [
+                    Html.div [
+                        prop.children [
+                            Html.div [
+                                prop.className "time"
+                                prop.children [
+                                    Html.text (sprintf "%s - %s" (workshop.StartDate |> DateTimeOffset.toCzTime) (workshop.EndDate |> DateTimeOffset.toCzTime))
+                                ]
+                            ]
+                            Html.div [
+                                prop.className "name"
+                                prop.text workshop.Name
+                            ]
+                        ]
+                    ]
+                    Popover.content [
+                        Html.div [
+                            prop.className "name"
+                            prop.text workshop.Name
+                        ]
+                        Html.div [
+                            prop.className "time"
+                            prop.children [
+                                Html.faIcon "far fa-clock"
+                                Html.text (sprintf "%s od %s do %s" (workshop.StartDate |> DateTimeOffset.toCzDate) (workshop.StartDate |> DateTimeOffset.toCzTime) (workshop.EndDate |> DateTimeOffset.toCzTime))
+                            ]
+                        ]
+                        Html.div workshop.Description
+                    ]
+                ]
+            ]
+        ]
+    ]
+
+let col (lessons:Queries.Lesson list) (workshops:Queries.Workshop list) dispatch =
     Html.td [
-        // Html.div (workshops |> List.map (workshopDiv dispatch))
         Html.div (lessons |> List.map (lessonDiv dispatch))
+        Html.div (workshops |> List.map (workshopDiv dispatch))
     ]
 
 let row model dispatch dates =
@@ -157,15 +199,15 @@ let row model dispatch dates =
         model.Lessons
         |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
-//    let getWorkshopsForDate (date:DateTimeOffset) =
-//        model.Workshops
-//        |> List.filter (fun x -> x.StartDate.Date = date.Date)
+    let getWorkshopsForDate (date:DateTimeOffset) =
+        model.Workshops
+        |> List.filter (fun x -> x.StartDate.Date = date.Date)
 
     dates
     |> List.map (fun date ->
         let lsns = date |> getLessonsForDate
-        //let wrksps = date |> getWorkshopsForDate
-        col lsns date dispatch
+        let wrksps = date |> getWorkshopsForDate
+        col lsns wrksps dispatch
     )
     |> (fun x ->
         Html.tr [

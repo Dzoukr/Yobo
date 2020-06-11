@@ -85,6 +85,28 @@ module Updates =
                 } |> conn.UpdateAsync
             return ()
         }
+    
+    let activationKeyRegenerated (conn:IDbConnection) (args:CmdArgs.RegenerateActivationKey) =
+        task {
+            let! _ =
+                update {
+                    table Tables.Users.name
+                    set {| ActivationKey = args.ActivationKey |}
+                    where (eq "Id" args.Id)
+                } |> conn.UpdateAsync
+            return ()
+        }
+
+    let subscribedToNewsletters (conn:IDbConnection) (args:CmdArgs.SubscribeToNewsletters) =
+        task {
+            let! _ =
+                update {
+                    table Tables.Users.name
+                    set {| Newsletters = true |}
+                    where (eq "Id" args.Id)
+                } |> conn.UpdateAsync
+            return ()
+        }
 
 module Queries =
     

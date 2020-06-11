@@ -10,6 +10,7 @@ open Microsoft.Azure.WebJobs.Host.Config
 open Microsoft.Azure.WebJobs.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
+open Serilog
 open Yobo.Libraries.Authentication
 open FSharp.Control.Tasks
 open Microsoft.Data.SqlClient
@@ -44,6 +45,16 @@ module CompositionRoot =
     let compose (cfg:IConfigurationRoot) =
         Dapper.FSharp.OptionTypes.register()
         
+        let mailchimp = MailChimp.Net.MailChimpManager(cfg.["MailChimpApiKey"])
+        
+        let logger =
+            LoggerConfiguration()
+                .WriteTo.MSSqlServer(
+                    connectionString = cfg.["ReadDbConnectionString"],
+                    tableName = "EventLogs"
+                )
+                .CreateLogger()
+        
         let sql fn =
             let conn = new SqlConnection(cfg.["ReadDbConnectionString"])
             fn conn
@@ -77,10 +88,17 @@ module CompositionRoot =
                 IsActivated = true
                 Credits = 0
                 CreditsExpiration = None
-                //CashReservationBlockedUntil = None
             } : Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount
         
         let adminPwd = cfg.["AdminPassword"] |> createPwdHash       
+        
+        let toExn = Result.mapError ServerError.Domain >> ServerError.ofResult
+        
+        let handleEvents conn evns = task {
+            for e in evns do
+                evns |> List.iter (Yobo.Libraries.Serialization.Serializer.serialize >> logger.Information)
+                do! Core.DbEventHandler.handle conn e
+        }
         
         {
             Auth =
@@ -108,8 +126,10 @@ module CompositionRoot =
                 
                 let handleEvents conn evns = task {
                     for e in evns do
+                        evns |> List.iter (Yobo.Libraries.Serialization.Serializer.serialize >> logger.Information)
                         do! Auth.DbEventHandler.handle conn e
                         do! Auth.EmailEventHandler.handle sendEmail emailBuilder queries.TryGetUserById e
+                        do! Auth.MailChimpEventHandler.handle mailchimp queries.TryGetUserById e
                 }
                 
                 {
@@ -139,6 +159,10 @@ module CompositionRoot =
                                 |> toExn
                                 |> sql handleEvents
                         }
+                        RegenerateActivationKey = fun args -> task {
+                            let! projections = sql Auth.Database.Projections.getAll
+                            return! args |> Auth.CommandHandler.regenerateActivationKey projections |> toExn |> sql handleEvents
+                        }
                     }
                 }
             UserAccount = {
@@ -152,13 +176,6 @@ module CompositionRoot =
                     }    
             }
             Admin =
-                let toExn = Result.mapError ServerError.Domain >> ServerError.ofResult
-                
-                let handleEvents conn evns = task {
-                    for e in evns do
-                        do! Core.DbEventHandler.handle conn e
-                }
-                
                 {
                     Queries = {
                         GetAllUsers = sql Core.Admin.Database.Queries.getAllUsers
@@ -195,22 +212,21 @@ module CompositionRoot =
                     }
             }
             Reservations =
-                let toExn = Result.mapError ServerError.Domain >> ServerError.ofResult
-                
-                let handleEvents conn evns = task {
-                    for e in evns do
-                        do! Core.DbEventHandler.handle conn e
-                }
-                
                 {
                     Queries = {
                         GetLessons = sql Core.Reservations.Database.Queries.getLessons
+                        GetWorkshops = sql Core.Reservations.Database.Queries.getWorkshops
                     }
                     CommandHandler = {
                         AddReservation = fun args -> task {
                             let! user = sql Core.Database.Projections.getById args.UserId
                             let! lesson = sql Core.Database.Projections.getLessonById args.LessonId
                             return! args |> Core.CommandHandler.addLessonReservation (lesson, user) |> toExn |> sql handleEvents
+                        }
+                        CancelReservation = fun args -> task {
+                            let! user = sql Core.Database.Projections.getById args.UserId
+                            let! lesson = sql Core.Database.Projections.getLessonById args.LessonId
+                            return! args |> Core.CommandHandler.cancelLessonReservation (lesson, user) |> toExn |> sql handleEvents
                         }
                     }
             }                

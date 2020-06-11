@@ -12,4 +12,6 @@ let handle (conn:SqlConnection) (e:Event) =
         | Activated args -> do! args |> Database.Updates.activated conn
         | PasswordResetInitiated args -> do! args |> Database.Updates.passwordResetInitiated conn
         | PasswordResetComplete args -> do! args |> Database.Updates.passwordResetComplete conn
+        | ActivationKeyRegenerated args -> do! args |> Database.Updates.activationKeyRegenerated conn
+        | SubscribedToNewsletters args -> do! args |> Database.Updates.subscribedToNewsletters conn
     }

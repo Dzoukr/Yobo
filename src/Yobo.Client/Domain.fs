@@ -1,5 +1,6 @@
 ﻿module Yobo.Client.Domain
 
+open System
 open Yobo.Shared.Errors
 open Router
 
@@ -11,6 +12,7 @@ type Model = {
     SubPageModel : obj
     IsCheckingUser : bool
     CurrentPage : CurrentPage
+    ShowTerms : bool
 }
 
 module Model =
@@ -26,8 +28,12 @@ type Msg =
     | RefreshToken of string
     | TokenRefreshed of ServerResult<string>
     | LoggedOut
+    | ResendActivation of Guid
+    | ActivationResent of ServerResult<unit>
     // navigation
     | UrlChanged of Page
+    // global
+    | ShowTerms of bool
     // sub pages
     | LoginMsg of Pages.Login.Domain.Msg
     | RegistrationMsg of Pages.Registration.Domain.Msg

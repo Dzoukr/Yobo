@@ -16,3 +16,11 @@ module Queries =
         LessonStatus : LessonStatus
         ReservationStatus : ReservationStatus
     }
+    
+    type Workshop = {
+        Id : Guid
+        StartDate : DateTimeOffset
+        EndDate : DateTimeOffset
+        Name : string
+        Description : string
+    }

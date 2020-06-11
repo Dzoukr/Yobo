@@ -9,7 +9,7 @@ open Yobo.Client.Router
 open Domain
 open Yobo.Client.Interfaces
 open Fable.Core.JsInterop
-open Feliz.Bulma.Calendar
+open Yobo.Shared.Tuples
 
 module CurrentPage =
     let getInitSubPageModel = function
@@ -33,6 +33,7 @@ module Model =
         CurrentPage = CurrentPage.init
         SubPageModel = CurrentPage.init |> CurrentPage.getInitSubPageModel
         IsCheckingUser = false
+        ShowTerms = false
     }
     
     let navigateToAnonymous (p:AnonymousPage) (m:Model) =
@@ -120,10 +121,26 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     | AccountActivationMsg subMsg -> model |> handleUpdate (Pages.AccountActivation.State.update subMsg) AccountActivationMsg
     | ForgottenPasswordMsg subMsg -> model |> handleUpdate (Pages.ForgottenPassword.State.update subMsg) ForgottenPasswordMsg
     | ResetPasswordMsg subMsg -> model |> handleUpdate (Pages.ResetPassword.State.update subMsg) ResetPasswordMsg
+    | ResendActivation i -> model, Cmd.OfAsync.eitherAsResult authService.ResendActivation i ActivationResent
+    | ActivationResent _ ->
+        model, [
+            SharedView.ServerResponseViews.showSuccessToast "Nyní se podívejte do vaší emailové schránky"
+            Cmd.ofMsg LoggedOut
+        ] |> Cmd.batch
     | MyAccountMsg subMsg -> model |> handleUpdate (Pages.MyAccount.State.update subMsg) MyAccountMsg
     | UsersMsg subMsg -> model |> handleUpdate (Pages.Users.State.update subMsg) UsersMsg
     | LessonsMsg subMsg -> model |> handleUpdate (Pages.Lessons.State.update subMsg) LessonsMsg
-    | CalendarMsg subMsg -> model |> handleUpdate (Pages.Calendar.State.update subMsg) CalendarMsg
+    | CalendarMsg subMsg ->
+        let injectCmds =
+            match subMsg with
+            | Pages.Calendar.Domain.Msg.ReservationAdded _
+            | Pages.Calendar.Domain.Msg.ReservationCancelled _ -> [ RefreshUser ]
+            | _ -> []
+            |> List.map Cmd.ofMsg
+        model
+        |> handleUpdate (Pages.Calendar.State.update subMsg) CalendarMsg
+        |> mapSnd (List.singleton >> List.append injectCmds >> Cmd.batch)
+    | ShowTerms show -> { model with ShowTerms = show }, Cmd.none        
 
 let subscribe (_:Model) =
     let sub dispatch = 

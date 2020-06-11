@@ -11,8 +11,7 @@ open Feliz.Bulma.PageLoader
 open Feliz.Router
 open Yobo.Client.SharedView
 
-let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) (page:SecuredPage) dispatch (content:ReactElement)  =
-    
+let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) (page:SecuredPage) showTerms dispatch (content:ReactElement)  =
     
     let item (pg:SecuredPage) (icon:string) (text:string) =
         let isActive = page = pg
@@ -74,26 +73,49 @@ let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.
                     content
                 ]
                 Bulma.container [
-                    
+                    Html.a [
+                        prop.className "terms-link"
+                        prop.text "Obchodní podmínky"
+                        prop.onClick (fun _ -> ShowTerms(true) |> dispatch)
+                    ]
+                    SharedView.StaticTextViews.showTermsModal showTerms (fun _ -> ShowTerms(false) |> dispatch)
                 ]
             ]
         ]
-        
-//        main [ Style [ PaddingTop "2rem" ] ] [
-//            Container.container [ ] [
-//                content
-//            ]
-//            Container.container [ ] [
-//                a [ ClassName "terms-link"; OnClick (fun _ -> ToggleTermsView |> dispatch) ] [str "Obchodní podmínky"]
-//                SharedView.termsModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
-//            ]
-//        ]
     ]
     
-
 let showView<'model,'msg> (fn:'model -> ('msg -> unit) -> Fable.React.ReactElement) (dispatch:'msg -> unit) (m:Model) =
     let pm = m |> Model.getPageModel<'model>
     fn pm dispatch
+
+let notActivatedView (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) dispatch =
+    let inMain (content:ReactElement) =
+        Html.main [
+            prop.style [ style.paddingTop(length.rem 2) ]
+            prop.children [
+                Bulma.container [
+                    content
+                ]
+            ]
+        ]
+    
+    Html.div [
+        Html.p "Váš účet ještě není aktivován."
+        Html.p "Podívejte se do své emailové schránky (zkontrolujte SPAM složku), kde byste měli najít odkaz na aktivaci."
+        Html.p "Pokud nemůžete kód najít, klikněte na tlačítko níže a my vám pošleme nový."
+        Html.div [
+            prop.style [ style.paddingTop(length.rem 2) ]
+            prop.children [
+                Bulma.button.button [
+                    color.isPrimary
+                    prop.text "Poslat nový kód na email"
+                    prop.onClick (fun _ -> user.Id |> ResendActivation |> dispatch)
+                ]
+            ]
+        ]
+    ]
+    |> BoxedViews.showError
+    |> inMain
     
 let view (model:Model) (dispatch:Msg -> unit) =
     let render =
@@ -111,17 +133,19 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 match pg with
                 | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
                 | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
-                | (AccountActivation _) -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
+                | AccountActivation _ -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
                 | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
-                | (ResetPassword _) -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
+                | ResetPassword _ -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
             | Secured (pg, user) ->
-                match pg with
-                | Calendar -> model |> showView Pages.Calendar.View.view (CalendarMsg >> dispatch)
-                | Users -> model |> showView Pages.Users.View.view (UsersMsg >> dispatch)
-                | Lessons -> model |> showView Pages.Lessons.View.view (LessonsMsg >> dispatch)
-                | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)
-                    
-                |> displayLoggedPage user pg dispatch
+                if not user.IsActivated then notActivatedView user dispatch
+                else
+                    match pg with
+                    | Calendar -> model |> showView Pages.Calendar.View.view (CalendarMsg >> dispatch)
+                    | Users -> model |> showView Pages.Users.View.view (UsersMsg >> dispatch)
+                    | Lessons -> model |> showView Pages.Lessons.View.view (LessonsMsg >> dispatch)
+                    | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)
+                        
+                    |> displayLoggedPage user pg model.ShowTerms dispatch
             
     Router.router [
         Router.pathMode

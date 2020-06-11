@@ -4,6 +4,7 @@ open System
 open Domain
 open Yobo.Shared.Errors
 open FSharp.Rop.Result
+open FSharp.Rop.Result.Operators
 
 module Projections =
     type ExistingUser = {
@@ -30,6 +31,9 @@ let private tryFindByResetKey (allUsers:Projections.ExistingUser list) (key:Guid
 let private isUniqueKey (allUsers:Projections.ExistingUser list) (key:Guid) =
     key |> tryFindByResetKey allUsers |> Option.isNone
 
+let private onlyIfNotAlreadyActivated (user:Projections.ExistingUser) =
+    if user.IsActivated then AuthenticationError.AccountAlreadyActivatedOrNotFound |> Error else Ok user
+
 let register (allUsers:Projections.ExistingUser list) (args:CmdArgs.Register) =
     [
         tryFindById allUsers args.Id
@@ -44,7 +48,14 @@ let register (allUsers:Projections.ExistingUser list) (args:CmdArgs.Register) =
 let activate (allUsers:Projections.ExistingUser list) (args:CmdArgs.Activate) =
     args.ActivationKey
     |> tryFindByActivationKey allUsers
-    |> Option.bind (fun usr -> if not usr.IsActivated then Some [ Activated { Id = usr.Id } ] else None)
+    |> Option.bind (fun usr ->
+        if not usr.IsActivated then
+            Some [
+                Activated { Id = usr.Id }
+                if usr.Newsletters then SubscribedToNewsletters { Id = usr.Id }
+            ]
+            else None
+    )
     |> Result.ofOption AuthenticationError.AccountAlreadyActivatedOrNotFound
     
 let initiatePasswordReset (allUsers:Projections.ExistingUser list) (args:CmdArgs.InitiatePasswordReset) =
@@ -62,4 +73,11 @@ let completePasswordReset (allUsers:Projections.ExistingUser list) (args:CmdArgs
     args.PasswordResetKey
     |> tryFindByResetKey allUsers
     |> Option.map (fun usr -> [ PasswordResetComplete { Id = usr.Id; PasswordResetKey = args.PasswordResetKey; PasswordHash = args.PasswordHash } ] )
-    |> Result.ofOption AuthenticationError.InvalidPasswordResetKey    
+    |> Result.ofOption AuthenticationError.InvalidPasswordResetKey
+
+let regenerateActivationKey (allUsers:Projections.ExistingUser list) (args:CmdArgs.RegenerateActivationKey) =
+    args.Id
+    |> tryFindById allUsers
+    |> Result.ofOption AuthenticationError.AccountAlreadyActivatedOrNotFound
+    >>= onlyIfNotAlreadyActivated
+    |>> (fun _ -> [ ActivationKeyRegenerated args ])

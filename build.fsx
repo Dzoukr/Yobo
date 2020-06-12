@@ -38,11 +38,17 @@ module Tools =
     let node = runTool (findTool "node" "node.exe")        
     let yarn = runTool (findTool "yarn" "yarn.cmd")             
 
-let clientSrcPath = "src" </> "Yobo.Client"
-let serverWatcherPath = "src" </> "Yobo.Server.Local"
-let clientDeployPath = "deploy" </> "client"
-let migrationsToolPath = "tools" </> "DbMigrations"
-let migrationsDeployPath = "deploy" </> "dbMigrations"
+let publishDir = Path.getFullName "deploy"
+let srcDir = Path.getFullName "src"
+let toolsDir = Path.getFullName "tools"
+
+let clientSrcPath = srcDir </> "Yobo.Client"
+let serverWatcherPath = srcDir </> "Yobo.Server.Local"
+let clientDeployPath = publishDir </> "client"
+let serverSrcPath = srcDir </> "Yobo.Server"
+let serverDeployPath = publishDir </> "server"
+let migrationsToolPath = toolsDir </> "DbMigrations"
+let migrationsDeployPath = publishDir </> "dbMigrations"
 
 // Targets
 let clean proj = [ proj </> "bin"; proj </> "obj" ] |> Shell.cleanDirs
@@ -61,6 +67,11 @@ Target.create "PublishClient" (fun _ ->
     [ clientDeployPath; clientDeployLocalPath] |> Shell.cleanDirs
     Tools.yarn "webpack-cli -p" __SOURCE_DIRECTORY__
     Shell.copyDir clientDeployPath clientDeployLocalPath FileFilter.allFiles
+)
+
+Target.create "PublishServer" (fun _ ->
+    let publishArgs = sprintf "publish -c Release -o \"%s\"" serverDeployPath
+    Tools.dotnet publishArgs serverSrcPath
 )
 
 Target.create "Run" (fun _ ->
@@ -90,6 +101,6 @@ Target.create "RunDbMigrations" (fun _ ->
 
 "InstallClient" ==> "Run"
 "InstallClient" ==> "PublishClient"
-"PublishDbMigrations" ==> "RunDbMigrations"
+"PublishDbMigrations" ==> "RunDbMigrations" ==> "PublishServer"
 
 Target.runOrDefaultWithArguments "Run"

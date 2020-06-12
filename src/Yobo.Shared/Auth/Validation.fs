@@ -1,29 +1,33 @@
 module Yobo.Shared.Auth.Validation
 
 open Yobo.Shared.Validation
-open Yobo.Shared.Auth.Domain
+open Yobo.Shared.Auth.Communication
 
-let validateAccount (acc:NewAccount) =
+let validateLogin (l:Request.Login) =
     [
-        "FirstName", validateNotEmpty (fun (x:NewAccount) -> x.FirstName)
-        "LastName", validateNotEmpty (fun x -> x.LastName)
-        "Email", validateNotEmpty (fun x -> x.Email)
-        "Password", validateLongerThan 5 (fun x -> x.Password)
-        "SecondPassword", validateLongerThan 5 (fun x -> x.SecondPassword)
-        "Password", validateEquals "SecondPassword" (fun x -> x.Password) (fun x -> x.SecondPassword)
-        "Email", validateEmail (fun x -> x.Email)
-        "Terms", validateTermsAgreed  (fun x -> x.AgreeButtonChecked)
-    ] |> validate acc
+        nameof(l.Email), validateEmail l.Email
+        nameof(l.Password), validateNotEmpty l.Password
+    ] |> validate
+    
+let validateRegister (r:Request.Register) =
+    [
+        nameof(r.FirstName), validateNotEmpty r.FirstName
+        nameof(r.LastName), validateNotEmpty r.LastName
+        nameof(r.Email), validateEmail r.Email
+        nameof(r.Password), validateMinimumLength 6 r.Password
+        nameof(r.SecondPassword), validateMinimumLength 6 r.SecondPassword
+        nameof(r.SecondPassword), validatePasswordsMatch r.Password r.SecondPassword
+        nameof(r.AgreeButtonChecked), validateTermsAgreed r.AgreeButtonChecked
+    ] |> validate
+    
+let validateForgottenPassword (l:Request.ForgottenPassword) =
+    [
+        nameof(l.Email), validateEmail l.Email
+    ] |> validate    
 
-let validateLogin (log:Login) =
+let validateResetPassword (r:Request.ResetPassword) =
     [
-        "Password", validateNotEmpty (fun (x:Login) -> x.Password)
-        "Email", validateEmail (fun x -> x.Email)
-    ] |> validate log
-
-let validatePasswordReset (r:PasswordReset) =
-    [
-        "Password", validateLongerThan 5 (fun x -> x.Password)
-        "SecondPassword", validateLongerThan 5 (fun x -> x.SecondPassword)
-        "Password", validateEquals "SecondPassword" (fun x -> x.Password) (fun x -> x.SecondPassword)
-    ] |> validate r
+        nameof(r.Password), validateMinimumLength 6 r.Password
+        nameof(r.SecondPassword), validateMinimumLength 6 r.SecondPassword
+        nameof(r.SecondPassword), validatePasswordsMatch r.Password r.SecondPassword
+    ] |> validate

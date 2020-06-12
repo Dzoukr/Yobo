@@ -1,88 +1,154 @@
-module Yobo.Client.View
+﻿module Yobo.Client.View
 
-open Yobo.Client.Domain
-open Fulma
-open Fable.React
-open Fable.React.Props
-open Yobo.Shared.Domain
-open Router
+open Yobo.Client.Router
+open Domain
+open Elmish
+open Feliz
+open Feliz
+open Feliz.Bulma
+open Feliz.Bulma.Operators
+open Feliz.Bulma.PageLoader
+open Feliz.Router
+open Yobo.Client.SharedView
 
-let private displayLoggedPage termsViewed (user:User option) (page:Page) content dispatch =
-    let item (pg:string) icon text =
-        let isActive = page.Path = pg
-        Navbar.Item.a [ Navbar.Item.IsActive isActive ; Navbar.Item.Option.Props [ Href pg; OnClick Router.goToUrl ] ] [
-            i [ ClassName icon; Style [ MarginRight 5] ] [ ]
-            str text
-        ]
-
-    let adminButtons =
-        match user with
-        | Some { IsAdmin = true } ->
-                [ item Router.Users.Path "fas fa-users" "Uživatelé"
-                  item Router.Lessons.Path "fas fa-calendar-alt" "Lekce" ]
-        | _ -> []
-
-    let userInfo =
-        match user with
-        | Some user ->
-            Navbar.Item.div [] [
-                Tag.tag [ Tag.Color IsInfo; Tag.Props [ Style [ MarginRight 10 ] ] ] [ sprintf "%i kreditů" user.Credits |> str ]
-                i [ ClassName "fas fa-user"; Style [ MarginRight 5 ] ] []
-                sprintf "%s %s" user.FirstName user.LastName |> str
-            ]
-        | None -> str ""
+let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) (page:SecuredPage) showTerms dispatch (content:ReactElement)  =
     
-    div [] [
-        Navbar.navbar [ Navbar.Color IsLight; ] [
-            Container.container [] [
-                Navbar.Start.div [] [
-                    item Router.Calendar.Path "fas fa-calendar-alt" "Kalendář"
-                    item Router.MyLessons.Path "fas fa-user" "Můj účet"
-                ]
-                Navbar.End.div [] [
-                    yield! adminButtons
-                    yield userInfo
-                    yield Navbar.Item.div [] [
-                        div [ ClassName "buttons" ] [
-                            Button.a [ Button.Color IsDanger; Button.Props [ OnClick (fun _ -> LoggedOut |> dispatch) ] ] [
-                                str "Odhlásit"
+    let item (pg:SecuredPage) (icon:string) (text:string) =
+        let isActive = page = pg
+        Bulma.navbarItem.a [
+            if isActive then navbarItem.isActive
+            yield! Html.Props.routed (Page.Secured pg)
+            prop.children [
+                Html.faIcon icon
+                Html.text text
+            ]
+        ]
+    
+    let adminButtons =
+        if user.IsAdmin then
+            [ item Users "fas fa-users" "Uživatelé"
+              item Lessons "fas fa-calendar-alt" "Lekce" ]
+        else []
+    
+    let userInfo =
+        Bulma.navbarItem.div [
+            Bulma.tag [
+                color.isInfo
+                prop.style [ style.marginRight 10 ]
+                prop.text (sprintf "%i kreditů" user.Credits)
+            ]
+            Html.faIcon "fas fa-user"
+            Html.text (sprintf "%s %s" user.FirstName user.LastName)
+        ]
+    
+    Html.div [
+        Bulma.navbar [
+            color.isLight
+            prop.children [
+                Bulma.container [
+                    Bulma.navbarStart.div [
+                        item Calendar "fas fa-calendar-alt" "Kalendář"
+                        item MyAccount "fas fa-user" "Můj účet"
+                    ]
+                    Bulma.navbarEnd.div [
+                        yield! adminButtons
+                        userInfo
+                        Bulma.navbarItem.div [
+                            Bulma.buttons [
+                                Bulma.button.a [
+                                    color.isDanger
+                                    prop.onClick (fun _ -> LoggedOut |> dispatch)
+                                    prop.text "Odhlásit"
+                                ]
                             ]
                         ]
                     ]
                 ]
             ]
         ]
-        main [ Style [ PaddingTop "2rem" ] ] [
-            Container.container [ ] [
-                content
-            ]
-            Container.container [ ] [
-                a [ ClassName "terms-link"; OnClick (fun _ -> ToggleTermsView |> dispatch) ] [str "Obchodní podmínky"]
-                SharedView.termsModal termsViewed (fun _ -> ToggleTermsView |> dispatch)
+        Html.main [
+            prop.style [ style.paddingTop(length.rem 2) ]
+            prop.children [
+                Bulma.container [
+                    content
+                ]
+                Bulma.container [
+                    Html.a [
+                        prop.className "terms-link"
+                        prop.text "Obchodní podmínky"
+                        prop.onClick (fun _ -> ShowTerms(true) |> dispatch)
+                    ]
+                    SharedView.StaticTextViews.showTermsModal showTerms (fun _ -> ShowTerms(false) |> dispatch)
+                ]
             ]
         ]
     ]
+    
+let showView<'model,'msg> (fn:'model -> ('msg -> unit) -> Fable.React.ReactElement) (dispatch:'msg -> unit) (m:Model) =
+    let pm = m |> Model.getPageModel<'model>
+    fn pm dispatch
 
-let render (state : State) (dispatch : Msg -> unit) =
-    let showInTemplate content =
-        displayLoggedPage state.TermsDisplayed state.LoggedUser state.Page content dispatch
-    match state.Page with
-    | AuthPage Login -> Auth.Login.View.render state.States.Login (LoginMsg >> AuthMsg >> dispatch)
-    | AuthPage Registration -> Auth.Registration.View.render state.States.Registration (RegistrationMsg >> AuthMsg >> dispatch)
-    | AuthPage (AccountActivation _) -> Auth.AccountActivation.View.render state.States.AccountActivation (AccountActivationMsg >> AuthMsg >> dispatch)
-    | AuthPage ForgottenPassword -> Auth.ForgottenPassword.View.render state.States.ForgottenPassword (ForgottenPasswordMsg >> AuthMsg >> dispatch)
-    | AuthPage (ResetPassword _) -> Auth.ResetPassword.View.render state.States.ResetPassword (ResetPasswordMsg >> AuthMsg >> dispatch)
-    | AdminPage pg ->
-        let content =
-            match pg with
-            | Users -> Admin.Users.View.render state.States.Users (UsersMsg >> AdminMsg >> dispatch)
-            | Lessons -> Admin.Lessons.View.render state.States.Lessons (LessonsMsg >> AdminMsg >> dispatch)
-        content |> showInTemplate
-    | Calendar ->
-        let content =
-            if state.LoggedUser.IsSome then
-                Calendar.View.render state.LoggedUser.Value state.States.Calendar (CalendarMsg >> dispatch)
-            else str ""
-        content |> showInTemplate
-    | MyLessons ->
-        MyLessons.View.render state.States.MyLessons (MyLessonsMsg >> dispatch) |> showInTemplate
+let notActivatedView (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) dispatch =
+    let inMain (content:ReactElement) =
+        Html.main [
+            prop.style [ style.paddingTop(length.rem 2) ]
+            prop.children [
+                Bulma.container [
+                    content
+                ]
+            ]
+        ]
+    
+    Html.div [
+        Html.p "Váš účet ještě není aktivován."
+        Html.p "Podívejte se do své emailové schránky (zkontrolujte SPAM složku), kde byste měli najít odkaz na aktivaci."
+        Html.p "Pokud nemůžete kód najít, klikněte na tlačítko níže a my vám pošleme nový."
+        Html.div [
+            prop.style [ style.paddingTop(length.rem 2) ]
+            prop.children [
+                Bulma.button.button [
+                    color.isPrimary
+                    prop.text "Poslat nový kód na email"
+                    prop.onClick (fun _ -> user.Id |> ResendActivation |> dispatch)
+                ]
+            ]
+        ]
+    ]
+    |> BoxedViews.showError
+    |> inMain
+    
+let view (model:Model) (dispatch:Msg -> unit) =
+    let render =
+        if model.IsCheckingUser then
+            PageLoader.pageLoader [
+                pageLoader.isWhite
+                pageLoader.isActive
+                prop.children [
+                    PageLoader.title "Ověřuji přihlášení"
+                ]
+            ]
+        else            
+            match model.CurrentPage with
+            | Anonymous pg ->
+                match pg with
+                | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
+                | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
+                | AccountActivation _ -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
+                | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
+                | ResetPassword _ -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
+            | Secured (pg, user) ->
+                if not user.IsActivated then notActivatedView user dispatch
+                else
+                    match pg with
+                    | Calendar -> model |> showView Pages.Calendar.View.view (CalendarMsg >> dispatch)
+                    | Users -> model |> showView Pages.Users.View.view (UsersMsg >> dispatch)
+                    | Lessons -> model |> showView Pages.Lessons.View.view (LessonsMsg >> dispatch)
+                    | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)
+                        
+                    |> displayLoggedPage user pg model.ShowTerms dispatch
+            
+    Router.router [
+        Router.pathMode
+        Router.onUrlChanged (Page.parseFromUrlSegments >> UrlChanged >> dispatch)
+        Router.application render
+    ]

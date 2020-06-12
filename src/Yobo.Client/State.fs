@@ -1,117 +1,148 @@
-module Yobo.Client.State
+﻿module Yobo.Client.State
 
-open Elmish
-open Fable.Import
-open Yobo.Client.Domain
-open Server
 open System
-open Elmish.UrlParser
-open Elmish.Navigation
-open Router
+open Elmish
+open Feliz.Router
+open Server
+open Yobo.Client
+open Yobo.Client.Router
+open Domain
+open Yobo.Client.Interfaces
+open Fable.Core.JsInterop
+open Yobo.Shared.Tuples
 
-let private removeSlash (s:string) = s.TrimStart([|'/'|])
-let inline private s p = p |> removeSlash |> s
+module CurrentPage =
+    let getInitSubPageModel = function
+        | CurrentPage.Anonymous p ->
+            match p with
+            | AccountActivation i -> i |> Pages.AccountActivation.Domain.Model.init |> box
+            | ResetPassword i -> i |> Pages.ResetPassword.Domain.Model.init |> box
+            | Login -> Pages.Login.Domain.Model.init |> box
+            | Registration -> Pages.Registration.Domain.Model.init |> box
+            | ForgottenPassword -> Pages.ForgottenPassword.Domain.Model.init |> box
+        | CurrentPage.Secured (p,u) ->
+            match p with
+            | Calendar -> Pages.Calendar.Domain.Model.init |> box
+            | Lessons -> Pages.Lessons.Domain.Model.init |> box
+            | Users -> Pages.Users.Domain.Model.init |> box
+            | MyAccount -> u |> Pages.MyAccount.Domain.Model.init |> box
+    let init = CurrentPage.Anonymous Login
+    
+module Model =
+    let init = {
+        CurrentPage = CurrentPage.init
+        SubPageModel = CurrentPage.init |> CurrentPage.getInitSubPageModel
+        IsCheckingUser = false
+        ShowTerms = false
+    }
+    
+    let navigateToAnonymous (p:AnonymousPage) (m:Model) =
+        let newPage = CurrentPage.Anonymous(p)
+        let newSubModel = newPage |> CurrentPage.getInitSubPageModel
+        { m with CurrentPage = newPage; SubPageModel = newSubModel }
+    
+    let navigateToSecured user (p:SecuredPage) (m:Model) =
+        let newPage = CurrentPage.Secured(p, user)
+        let newSubModel = newPage |> CurrentPage.getInitSubPageModel
+        { m with CurrentPage = newPage; SubPageModel = newSubModel }
+    
+    let refreshUser user (m:Model) =
+        match m.CurrentPage with
+        | CurrentPage.Anonymous _ -> m
+        | CurrentPage.Secured(p,_) ->
+            let newPage = Secured(p, user)
+            let newSubModel =
+                // ugly hack because of error FABLE: Cannot type test: interface
+                match m.SubPageModel?UpdateUser with
+                | null -> m.SubPageModel
+                | _ -> user |> (m.SubPageModel :?> IUserAwareModel).UpdateUser |> box
+            { m with CurrentPage = newPage; SubPageModel = newSubModel }    
 
-let pageParser: Parser<Page -> Page, Page> =
-    oneOf [
-        map (AuthPage(ForgottenPassword)) (s ForgottenPassword.Path)
-        map (AuthPage(Login)) (s Login.Path)
-        map (AuthPage(Registration)) (s Registration.Path)
-        map ((fun (x:string) -> Guid(x)) >> AccountActivation >> AuthPage) (s "/accountActivation" </> str)
-        map ((fun (x:string) -> Guid(x)) >> ResetPassword >> AuthPage) (s "/resetPassword" </> str)
-        map (AdminPage(Users)) (s Users.Path)
-        map (AdminPage(Lessons)) (s Lessons.Path)
-        map Calendar (s Page.Calendar.Path)
-        map MyLessons (s MyLessons.Path)
-    ]
+let init () =
+    let nextPage = (Router.currentPath() |> Page.parseFromUrlSegments)
+    Model.init, (nextPage |> UrlChanged |> Cmd.ofMsg)
+    
+let private handleUpdate<'subModel,'subCmd> (fn:'subModel -> 'subModel * Cmd<'subCmd>) mapFn (m:Model) =
+    let pageModel = m |> Model.getPageModel<'subModel>
+    let newSubModel,subCmd = fn pageModel
+    (m |> Model.setPageModel newSubModel), (Cmd.map(mapFn) subCmd)
 
-let private withCheckingLogin (state:State) cmd =
-    let requiresLogin =
-        match state.Page with
-        | AuthPage _ -> false
-        | _ -> true
+let private getPageInitCommands targetPage =
+    match targetPage with
+    | Page.Anonymous (AccountActivation _) -> Pages.AccountActivation.Domain.Msg.Activate |> AccountActivationMsg |> Cmd.ofMsg
+    | Page.Secured MyAccount -> [RefreshUser; (Pages.MyAccount.Domain.Init |> MyAccountMsg)] |> List.map Cmd.ofMsg |> Cmd.batch
+    | Page.Secured Users -> Pages.Users.Domain.LoadUsers |> UsersMsg |> Cmd.ofMsg
+    | Page.Secured Lessons -> Pages.Lessons.Domain.Init |> LessonsMsg |> Cmd.ofMsg
+    | Page.Secured Calendar -> Pages.Calendar.Domain.Init |> CalendarMsg |> Cmd.ofMsg
+    | _ -> Cmd.none
 
-    if requiresLogin then
-        match state.LoggedUser, TokenStorage.tryGetToken() with
-        | None, Some _ -> [ Cmd.ofMsg Msg.ReloadUser; cmd ] |> Cmd.batch
-        | Some _, Some _ -> cmd
-        | _ -> LoggedOut |> Cmd.ofMsg
-    else cmd
-
-let urlUpdate (result: Option<Page>) state =
-    match result with
-    | None -> state, Navigation.newUrl Router.Page.Default.Path
-    | Some page ->
-        let state = { state with Page = page }
-        let cmd =
-            match page with
-            | AuthPage pg ->
-                match pg with
-                | AccountActivation id ->
-                    id
-                    |> Auth.AccountActivation.Domain.Msg.Activate
-                    |> AuthMsg.AccountActivationMsg
-                    |> AuthMsg
-                    |> Cmd.ofMsg
-                | ResetPassword id ->
-                    id
-                    |> Auth.ResetPassword.Domain.Msg.Init
-                    |> AuthMsg.ResetPasswordMsg
-                    |> AuthMsg
-                    |> Cmd.ofMsg
-                | _ -> Cmd.none
-            | AdminPage pg ->
-                match pg with
-                | Users _ -> Admin.Users.Domain.Msg.Init |> UsersMsg |> AdminMsg |> Cmd.ofMsg
-                | Lessons _ -> Admin.Lessons.Domain.Msg.Init |> LessonsMsg |> AdminMsg |> Cmd.ofMsg
-            | Calendar _ -> Calendar.Domain.Msg.Init |> CalendarMsg |> Cmd.ofMsg
-            | MyLessons _ -> MyLessons.Domain.Msg.Init |> MyLessonsMsg |> Cmd.ofMsg
-        state, (withCheckingLogin state cmd)
-
-let init result =
-    urlUpdate result State.Init
- 
-let update (msg : Msg) (state : State) : State * Cmd<Msg> =
-    let map stateMap cmdMap (subState,subCmd) = { state with States = (stateMap state.States subState) }, (subCmd |> Cmd.map cmdMap)
-
-    let mapWithReloadUser stateMap cmdMap (subState,subCmd,reloadUser) =
-        let reloadCmd = if reloadUser then ReloadUser |> Cmd.ofMsg else Cmd.none
-        { state with States = (stateMap state.States subState) }, Cmd.batch [(subCmd |> Cmd.map cmdMap); reloadCmd]
-
+let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
-    | AuthMsg (LoginMsg msg) ->
-        Auth.Login.State.update msg state.States.Login |> map (fun s ns -> { s with Login = ns }) (LoginMsg >> Msg.AuthMsg) 
-    | AuthMsg (RegistrationMsg msg) ->
-        Auth.Registration.State.update msg state.States.Registration |> map (fun s ns -> { s with Registration = ns }) (RegistrationMsg >> Msg.AuthMsg) 
-    | AuthMsg (AccountActivationMsg msg) ->
-        Auth.AccountActivation.State.update msg state.States.AccountActivation |> map (fun s ns -> { s with AccountActivation = ns }) (AccountActivationMsg >> Msg.AuthMsg) 
-    | AuthMsg (ForgottenPasswordMsg msg) ->
-        Auth.ForgottenPassword.State.update msg state.States.ForgottenPassword |> map (fun s ns -> { s with ForgottenPassword = ns }) (ForgottenPasswordMsg >> Msg.AuthMsg)
-    | AuthMsg (ResetPasswordMsg msg) ->
-        Auth.ResetPassword.State.update msg state.States.ResetPassword |> map (fun s ns -> { s with ResetPassword = ns }) (ResetPasswordMsg >> Msg.AuthMsg)
-    | AdminMsg (UsersMsg msg) -> Admin.Users.State.update msg state.States.Users |> map (fun s ns -> { s with Users = ns }) (UsersMsg >> Msg.AdminMsg)
-    | AdminMsg (LessonsMsg msg) -> Admin.Lessons.State.update msg state.States.Lessons |> map (fun s ns -> { s with Lessons = ns }) (LessonsMsg >> Msg.AdminMsg)
-    | CalendarMsg msg -> Calendar.State.update msg state.States.Calendar |> mapWithReloadUser (fun s ns -> { s with Calendar = ns }) Msg.CalendarMsg
-    | MyLessonsMsg msg -> MyLessons.State.update msg state.States.MyLessons |> map (fun s ns -> { s with MyLessons = ns }) Msg.MyLessonsMsg
-    | ReloadUser -> state, (TokenStorage.tryGetToken() |> Option.defaultValue "" |> Cmd.ofAsyncResult authAPI.GetUserByToken UserByTokenLoaded)
-    | UserByTokenLoaded res ->
+    | UrlChanged page ->
+        match model.CurrentPage, page with
+        | CurrentPage.Secured(_,user), Page.Secured targetPage -> 
+            if SecuredPage.isAdminOnly targetPage && not user.IsAdmin then
+                model, Cmd.ofMsg LoggedOut
+            else                
+                let newModel = model |> Model.navigateToSecured user targetPage
+                newModel, (getPageInitCommands page)
+        | CurrentPage.Anonymous _, Page.Anonymous targetPage
+        | CurrentPage.Secured _, Page.Anonymous targetPage ->
+            let newModel = model |> Model.navigateToAnonymous targetPage
+            newModel, (getPageInitCommands page)
+        | CurrentPage.Anonymous _, Page.Secured targetpage ->
+            model, Cmd.ofMsg <| RefreshUserWithRedirect(targetpage)
+    | RefreshUserWithRedirect p ->                
+        { model with IsCheckingUser = true }, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () (fun u -> UserRefreshedWithRedirect(p, u))
+    | UserRefreshedWithRedirect(p, u) ->
+        let model = { model with IsCheckingUser = false }
+        match u with
+        | Ok usr -> model |> Model.navigateToSecured usr p, Router.navigatePage (Page.Secured p)
+        | Error _ -> model, Cmd.ofMsg LoggedOut
+    | RefreshUser ->
+        model, Cmd.OfAsync.eitherAsResult (onUserAccountService (fun x -> x.GetUserInfo)) () UserRefreshed
+    | UserRefreshed res ->
         match res with
-        | Ok user -> { state with LoggedUser = Some user; States = { state.States with MyLessons = { state.States.MyLessons with LoggedUser = Some user }} }, Cmd.none
-        | Error _ -> state, LoggedOut |> Cmd.ofMsg
-    | RefreshToken t -> state, (t |> Cmd.ofAsyncResult authAPI.RefreshToken TokenRefreshed)
+        | Ok usr -> model |> Model.refreshUser usr, Cmd.none
+        | Error _ -> model, Cmd.ofMsg LoggedOut        
+    | RefreshToken token -> model, Cmd.OfAsync.eitherAsResult authService.RefreshToken token TokenRefreshed
     | TokenRefreshed res ->
         match res with
         | Ok t ->
-            t |> TokenStorage.setToken
-            state, Cmd.none
-        | Error _ -> state, LoggedOut |> Cmd.ofMsg
+            TokenStorage.setToken t
+            model, Cmd.none
+        | Error _ -> model, Cmd.ofMsg LoggedOut
     | LoggedOut ->
         TokenStorage.removeToken()
-        { state with LoggedUser = None}, Navigation.newUrl AuthPage.Login.Path
-    | ToggleTermsView ->
-        { state with TermsDisplayed = not state.TermsDisplayed }, Cmd.none
+        model, Router.navigatePage (Page.Anonymous Login)
+    // auth
+    | LoginMsg subMsg -> model |> handleUpdate (Pages.Login.State.update subMsg) LoginMsg
+    | RegistrationMsg subMsg -> model |> handleUpdate (Pages.Registration.State.update subMsg) RegistrationMsg
+    | AccountActivationMsg subMsg -> model |> handleUpdate (Pages.AccountActivation.State.update subMsg) AccountActivationMsg
+    | ForgottenPasswordMsg subMsg -> model |> handleUpdate (Pages.ForgottenPassword.State.update subMsg) ForgottenPasswordMsg
+    | ResetPasswordMsg subMsg -> model |> handleUpdate (Pages.ResetPassword.State.update subMsg) ResetPasswordMsg
+    | ResendActivation i -> model, Cmd.OfAsync.eitherAsResult authService.ResendActivation i ActivationResent
+    | ActivationResent _ ->
+        model, [
+            SharedView.ServerResponseViews.showSuccessToast "Nyní se podívejte do vaší emailové schránky"
+            Cmd.ofMsg LoggedOut
+        ] |> Cmd.batch
+    | MyAccountMsg subMsg -> model |> handleUpdate (Pages.MyAccount.State.update subMsg) MyAccountMsg
+    | UsersMsg subMsg -> model |> handleUpdate (Pages.Users.State.update subMsg) UsersMsg
+    | LessonsMsg subMsg -> model |> handleUpdate (Pages.Lessons.State.update subMsg) LessonsMsg
+    | CalendarMsg subMsg ->
+        let injectCmds =
+            match subMsg with
+            | Pages.Calendar.Domain.Msg.ReservationAdded _
+            | Pages.Calendar.Domain.Msg.ReservationCancelled _ -> [ RefreshUser ]
+            | _ -> []
+            |> List.map Cmd.ofMsg
+        model
+        |> handleUpdate (Pages.Calendar.State.update subMsg) CalendarMsg
+        |> mapSnd (List.singleton >> List.append injectCmds >> Cmd.batch)
+    | ShowTerms show -> { model with ShowTerms = show }, Cmd.none        
 
-let subscribe (_:State) =
+let subscribe (_:Model) =
     let sub dispatch = 
         let timer = (TimeSpan.FromMinutes 1.).TotalMilliseconds |> int
         

@@ -1,51 +1,66 @@
 module Yobo.Client.Server
 
-open Fable.Remoting.Client
 open Fable.Core
+open Fable.Remoting.Client
+open Fable.SimpleJson
+open Yobo.Shared.Errors
+open Yobo.Shared.Auth.Communication
+open Yobo.Shared.Core.UserAccount.Communication
+open Yobo.Shared.Core.Admin.Communication
+open Yobo.Shared.Core.Reservations.Communication
+
+let exnToError (e:exn) : ServerError =
+    match e with
+    | :? Fable.Remoting.Client.ProxyRequestException as ex -> 
+        if ex.StatusCode = 401 then
+            AuthenticationError.InvalidOrExpiredToken |> ServerError.Authentication
+        else
+            try
+                let serverError = Json.parseAs<{| error: ServerError |}>(ex.Response.ResponseBody)
+                serverError.error
+            with _ -> (ServerError.Exception(e.Message)) 
+    | _ -> (ServerError.Exception(e.Message))
+
+module Cmd =
+    open Elmish
+    
+    module OfAsync =
+        let eitherAsResult f args resultMsg =
+            Cmd.OfAsync.either f args (Ok >> resultMsg) (exnToError >> Error >> resultMsg)
+
 
 [<Emit("config.baseUrl")>]
 let baseUrl : string = jsNative
 
-module Cmd =
-    open Elmish
-    open Yobo.Shared.Communication
-
-    let ofAsyncResult f msg i =
-        Cmd.OfAsync.either
-            f i            
-            (msg)
-            (fun ex -> ServerError.Exception(ex.Message) |> Error |> msg)
-
-let authAPI =
+let authService =
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Auth.Communication.routeBuilder
+    |> Remoting.withRouteBuilder AuthService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
-    |> Remoting.buildProxy<Yobo.Shared.Auth.Communication.API>
+    |> Remoting.buildProxy<AuthService>
 
-let adminAPI =
+let onUserAccountService (fn:UserAccountService -> 'a) =
+    let token = TokenStorage.tryGetToken() |> Option.defaultValue ""
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Admin.Communication.routeBuilder
+    |> Remoting.withRouteBuilder UserAccountService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
-    |> Remoting.buildProxy<Yobo.Shared.Admin.Communication.API>
+    |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
+    |> Remoting.buildProxy<UserAccountService>
+    |> fn
 
-let calendarAPI =
+let onAdminService (fn:AdminService -> 'a) =
+    let token = TokenStorage.tryGetToken() |> Option.defaultValue ""
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.Calendar.Communication.routeBuilder
+    |> Remoting.withRouteBuilder AdminService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
-    |> Remoting.buildProxy<Yobo.Shared.Calendar.Communication.API>
+    |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
+    |> Remoting.buildProxy<AdminService>
+    |> fn
 
-let myLessonsAPI =
+let onReservationsService (fn:ReservationsService -> 'a) =
+    let token = TokenStorage.tryGetToken() |> Option.defaultValue ""
     Remoting.createApi()
-    |> Remoting.withRouteBuilder Yobo.Shared.MyLessons.Communication.routeBuilder
+    |> Remoting.withRouteBuilder ReservationsService.RouteBuilder
     |> Remoting.withBaseUrl baseUrl
-    |> Remoting.buildProxy<Yobo.Shared.MyLessons.Communication.API>
-
-
-
-module SecuredParam =
-    open Yobo.Shared.Communication
-
-    let create value = {
-        Token = TokenStorage.tryGetToken() |> Option.defaultValue ""
-        Param = value
-    }
+    |> Remoting.withAuthorizationHeader (sprintf "Bearer %s" token)
+    |> Remoting.buildProxy<ReservationsService>
+    |> fn    

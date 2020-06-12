@@ -1,8 +1,4 @@
 FSharp.Core
-Newtonsoft.Json
-Microsoft.FSharpLu.Json
-File:FSharp.Rop.fs
-WindowsAzure.Storage
 TaskBuilder.fs
 Mailjet.Api
 System.IdentityModel.Tokens.Jwt

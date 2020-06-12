@@ -4,10 +4,11 @@ open DbUp
 [<EntryPoint>]
 let main args =
     let connectionString = args.[0]
+    let scriptsPath = args.[1]
     let engine =
             DeployChanges.To
                 .SqlDatabase(connectionString)
-                .WithScriptsFromFileSystem("./scripts")
+                .WithScriptsFromFileSystem(scriptsPath)
                 .JournalToSqlTable("dbo", "_SchemaVersions")
                 .LogToConsole()
                 .Build()

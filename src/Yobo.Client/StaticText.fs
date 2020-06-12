@@ -1,7 +1,6 @@
 module Yobo.Client.StaticText
 
 let terms = """
-
 <div class="terms">
 <h2>Podmínky rezervace:</h2>
 <p>Lekce se konají na adrese: Centrum volného času GaPa, U pošty 822, Kostelec nad Labem.</p>
@@ -15,7 +14,6 @@ let terms = """
 <li>Přihlašování na lekce a odhlašování lze provádět kdykoliv s výjimkou dne konání lekce, kdy se od 10:00 lze pouze přihlašovat (viz. Storno podmínky).</li>
 </ol>
 </p>
-
 <h2>Storno podmínky</h2>
 <p>
 <ol>
@@ -28,11 +26,9 @@ let terms = """
 <li>Rezervací lekce souhlasím s podmínkami rezervace a storna lekcí.</li>
 </ol>
 </p>
-
 <p>
 Prosím o včasné odhlašovaní lekcí, umožníte tak všem, kdo mohou přijít, zúčastnit se lekce a Vám zbytečně nepropadne kredit nebo částka za lekci. Děkuji 😊
 </p>
-
 <h2>Ochrana osobních údajů</h2>
 <p>Klient souhlasí se zpracováním a uchováním osobních údajů - jméno, příjmení a e-mailová adresa. Ochrana osobních údajů klienta, který je fyzickou osobou, je poskytována zákonem č. 101/2000 Sb., o ochraně osobních údajů, ve znění pozdějších předpisů. Klient souhlasí se zasíláním informací souvisejících se zbožím, službami nebo podnikem prodávajícího na e-mailovou adresu. Osobní údaje poskytnuté poskytovateli služeb přes internetové stránky nebudou bez souhlasu klienta předány třetí osobě.</p>
 <p>Veškeré osobní údaje jako jméno, příjmení a emailová adresa jsou zašifrovány a uloženy v nečitelné podobě v cloudové službě Microsoft Azure Table Storage. V případě žádosti o zrušení účtu bude klíč k rozšifrování těchto údajů smazán.</p>

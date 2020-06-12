@@ -1,74 +1,46 @@
-module Yobo.Client.Domain
+﻿module Yobo.Client.Domain
 
-open Yobo.Shared.Communication
-open System.Collections.Generic
+open System
+open Yobo.Shared.Errors
 open Router
 
-type States = {
-    Login : Auth.Login.Domain.State
-    Registration : Auth.Registration.Domain.State
-    AccountActivation : Auth.AccountActivation.Domain.State
-    ForgottenPassword : Auth.ForgottenPassword.Domain.State
-    ResetPassword : Auth.ResetPassword.Domain.State
-    Users : Admin.Users.Domain.State
-    Lessons : Admin.Lessons.Domain.State
-    Calendar : Calendar.Domain.State
-    MyLessons : MyLessons.Domain.State
+type CurrentPage =
+    | Anonymous of AnonymousPage
+    | Secured of SecuredPage * Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount
+
+type Model = {
+    SubPageModel : obj
+    IsCheckingUser : bool
+    CurrentPage : CurrentPage
+    ShowTerms : bool
 }
-with
-    static member Init = {
-        Login = Auth.Login.Domain.State.Init
-        Registration = Auth.Registration.Domain.State.Init
-        AccountActivation = Auth.AccountActivation.Domain.State.Init
-        ForgottenPassword = Auth.ForgottenPassword.Domain.State.Init
-        ResetPassword = Auth.ResetPassword.Domain.State.Init
-        Users = Admin.Users.Domain.State.Init
-        Lessons = Admin.Lessons.Domain.State.Init
-        Calendar = Calendar.Domain.State.Init
-        MyLessons = MyLessons.Domain.State.Init
-    }
 
-type State = {
-    Page : Router.Page
-    States : States
-    LoggedUser : Yobo.Shared.Domain.User option
-    TermsDisplayed : bool
-}
-with
-    static member Init = {
-        Page = Page.AdminPage(AdminPage.Users)
-        States = States.Init
-        LoggedUser = None
-        TermsDisplayed = false
-    }
-
-type Dictionary<'k,'v> with
-    member x.GetState name def =
-        if x.ContainsKey(name) then x.[name]
-        else
-            x.[name] <- def
-            def
-    member x.SetState name state = x.[name] <- state
-
-type AuthMsg =
-    | LoginMsg of Auth.Login.Domain.Msg
-    | RegistrationMsg of Auth.Registration.Domain.Msg
-    | AccountActivationMsg of Auth.AccountActivation.Domain.Msg
-    | ForgottenPasswordMsg of Auth.ForgottenPassword.Domain.Msg
-    | ResetPasswordMsg of Auth.ResetPassword.Domain.Msg
-
-type AdminMsg =
-    | UsersMsg of Admin.Users.Domain.Msg
-    | LessonsMsg of Admin.Lessons.Domain.Msg
+module Model =
+    let getPageModel<'a> (m:Model) = m.SubPageModel :?> 'a
+    let setPageModel (m:obj) (model:Model) = { model with SubPageModel = m }
 
 type Msg =
-    | AuthMsg of AuthMsg
-    | AdminMsg of AdminMsg
-    | CalendarMsg of Calendar.Domain.Msg
-    | MyLessonsMsg of MyLessons.Domain.Msg
-    | ReloadUser
-    | UserByTokenLoaded of Result<Yobo.Shared.Domain.User,ServerError>
+    // auth
+    | RefreshUser
+    | UserRefreshed of ServerResult<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount>
+    | RefreshUserWithRedirect of SecuredPage
+    | UserRefreshedWithRedirect of SecuredPage * ServerResult<Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount> 
     | RefreshToken of string
-    | TokenRefreshed of Result<string, ServerError>
-    | ToggleTermsView
+    | TokenRefreshed of ServerResult<string>
     | LoggedOut
+    | ResendActivation of Guid
+    | ActivationResent of ServerResult<unit>
+    // navigation
+    | UrlChanged of Page
+    // global
+    | ShowTerms of bool
+    // sub pages
+    | LoginMsg of Pages.Login.Domain.Msg
+    | RegistrationMsg of Pages.Registration.Domain.Msg
+    | AccountActivationMsg of Pages.AccountActivation.Domain.Msg
+    | ForgottenPasswordMsg of Pages.ForgottenPassword.Domain.Msg
+    | ResetPasswordMsg of Pages.ResetPassword.Domain.Msg
+    | UsersMsg of Pages.Users.Domain.Msg
+    | LessonsMsg of Pages.Lessons.Domain.Msg
+    | MyAccountMsg of Pages.MyAccount.Domain.Msg
+    | CalendarMsg of Pages.Calendar.Domain.Msg

@@ -1,35 +1,26 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <AssemblyName>Yobo.Shared</AssemblyName>
-    <TargetFramework>netstandard2.0</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <WarningsAsErrors>FS0025</WarningsAsErrors>
-    <NoWarn>2003</NoWarn>
-  </PropertyGroup>
-  <ItemGroup>
-    <Compile Include="..\..\paket-files\Dzoukr\FSharp.Rop\FSharp.Rop.fs">
-      <Paket>True</Paket>
-      <Link>paket-files/FSharp.Rop.fs</Link>
-    </Compile>
-    <Compile Include="Extensions.fs" />
-    <Compile Include="DateRange.fs" />
-    <Compile Include="Domain.fs" />
-    <Compile Include="Validation.fs" />
-    <Compile Include="Auth.fs" />
-    <Compile Include="Communication.fs" />
-    <Compile Include="Admin\Domain.fs" />
-    <Compile Include="Admin\Validation.fs" />
-    <Compile Include="Admin\Communication.fs" />
-    <Compile Include="Auth\Domain.fs" />
-    <Compile Include="Auth\Validation.fs" />
-    <Compile Include="Auth\Communication.fs" />
-    <Compile Include="Calendar\Domain.fs" />
-    <Compile Include="Calendar\Communication.fs" />
-    <Compile Include="MyLessons\Domain.fs" />
-    <Compile Include="MyLessons\Communication.fs" />
-  </ItemGroup>
-  <Import Project="..\..\.paket\Paket.Restore.targets" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <LangVersion>preview</LangVersion>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="DateTime.fs" />
+        <Compile Include="ClientPaths.fs" />
+        <Compile Include="Validation.fs" />
+        <Compile Include="Errors.fs" />
+        <Compile Include="Auth\Communication.fs" />
+        <Compile Include="Auth\Validation.fs" />
+        <Compile Include="Core\Domain.fs" />
+        <Compile Include="Core\UserAccount\Domain.fs" />
+        <Compile Include="Core\UserAccount\Communication.fs" />
+        <Compile Include="Core\Admin\Domain.fs" />
+        <Compile Include="Core\Admin\Communication.fs" />
+        <Compile Include="Core\Admin\Validation.fs" />
+        <Compile Include="Core\Reservations\Domain.fs" />
+        <Compile Include="Core\Reservations\Communication.fs" />
+        <Compile Include="Tuples.fs" />
+    </ItemGroup>
+    <Import Project="..\..\.paket\Paket.Restore.targets" />
 </Project>

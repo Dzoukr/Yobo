@@ -12,28 +12,27 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CopyWebpackPlugin = require('copy-webpack-plugin');
 var MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-var apiServerPort = 7071;
+var clientPath = './src/Yobo.Client';
 
 var CONFIG = {
     // The tags to include the generated JS and CSS will be automatically injected in the HTML template
     // See https://github.com/jantimon/html-webpack-plugin
-    indexHtmlTemplate: './src/Yobo.Client/public/index.html',
-    fsharpEntry: './src/Yobo.Client/Yobo.Client.fsproj',
-    cssEntry: './src/Yobo.Client/styles/app.scss',
-    outputDir: './src/Yobo.Client/output',
-    assetsDir: './src/Yobo.Client/public',
+    indexHtmlTemplate: clientPath +'/public/index.html',
+    fsharpEntry: clientPath + '/Yobo.Client.fsproj',
+    cssEntry: clientPath + '/styles/styles.scss',
+    outputDir: clientPath + '/deploy',
+    assetsDir: clientPath + '/public',
     devServerPort: 8080,
     // When using webpack-dev-server, you may need to redirect some calls
     // to a external API server. See https://webpack.js.org/configuration/dev-server/#devserver-proxy
     devServerProxy: {
-        // redirect requests that start with /api/* to the server on port 8085
         '/api/*': {
-            target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || apiServerPort),
+            target: 'http://localhost:7071',
                changeOrigin: true
            },
         // redirect websocket requests that start with /socket/* to the server on the port 8085
         '/socket/*': {
-            target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || apiServerPort),
+            target: 'http://localhost:' + (process.env.SERVER_PROXY_PORT || "8085"),
             ws: true
            }
        },
@@ -80,7 +79,7 @@ module.exports = {
     // to prevent browser caching if code changes
     output: {
         path: resolve(CONFIG.outputDir),
-        publicPath: '/',
+        publicPath: "/",
         filename: isProduction ? '[name].[hash].js' : '[name].js'
     },
     mode: isProduction ? 'production' : 'development',
@@ -93,7 +92,7 @@ module.exports = {
     // Besides the HtmlPlugin, we use the following plugins:
     // PRODUCTION
     //      - MiniCssExtractPlugin: Extracts CSS from bundle to a different file
-    //          To minify CSS, see https://github.com/webpack-contrib/mini-css-extract-plugin#minimizing-for-production    
+    //          To minify CSS, see https://github.com/webpack-contrib/mini-css-extract-plugin#minimizing-for-production
     //      - CopyWebpackPlugin: Copies static assets to output directory
     // DEVELOPMENT
     //      - HotModuleReplacementPlugin: Enables hot reloading when code changes without refreshing

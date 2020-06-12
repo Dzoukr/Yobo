@@ -101,6 +101,6 @@ Target.create "RunDbMigrations" (fun _ ->
 
 "InstallClient" ==> "Run"
 "InstallClient" ==> "PublishClient"
-"PublishDbMigrations" ==> "RunDbMigrations"
+"PublishDbMigrations" ==> "PublishServer"
 
 Target.runOrDefaultWithArguments "Run"

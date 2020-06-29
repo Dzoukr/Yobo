@@ -36,7 +36,7 @@ let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
                 model, Cmd.ofMsg LoggedOut
             else                
                 let newModel = model |> navigateToSecured user targetPage
-                newModel, (Cmd.ofMsg RefreshUser)
+                newModel, Cmd.none
         | CurrentPage.Anonymous _, Page.Anonymous targetPage
         | CurrentPage.Secured _, Page.Anonymous targetPage ->
             let newModel = model |> navigateToAnonymous targetPage

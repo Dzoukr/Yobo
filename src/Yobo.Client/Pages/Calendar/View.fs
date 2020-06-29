@@ -51,14 +51,17 @@ let headerRow dates =
     |> List.map headerTd
     |> (fun x -> Html.tr [ prop.className "header"; prop.children x ])
 
-let getTag (la:LessonStatus) =
+let getTag (la:LessonStatus) (re:ReservationStatus) =
     let tagColor, tagText =
-        match la with
-        | Open Free -> color.isSuccess, "Volno"
-        | Open LastFreeSpot -> color.isWarning, "Poslední volné místo"
-        | Closed Full -> color.isDanger, "Obsazeno"
-        | Closed AlreadyStarted -> color.isBlack, "Lekce uzavřena"
-        | Closed Cancelled -> color.isBlack, "Lekce zrušena"
+        
+        match re, la with
+        | Reserved _, Open _ -> color.isWarning, "Zarezervováno"
+        | Reserved _, Closed _ -> color.isBlack, "Zúčastnili jste se"
+        | _, Open Free -> color.isSuccess, "Volno"
+        | _, Open LastFreeSpot -> color.isWarning, "Poslední volné místo"
+        | _, Closed Full -> color.isDanger, "Obsazeno"
+        | _, Closed AlreadyStarted -> color.isBlack, "Lekce uzavřena"
+        | _, Closed Cancelled -> color.isBlack, "Lekce zrušena"
     Bulma.tag [ tagColor; prop.text tagText ] 
 
 let isCancelled (la:LessonStatus) =
@@ -116,7 +119,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
                                 prop.className "name"
                                 prop.text lesson.Name
                             ]
-                            Html.div [ getTag lesson.LessonStatus ]
+                            Html.div [ getTag lesson.LessonStatus lesson.ReservationStatus ]
                         ]
                     ]
                     Popover.content [

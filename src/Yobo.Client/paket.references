@@ -5,6 +5,7 @@ Fable.Elmish.React
 Fable.Elmish.HMR
 Feliz
 Feliz.Router
+Feliz.UseElmish
 Feliz.Bulma
 Feliz.Bulma.Checkradio
 Feliz.Bulma.PageLoader

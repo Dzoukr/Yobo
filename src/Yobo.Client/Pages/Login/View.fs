@@ -3,11 +3,10 @@
 open Yobo.Client.Router
 open Feliz
 open Feliz.Bulma
-open Yobo.Client
 open Yobo.Client.Forms
 open Domain
 open Yobo.Client.SharedView
-open Feliz.Router
+open Feliz.UseElmish
 
 let inTemplate (content:ReactElement) =
     Bulma.hero [
@@ -23,7 +22,8 @@ let inTemplate (content:ReactElement) =
         ]
     ]
 
-let view (model:Model) (dispatch:Msg -> unit) =
+let view = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init, State.update, [| |])
     Bulma.box [
         Html.img [ prop.src "img/logo.png" ]
         Bulma.field.div [
@@ -66,3 +66,4 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
     ]
     |> inTemplate
+)    

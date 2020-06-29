@@ -8,11 +8,6 @@ type Model = {
     Form : ValidatedForm<Request.Login>
 }
 
-module Model =
-    let init = {
-        Form = Request.Login.init |> ValidatedForm.init
-    }
-
 type Msg =
     | FormChanged of Request.Login
     | Login

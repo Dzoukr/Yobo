@@ -3,6 +3,7 @@ module Yobo.Client.Pages.Users.View
 open System
 open Domain
 open Feliz
+open Feliz.UseElmish
 open Feliz.Bulma
 open Feliz.Bulma.QuickView
 open Feliz.Bulma.Calendar
@@ -197,7 +198,8 @@ let private loadingRow =
         ]
     ]
 
-let view (model : Model) (dispatch : Msg -> unit) =
+let view = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init, State.update, [| |])
     let rows = if model.UsersLoading then [ loadingRow ] else model.Users |> List.map (userRow dispatch)
     let table =
         Bulma.table [
@@ -235,4 +237,5 @@ let view (model : Model) (dispatch : Msg -> unit) =
         table
         quickviewAddCredits
         quickviewSetExpiration
-    ]        
+    ]
+)

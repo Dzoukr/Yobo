@@ -1,12 +1,12 @@
 module Yobo.Client.Pages.ResetPassword.View
 
+open System
 open Domain
 open Yobo.Client.Router
 open Feliz
-open Feliz.Router
+open Feliz.UseElmish
 open Feliz.Bulma
 open Yobo.Client.SharedView
-open Yobo.Shared.Errors
 
 let inTemplate (content:ReactElement) =
     Bulma.hero [
@@ -22,7 +22,8 @@ let inTemplate (content:ReactElement) =
         ]
     ]
 
-let view (model:Model) (dispatch:Msg -> unit) =
+let view (props:{| key : Guid |}) = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init props.key, State.update, [| |])
     Bulma.box [
         Bulma.title.h1 "Nastavení nového hesla"
         Bulma.field.div [
@@ -65,3 +66,4 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
     ]
     |> inTemplate
+)    

@@ -5,7 +5,6 @@
         <LangVersion>preview</LangVersion>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Interfaces.fs" />
         <Compile Include="TokenStorage.fs" />
         <Compile Include="Router.fs" />
         <Compile Include="Server.fs" />
@@ -41,8 +40,8 @@
         <Compile Include="Pages\Calendar\State.fs" />
         <Compile Include="Pages\Calendar\View.fs" />
         <Compile Include="Domain.fs" />
-        <Compile Include="View.fs" />
         <Compile Include="State.fs" />
+        <Compile Include="View.fs" />
         <Compile Include="App.fs" />
     </ItemGroup>
     <ItemGroup>

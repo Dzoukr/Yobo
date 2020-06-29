@@ -2,7 +2,6 @@ module Yobo.Client.Pages.Lessons.Domain
 
 open System
 open Yobo.Client.Forms
-open Yobo.Client.Forms
 open Yobo.Shared.Core.Admin.Communication
 open Yobo.Shared.Errors
 open Yobo.Shared.Core.Admin.Domain.Queries
@@ -73,21 +72,7 @@ type Model = {
     ActiveItemModel : ActiveItemModel option
 }
 
-module Model =
-    let init =
-        {
-            Lessons = []
-            Workshops = []
-            WeekOffset = 0
-            SelectedDates = []
-            ActiveForm = None
-            LessonsForm = Request.CreateLessons.init |> ValidatedForm.init
-            WorkshopsForm = Request.CreateWorkshops.init |> ValidatedForm.init
-            ActiveItemModel = None
-        }
-
 type Msg =
-    | Init
     | SelectActiveForm of ActiveForm option
     | ToggleDate of DateTimeOffset
     | WeekOffsetChanged of int

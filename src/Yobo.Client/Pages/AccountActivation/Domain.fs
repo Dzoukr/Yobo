@@ -8,12 +8,6 @@ type Model = {
     ActivationResult: ServerResult<unit> option
 }
 
-module Model =
-    let init id  = {
-        ActivationId = id
-        ActivationResult = None
-    }
-
 type Msg =
     | Activate
     | Activated of ServerResult<unit>

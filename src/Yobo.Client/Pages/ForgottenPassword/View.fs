@@ -1,6 +1,7 @@
 ﻿module Yobo.Client.Pages.ForgottenPassword.View
 
 open Feliz
+open Feliz.UseElmish
 open Feliz.Bulma
 open Yobo.Client.Router
 open Yobo.Client.Forms
@@ -21,7 +22,9 @@ let inTemplate (content:ReactElement) =
         ]
     ]
 
-let view (model:Model) (dispatch:Msg -> unit) =
+
+let view = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init, State.update, [| |])
     Bulma.box [
         Bulma.title.h1 "Zapomenuté heslo"
         Bulma.field.div [
@@ -52,3 +55,4 @@ let view (model:Model) (dispatch:Msg -> unit) =
         ]
     ]
     |> inTemplate
+)

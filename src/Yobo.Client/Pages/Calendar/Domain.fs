@@ -12,15 +12,7 @@ type Model = {
     WeekOffset : int
 }
 
-module Model =
-    let init = {
-        WeekOffset = 0
-        Lessons = []
-        Workshops = []
-    }
-
 type Msg =
-    | Init
     | LoadLessons
     | LessonsLoaded of ServerResult<Queries.Lesson list>
     | WeekOffsetChanged of int

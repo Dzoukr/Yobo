@@ -6,6 +6,17 @@ open Yobo.Client.Server
 open Yobo.Client.Forms
 open Yobo.Client.SharedView
 open Yobo.Shared.Core.Admin.Validation
+open Yobo.Shared.Core.Admin.Communication
+
+let init() =
+    {
+        Users = []
+        UsersLoading = false
+        AddCreditsSelectedUser = None
+        AddCreditsForm = Request.AddCredits.init |> ValidatedForm.init
+        SetExpirationSelectedUser = None
+        SetExpirationForm = Request.SetExpiration.init |> ValidatedForm.init
+    }, LoadUsers |> Cmd.ofMsg
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with

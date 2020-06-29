@@ -2,11 +2,8 @@
 
 open Yobo.Client.Router
 open Domain
-open Elmish
-open Feliz
 open Feliz
 open Feliz.Bulma
-open Feliz.Bulma.Operators
 open Feliz.Bulma.PageLoader
 open Feliz.Router
 open Yobo.Client.SharedView
@@ -84,10 +81,6 @@ let private displayLoggedPage (user:Yobo.Shared.Core.UserAccount.Domain.Queries.
         ]
     ]
     
-let showView<'model,'msg> (fn:'model -> ('msg -> unit) -> Fable.React.ReactElement) (dispatch:'msg -> unit) (m:Model) =
-    let pm = m |> Model.getPageModel<'model>
-    fn pm dispatch
-
 let notActivatedView (user:Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount) dispatch =
     let inMain (content:ReactElement) =
         Html.main [
@@ -131,19 +124,19 @@ let view (model:Model) (dispatch:Msg -> unit) =
             match model.CurrentPage with
             | Anonymous pg ->
                 match pg with
-                | Login -> model |> showView Pages.Login.View.view (LoginMsg >> dispatch)
-                | Registration -> model |> showView Pages.Registration.View.view (RegistrationMsg >> dispatch)
-                | AccountActivation _ -> model |> showView Pages.AccountActivation.View.view (AccountActivationMsg >> dispatch)
-                | ForgottenPassword -> model |> showView Pages.ForgottenPassword.View.view (ForgottenPasswordMsg >> dispatch)
-                | ResetPassword _ -> model |> showView Pages.ResetPassword.View.view (ResetPasswordMsg >> dispatch)
+                | Login -> Pages.Login.View.view()
+                | Registration -> Pages.Registration.View.view()
+                | AccountActivation key -> Pages.AccountActivation.View.view {| key = key |} ()
+                | ForgottenPassword -> Pages.ForgottenPassword.View.view()
+                | ResetPassword key -> Pages.ResetPassword.View.view {| key = key |} ()
             | Secured (pg, user) ->
                 if not user.IsActivated then notActivatedView user dispatch
                 else
                     match pg with
-                    | Calendar -> model |> showView Pages.Calendar.View.view (CalendarMsg >> dispatch)
-                    | Users -> model |> showView Pages.Users.View.view (UsersMsg >> dispatch)
-                    | Lessons -> model |> showView Pages.Lessons.View.view (LessonsMsg >> dispatch)
-                    | MyAccount -> model |> showView Pages.MyAccount.View.view (MyAccountMsg >> dispatch)
+                    | Calendar -> Pages.Calendar.View.view {| creditsChanged = fun _ -> RefreshUser |> dispatch |} ()
+                    | Users -> Pages.Users.View.view ()
+                    | Lessons -> Pages.Lessons.View.view()
+                    | MyAccount -> Pages.MyAccount.View.view {| user = user |} ()
                         
                     |> displayLoggedPage user pg model.ShowTerms dispatch
             

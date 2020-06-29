@@ -3,6 +3,7 @@ module Yobo.Client.Pages.Lessons.View
 open System
 open Domain
 open Feliz
+open Feliz.UseElmish
 open Feliz.Bulma
 open Feliz.Bulma.Checkradio
 open Feliz.Bulma.QuickView
@@ -10,7 +11,6 @@ open Feliz.Bulma.Calendar
 open Feliz.Bulma.Operators
 open Yobo.Client.Forms
 open Yobo.Shared.DateTime
-open Yobo.Client.SharedView
 open Yobo.Client.SharedView
 open Yobo.Shared.Core
 open Yobo.Shared.Core.Admin.Communication
@@ -511,8 +511,9 @@ let activeItemQuickView (model:Model) (dispatch:Msg -> unit) =
     | Some (Lesson l) -> l |> lessonItemForm (ActiveLessonMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch l.Lesson.Name
     | Some (Workshop w) -> w |> workshopItemForm (ActiveWorkshopMsg >> Msg.ActiveItemMsg >> dispatch) |> inItemQuickView dispatch w.Workshop.Name
     | None -> Html.none
-    
-let view (model:Model) (dispatch: Msg -> unit) =
+
+let view = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init, State.update, [| |])    
 
     let dates =
         model.WeekOffset
@@ -535,3 +536,4 @@ let view (model:Model) (dispatch: Msg -> unit) =
             ]
         ]
     ]
+)

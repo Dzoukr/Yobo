@@ -2,17 +2,14 @@ module Yobo.Client.Pages.MyAccount.View
 
 open Domain
 open Feliz
-open Fable.React
+open Feliz.UseElmish
 open Feliz.Bulma
-open Fable.React.Props
-open System
-open Yobo.Shared
 open Yobo.Client
 open Yobo.Client.SharedView
-open Yobo.Shared.Errors
 open Yobo.Shared.DateTime
 
-let view (model:Model) (dispatch:Msg -> unit) =
+let view (props:{| user : Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount |}) = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init props.user, State.update, [| |])
     let msg =
         let exp = model.LoggedUser.CreditsExpiration |> Option.map (DateTimeOffset.toCzDate) |> Option.defaultValue ""
         if model.LoggedUser.Credits > 0 then
@@ -59,4 +56,5 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 Html.tbody lessonRows
             ]
         ]
-    ] 
+    ]
+)

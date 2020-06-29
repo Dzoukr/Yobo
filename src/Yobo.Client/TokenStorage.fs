@@ -1,7 +1,6 @@
 module Yobo.Client.TokenStorage
 
 open System
-open Elmish
 open Fable.Import
 
 let private storageKey = "token"

@@ -2,19 +2,14 @@ module Yobo.Client.Pages.Calendar.View
 
 open Domain
 open Feliz
-open Fable.React
+open Feliz.UseElmish
 open Feliz.Bulma
 open Feliz.Bulma.Operators
 open Feliz.Bulma.Popover
-open Fable.React.Props
 open System
-open Yobo.Shared
-open Yobo.Client
-open Yobo.Client.SharedView
 open Yobo.Client.SharedView
 open Yobo.Shared.Core.Domain
 open Yobo.Shared.Core.Domain.Queries
-open Yobo.Shared.Errors
 open Yobo.Shared.DateTime
 open Yobo.Shared.Core.Reservations.Domain
 open Yobo.Shared.Core.Reservations.Domain.Queries
@@ -216,7 +211,8 @@ let row model dispatch dates =
         ]
     )
 
-let view (model:Model) (dispatch:Msg -> unit) =
+let view (props:{| creditsChanged:unit -> unit |}) = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init, State.update props, [| |])
     let dates =
         model.WeekOffset
         |> DateRange.getDateRangeForWeekOffset
@@ -237,3 +233,4 @@ let view (model:Model) (dispatch:Msg -> unit) =
             ]
         ]
     ]
+)

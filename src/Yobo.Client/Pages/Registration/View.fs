@@ -2,6 +2,7 @@
 
 open Yobo.Client.Router
 open Feliz
+open Feliz.UseElmish
 open Feliz.Bulma
 open Yobo.Client
 open Yobo.Client.Forms
@@ -139,8 +140,8 @@ let registerForm model dispatch =
         ]
     ]
 
-
-let view (model:Model) (dispatch:Msg -> unit) =
+let view = React.functionComponent(fun () ->
+    let model, dispatch = React.useElmish(State.init, State.update, [| |])
     Html.div [
         // terms modal
         SharedView.StaticTextViews.showTermsModal model.ShowTerms (fun _ -> ToggleTerms |> dispatch)
@@ -152,3 +153,4 @@ let view (model:Model) (dispatch:Msg -> unit) =
             registerForm model dispatch            
     ]
     |> inTemplate
+)

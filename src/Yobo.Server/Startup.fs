@@ -57,7 +57,10 @@ module CompositionRoot =
         
         let sql fn =
             let conn = new SqlConnection(cfg.["ReadDbConnectionString"])
-            fn conn
+            conn.Open()
+            let ret = fn conn
+            conn.Close()
+            ret
         
         // JWT config
         let issuer = cfg.["AuthIssuer"]

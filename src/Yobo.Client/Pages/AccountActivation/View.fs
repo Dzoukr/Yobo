@@ -1,15 +1,17 @@
 module Yobo.Client.Pages.AccountActivation.View
 
+open System
 open Yobo.Client.Router
 open Yobo.Client.SharedView
 open Domain
 open Yobo.Client
 open Feliz
-open Feliz.Router
+open Feliz.UseElmish
 open Feliz.Bulma
 open Yobo.Shared.Errors
 
-let view (state:Model) (dispatch : Msg -> unit) =
+let view (props:{|key:Guid|}) = React.functionComponent(fun () ->
+    let model, _ = React.useElmish(State.init props.key, State.update, [| |])
     
     let successContent (msg:string) =
         Html.span [
@@ -20,7 +22,7 @@ let view (state:Model) (dispatch : Msg -> unit) =
         ]
     
     let content =
-        match state.ActivationResult with
+        match model.ActivationResult with
         | Some (Ok _) -> successContent "Váš účet byl právě zaktivován. Nyní se můžete přihlásit do systému." |> SharedView.BoxedViews.showSuccess
         | Some (Error e) -> e |> ServerError.explain |> SharedView.BoxedViews.showErrorMessage
         | None -> "Aktivuji váš účet..." |> SharedView.BoxedViews.showInProgressMessage
@@ -32,3 +34,4 @@ let view (state:Model) (dispatch : Msg -> unit) =
             ]
         ]
     ]
+)

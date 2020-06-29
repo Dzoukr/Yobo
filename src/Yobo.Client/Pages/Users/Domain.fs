@@ -3,7 +3,6 @@ module Yobo.Client.Pages.Users.Domain
 open System
 open Yobo.Client.Forms
 open Yobo.Shared.Core.Admin.Communication
-open Yobo.Shared.DateTime
 open Yobo.Shared.Errors
 open Yobo.Shared.Core.Admin.Domain.Queries
 
@@ -15,17 +14,6 @@ type Model = {
     SetExpirationSelectedUser : Guid option    
     SetExpirationForm : ValidatedForm<Request.SetExpiration>
 }
-
-module Model =
-    let init =
-        {
-            Users = []
-            UsersLoading = false
-            AddCreditsSelectedUser = None
-            AddCreditsForm = Request.AddCredits.init |> ValidatedForm.init
-            SetExpirationSelectedUser = None
-            SetExpirationForm = Request.SetExpiration.init |> ValidatedForm.init
-        }
 
 type Msg =
     | LoadUsers

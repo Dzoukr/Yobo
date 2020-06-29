@@ -4,10 +4,16 @@ open Domain
 open Elmish
 open Yobo.Shared.Auth.Validation
 open Yobo.Client.Server
-open Yobo.Client.SharedView
 open Yobo.Client.StateHandlers
 open Yobo.Shared.Auth.Communication
 open Yobo.Client.Forms
+
+let init() =
+    {
+        ShowTerms = false
+        Form = Request.Register.init |> ValidatedForm.init
+        ShowThankYou = false
+    }, Cmd.none
 
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with

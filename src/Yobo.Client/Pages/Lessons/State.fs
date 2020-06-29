@@ -8,10 +8,22 @@ open Yobo.Client.SharedView
 open Yobo.Shared.Tuples
 open Yobo.Shared.DateTime
 open Yobo.Shared.Core.Admin.Validation
+open Yobo.Shared.Core.Admin.Communication
+
+let init() =
+    {
+        Lessons = []
+        Workshops = []
+        WeekOffset = 0
+        SelectedDates = []
+        ActiveForm = None
+        LessonsForm = Request.CreateLessons.init |> ValidatedForm.init
+        WorkshopsForm = Request.CreateWorkshops.init |> ValidatedForm.init
+        ActiveItemModel = None
+    }, Cmd.ofMsg (WeekOffsetChanged 0)
 
 let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     match msg with
-    | Init -> { Model.init with WeekOffset = model.WeekOffset }, Cmd.ofMsg <| WeekOffsetChanged model.WeekOffset
     | SelectActiveForm v -> { model with ActiveForm = v }, Cmd.none
     | ToggleDate d ->
         let newDates =
@@ -46,7 +58,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | LessonsCreated res ->
         let model = { model with LessonsForm = model.LessonsForm |> ValidatedForm.stopLoading; SelectedDates = [] }
         match res with
-        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce úspěšně přidány."; Cmd.ofMsg Init ]
+        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce úspěšně přidány."; Cmd.ofMsg LoadLessons ]
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     | WorkshopsFormChanged f ->
         { model
@@ -85,7 +97,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | WorkshopsCreated res ->
         let model = { model with WorkshopsForm = model.WorkshopsForm |> ValidatedForm.stopLoading; SelectedDates = [] }
         match res with
-        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshopy úspěšně přidány."; Cmd.ofMsg Init ]
+        | Ok _ -> model, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshopy úspěšně přidány."; Cmd.ofMsg LoadWorkshops ]
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     | SetActiveLesson l -> { model with ActiveItemModel = l |> Option.map (ActiveLessonModel.init >> ActiveItemModel.Lesson) }, Cmd.none
     | SetActiveWorkshop l -> { model with ActiveItemModel = l |> Option.map (ActiveWorkshopModel.init >> ActiveItemModel.Workshop) }, Cmd.none
@@ -112,7 +124,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
             | LessonDescriptionChanged res ->
                 let subModel = { subModel with ChangeDescriptionForm = subModel.ChangeDescriptionForm |> ValidatedForm.stopLoading }
                 match res with
-                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Popis úspěšně změněn."; Cmd.ofMsg Init ]
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Popis úspěšně změněn."; Cmd.ofMsg LoadLessons ]
                 | Error e -> subModel, e |> ServerResponseViews.showErrorToast
                 |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
             | CancelLesson ->
@@ -128,7 +140,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
             | LessonCancelled res ->
                 let subModel = { subModel with CancelLessonForm = subModel.CancelLessonForm |> ValidatedForm.stopLoading }
                 match res with
-                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce byla úspěšně zrušena."; Cmd.ofMsg Init ]
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce byla úspěšně zrušena."; Cmd.ofMsg LoadLessons ]
                 | Error e -> subModel, e |> ServerResponseViews.showErrorToast
                 |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))
             | DeleteLesson ->
@@ -144,7 +156,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
             | LessonDeleted res ->
                 let subModel = { subModel with DeleteLessonForm = subModel.DeleteLessonForm |> ValidatedForm.stopLoading }
                 match res with
-                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce byla úspěšně smazána."; Cmd.ofMsg Init ]
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Lekce byla úspěšně smazána."; Cmd.ofMsg LoadLessons ]
                 | Error e -> subModel, e |> ServerResponseViews.showErrorToast
                 |> mapFst (ActiveItemModel.Lesson >> Some >> (fun x -> { model with ActiveItemModel = x }))                
         | ActiveWorkshopMsg m, (Some (Workshop subModel)) ->
@@ -162,7 +174,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
             | WorkshopDeleted res ->
                 let subModel = { subModel with DeleteWorkshopForm = subModel.DeleteWorkshopForm |> ValidatedForm.stopLoading }
                 match res with
-                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshop byla úspěšně smazán."; Cmd.ofMsg Init ]
+                | Ok _ -> subModel, Cmd.batch [ ServerResponseViews.showSuccessToast "Workshop byla úspěšně smazán."; Cmd.ofMsg LoadWorkshops ]
                 | Error e -> subModel, e |> ServerResponseViews.showErrorToast
                 |> mapFst (ActiveItemModel.Workshop >> Some >> (fun x -> { model with ActiveItemModel = x }))
         | _ -> model, Cmd.none                

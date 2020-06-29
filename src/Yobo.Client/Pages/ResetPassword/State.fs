@@ -11,6 +11,11 @@ open Yobo.Client.StateHandlers
 open Yobo.Shared.Auth.Communication
 open Yobo.Client.Forms
 
+let init key  =
+    {
+        Form = Request.ResetPassword.init |> fun x -> { x with PasswordResetKey = key } |> ValidatedForm.init
+    }, Cmd.none
+
 let update (msg:Msg) (model:Model) : Model * Cmd<Msg> =
     match msg with
     | FormChanged f ->

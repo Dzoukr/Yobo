@@ -12,6 +12,7 @@ nuget Fable.Elmish.React
 nuget Fable.Elmish.HMR
 nuget Feliz
 nuget Feliz.Router
+nuget Feliz.UseElmish
 nuget Feliz.Bulma
 nuget Feliz.Bulma.Checkradio
 nuget Feliz.Bulma.PageLoader

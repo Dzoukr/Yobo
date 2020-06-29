@@ -126,17 +126,17 @@ let view (model:Model) (dispatch:Msg -> unit) =
                 match pg with
                 | Login -> Pages.Login.View.view()
                 | Registration -> Pages.Registration.View.view()
-                | AccountActivation key -> Pages.AccountActivation.View.view {| key = key |} ()
+                | AccountActivation key -> Pages.AccountActivation.View.view {| key = key |}
                 | ForgottenPassword -> Pages.ForgottenPassword.View.view()
-                | ResetPassword key -> Pages.ResetPassword.View.view {| key = key |} ()
+                | ResetPassword key -> Pages.ResetPassword.View.view {| key = key |}
             | Secured (pg, user) ->
                 if not user.IsActivated then notActivatedView user dispatch
                 else
                     match pg with
-                    | Calendar -> Pages.Calendar.View.view {| creditsChanged = fun _ -> RefreshUser |> dispatch |} ()
+                    | Calendar -> Pages.Calendar.View.view {| creditsChanged = fun _ -> RefreshUser |> dispatch |}
                     | Users -> Pages.Users.View.view ()
                     | Lessons -> Pages.Lessons.View.view()
-                    | MyAccount -> Pages.MyAccount.View.view {| user = user |} ()
+                    | MyAccount -> Pages.MyAccount.View.view {| user = user |}
                         
                     |> displayLoggedPage user pg model.ShowTerms dispatch
             

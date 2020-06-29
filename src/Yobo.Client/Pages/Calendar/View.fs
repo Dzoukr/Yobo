@@ -211,7 +211,7 @@ let row model dispatch dates =
         ]
     )
 
-let view (props:{| creditsChanged:unit -> unit |}) = React.functionComponent(fun () ->
+let view = React.functionComponent(fun (props:{| creditsChanged:unit -> unit |}) ->
     let model, dispatch = React.useElmish(State.init, State.update props, [| |])
     let dates =
         model.WeekOffset

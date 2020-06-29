@@ -8,7 +8,7 @@ open Yobo.Client
 open Yobo.Client.SharedView
 open Yobo.Shared.DateTime
 
-let view (props:{| user : Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount |}) = React.functionComponent(fun () ->
+let view = React.functionComponent(fun (props:{| user : Yobo.Shared.Core.UserAccount.Domain.Queries.UserAccount |}) ->
     let model, dispatch = React.useElmish(State.init props.user, State.update, [| |])
     let msg =
         let exp = model.LoggedUser.CreditsExpiration |> Option.map (DateTimeOffset.toCzDate) |> Option.defaultValue ""

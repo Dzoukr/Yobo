@@ -12,7 +12,7 @@ open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Configuration
 open Serilog
 open Yobo.Libraries.Authentication
-open FSharp.Control.Tasks
+open FSharp.Control.Tasks.V2
 open Microsoft.Data.SqlClient
 open Yobo.Server.Auth
 open Yobo.Shared.Errors
@@ -143,19 +143,19 @@ module CompositionRoot =
                     Queries = queries
                     CommandHandler = {
                         Register = fun args -> task {
-                            let! projections = sql Auth.Database.Projections.getAll
+                            let! projections = sql Auth.Database.Projections.getAll ()
                             return! args |> Auth.CommandHandler.register projections |> toExn |> sql handleEvents
                         }
                         ActivateAccount = fun args -> task {
-                            let! projections = sql Auth.Database.Projections.getAll
+                            let! projections = sql Auth.Database.Projections.getAll ()
                             return! args |> Auth.CommandHandler.activate projections |> toExn |> sql handleEvents
                         }
                         ForgottenPassword = fun args -> task {
-                            let! projections = sql Auth.Database.Projections.getAll
+                            let! projections = sql Auth.Database.Projections.getAll ()
                             return! args |> Auth.CommandHandler.initiatePasswordReset projections |> toExn |> sql handleEvents
                         }
                         ResetPassword = fun args -> task {
-                            let! projections = sql Auth.Database.Projections.getAll
+                            let! projections = sql Auth.Database.Projections.getAll ()
                             return!
                                 args
                                 |> Auth.CommandHandler.completePasswordReset projections
@@ -163,7 +163,7 @@ module CompositionRoot =
                                 |> sql handleEvents
                         }
                         RegenerateActivationKey = fun args -> task {
-                            let! projections = sql Auth.Database.Projections.getAll
+                            let! projections = sql Auth.Database.Projections.getAll ()
                             return! args |> Auth.CommandHandler.regenerateActivationKey projections |> toExn |> sql handleEvents
                         }
                     }

@@ -156,7 +156,7 @@ module Queries =
         
 
 module Projections =
-    let getAll (conn:IDbConnection) =
+    let getAll (conn:IDbConnection) () =
         task {
             let! res = select { table "Users" } |> conn.SelectAsync<Tables.Users>
             return

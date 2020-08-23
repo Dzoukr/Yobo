@@ -10,9 +10,12 @@ open Feliz.UseElmish
 open Feliz.Bulma
 open Yobo.Shared.Errors
 
-let view = React.functionComponent(fun (props:{|key:Guid|}) ->
-    let model, _ = React.useElmish(State.init props.key, State.update, [| |])
-    
+type ViewProps = {
+    Key : Guid
+}
+
+let view = React.functionComponent(fun (props:ViewProps) ->
+    let model, _ = React.useElmish(State.init props.Key, State.update, [| |])
     let successContent (msg:string) =
         Html.span [
             Html.text msg

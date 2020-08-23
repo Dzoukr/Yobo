@@ -22,8 +22,12 @@ let inTemplate (content:ReactElement) =
         ]
     ]
 
-let view = React.functionComponent(fun (props:{| key : Guid |}) ->
-    let model, dispatch = React.useElmish(State.init props.key, State.update, [| |])
+type ViewProps = {
+    Key : Guid
+}
+
+let view = React.functionComponent(fun (props:ViewProps) ->
+    let model, dispatch = React.useElmish(State.init props.Key, State.update, [| |])
     Bulma.box [
         Bulma.title.h1 "Nastavení nového hesla"
         Bulma.field.div [

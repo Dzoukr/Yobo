@@ -61,6 +61,7 @@ module Queries =
                         ReservationStatus = ReservationStatus.getReservationStatus lsnStatus lsn.StartDate lsn.CancellableBeforeStart userRes credits creditsExpiration cashBlocked
                     } : Queries.Lesson
                 )
+                |> List.sortBy (fun x -> x.StartDate)
         }
         
     let getWorkshops (conn:IDbConnection) (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
@@ -83,4 +84,5 @@ module Queries =
                         Description = x.Description
                     } : Queries.Workshop
                 )
-        }         
+                |> List.sortBy (fun x -> x.StartDate)
+        }

@@ -71,6 +71,7 @@ module Queries =
                         CancellableBeforeStart = lsn.CancellableBeforeStart
                     } : Queries.Lesson
                 )
+                |> List.map (fun x -> x.StartDate)
         }
         
     let getWorkshops (conn:IDbConnection) (dFrom:DateTimeOffset,dTo:DateTimeOffset) =
@@ -93,4 +94,5 @@ module Queries =
                         Description = x.Description
                     } : Queries.Workshop
                 )
+                |> List.map (fun x -> x.StartDate)
         }

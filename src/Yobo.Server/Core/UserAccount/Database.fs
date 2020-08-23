@@ -50,4 +50,5 @@ module Queries =
                         Payment = LessonPayment.fromUseCredits gr.UseCredits
                     } : Queries.Lesson
                 )
+                |> List.map (fun x -> x.StartDate)
         }

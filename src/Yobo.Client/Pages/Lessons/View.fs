@@ -459,7 +459,7 @@ let lessonItemForm (dispatch:ActiveLessonMsg -> unit) (l:ActiveLessonModel) =
         Bulma.field.div [
             Bulma.label "Popis"
             Bulma.fieldBody [
-                Bulma.input.text [
+                Bulma.textarea [
                     ValidationViews.color l.ChangeDescriptionForm.ValidationErrors (nameof(l.ChangeDescriptionForm.FormData.Description))
                     prop.onTextChange (fun x -> { l.ChangeDescriptionForm.FormData with Description = x } |> ChangeLessonDescriptionFormChanged |> dispatch)
                     prop.valueOrDefault l.ChangeDescriptionForm.FormData.Description
@@ -500,7 +500,7 @@ let workshopItemForm (dispatch:ActiveWorkshopMsg -> unit) (w:ActiveWorkshopModel
     
     Html.div [
         Bulma.field.div [ Bulma.label "Název"; Bulma.fieldBody w.Workshop.Name ]
-        Bulma.field.div [ Bulma.label "Popis"; Bulma.fieldBody w.Workshop.Description ]
+        Bulma.field.div [ Bulma.label "Popis"; Bulma.fieldBody (Html.text [ w.Workshop.Description |> eolToBr |> prop.dangerouslySetInnerHTML ]) ]
         Bulma.field.div [ Bulma.label "Datum"; Bulma.fieldBody (w.Workshop.StartDate |> DateTimeOffset.toCzDate) ]
         Bulma.field.div [ Bulma.label "Čas"; Bulma.fieldBody (sprintf "%s - %s" (w.Workshop.StartDate |> DateTimeOffset.toCzTime) (w.Workshop.EndDate |> DateTimeOffset.toCzTime)) ]
         Bulma.field.div [ Bulma.label "Akce"; Bulma.fieldBody actions ]

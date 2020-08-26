@@ -7,6 +7,8 @@ open Yobo.Shared.Validation
 open Yobo.Client.Router
 open Feliz.Router
 
+let eolToBr (s:string) = s.Replace("\n", "</br>")
+
 module Queries =
     open Yobo.Shared.Core.Domain
     let paymentToText = function
@@ -27,8 +29,8 @@ module Html =
             prop.text text
         ]
         
-    let faIcon (icon:string) = Html.i [ prop.className icon; prop.style [ style.marginRight 5 ] ]        
-    let faIconSingle (icon:string) = Html.i [ prop.className icon ]        
+    let faIcon (icon:string) = Html.i [ prop.className icon; prop.style [ style.marginRight 5 ] ]
+    let faIconSingle (icon:string) = Html.i [ prop.className icon ]
 
 module ServerResponseViews =
     open Elmish

@@ -134,7 +134,7 @@ let lessonDiv dispatch (lesson:Queries.Lesson) =
                                 Html.text (sprintf "%s od %s do %s" (lesson.StartDate |> DateTimeOffset.toCzDate) (lesson.StartDate |> DateTimeOffset.toCzTime) (lesson.EndDate |> DateTimeOffset.toCzTime))
                             ]
                         ]
-                        Html.div lesson.Description
+                        Html.div [ lesson.Description |> eolToBr |> prop.dangerouslySetInnerHTML ]
                         Bulma.buttons [
                             buttons.isCentered
                             prop.children btns
@@ -179,7 +179,7 @@ let workshopDiv dispatch (workshop:Queries.Workshop) =
                                 Html.text (sprintf "%s od %s do %s" (workshop.StartDate |> DateTimeOffset.toCzDate) (workshop.StartDate |> DateTimeOffset.toCzTime) (workshop.EndDate |> DateTimeOffset.toCzTime))
                             ]
                         ]
-                        Html.div workshop.Description
+                        Html.div [ workshop.Description |> eolToBr |> prop.dangerouslySetInnerHTML ]
                     ]
                 ]
             ]

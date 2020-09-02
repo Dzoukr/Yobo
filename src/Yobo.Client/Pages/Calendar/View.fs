@@ -55,7 +55,8 @@ let getTag (la:LessonStatus) (re:ReservationStatus) =
     let tagColor, tagText =
         
         match re, la with
-        | Reserved _, Open _ -> color.isWarning, "Zarezervováno"
+        | Reserved _, Open _
+        | Reserved _, Closed Full -> color.isWarning, "Zarezervováno"
         | Reserved _, Closed _ -> color.isBlack, "Zúčastnili jste se"
         | _, Open Free -> color.isSuccess, "Volno"
         | _, Open LastFreeSpot -> color.isWarning, "Poslední volné místo"

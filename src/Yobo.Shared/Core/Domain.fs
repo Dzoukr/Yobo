@@ -62,6 +62,7 @@ module Queries =
             let canBeCancelled = DateTimeOffset.UtcNow <= startDate.Subtract(cancelLimit)
             match lessonStatus, userReservation with
             | Closed _, None -> Unreservable
+            | Closed Full, Some res -> Reserved(res, canBeCancelled)
             | Closed _, Some res -> Reserved(res, false)
             | Open _, Some res -> Reserved(res, canBeCancelled)
             | Open _, None ->

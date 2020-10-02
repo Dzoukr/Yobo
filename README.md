@@ -18,7 +18,7 @@ However let me be clear on this:
 Absolutely! And that's the reason I made this project public. Take any **code part** of the repository as do what you like. Really. It's built on the top of OSS libraries anyway, so I would be happy to somehow contribute back.
 
 ## So what's the limitation?
-All graphic content (especially logo) and "Mindful Yoga" phrase are trademarks registered on [Úřad Průmslového Vlastnictví](https://upv.cz/en.html) (Industrial Property Office in Czech Republic) so please avoid of reusing those.
+All graphic content (especially logo) and "Mindful Yoga" phrase are trademarks registered on [Úřad Průmyslového Vlastnictví](https://upv.cz/en.html) (Industrial Property Office in Czech Republic) so please avoid of reusing those.
 
 ## That's all?
-Yup. Just clone the repo, delete trademarked `/src/Yobo.Client/public/img/logo.png`, rename "Mindful Yoga" (it's currently in [3 files](https://github.com/Dzoukr/Yobo/search?q=mindful) anyway, so no brainer here :-)) and we're all ok.
+Yup. Just clone the repo, delete trademarked `/src/Yobo.Client/public/img/logo.png`, rename "Mindful Yoga" to something else like "My Amazing Yoga Kickass Booking" (it's currently in [3 files](https://github.com/Dzoukr/Yobo/search?q=mindful) anyway, so no brainer here :-)) and we're all ok.

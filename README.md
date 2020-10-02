@@ -15,7 +15,7 @@ None. :) By [definition of missing licence](https://choosealicense.com/no-permis
 However let me be clear on this:
 
 ## Can I still use some parts of it for my own good?
-Absolutely! And that's the reason I made this project public. Take any **code part** of the repository as do what you like. Really. It's built on the top of OSS libraries anyway, so I would be happy to somehow contribute back.
+Absolutely! And that's the reason I made this project public. Take any **code part** of the repository and do what you like. Really. It's built on the top of OSS libraries anyway, so I would be happy to somehow contribute back.
 
 ## So what's the limitation?
 All graphic content (especially logo) and "Mindful Yoga" phrase are trademarks registered on [Úřad Průmyslového Vlastnictví](https://upv.cz/en.html) (Industrial Property Office in Czech Republic) so please avoid of reusing those.

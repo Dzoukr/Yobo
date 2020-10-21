@@ -24,7 +24,7 @@ let update (msg : Msg) (model : Model) : Model * Cmd<Msg> =
     | UsersLoaded res ->
         let model = { model with UsersLoading = false }
         match res with
-        | Ok users -> { model with Users = users }, Cmd.none
+        | Ok users -> { model with Users = users |> List.sortBy (fun x -> x.LastName) }, Cmd.none
         | Error e -> model, e |> ServerResponseViews.showErrorToast
     | ShowAddCreditsForm userId ->
         let model = { model with AddCreditsSelectedUser = userId }

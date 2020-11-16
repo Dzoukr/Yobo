@@ -38,7 +38,7 @@ module Tools =
     let node = runTool (findTool "node" "node.exe")        
     let yarn = runTool (findTool "yarn" "yarn.cmd")             
 
-let publishDir = Path.getFullName "deploy"
+let publishDir = Path.getFullName "publish"
 let srcDir = Path.getFullName "src"
 let toolsDir = Path.getFullName "tools"
 
@@ -63,10 +63,8 @@ Target.create "InstallClient" (fun _ ->
 )
 
 Target.create "PublishClient" (fun _ ->
-    let clientDeployLocalPath = (clientSrcPath </> "deploy")
-    [ clientDeployPath; clientDeployLocalPath] |> Shell.cleanDirs
+    [ clientDeployPath ] |> Shell.cleanDirs
     Tools.yarn "webpack-cli -p" __SOURCE_DIRECTORY__
-    Shell.copyDir clientDeployPath clientDeployLocalPath FileFilter.allFiles
 )
 
 Target.create "PublishServer" (fun _ ->

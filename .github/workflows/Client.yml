@@ -6,7 +6,7 @@ on:
       deploy:
         description: 'Deploy?'
         required: false
-        default: false
+        default: 'false'
   push:
     branches: [ master ]
     paths:
@@ -40,7 +40,7 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    if: github.event.inputs.deploy == true
+    if: github.event.inputs.deploy == 'true'
     steps:
       - name: Download app artifact
         uses: actions/download-artifact@v2.0.5

@@ -1,0 +1,65 @@
+name: Client
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy?'
+        required: false
+        default: false
+  push:
+    branches: [ master ]
+    paths:
+      - 'src/Yobo.Client/**'
+      - 'src/Yobo.Shared/**'
+      - '.github/workflows/Client.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 3.1.300
+
+      - name: Install Tools
+        run: dotnet tool restore
+
+      - name: Build
+        run: dotnet fake build -t PublishClient
+
+      - name: Publish Client
+        uses: actions/upload-artifact@v2
+        with:
+          name: client
+          path: publish/client
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event.inputs.deploy == true
+    steps:
+      - name: Download app artifact
+        uses: actions/download-artifact@v2.0.5
+        with:
+          name: client
+          path: client
+      - name: Setup config
+        uses: DamianReeves/write-file-action@v1.0
+        with:
+          path: client/configuration.js
+          contents: |
+            const config = {
+                baseUrl : "https://yobo-prod.azurewebsites.net/"
+            }
+          write-mode: overwrite
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@3.7.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: client
+          CLEAN: true

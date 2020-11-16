@@ -20,7 +20,7 @@ var CONFIG = {
     indexHtmlTemplate: clientPath +'/public/index.html',
     fsharpEntry: clientPath + '/Yobo.Client.fsproj',
     cssEntry: clientPath + '/styles/styles.scss',
-    outputDir: '/publish',
+    outputDir: './publish/client',
     assetsDir: clientPath + '/public',
     devServerPort: 8080,
     // When using webpack-dev-server, you may need to redirect some calls

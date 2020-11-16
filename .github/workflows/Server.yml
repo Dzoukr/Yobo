@@ -56,10 +56,10 @@ jobs:
           name: server
           path: server
       - name: Download migrations artifact
-          uses: actions/download-artifact@v2.0.5
-          with:
-            name: dbMigrations
-            path: dbMigrations
+        uses: actions/download-artifact@v2.0.5
+        with:
+          name: dbMigrations
+          path: dbMigrations
       - name: Deploy to FunctionApp
         uses: Azure/functions-action@v1.1.7
         with:

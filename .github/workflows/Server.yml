@@ -1,0 +1,70 @@
+name: Server
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy:
+        description: 'Deploy?'
+        required: false
+        default: 'false'
+  push:
+    branches: [ master ]
+    paths:
+      - 'src/Yobo.Server/*'
+      - 'src/Yobo.Shared/*'
+      - 'src/Yobo.Core/*'
+      - 'src/Yobo.Libraries/*'
+      - '.github/workflows/Server.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 3.1.300
+
+      - name: Install Tools
+        run: dotnet tool restore
+
+      - name: Build
+        run: dotnet fake build -t PublishServer
+
+      - name: Publish Server
+        uses: actions/upload-artifact@v2
+        with:
+          name: server
+          path: publish/server
+      
+      - name: Publish DB Migrations
+        uses: actions/upload-artifact@v2
+        with:
+          name: dbMigrations
+          path: publish/dbMigrations
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event.inputs.deploy == 'true'
+    steps:
+      - name: Download app artifact
+        uses: actions/download-artifact@v2.0.5
+        with:
+          name: server
+          path: server
+      - name: Download migrations artifact
+          uses: actions/download-artifact@v2.0.5
+          with:
+            name: dbMigrations
+            path: dbMigrations
+      - name: Deploy to FunctionApp
+        uses: Azure/functions-action@v1.1.7
+        with:
+          app-name: yobo-prod
+          package: server
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}
+      - name: Run DB migrations
+        run: dotnet dbMigrations/DbMigrations.dll "${{ secrets.DB_CONNECTIONSTRING }}" "dbMigrations"

@@ -12,8 +12,11 @@ jobs:
         id: names
         run: |
           echo "::set-output name=folder::$(date +'%Y/%m')"
-          echo "::set-output name=file::$(date +'%Y-%m-%d%H%M%S')"
-          
+          echo "::set-output name=file::$(date +'%Y-%m-%d_%H%M%S')"
+      
+      - name: Create folder for dump
+      - run: mkdir -p ${{ steps.names.outputs.folder }}
+        
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.7.2
         with:
@@ -30,7 +33,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
         with:
-          source-directory: ${{ steps.names.outputs.folder }}
+          source-directory: .
           destination-github-username: 'Dzoukr'
           destination-repository-name: ${{ secrets.BACKUP_REPO }}
           user-email: ${{ secrets.BACKUP_REPO_EMAIL }}

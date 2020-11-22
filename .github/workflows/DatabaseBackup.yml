@@ -1,0 +1,41 @@
+name: Database Backup
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '* 6,18 * * *'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get current date
+        run: |
+          echo "::set-output name=folder::$(date +'%Y/%m')"
+          echo "::set-output name=file::$(date +'%Y-%m-%d%H%M%S')"
+          
+      - name: Test with environment variables
+        run: echo $TAG_NAME - $RELEASE_NAME
+        env:
+          TAG_NAME: nightly-tag-${{ steps.date.outputs.date }}
+          RELEASE_NAME: nightly-release-${{ steps.date.outputs.date }}
+            
+      - name: Setup .NET Core SDK
+        uses: actions/setup-dotnet@v1.7.2
+        with:
+          dotnet-version: 3.1.300
+
+      - name: Install SQL Dumper
+        run: dotnet tool install --global SQLDumper.Tool 
+
+      - name: Dump database
+        run: sqldump "${{ secrets.DB_CONNECTIONSTRING }}" "${{ steps.date.outputs.folder }}/${{ steps.date.outputs.folder }}.sql"
+
+      - name: Backup dump
+          uses: cpina/github-action-push-to-another-repository@master
+          env:
+            API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            source-directory: ${{ steps.date.outputs.folder }}
+            destination-github-username: 'Dzoukr'
+            destination-repository-name: ${{ secrets.BACKUP_REPO }}
+            user-email: ${{ secrets.BACKUP_REPO_EMAIL }}

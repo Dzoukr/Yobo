@@ -29,11 +29,12 @@ jobs:
         run: sqldump "${{ secrets.DB_CONNECTIONSTRING }}" "${{ steps.names.outputs.folder }}/${{ steps.names.outputs.file }}.sql"
 
       - name: Backup dump
-        uses: cpina/github-action-push-to-another-repository@master
+        uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source-directory: .
-          destination-github-username: 'Dzoukr'
-          destination-repository-name: ${{ secrets.BACKUP_REPO }}
-          user-email: ${{ secrets.BACKUP_REPO_EMAIL }}
+          source_file: ${{ steps.names.outputs.folder }}/${{ steps.names.outputs.file }}.sql
+          destination_repo: ${{ secrets.BACKUP_REPO }}
+          destination_folder: ${{ steps.names.outputs.folder }}
+          user_email: ${{ secrets.BACKUP_REPO_EMAIL }}
+          user_name: 'Dzoukr'

@@ -31,11 +31,11 @@ jobs:
         run: sqldump "${{ secrets.DB_CONNECTIONSTRING }}" "${{ steps.date.outputs.folder }}/${{ steps.date.outputs.folder }}.sql"
 
       - name: Backup dump
-          uses: cpina/github-action-push-to-another-repository@master
-          env:
-            API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            source-directory: ${{ steps.date.outputs.folder }}
-            destination-github-username: 'Dzoukr'
-            destination-repository-name: ${{ secrets.BACKUP_REPO }}
-            user-email: ${{ secrets.BACKUP_REPO_EMAIL }}
+        uses: cpina/github-action-push-to-another-repository@master
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          source-directory: ${{ steps.date.outputs.folder }}
+          destination-github-username: 'Dzoukr'
+          destination-repository-name: ${{ secrets.BACKUP_REPO }}
+          user-email: ${{ secrets.BACKUP_REPO_EMAIL }}

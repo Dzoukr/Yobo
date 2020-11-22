@@ -15,7 +15,7 @@ jobs:
           echo "::set-output name=file::$(date +'%Y-%m-%d_%H%M%S')"
       
       - name: Create folder for dump
-      - run: mkdir -p ${{ steps.names.outputs.folder }}
+        run: mkdir -p ${{ steps.names.outputs.folder }}
         
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.7.2

@@ -8,12 +8,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Get current date
-        id: names
-        run: |
-          echo "::set-output name=folder::$(date +'%Y/%m')"
-          echo "::set-output name=file::$(date +'%Y-%m-%d_%H%M%S')"
-        
       - name: Setup .NET Core SDK
         uses: actions/setup-dotnet@v1.7.2
         with:
@@ -23,15 +17,15 @@ jobs:
         run: dotnet tool install --global SQLDumper.Tool 
 
       - name: Dump database
-        run: sqldump "${{ secrets.DB_CONNECTIONSTRING }}" "${{ steps.names.outputs.file }}.sql"
+        run: sqldump "${{ secrets.DB_CONNECTIONSTRING }}" "backup.sql"
 
       - name: Backup dump
         uses: dmnemec/copy_file_to_another_repo_action@v1.0.4
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: ${{ steps.names.outputs.file }}.sql
+          source_file: backup.sql
           destination_repo: ${{ secrets.BACKUP_REPO }}
-          destination_folder: ${{ steps.names.outputs.folder }}
+          destination_folder: .
           user_email: ${{ secrets.BACKUP_REPO_EMAIL }}
           user_name: 'Dzoukr'
